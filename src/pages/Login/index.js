@@ -4,6 +4,12 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 
+import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
+
+import validationRules from 'utils/validation';
+import { getRememberUserEmail } from 'utils/storage';
+import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+
 import { useGlobalContext } from 'services/globalContext';
 import {
   mixPanelEventTags,
@@ -12,11 +18,6 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-
-import validationRules from 'utils/validation';
-import { getRememberUserEmail } from 'utils/storage';
-import { isAPISuccess } from 'utils/helper';
-import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
@@ -37,10 +38,11 @@ const Login = ({ history }) => {
     (user) => {
       if (user) {
         if (user.is_creator) {
-          if (user.profile_complete === false) {
-            history.push(Routes.profile);
-            // } else if (user.profile?.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
-            //   history.push(Routes.livestream);
+          if (!user.first_name || !user.last_name || !user.username) {
+            history.push(Routes.onboardingName);
+          } else if (user.profile_complete === false) {
+            // history.push(Routes.onboardingProfile);
+            window.open(`${generateUrlFromUsername(user.username)}${Routes.onboardingProfile}`, '_self');
           } else {
             history.push(Routes.creatorDashboard.rootPath);
           }

@@ -9,14 +9,14 @@ import { storeCreatorDetailsToLS } from 'utils/storage';
 import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
 
+import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
-import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
+import { mapUserToPendo } from 'services/integrations/pendo';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie, setAuthCookie } from 'services/authCookie';
-import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
-import { mapUserToPendo } from 'services/integrations/pendo';
-import http from 'services/http';
+import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
+import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
@@ -27,6 +27,7 @@ const SideNavWithHeaderLayout = lazy(() => import('layouts/SideNavWithHeaderLayo
 const NavbarFullWidthLayout = lazy(() => import('layouts/NavbarFullWidthLayout'));
 const NavbarLayout = lazy(() => import('layouts/NavbarLayout'));
 const MobileLayout = lazy(() => import('layouts/MobileLayout'));
+const FullWidthLayout = lazy(() => import('layouts/FullWidthLayout'));
 
 const Home = lazy(() => import('pages/Home'));
 const Profile = lazy(() => import('pages/Profile'));
@@ -57,6 +58,7 @@ const SessionDetailedListView = lazy(() => import('pages/DetailedListView/Sessio
 const CourseDetailedListView = lazy(() => import('pages/DetailedListView/Courses'));
 const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
 const Legals = lazy(() => import('pages/Legals'));
+const Onboarding = lazy(() => import('pages/EditProfile'));
 
 const PassDetailPreview = lazy(() => import('pages/PreviewPages/PassDetails'));
 const CourseDetailPreview = lazy(() => import('pages/PreviewPages/CourseDetails'));
@@ -235,7 +237,9 @@ function App() {
               path={Routes.attendeeDashboard.rootPath}
               component={AttendeeDashboard}
             />
-            <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
+            <PrivateRoute layout={FullWidthLayout} exact path={Routes.profileEdit} component={Onboarding} />
+            <PrivateRoute layout={FullWidthLayout} exact path={Routes.onboardingProfile} component={Onboarding} />
+            <PrivateRoute layout={FullWidthLayout} exact path={Routes.onboardingName} component={Profile} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionCreate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
@@ -312,9 +316,6 @@ function App() {
               component={SessionDetailsPreview}
             />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} /> */}
-            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
-            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} /> */}
             <RouteWithLayout
               layout={NavbarLayout}
               exact
@@ -326,7 +327,7 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
-            <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
+            <RouteWithLayout layout={FullWidthLayout} exact path={Routes.signup} component={SignUp} />
             {/* New Pages are put higher for more priority matching */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
             <RouteWithLayout

@@ -2,23 +2,12 @@ import React, { useState } from 'react';
 
 import { Row, Col, Button } from 'antd';
 
-import styles from './style.module.scss';
-import { getYoutubeVideoIDFromURL } from 'utils/video';
 import YoutubeEmbedListItem from '../YoutubeEmbedListItem';
+import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
 
-const YoutubeVideoEmbed = ({ videoId = null }) =>
-  videoId ? (
-    <iframe
-      width="100%"
-      height="100%"
-      style={{ aspectRatio: '16 / 9' }}
-      src={`https://www.youtube.com/embed/${videoId}`}
-      title="YouTube video player"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen
-    ></iframe>
-  ) : null;
+import { getYoutubeVideoIDFromURL } from 'utils/video';
+
+import styles from './style.module.scss';
 
 const YoutubeEmbedListView = ({ urls = [], isContained = false }) => {
   const [selectedYoutubeVideoID, setSelectedYoutubeVideoID] = useState(null);
@@ -49,7 +38,7 @@ const YoutubeEmbedListView = ({ urls = [], isContained = false }) => {
         </Row>
       )}
       <Row gutter={[8, 8]} className={isContained ? undefined : styles.youtubeItemListContainer}>
-        {urls.map(renderYoutubeVideoListItem)}
+        {urls.filter((url) => url).map(renderYoutubeVideoListItem)}
       </Row>
     </div>
   );

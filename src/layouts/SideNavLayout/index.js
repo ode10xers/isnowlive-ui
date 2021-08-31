@@ -34,8 +34,7 @@ const SideNavLayout = ({ children }) => {
           onCollapse={handleCollapsed}
           trigger={
             <Button ghost size="small" type="primary" className={styles.siderTriggerMenuButton}>
-              {' '}
-              Menu{' '}
+              Menu
             </Button>
           }
         >

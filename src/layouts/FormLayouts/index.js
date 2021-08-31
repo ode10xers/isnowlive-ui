@@ -129,3 +129,13 @@ export const courseCreatePageLayout = {
 export const coursePageTailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
+export const newProfileFormLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    lg: { span: 8 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    lg: { span: 16 },
+  },
+};
