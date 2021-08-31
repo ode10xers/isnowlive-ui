@@ -141,6 +141,7 @@ const CourseForm = ({ match, history }) => {
             price: data.price,
             courseTagType: data.tag?.length > 0 ? 'selected' : 'anyone',
             selectedMemberTags: data.tag?.map((tagData) => tagData.external_id),
+            preview_video_urls: data.preview_video_urls ?? [],
           });
 
           if (data.currency) {
@@ -276,6 +277,7 @@ const CourseForm = ({ match, history }) => {
       currency: currency?.toLowerCase() || '',
       tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
       preview_image_url: previewImageUrls ?? [],
+      preview_video_urls: values.preview_video_urls ?? [],
       ...modulesData,
     };
 
@@ -529,11 +531,95 @@ const CourseForm = ({ match, history }) => {
             </Row>
           </Col>
 
+          {/* Course Preview */}
+          <Col xs={24} className={styles.courseSection}>
+            <Row gutter={[8, 16]}>
+              <Col xs={24}>
+                <Title level={4}>3. Course Preview (Optional)</Title>
+              </Col>
+              <Col xs={24}>
+                <Form.List name="preview_video_urls">
+                  {(fields, { add, remove }) => (
+                    <>
+                      {fields.map(({ key, name, fieldKey, ...restField }) => (
+                        <Row key={key}>
+                          <Col xs={24}>
+                            <Form.Item {...courseCreatePageLayout} label="Preview Title" required={true}>
+                              <Form.Item
+                                {...restField}
+                                id="title"
+                                name={[name, 'title']}
+                                fieldKey={[fieldKey, 'title']}
+                                rules={validationRules.requiredValidation}
+                                noStyle
+                              >
+                                <Input
+                                  placeholder="Enter preview title (max. 50 characters)"
+                                  maxLength={50}
+                                  className={styles.inputWithButton}
+                                />
+                              </Form.Item>
+                              {fields.length > 0 ? (
+                                <span className="ant-form-text">
+                                  <Tooltip title="Remove this item">
+                                    <DeleteOutlined
+                                      className={styles.deleteItemIconButton}
+                                      onClick={() => remove(name)}
+                                    />
+                                  </Tooltip>
+                                </span>
+                              ) : null}
+                            </Form.Item>
+                          </Col>
+                          <Col xs={0}>
+                            {/* TODO: Currently this input is hidden, but later when we support more types we can show this as radio button */}
+                            <Form.Item
+                              initialValue="YOUTUBE"
+                              hidden
+                              id="preview_type"
+                              name={[name, 'type']}
+                              fieldKey={[fieldKey, 'type']}
+                              rules={validationRules.requiredValidation}
+                            >
+                              <Input disabled />
+                            </Form.Item>
+                          </Col>
+                          <Col xs={24}>
+                            <Form.Item
+                              {...restField}
+                              {...courseCreatePageLayout}
+                              id="preview_url"
+                              label="Preview YouTube URL"
+                              name={[name, 'url']}
+                              fieldKey={[fieldKey, 'url']}
+                              rules={validationRules.youtubeLinkValidation}
+                            >
+                              <Input placeholder="Put YouTube video link here" maxLength={100} />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      ))}
+                      {fields.length < 1 && (
+                        <Row>
+                          <Col xs={24} md={{ span: 6, offset: 8 }}>
+                            <Button block size="large" type="primary" onClick={() => add()} icon={<PlusOutlined />}>
+                              Add Preview
+                            </Button>
+                          </Col>
+                        </Row>
+                      )}
+                    </>
+                  )}
+                </Form.List>
+              </Col>
+            </Row>
+          </Col>
+
           {/* FAQs */}
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={4}>3. Frequently Asked Questions (Optional)</Title>
+                <Title level={4}>4. Frequently Asked Questions (Optional)</Title>
               </Col>
               <Col xs={24}>
                 <Form.List name="faqs">
@@ -609,7 +695,7 @@ const CourseForm = ({ match, history }) => {
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={4}>4. Course Pricing</Title>
+                <Title level={4}>5. Course Pricing</Title>
               </Col>
               <Col xs={24}>
                 <Row gutter={8}>

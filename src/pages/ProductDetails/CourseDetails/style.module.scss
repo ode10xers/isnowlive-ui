@@ -404,3 +404,31 @@
     }
   }
 }
+
+.coursePreviewContainer {
+  width: 100%;
+  height: 100%;
+
+  .coursePreviewTitle {
+    font-weight: 500;
+    font-size: 36px;
+    margin-bottom: 12px;
+    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+
+    @media screen and (max-width: 526px) {
+      font-size: 24px;
+    }
+  }
+
+  .courseEmbedContainer {
+    width: 100%;
+    padding: 0 20px;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 800px;
+
+    @media screen and (max-width: 769px) {
+      padding: 0 8px;
+    }
+  }
+}
