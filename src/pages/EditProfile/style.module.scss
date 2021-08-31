@@ -1,0 +1,136 @@
+@import '../../styles/variables.scss';
+
+.editUsernameContainer {
+  .alignUrl {
+    align-items: baseline !important;
+  }
+
+  .dot {
+    height: 10px;
+    width: 10px;
+    background-color: map-get($colors, $key: 'White1');
+    border-radius: 50%;
+    display: inline-block;
+
+    &.success {
+      background-color: map-get($colors, $key: 'KellyGreen');
+    }
+    &.danger {
+      background-color: map-get($colors, $key: 'FireBrick');
+    }
+  }
+}
+
+.editPageContainer {
+  @extend .box;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.profileFormContainer {
+  background-color: map-get($map: $colors, $key: 'White');
+  padding: 8px;
+}
+
+.colorChoicesContainer {
+  width: 100%;
+  padding: 8px;
+
+  .colorContainer {
+    border-radius: 50%;
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    background-color: map-get($map: $colors, $key: 'White');
+
+    .colorChoice {
+      border-radius: 50%;
+      width: 100%;
+      height: 100%;
+      min-width: 20px;
+      min-height: 20px;
+    }
+
+    &.selected, &:hover {
+      padding: 3px;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+.nameInputWrapper {
+  width: calc(50% - 8px);
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.creatorCoverImage {
+  width: 100%;
+  max-height: 320px;
+  margin: 0 auto;
+
+  & > div {
+    width: 100% !important;
+    min-height: 130px !important;
+  }
+}
+
+.creatorProfileImage {
+  text-align: center;
+}
+
+.componentsSectionContainer {
+  width: 100%;
+
+  :global {
+    .ant-collapse-item {
+      margin: 10px 0 !important;
+      border: 1px solid map-get($map: $colors, $key: 'SuvaGrey') !important;
+      border-radius: 12px !important;
+    }
+  }
+}
+
+.customAccordionContainers {
+  .customAccordionItem {
+    border: 1px solid map-get($map: $colors, $key: 'Silver');
+    border-radius: 12px;
+    margin: 10px 0;
+
+    .customAccordionHeader {
+      padding: 10px 8px;
+    }
+
+    .customAccordionContent {
+      padding: 20px;
+      transition: 0.3s;
+
+      &.hidden {
+        display : none;
+      }
+    }
+  }
+}
+
+.usernameContainer {
+  padding: 10px;
+  background-color: map-get($map: $colors, $key: 'White');
+  border-radius: 12px;
+}
+
+.deviceContainer {
+  padding-left: 15% !important;
+  text-align: center;
+}
+
+.desktopSaveButtonContainer {
+  margin-top : -300px;
+}
+
+.mobileDeviceContainer {
+  text-align: center;
+}
+
+.mobileSaveButtonContainer {
+  margin-top: -120px;
+}

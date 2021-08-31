@@ -19,14 +19,14 @@ import { isMobileDevice } from 'utils/device';
 import { socialMediaIcons } from 'utils/constants';
 import { generateColorPalletteForProfile } from 'utils/colors';
 import {
-  isAPISuccess,
-  reservedDomainName,
-  getUsernameFromUrl,
   orderType,
   productType,
-  isUnapprovedUserError,
+  isAPISuccess,
   convertHexToRGB,
+  reservedDomainName,
+  getUsernameFromUrl,
   isBrightColorShade,
+  isUnapprovedUserError,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';

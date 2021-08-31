@@ -255,11 +255,13 @@ const componentsMap = {
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
-const DynamicProfile = ({ creatorUsername = null }) => {
+// TODO: Most of the edit functionality in this page will be moved to the new onboarding page
+// Remove code as necessary
+const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) => {
   const history = useHistory();
   const match = useRouteMatch();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(overrideUserObject ? false : true);
   const [creatorProfileData, setCreatorProfileData] = useState(null);
   const [editingMode, setEditingMode] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
@@ -335,12 +337,19 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   //#region Start of Use Effects
 
   useEffect(() => {
-    if (!creatorUsername) {
-      fetchCreatorProfileData(getLocalUserDetails()?.username ?? '');
+    if (overrideUserObject) {
+      setCreatorProfileData(overrideUserObject);
+      // setContainedUI(!overrideUserObject?.profile?.new_profile);
+      setContainedUI(false);
+      setCreatorColorChoice(overrideUserObject?.profile?.color);
     } else {
-      fetchCreatorProfileData(creatorUsername);
+      if (!creatorUsername) {
+        fetchCreatorProfileData(getLocalUserDetails()?.username ?? '');
+      } else {
+        fetchCreatorProfileData(creatorUsername);
+      }
     }
-  }, [fetchCreatorProfileData, creatorUsername]);
+  }, [fetchCreatorProfileData, creatorUsername, overrideUserObject]);
 
   useEffect(() => {
     setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
@@ -361,17 +370,37 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
 
     Object.entries(profileStyleObject).forEach(([key, val]) => {
-      document.documentElement.style.setProperty(key, val);
+      if (overrideUserObject) {
+        for (let idx = 0; idx <= window.frames.length; idx++) {
+          try {
+            window.frames[idx].document.documentElement.style.setProperty(key, val);
+          } catch (error) {
+            console.log('Silently passing error');
+          }
+        }
+      } else {
+        window.document.documentElement.style.setProperty(key, val);
+      }
     });
 
     return () => {
       if (profileStyleObject) {
         Object.keys(profileStyleObject).forEach((key) => {
-          document.documentElement.style.removeProperty(key);
+          if (overrideUserObject) {
+            for (let idx = 0; idx <= window.frames.length; idx++) {
+              try {
+                window.frames[idx].document.documentElement.style.removeProperty(key);
+              } catch (error) {
+                console.log('Silently passing error');
+              }
+            }
+          } else {
+            window.document.documentElement.style.removeProperty(key);
+          }
         });
       }
     };
-  }, [creatorColorChoice, containedUI]);
+  }, [creatorColorChoice, containedUI, overrideUserObject]);
 
   useEffect(() => {
     scrollToComponent(match.path);
@@ -449,18 +478,15 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setPreviewMode(false);
   };
 
-  // const handleTogglePreviewMode = (e) => {
-  //   preventDefaults(e);
-  //   setPreviewMode(!previewMode);
-  // };
-
   const handleEditDynamicProfileButtonClicked = (e) => {
     preventDefaults(e);
 
-    setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
-    setEditingMode(true);
-    setPreviewMode(false);
-    setUiConfigChanged(false);
+    window.open(`${generateUrlFromUsername(creatorProfileData?.username)}${Routes.profileEdit}`, '_self');
+
+    // setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
+    // setEditingMode(true);
+    // setPreviewMode(false);
+    // setUiConfigChanged(false);
   };
 
   const handleSaveDynamicProfileButtonClicked = async (e) => {
@@ -837,6 +863,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             <Space className={styles.colorChoicesContainer}>
               {colorPalletteChoices.map((color) => (
                 <div
+                  key={color}
                   className={classNames(
                     styles.colorContainer,
                     creatorColorChoice === color ? styles.selected : undefined

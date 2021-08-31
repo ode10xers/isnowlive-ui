@@ -57,7 +57,7 @@
     flex: 1 1 320px;
   }
 
-  :global  {
+  :global {
     .ant-menu-item {
       color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
     }
@@ -72,6 +72,10 @@
 .menuContainer {
   text-align: right !important;
   background-color: var(--passion-profile-navbar-bg, #{map-get($colors, 'White')}) !important;
+
+  & > li {
+    vertical-align: baseline !important;
+  }
 }
 
 .overflowMenuIcon {
@@ -106,6 +110,7 @@
 .mobileMenuContainer {
   flex: 1 0 auto;
   display: none;
+  align-self: center;
 
   .externalButtonWrapper {
     align-self: right;

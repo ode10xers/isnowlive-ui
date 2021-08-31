@@ -23,8 +23,8 @@ const TextEditor = ({ name, form, placeholder }) => {
         }
       }
     } else if (Array.isArray(name)) {
-      if (form.getFieldsValue()[name[0]][name[1]]) {
-        const contentBlock = htmlToDraft(form.getFieldsValue()[name[0]][name[1]]);
+      if (form.getFieldValue(name)) {
+        const contentBlock = htmlToDraft(form.getFieldValue(name));
         if (contentBlock) {
           const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
           const editorState = EditorState.createWithContent(contentState);
@@ -40,15 +40,21 @@ const TextEditor = ({ name, form, placeholder }) => {
 
   const handleChange = (e) => {
     let text = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-    if (typeof name === 'string') {
-      form.setFieldsValue({ ...form.getFieldsValue(), [name]: text });
-    } else if (Array.isArray(name)) {
-      let newFormData = JSON.parse(JSON.stringify(form.getFieldsValue()));
-      if (newFormData[name[0]]) {
-        newFormData[name[0]][name[1]] = text;
-      }
-      form.setFieldsValue(newFormData);
-    }
+    // if (typeof name === 'string') {
+    // form.setFieldsValue({ ...form.getFieldsValue(), [name]: text });
+    // } else if (Array.isArray(name)) {
+    // let newFormData = JSON.parse(JSON.stringify(form.getFieldsValue()));
+    // if (newFormData[name[0]]) {
+    //   newFormData[name[0]][name[1]] = text;
+    // }
+    // form.setFieldsValue(newFormData);
+    // }
+    form.setFields([
+      {
+        name: name,
+        value: text,
+      },
+    ]);
   };
 
   return (

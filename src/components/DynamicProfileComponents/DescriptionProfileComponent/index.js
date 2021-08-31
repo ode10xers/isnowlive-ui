@@ -39,7 +39,7 @@ const DescriptionProfileComponent = ({
       <Col className={styles.textAlignCenter}>Description that you have entered will show up here</Col>
     </Row>
   ) : (
-    <div className={styles.contentContainer}>{ReactHtmlParser(customComponentProps?.values)}</div>
+    <div className={styles.contentContainer}>{ReactHtmlParser(customComponentProps?.values ?? '')}</div>
   );
 
   const commonContainerProps = {
