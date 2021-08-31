@@ -18,6 +18,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
+import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
 import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -41,7 +42,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;

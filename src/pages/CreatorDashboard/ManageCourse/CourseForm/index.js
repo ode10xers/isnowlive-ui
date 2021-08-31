@@ -266,7 +266,6 @@ const CourseForm = ({ match, history }) => {
           validity: 1,
         };
 
-    // TODO: Add the preview key and data in the payload
     const payload = {
       name: values.courseName,
       course_image_url: courseImageUrl || values.courseImageUrl,
@@ -539,7 +538,6 @@ const CourseForm = ({ match, history }) => {
                 <Title level={4}>3. Course Preview (Optional)</Title>
               </Col>
               <Col xs={24}>
-                {/* TODO: Rename this accordingly to BE implementation */}
                 <Form.List name="preview_video_urls">
                   {(fields, { add, remove }) => (
                     <>
