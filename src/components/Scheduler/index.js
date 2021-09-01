@@ -595,11 +595,11 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                             <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
                           </Badge>
                         </Tooltip>
-                      ) : (
+                      ) : slot.start_time && slot.end_time ? (
                         <Tooltip title="Delete">
                           <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
                         </Tooltip>
-                      )}
+                      ) : null}
                     </Col>
                   )}
                 </Row>
