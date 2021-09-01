@@ -54,7 +54,9 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
 
       if (isAPISuccess(status) && data) {
         const upcomingInventories: UpcomingSessionInventory[] = data;
-        const sessionIds = Array.from(new Set(upcomingInventories.map((inventory) => inventory.session_id)));
+        // NOTE : This filter is applied to prevent any zombie availability inventory from showing up at all
+        // This approach is different from the one in sessions because availability don't have an inventory page
+        const sessionIds = Array.from(new Set(upcomingInventories.filter((inv) => inv.session_external_id).map((inventory) => inventory.session_id)));
         const sessions: Session[] = sessionIds
           .map((sessionId) => upcomingInventories.filter((item) => item.session_id === sessionId)!)
           .map(

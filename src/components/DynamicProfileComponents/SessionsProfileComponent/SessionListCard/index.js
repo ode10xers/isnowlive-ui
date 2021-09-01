@@ -132,7 +132,10 @@ const SessionListCard = ({ session }) => {
   const handleCardClicked = (e) => {
     preventDefaults(e);
 
-    if (adjustedSession.inventory_id) {
+    // NOTE : This special check is there to act as a fallback navigation
+    // to handle the case of zombie inventories (inventories that's booked, but the sessions deleted)
+    if (!adjustedSession.session_external_id) redirectToInventoryPage({ ...session, ...session.inventory[0] });
+    else if (adjustedSession.inventory_id) {
       redirectToInventoryPage(session);
     } else {
       redirectToSessionsPage(session);
