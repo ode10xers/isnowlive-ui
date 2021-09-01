@@ -698,6 +698,7 @@ const Session = ({ match, history }) => {
 
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
+        // NOTE : Investigate why we filter out booked inventories here
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
         );
