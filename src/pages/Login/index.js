@@ -111,66 +111,81 @@ const Login = ({ history }) => {
 
   if (isLoginView) {
     view = (
-      <>
-        <Form form={loginForm} {...formLayout} name="basic" onFinish={onFinish}>
-          <Item label="Email" name="email" rules={validationRules.emailValidation}>
-            <Input />
-          </Item>
+      <div className={styles.loginFormContainer}>
+        <div className={styles.loginHeadingText}>Enter your email and password</div>
+        <div className={styles.loginHeadingSubtext}>
+          If you've created an account but haven't set a password, click on the <b>Set new password</b> below
+        </div>
+        <div className={styles.loginForm}>
+          <Form form={loginForm} wrapperCol={24} onFinish={onFinish}>
+            <Item name="email" rules={validationRules.emailValidation}>
+              <Input placeholder="Your registered email" />
+            </Item>
 
-          <Item label="Password" name="password" rules={validationRules.passwordValidation}>
-            <Password />
-          </Item>
+            <Item name="password" rules={validationRules.passwordValidation}>
+              <Password placeholder="Your password" />
+            </Item>
 
-          <Item {...formTailLayout}>
-            <Button type="primary" htmlType="submit" loading={isLoading}>
-              Submit
-            </Button>
-          </Item>
-        </Form>
+            <Row justify="center">
+              <Col>
+                <Button className={styles.submitButton} type="primary" htmlType="submit" loading={isLoading}>
+                  Login
+                </Button>
+              </Col>
+            </Row>
+          </Form>
 
-        <Row>
-          <Col {...formTailLayout.wrapperCol}>
-            <Button type="link" onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
-              Set a new password
-            </Button>
-          </Col>
-        </Row>
-      </>
+          <Row justify="center">
+            <Col>
+              <Button
+                className={styles.linkButton}
+                type="link"
+                onClick={() => trackAndSetLoginView(user.click.newPassword, false)}
+              >
+                Set new password
+              </Button>
+            </Col>
+          </Row>
+        </div>
+      </div>
     );
   } else {
     view = (
-      <>
-        <Row>
-          <Col xs={24} md={{ span: 18, offset: 6 }}>
-            <h1>Set a new password</h1>
-          </Col>
-        </Row>
-
-        <Form form={emailPasswordForm} {...formLayout} name="basic" onFinish={handleSendNewPasswordEmail}>
-          <Item label="Email" name="email" rules={validationRules.emailValidation}>
-            <Input />
-          </Item>
-          <Item {...formTailLayout}>
-            <Button type="primary" htmlType="submit" loading={isLoading}>
-              Send Email
-            </Button>
-          </Item>
-        </Form>
-
-        <Row>
-          <Col {...formTailLayout.wrapperCol}>
-            <Button type="link" onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
-              Login with password
-            </Button>
-          </Col>
-        </Row>
-      </>
+      <div className={styles.loginFormContainer}>
+        <div className={styles.loginHeadingText}>Set a new password</div>
+        <div className={styles.loginHeadingSubtext}>Enter the email you created the account with</div>
+        <div className={styles.loginForm}>
+          <Form form={emailPasswordForm} wrapperCol={24} onFinish={handleSendNewPasswordEmail}>
+            <Item name="email" rules={validationRules.emailValidation}>
+              <Input placeholder="The email associated with your account" />
+            </Item>
+            <Row justify="center">
+              <Col>
+                <Button className={styles.submitButton} type="primary" htmlType="submit" loading={isLoading}>
+                  Send Email
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+          <Row justify="center">
+            <Col>
+              <Button
+                className={styles.linkButton}
+                type="link"
+                onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}
+              >
+                Have an account? Sign in.
+              </Button>
+            </Col>
+          </Row>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Row align="middle" justify="center" className={styles.mt50}>
-      <Col xs={24} md={18} lg={12}>
+    <Row align="middle" justify="center">
+      <Col xs={24} md={18}>
         {view}
       </Col>
     </Row>
