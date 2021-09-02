@@ -59,6 +59,7 @@ const CourseDetailedListView = lazy(() => import('pages/DetailedListView/Courses
 const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
 const Legals = lazy(() => import('pages/Legals'));
 const Onboarding = lazy(() => import('pages/EditProfile'));
+const PageBuilder = lazy(() => import('pages/PageBuilder'));
 
 const PassDetailPreview = lazy(() => import('pages/PreviewPages/PassDetails'));
 const CourseDetailPreview = lazy(() => import('pages/PreviewPages/CourseDetails'));
@@ -231,6 +232,7 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
+            <RouteWithLayout layout={FullWidthLayout} exact path="/test-editor" component={PageBuilder} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute
               layout={SideNavWithHeaderLayout}
