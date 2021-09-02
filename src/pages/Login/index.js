@@ -19,8 +19,6 @@ import {
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
 
-import { formLayout, formTailLayout } from 'layouts/FormLayouts';
-
 import styles from './style.module.scss';
 
 const { Item } = Form;

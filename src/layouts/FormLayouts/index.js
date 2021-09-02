@@ -17,6 +17,7 @@ export const profileFormTailLayout = {
 export const profileTestimonialTailLayout = {
   wrapperCol: { offset: 0, span: 24 },
 };
+/** @deprecated */
 export const formLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -29,6 +30,7 @@ export const formLayout = {
     xl: { span: 16 },
   },
 };
+/** @deprecated */
 export const formTailLayout = {
   wrapperCol: {
     xs: { span: 24 },

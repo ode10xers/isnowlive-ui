@@ -1,6 +1,5 @@
 @import '../../styles/variables.scss';
 
-
 .loginFormContainer {
   box-shadow: -4px 3px 2px map-get($map: $colors, $key: 'Lavender');
   border: 1px solid map-get($map: $colors, $key: 'Silver');

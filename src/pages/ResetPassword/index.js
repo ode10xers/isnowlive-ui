@@ -6,7 +6,6 @@ import Routes from 'routes';
 import apis from 'apis';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
-import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
@@ -49,26 +48,23 @@ const ResetPassword = () => {
   };
 
   return (
-    <Row align="middle" className={styles.mt50}>
-      <Col xs={24} md={{ span: 12, offset: 6 }}>
-        <Row>
-          <Col xs={24} md={{ span: 16, offset: 4 }}>
-            <h1>Set a new password</h1>
-          </Col>
-        </Row>
-
-        <Form form={form} {...formLayout} name="basic" onFinish={setNewPassword}>
-          <Item label="Password" name="password" rules={validationRules.passwordValidation}>
-            <Password />
+    <div className={styles.resetPasswordFormContainer}>
+      <div className={styles.resetPasswordHeadingText}>Set your new password</div>
+      <div className={styles.resetPasswordForm}>
+        <Form form={form} wrapperCol={24} onFinish={setNewPassword}>
+          <Item name="password" rules={validationRules.passwordValidation}>
+            <Password placeholder="Your new password" />
           </Item>
-          <Item {...formTailLayout}>
-            <Button type="primary" htmlType="submit" loading={submitting}>
-              Set Password
-            </Button>
-          </Item>
+          <Row justify="center">
+            <Col>
+              <Button className={styles.submitButton} type="primary" htmlType="submit" loading={submitting}>
+                Set Password
+              </Button>
+            </Col>
+          </Row>
         </Form>
-      </Col>
-    </Row>
+      </div>
+    </div>
   );
 };
 
