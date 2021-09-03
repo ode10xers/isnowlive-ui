@@ -21,7 +21,6 @@ const AvailabilitiesPlugin = () => {
       const { data, status } = await apis.user.getAvailabilitiesByUsername('upcoming');
 
       if (isAPISuccess(status) && data) {
-        console.log(data);
         const upcomingInventories = data;
         // NOTE : This filter is applied to prevent any zombie availability inventory from showing up at all
         // This approach is different from the one in sessions because availability don't have an inventory page
@@ -86,7 +85,6 @@ const AvailabilitiesPlugin = () => {
   useEffect(() => {
     fetchCreatorAvailabilities();
     document.body.style.backgroundColor = 'transparent';
-    console.log('Testing');
   }, [fetchCreatorAvailabilities]);
 
   const renderAvailabilityListItem = useCallback(
