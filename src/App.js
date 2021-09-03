@@ -239,7 +239,7 @@ function App() {
             />
             <PrivateRoute layout={FullWidthLayout} exact path={Routes.profileEdit} component={Onboarding} />
             <PrivateRoute layout={FullWidthLayout} exact path={Routes.onboardingProfile} component={Onboarding} />
-            <PrivateRoute layout={FullWidthLayout} exact path={Routes.onboardingName} component={Profile} />
+            <PrivateRoute layout={NavbarFullWidthLayout} exact path={Routes.onboardingName} component={Profile} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionCreate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
@@ -327,7 +327,7 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
-            <RouteWithLayout layout={FullWidthLayout} exact path={Routes.signup} component={SignUp} />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.signup} component={SignUp} />
             {/* New Pages are put higher for more priority matching */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
             <RouteWithLayout

@@ -13,7 +13,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  top: 340px;
+  top: 280px;
   background: #ffffff;
   border-radius: 20px;
   max-width: 490px;
@@ -21,6 +21,7 @@
 
   @media screen and (max-width: 526px) {
     padding: 60px 24px;
+    top: 200px;
   }
 }
 
