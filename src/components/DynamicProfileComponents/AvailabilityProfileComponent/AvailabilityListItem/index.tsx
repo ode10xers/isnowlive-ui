@@ -35,11 +35,11 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
     <div className={styles.availabilityItem} onClick={handleClick}>
       <Card
         style={{
-          boxShadow: '0px 0px 5.18291px rgba(0, 0, 0, 0.08), 0px 0px 20.7317px 2.59146px rgba(0, 0, 0, 0.05)',
+          boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.08), 0px 0px 20px 2px rgba(0, 0, 0, 0.05)',
           borderRadius: 10,
         }}
         bodyStyle={{ 
-          padding : 8,
+          padding : 12,
           backgroundColor: 'var(--availability-card-background-color, #ffffff)',
           borderRadius: 10,
         }}
@@ -76,7 +76,7 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
               {ReactHtmlParser(availability.description)}
             </Paragraph>
             <Button size="small" type="primary" className={styles.ctaButton}>
-              Select your slot{' '}<RightOutlined />
+              Select a time{' '}<RightOutlined />
             </Button>
           </Col>
         </Row>
