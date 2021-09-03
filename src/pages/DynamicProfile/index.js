@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
-import classNames from 'classnames';
+// import classNames from 'classnames';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
   ArrowLeftOutlined,
   BookOutlined,
-  CheckOutlined,
+  // CheckOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
   EditOutlined,
@@ -255,7 +255,7 @@ const componentsMap = {
   },
 };
 
-const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
+// const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
 // TODO: Most of the edit functionality in this page will be moved to the new onboarding page
 // Remove code as necessary
@@ -412,39 +412,39 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
 
   //#region Start Of Page Edit Button Handlers
 
-  const saveCreatorColorPalletteChoice = async (e) => {
-    preventDefaults(e);
+  // const saveCreatorColorPalletteChoice = async (e) => {
+  //   preventDefaults(e);
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    try {
-      const payload = {
-        cover_image_url: creatorProfileData?.cover_image_url,
-        profile_image_url: creatorProfileData?.profile_image_url,
-        first_name: creatorProfileData?.first_name,
-        last_name: creatorProfileData?.last_name,
-        username: creatorProfileData?.username,
-        profile: {
-          color: creatorColorChoice,
-          new_profile: !containedUI,
-        },
-      };
+  //   try {
+  //     const payload = {
+  //       cover_image_url: creatorProfileData?.cover_image_url,
+  //       profile_image_url: creatorProfileData?.profile_image_url,
+  //       first_name: creatorProfileData?.first_name,
+  //       last_name: creatorProfileData?.last_name,
+  //       username: creatorProfileData?.username,
+  //       profile: {
+  //         color: creatorColorChoice,
+  //         new_profile: !containedUI,
+  //       },
+  //     };
 
-      const { status, data } = await apis.user.updateProfile(payload);
+  //     const { status, data } = await apis.user.updateProfile(payload);
 
-      if (isAPISuccess(status) && data) {
-        setContainedUI(!data?.profile?.new_profile);
-        message.success('Creator profile color successfully updated');
-      }
-    } catch (error) {
-      showErrorModal(
-        'Failed updating Creator Profile UI Colors',
-        error?.response?.data?.message || 'Something went wrong.'
-      );
-    }
+  //     if (isAPISuccess(status) && data) {
+  //       setContainedUI(!data?.profile?.new_profile);
+  //       message.success('Creator profile color successfully updated');
+  //     }
+  //   } catch (error) {
+  //     showErrorModal(
+  //       'Failed updating Creator Profile UI Colors',
+  //       error?.response?.data?.message || 'Something went wrong.'
+  //     );
+  //   }
 
-    setIsLoading(false);
-  };
+  //   setIsLoading(false);
+  // };
 
   const getExistingComponentInstance = (identifier) =>
     tempCreatorUIConfig.find((component) => component.key === identifier);
@@ -861,7 +861,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
               )}
             </Space>
           </Col>
-          <Col xs={24}>
+          {/* <Col xs={24}>
             <Space className={styles.colorChoicesContainer}>
               {colorPalletteChoices.map((color) => (
                 <div
@@ -884,7 +884,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
                 Apply Color
               </Button>
             </Space>
-          </Col>
+          </Col> */}
         </Row>
       )}
       <div className={styles.creatorProfilePage}>
