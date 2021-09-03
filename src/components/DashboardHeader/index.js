@@ -1,29 +1,13 @@
 import React from 'react';
-// import { useHistory } from 'react-router-dom';
 import { Row, Col } from 'antd';
 
 import DashboardToggle from 'components/DashboardToggle';
-
-// import { isMobileDevice } from 'utils/device';
-
-// import { useGlobalContext } from 'services/globalContext';
-// import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
 
 const logo = require('assets/images/passion-orange-logo.png');
 
-// const { user } = mixPanelEventTags;
-
 const DashboardHeader = () => {
-  // const { logOut } = useGlobalContext();
-  // const history = useHistory();
-
-  // const trackAndLogOut = (eventTag) => {
-  //   trackSimpleEvent(eventTag);
-  //   logOut(history, true);
-  // };
-
   return (
     <Row className={styles.headerContainer} gutter={[20, 8]}>
       <Col className={styles.logoWrapper}>
@@ -31,9 +15,6 @@ const DashboardHeader = () => {
       </Col>
       <Col className={styles.navItemWrapper}>
         <DashboardToggle />
-        {/* <Button type="primary" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
-          Logout
-        </Button> */}
       </Col>
     </Row>
   );
