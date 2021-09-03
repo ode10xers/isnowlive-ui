@@ -513,7 +513,7 @@ const CourseModulesForm = ({ match, history }) => {
     const modifiedFields = {
       modules: values.modules,
       type: courseCurriculumType ?? values.curriculumType ?? courseCurriculumTypes.MIXED.name,
-      max_participants: values.maxParticipants || 1,
+      max_participants: courseCurriculumType === courseCurriculumTypes.VIDEO.name ? 0 : values.maxParticipants || 1,
       start_date: moment(courseStartDate).startOf('day').utc().format(),
       end_date: moment(courseEndDate).endOf('day').utc().format(),
       validity: values.validity ?? 1,
