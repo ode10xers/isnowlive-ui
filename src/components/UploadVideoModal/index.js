@@ -268,7 +268,7 @@ const UploadVideoModal = ({
       const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 25);
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberships(data.Data);
+        setCreatorMemberships(data.Data ?? []);
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed to fetch memberships');
@@ -541,7 +541,7 @@ const UploadVideoModal = ({
           }
 
           const targetMembershipIds = selectedMembershipIds || values.membership_ids || [];
-          const targetMemberships = creatorMemberships.filter((cSubs) =>
+          const targetMemberships = creatorMemberships?.filter((cSubs) =>
             targetMembershipIds.includes(cSubs.external_id)
           );
 
@@ -621,6 +621,7 @@ const UploadVideoModal = ({
         }
       }
     } catch (error) {
+      console.error(error);
       showErrorModal(
         `Failed to ${editedVideo ? 'update' : 'create'} video`,
         error?.response?.data?.message || 'Something went wrong.'
@@ -1078,7 +1079,7 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={editedVideo ? 0 : 24}>
-                <Form.Item id="membership_ids" name="membership_ods" label="Related Memberships(s)">
+                <Form.Item id="membership_ids" name="membership_ids" label="Related Memberships(s)">
                   <Select
                     showArrow
                     showSearch={false}
