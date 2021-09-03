@@ -6,8 +6,11 @@ import Courses from 'components/EmbeddableComponents/Courses';
 import SessionsList from 'components/EmbeddableComponents/SessionsList';
 import Subscriptions from 'components/EmbeddableComponents/Subscriptions';
 import CalendarSessions from 'components/EmbeddableComponents/CalendarSessions';
+import AvailabilitiesPlugin from 'components/EmbeddableComponents/AvailabilitiesPlugin';
+
 import { widgetComponentsName } from 'utils/widgets';
 
+// TODO: Might want to implement lazy loading here as well
 export default function EmbeddablePage({ widget }) {
   let componentToLoad = null;
   if (widget === widgetComponentsName.CALENDAR.value) {
@@ -20,8 +23,10 @@ export default function EmbeddablePage({ widget }) {
     componentToLoad = <Courses />;
   } else if (widget === widgetComponentsName.MEMBERSHIPS.value) {
     componentToLoad = <Subscriptions />;
-  } else if (widget === 'list') {
+  } else if (widget === widgetComponentsName.LIST.value) {
     componentToLoad = <SessionsList />;
+  } else if (widget === widgetComponentsName.AVAILABILITY.value) {
+    componentToLoad = <AvailabilitiesPlugin />;
   }
 
   window.addEventListener('message', (e) => {

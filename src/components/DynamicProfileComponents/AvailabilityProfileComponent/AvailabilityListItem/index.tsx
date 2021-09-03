@@ -37,7 +37,11 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
           boxShadow: '0px 0px 5.18291px rgba(0, 0, 0, 0.08), 0px 0px 20.7317px 2.59146px rgba(0, 0, 0, 0.05)',
           borderRadius: 10,
         }}
-        bodyStyle={{ padding : 8 }}
+        bodyStyle={{ 
+          padding : 8,
+          backgroundColor: 'var(--availability-card-background-color, #ffffff)',
+          borderRadius: 10,
+        }}
       >
         <Row gutter={[12, 4]} justify="center" align="stretch">
           <Col sm={8} xs={10} ref={avatarContainer}>

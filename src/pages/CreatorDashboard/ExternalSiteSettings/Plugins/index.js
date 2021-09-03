@@ -98,11 +98,11 @@ const Plugins = () => {
                   <Paragraph>Select a plugin that you want to embed below.</Paragraph>
                 </Col>
                 <Col xs={24}>
-                  <Row gutter={[10, 10]}>
-                    <Col xs={24} lg={4}>
+                  <Row gutter={[10, 10]} align="baseline">
+                    <Col flex="0 1 auto">
                       <Text strong> Select Plugin </Text>
                     </Col>
-                    <Col xs={24} lg={20}>
+                    <Col flex="1 0 auto">
                       <Select
                         size="small"
                         className={styles.widgetSelect}
