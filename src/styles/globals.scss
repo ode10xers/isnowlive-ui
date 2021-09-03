@@ -46,4 +46,10 @@
   --pass-plugin-table-text-color: #{map-get($colors, 'Black')};
   --pass-plugin-cta-background-color: #{map-get($colors, 'DodgerBlue')};
   --pass-plugin-cta-text-color: #{map-get($colors, 'White')};
+
+  // Availability Plugin Variables
+  --availability-card-background-color : #{map-get($map: $colors, $key: 'White')};
+  --availability-card-font-color : #{map-get($map: $colors, $key: 'PrussianBlue')};
+  --availability-cta-background-color : #{map-get($map: $colors, $key: 'PrussianBlue')};
+  --availability-cta-font-color : #{map-get($map:$colors, $key : 'White')};
 }

@@ -253,16 +253,15 @@ const CourseForm = ({ match, history }) => {
 
     const modulesData = courseDetails
       ? {
-          // modules: courseDetails?.modules ?? dummyModuleData,
           type: courseDetails?.type ?? 'VIDEO',
-          max_participants: courseDetails?.max_participants || 1,
+          max_participants: courseDetails?.max_participants ?? 1,
           start_date: courseDetails?.start_date ?? moment().startOf('day').utc().format(),
           end_date: courseDetails?.end_date ?? moment().endOf('day').add(10, 'day').utc().format(),
           validity: courseDetails?.validity ?? 1,
         }
       : {
           type: 'VIDEO',
-          max_participants: 20,
+          max_participants: 0,
           validity: 1,
         };
 

@@ -552,7 +552,10 @@ const CourseDetails = ({ match }) => {
                           styles.courseBuyBtn,
                           isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
                             ? styles.darkText
-                            : styles.lightText
+                            : styles.lightText,
+                          !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
+                            ? styles.disabled
+                            : undefined
                         )}
                         onClick={handleCourseBuyClicked}
                         disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}

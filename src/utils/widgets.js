@@ -33,6 +33,54 @@ export const widgetComponentsName = {
       },
     ],
   },
+  LIST: {
+    value: 'list',
+    label: 'Sessions List',
+    styling: [
+      {
+        key: '--session-list-card-background-color',
+        label: 'Card Background',
+      },
+      {
+        key: '--session-list-card-font-color',
+        label: 'Card Text Color',
+      },
+      {
+        key: '--session-list-bar-color',
+        label: 'Top Bar Color',
+      },
+      {
+        key: '--session-list-date-font-color',
+        label: 'Date Color',
+      },
+      {
+        key: '--session-list-widget-background-color',
+        label: 'Plugin Background',
+      },
+    ],
+  },
+  AVAILABILITY: {
+    value: 'availability',
+    label: 'Availabilities',
+    styling: [
+      {
+        key: '--availability-card-background-color',
+        label: 'Card Background Color',
+      },
+      {
+        key: '--availability-card-font-color',
+        label: 'Card Text Color',
+      },
+      {
+        key: '--availability-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--availability-cta-font-color',
+        label: 'Button Text Color',
+      },
+    ],
+  },
   PASSES: {
     value: 'passes',
     label: 'Passes',
@@ -108,35 +156,9 @@ export const widgetComponentsName = {
     label: 'Memberships',
     styling: [],
   },
-  LIST: {
-    value: 'list',
-    label: 'Sessions List',
-    styling: [
-      {
-        key: '--session-list-card-background-color',
-        label: 'Card Background',
-      },
-      {
-        key: '--session-list-card-font-color',
-        label: 'Card Text Color',
-      },
-      {
-        key: '--session-list-bar-color',
-        label: 'Top Bar Color',
-      },
-      {
-        key: '--session-list-date-font-color',
-        label: 'Date Color',
-      },
-      {
-        key: '--session-list-widget-background-color',
-        label: 'Plugin Background',
-      },
-    ],
-  },
 };
 
-export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses', 'memberships', 'list'];
+export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses', 'memberships', 'list', 'availability'];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
   const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();
