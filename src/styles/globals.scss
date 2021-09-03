@@ -50,4 +50,6 @@
   // Availability Plugin Variables
   --availability-card-background-color : #{map-get($map: $colors, $key: 'White')};
   --availability-card-font-color : #{map-get($map: $colors, $key: 'PrussianBlue')};
+  --availability-cta-background-color : #{map-get($map: $colors, $key: 'PrussianBlue')};
+  --availability-cta-font-color : #{map-get($map:$colors, $key : 'White')};
 }

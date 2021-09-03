@@ -71,6 +71,14 @@ export const widgetComponentsName = {
         key: '--availability-card-font-color',
         label: 'Card Text Color',
       },
+      {
+        key: '--availability-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--availability-cta-font-color',
+        label: 'Button Text Color',
+      },
     ],
   },
   PASSES: {
