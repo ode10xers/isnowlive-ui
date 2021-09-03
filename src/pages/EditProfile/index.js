@@ -255,7 +255,7 @@ const editViewMap = {
   },
 };
 
-const Onboarding = ({ match, history }) => {
+const EditProfile = ({ match, history }) => {
   const [form] = Form.useForm();
   const [usernameForm] = Form.useForm();
   const { setUserDetails } = useGlobalContext();
@@ -693,12 +693,11 @@ const Onboarding = ({ match, history }) => {
     window.open(`${protocol}//${updatedHost}${pathname}`, '_self');
   };
 
-  const handleFinishEditUsername = async () => {
+  const handleFinishEditUsername = async (values) => {
     setIsLoading(true);
 
     if (isPublicUrlAvailable) {
       try {
-        const values = usernameForm.getFieldsValue();
         const payload = {
           ...creatorProfileData,
           ...values,
@@ -775,6 +774,7 @@ const Onboarding = ({ match, history }) => {
                 form={usernameForm}
                 scrollToFirstError={true}
                 initialValues={{ username: creatorProfileData?.username ?? '' }}
+                onFinish={handleFinishEditUsername}
               >
                 <Form.Item>
                   <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
@@ -813,16 +813,16 @@ const Onboarding = ({ match, history }) => {
                     </Col>
                   </Row>
                 </Form.Item>
+                <Form.Item>
+                  <Row gutter={8} justify="center">
+                    <Col>
+                      <Button disabled={!isPublicUrlAvailable} type="primary" htmlType="submit">
+                        Update Username
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form.Item>
               </Form>
-              <Form.Item>
-                <Row gutter={8} justify="center">
-                  <Col>
-                    <Button disabled={!isPublicUrlAvailable} type="primary" onClick={handleFinishEditUsername}>
-                      Update Username
-                    </Button>
-                  </Col>
-                </Row>
-              </Form.Item>
             </Col>
           </Row>
         </Spin>
@@ -1149,4 +1149,4 @@ const Onboarding = ({ match, history }) => {
   );
 };
 
-export default Onboarding;
+export default EditProfile;
