@@ -694,9 +694,6 @@ const EditProfile = ({ match, history }) => {
   };
 
   const handleFinishEditUsername = async (values) => {
-    console.log(values);
-    return;
-
     setIsLoading(true);
 
     if (isPublicUrlAvailable) {
@@ -816,16 +813,16 @@ const EditProfile = ({ match, history }) => {
                     </Col>
                   </Row>
                 </Form.Item>
+                <Form.Item>
+                  <Row gutter={8} justify="center">
+                    <Col>
+                      <Button disabled={!isPublicUrlAvailable} type="primary" htmlType="submit">
+                        Update Username
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form.Item>
               </Form>
-              <Form.Item>
-                <Row gutter={8} justify="center">
-                  <Col>
-                    <Button disabled={!isPublicUrlAvailable} type="primary" htmlType="submit">
-                      Update Username
-                    </Button>
-                  </Col>
-                </Row>
-              </Form.Item>
             </Col>
           </Row>
         </Spin>
