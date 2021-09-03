@@ -2,7 +2,8 @@ import React, { MouseEvent, useCallback, useRef } from 'react'
 import ReactHtmlParser from 'react-html-parser'
 import moment from 'moment'
 
-import { Row, Col, Typography, Card, Image } from 'antd'
+import { Row, Col, Typography, Card, Image, Button } from 'antd'
+import { RightOutlined } from '@ant-design/icons'
 
 import type { Session } from 'types/models/session'
 
@@ -34,13 +35,17 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
     <div className={styles.availabilityItem} onClick={handleClick}>
       <Card
         style={{
-          boxShadow: '0px 0px 5.18291px rgba(0, 0, 0, 0.08), 0px 0px 20.7317px 2.59146px rgba(0, 0, 0, 0.05)',
+          boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.08), 0px 0px 20px 2px rgba(0, 0, 0, 0.05)',
           borderRadius: 10,
         }}
-        bodyStyle={{ padding : 8 }}
+        bodyStyle={{ 
+          padding : 12,
+          backgroundColor: 'var(--availability-card-background-color, #ffffff)',
+          borderRadius: 10,
+        }}
       >
         <Row gutter={[12, 4]} justify="center" align="stretch">
-          <Col sm={8} xs={10} ref={avatarContainer}>
+          <Col xs={10} ref={avatarContainer}>
             <div className={styles.availabilityImageContainer}>
             <Image
               // shape="square"
@@ -51,7 +56,7 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
             />
             </div>
           </Col>
-          <Col sm={16} xs={14}>
+          <Col xs={14}>
             <Row>
               <Text className={styles.availabilityInfo}>
                 {availability.total_price > 0 ? `${availability.currency.toUpperCase()} ${availability.total_price}` : 'Free'}
@@ -70,6 +75,9 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
             <Paragraph className={styles.availabilityDescription}>
               {ReactHtmlParser(availability.description)}
             </Paragraph>
+            <Button size="small" type="primary" className={styles.ctaButton}>
+              Select a time{' '}<RightOutlined />
+            </Button>
           </Col>
         </Row>
       </Card>

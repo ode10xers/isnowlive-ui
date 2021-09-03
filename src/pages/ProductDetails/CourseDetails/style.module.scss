@@ -88,6 +88,10 @@
           &.darkText {
             color : map-get($colors, 'Zeus');
           }
+
+          &.disabled {
+            opacity: 0.6;
+          }
         }
 
         .courseName {

@@ -1,0 +1,12 @@
+@import '../../../styles/variables.scss';
+
+.availabilityListPluginContainer {
+  background-color: transparent;
+  width: 100%;
+
+  .availabilityListContainer {
+    max-width: 992px;
+    min-height: 700px;
+    margin: 0 auto;
+  }
+}
