@@ -18,6 +18,8 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
+const logo = require('assets/images/passion-orange-logo.png');
+
 const { Text } = Typography;
 
 const NavbarHeader = () => {
@@ -156,7 +158,11 @@ const NavbarHeader = () => {
   }, [username, userDetails]);
 
   if (reservedDomainName.includes(username)) {
-    return null;
+    return (
+      <div>
+        <img src={logo} alt="Passion.do" height="44px" />
+      </div>
+    );
   }
 
   //TODO: Investigate better solution for dynamic font size adjustment

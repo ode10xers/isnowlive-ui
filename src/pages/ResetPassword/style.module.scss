@@ -1,1 +1,54 @@
 @import '../../styles/variables.scss';
+
+.resetPasswordFormContainer {
+  box-shadow: -4px 3px 2px map-get($map: $colors, $key: 'Lavender');
+  border: 1px solid map-get($map: $colors, $key: 'Silver');
+
+  position: absolute;
+  left: 50%;
+  -moz-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: 240px;
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 700px;
+  padding: 60px;
+
+  @media screen and (max-width: 526px) {
+    padding: 60px 24px;
+    top: 200px;
+  }
+}
+
+.resetPasswordHeadingText {
+  min-width: 320px;
+  font-weight: 700;
+  font-size: 24px;
+  text-align: center;
+  color: #434343;
+  padding-bottom: 24px;
+
+  @media screen and (max-width: 526px) {
+    min-width: 240px;
+    font-size: 18px;
+  }
+}
+
+.resetPasswordForm {
+  width: 100%;
+  text-align: center;
+}
+
+.submitButton {
+  @extend .orangeBtn;
+  min-height: 48px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+}

@@ -232,14 +232,14 @@ export const isBrightColorShade = ([r, g, b]) => {
 export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];
 
 export const getDuration = (start_time, end_time) => {
-  let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
-  if (duration >= 60) {
-    return `${Math.floor(duration / 60)} Hr`;
-  }
+  const duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration < 0) {
     return null;
   }
-  return `${duration} Min`;
+
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
+  return `${hours > 0 ? `${hours} Hr` : ''} ${minutes > 0 ? `${minutes} min` : ''}`;
 };
 
 export const scrollToErrorField = (errorFields) => {
