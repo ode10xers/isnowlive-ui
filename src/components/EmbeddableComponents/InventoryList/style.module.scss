@@ -23,9 +23,13 @@
   }
 
   .monthArrowButton {
-    color: var(--inventory-list-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    background-color: var(--inventory-list-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    border-color: var(--inventory-list-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    color: var(--inventory-list-plugin-cta-font-color, #{map-get($colors, 'White')}) !important;
 
     &:disabled {
+      background-color: #f5f5f5 !important;
+      border-color: #f5f5f5 !important;
       color: rgba(0,0,0,0.25) !important;
     }
   }
@@ -92,20 +96,20 @@
 @media screen and (max-width: 768px) {
   .monthPickerContainer {
     .monthHeader {
-      font-size: 16px;
+      font-size: 16px !important;
     }
   }
 
   .dateContainer {
     .dateHeading {
-      font-size: 16px;
+      font-size: 16px !important;
     }
 
     .dateInventoriesContainer {
       .inventoryItem {
         .inventoryTitle {
-          font-size: 14px;
-          line-height: 18px;
+          font-size: 14px !important;
+          line-height: 18px !important;
         }
       }
     }
@@ -115,20 +119,34 @@
 @media screen and (max-width: 576px) {
   .monthPickerContainer {
     .monthHeader {
-      font-size: 14px;
+      font-size: 14px !important;
+    }
+
+    .monthArrowButton {
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 14px !important;
+      padding: 3px !important;
     }
   }
 
   .dateContainer {
     .dateHeading {
-      font-size: 14px;
+      font-size: 14px !important;
     }
 
     .dateInventoriesContainer {
       .inventoryItem {
         .inventoryTitle {
-          font-size: 12px;
-          line-height: 14px;
+          font-size: 12px !important;
+          line-height: 14px !important;
+        }
+
+        .bookButton {
+          width: 100% !important;
+          height: 32px !important;
+          font-size: 11px !important;
+          padding: 3px !important;
         }
       }
     }

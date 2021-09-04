@@ -109,7 +109,8 @@ const InventoryList = () => {
       <Row gutter={8} align="middle" className={styles.monthPickerContainer}>
         <Col flex="0 0 40px" className={styles.p10}>
           <Button
-            type="link"
+            type="primary"
+            size="large"
             className={styles.monthArrowButton}
             disabled={selectedMonthIdx === 0}
             icon={<LeftOutlined />}
@@ -123,7 +124,8 @@ const InventoryList = () => {
         </Col>
         <Col flex="0 0 40px" className={styles.p10}>
           <Button
-            type="link"
+            type="primary"
+            size="large"
             className={styles.monthArrowButton}
             disabled={selectedMonthIdx === months.length - 1}
             icon={<RightOutlined />}
