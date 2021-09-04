@@ -1,0 +1,69 @@
+@import '../../../styles/variables.scss';
+
+.inventoryListPluginContainer {
+  padding: 6px;
+  width: 100%;
+  background: transparent;
+}
+
+.monthPickerContainer {
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+
+  .monthHeader {
+    text-align: center;
+    font-size: 28px !important;
+    margin-bottom: 0px !important;
+    color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+  }
+}
+
+.dateContainer {
+  width: 100%;
+  padding: 0 8px;
+
+  .dateHeading {
+    font-size: 20px;
+    color: map-get($map: $colors, $key: 'White');
+    background-color: map-get($map: $colors, $key: 'PrussianBlue');
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+
+  .dateInventoriesContainer {
+    width: 100%;
+
+    .inventoryItem {
+      padding: 10px 0;
+      border-bottom: 1px solid map-get($map: $colors, $key: 'Silver');
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .inventoryStartTime {
+        width: 100%;
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+      }
+  
+      .inventoryDuration {
+        font-size: 12px;
+        width: 100%;
+        display: block;
+        text-align: center;
+      }
+  
+      .inventoryTitle {
+        font-size: 16px;
+        font-weight: 500;
+        width: 100%;
+        line-height: 20px;
+      }
+    }
+  }
+}

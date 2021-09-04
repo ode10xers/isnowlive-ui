@@ -3,6 +3,11 @@ import { getLocalUserDetails } from 'utils/storage';
 import parseQueryString from 'utils/parseQueryString';
 
 export const widgetComponentsName = {
+  INVENTORIES: {
+    value: 'inventory-list',
+    label: 'Simple Session List',
+    styling: [],
+  },
   CALENDAR: {
     value: 'calendar',
     label: 'Calendar',
@@ -35,7 +40,7 @@ export const widgetComponentsName = {
   },
   LIST: {
     value: 'list',
-    label: 'Sessions List',
+    label: 'Sessions Card List',
     styling: [
       {
         key: '--session-list-card-background-color',
@@ -158,7 +163,16 @@ export const widgetComponentsName = {
   },
 };
 
-export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses', 'memberships', 'list', 'availability'];
+export const publishedWidgets = [
+  'calendar',
+  'passes',
+  'videos',
+  'courses',
+  'memberships',
+  'list',
+  'availability',
+  'inventory-list',
+];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
   const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();
