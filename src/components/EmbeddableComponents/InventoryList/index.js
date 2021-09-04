@@ -106,7 +106,7 @@ const InventoryList = () => {
 
   const monthPicker = useMemo(
     () => (
-      <Row gutter={8} align="middle" className={styles.monthPickerContainer}>
+      <Row gutter={8} align="middle" className={styles.monthPickerContainer} wrap={false}>
         <Col flex="0 0 40px" className={styles.p10}>
           <Button
             type="primary"
