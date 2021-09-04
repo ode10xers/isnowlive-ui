@@ -6,7 +6,32 @@ export const widgetComponentsName = {
   INVENTORIES: {
     value: 'inventory-list',
     label: 'Simple Session List',
-    styling: [],
+    styling: [
+      {
+        key: '--inventory-list-plugin-month-font-color',
+        label: 'Month Heading Color',
+      },
+      {
+        key: '--inventory-list-plugin-inventory-font-color',
+        label: 'List Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-background-color',
+        label: 'Date Heading Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-font-color',
+        label: 'Date Heading Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+    ],
   },
   CALENDAR: {
     value: 'calendar',

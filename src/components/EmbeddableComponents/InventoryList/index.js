@@ -57,28 +57,6 @@ const InventoryList = () => {
     document.body.style.background = 'transparent';
   }, [fetchUpcomingInventories]);
 
-  // const filteredByDateInventories = useMemo(() => {
-  //   let filteredByDate = [];
-
-  //   inventories
-  //     .forEach((inv) => {
-  //       const formattedStartTime = toLongDateWithDay(inv.start_time);
-  //       const foundIndex = filteredByDate.findIndex((val) => val.key === formattedStartTime);
-
-  //       if (foundIndex >= 0) {
-  //         filteredByDate[foundIndex].children.push(inv);
-  //       } else {
-  //         filteredByDate.push({
-  //           key: formattedStartTime,
-  //           title: formattedStartTime,
-  //           children: [inv],
-  //         });
-  //       }
-  //     });
-
-  //   return filteredByDate;
-  // }, [inventories]);
-
   const renderInventoryItems = (dateInventoriesInMonth) => {
     const dates = Object.keys(dateInventoriesInMonth);
 
@@ -93,8 +71,8 @@ const InventoryList = () => {
                   <Row gutter={[8, 8]}>
                     {dateInventoriesInMonth[date].map((inventory) => (
                       <Col xs={24} key={inventory.inventory_external_id} className={styles.inventoryItem}>
-                        <Row gutter={[8, 8]} align="middle">
-                          <Col flex="0 0 120px" className={styles.p10}>
+                        <Row gutter={[8, 8]} align="middle" wrap={false}>
+                          <Col flex="0 0 100px" className={styles.p10}>
                             <Text className={styles.inventoryStartTime}>
                               {moment(inventory.start_time).format('h:mm A')}
                             </Text>
@@ -132,6 +110,7 @@ const InventoryList = () => {
         <Col flex="0 0 40px" className={styles.p10}>
           <Button
             type="link"
+            className={styles.monthArrowButton}
             disabled={selectedMonthIdx === 0}
             icon={<LeftOutlined />}
             onClick={() => setSelectedMonthIdx((prev) => (prev === 0 ? 0 : prev - 1))}
@@ -145,6 +124,7 @@ const InventoryList = () => {
         <Col flex="0 0 40px" className={styles.p10}>
           <Button
             type="link"
+            className={styles.monthArrowButton}
             disabled={selectedMonthIdx === months.length - 1}
             icon={<RightOutlined />}
             onClick={() => setSelectedMonthIdx((prev) => (prev === months.length - 1 ? months.length - 1 : prev + 1))}
@@ -162,7 +142,7 @@ const InventoryList = () => {
           {inventories.length > 0 ? (
             <>
               <Col xs={24} className={styles.textAlignCenter}>
-                <Paragraph>
+                <Paragraph className={styles.helperText}>
                   You can click the arrows to change the months. Months without any sessions will be skipped and not
                   shown.
                 </Paragraph>
