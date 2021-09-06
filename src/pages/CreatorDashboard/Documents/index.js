@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
 import { Row, Col, Button, Typography, Tooltip, Card, Empty } from 'antd';
-import { DownloadOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { DownloadOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -15,12 +15,14 @@ import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Documents = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [createDocumentModalVisible, setCreateDocumentModalVisible] = useState(false);
+
+  const [selectedDocument, setSelectedDocument] = useState(null);
 
   const getCreatorDocuments = useCallback(async () => {
     setIsLoading(true);
@@ -46,10 +48,16 @@ const Documents = () => {
 
   const hideCreateDocumentModal = (shouldRefresh = false) => {
     setCreateDocumentModalVisible(false);
+    setSelectedDocument(null);
 
     if (shouldRefresh) {
       getCreatorDocuments();
     }
+  };
+
+  const handleEditDocument = (document) => {
+    setSelectedDocument(document);
+    showCreateDocumentModal();
   };
 
   // TODO: Add other buttons/columns as necessary
@@ -65,9 +73,19 @@ const Documents = () => {
       width: '20%',
       render: (record) => (
         <Row gutter={[8, 8]} justify="end">
-          <Col xs={24}>
+          <Col xs={12}>
             <Tooltip title="Download document">
               <Button type="link" icon={<DownloadOutlined />} onClick={() => window.open(record.url)} />
+            </Tooltip>
+          </Col>
+          <Col xs={12}>
+            <Tooltip title="Edit document">
+              <Button
+                className={styles.editButton}
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEditDocument(record)}
+              />
             </Tooltip>
           </Col>
         </Row>
@@ -76,31 +94,37 @@ const Documents = () => {
   ];
 
   const renderMobileDocumentItems = (document) => {
-    const layout = (label, value) => (
-      <Row>
-        <Col span={9}>
-          <Text strong>{label}</Text>
-        </Col>
-        <Col span={15}>: {value}</Col>
-      </Row>
-    );
-
-    const downloadButton = (
-      <Tooltip title="Download document">
-        <Button type="link" icon={<DownloadOutlined />} onClick={() => window.open(document.url)} />
-      </Tooltip>
-    );
-
     return (
       <Col xs={24} key={document.id}>
-        <Card title={<Title level={5}> {document.name} </Title>}>{layout('Download', downloadButton)}</Card>
+        <Card
+          bodyStyle={{ padding: 10 }}
+          actions={[
+            <Tooltip title="Download document">
+              <Button type="link" icon={<DownloadOutlined />} onClick={() => window.open(document.url)} />
+            </Tooltip>,
+            <Tooltip title="Edit document">
+              <Button
+                className={styles.editButton}
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEditDocument(document)}
+              />
+            </Tooltip>,
+          ]}
+        >
+          <Title level={5}> {document.name} </Title>
+        </Card>
       </Col>
     );
   };
 
   return (
     <div className={styles.box}>
-      <CreateDocumentModal visible={createDocumentModalVisible} closeModal={hideCreateDocumentModal} />
+      <CreateDocumentModal
+        selectedDocument={selectedDocument}
+        visible={createDocumentModalVisible}
+        closeModal={hideCreateDocumentModal}
+      />
       <Row gutter={[8, 16]}>
         <Col xs={24} md={12} lg={16}>
           <Title level={4}> Documents </Title>
