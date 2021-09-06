@@ -1,5 +1,9 @@
 @import '../../styles/variables.scss';
 
+.productTag {
+  cursor: pointer;
+}
+
 .sessionRegistrationWrapper {
   // background: var(--passion-profile-light-color, #{map-get($colors, 'White1')});
   background: map-get($colors, 'White1');

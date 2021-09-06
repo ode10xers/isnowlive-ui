@@ -24,6 +24,7 @@ import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/help
 import useQueryParamState from 'hooks/useQueryParamState';
 
 import styles from './styles.module.scss';
+import { showErrorModal } from 'components/Modals/modals';
 
 const {
   formatDate: { getTimeDiff },
@@ -39,6 +40,7 @@ type AvailabilityDetailsView = 'all' | 'date' | 'form';
 const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [availability, setAvailability] = useState<Session>();
+  const [availabilityPasses, setAvailabilityPasses] = useState([]);
   const [showLongDescription, setShowLongDescription] = useState(false);
   const inventoriesByDates = useMemo<Record<string, Record<string, SessionInventory[]>>>(
     () =>
@@ -97,10 +99,32 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   const fetchAvailabilityDetail = useCallback(async (session_id: string) => {
     setIsLoading(true);
 
-    const { data, status } = (await apis.availabilities.getAvailabilityDetails(session_id)) ?? {};
+    try {
+      const { data, status } = await apis.availabilities.getAvailabilityDetails(session_id);
 
-    if (isAPISuccess(status) && data) {
-      setAvailability(data);
+      if (isAPISuccess(status) && data) {
+        setAvailability(data);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to fetch availability details', error?.response?.data?.message || 'Something went wrong');
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  const fetchAvailabilityPasses = useCallback(async (session_id : string) => {
+    setIsLoading(true);
+
+    try {
+      const { data, status } = await apis.passes.getPassesBySessionId(session_id);
+
+      if (isAPISuccess(status) && data) {
+        setAvailabilityPasses(data);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to fetch availability details', error?.response?.data?.message || 'Something went wrong');
     }
 
     setIsLoading(false);
@@ -120,12 +144,13 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         fetchAvailabilityDetail(match.params.session_id);
+        fetchAvailabilityPasses(match.params.session_id);
         fetchCreatorProfile(domainUsername);
       }
     } else {
       message.error('Session details not found.');
     }
-  }, [fetchAvailabilityDetail, match, fetchCreatorProfile]);
+  }, [match, fetchCreatorProfile, fetchAvailabilityPasses, fetchAvailabilityDetail]);
 
   useEffect(() => {
     let profileColorObject: Record<string, string> | null = null;
@@ -399,6 +424,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               {availability && (
                 <SessionRegistration
                   fullWidth
+                  availablePasses={availabilityPasses}
                   classDetails={{ ...selectedInventory, ...availability }}
                   isInventoryDetails={true}
                 />
