@@ -79,7 +79,12 @@ const Documents = () => {
           </Col>
           <Col xs={12}>
             <Tooltip title="Edit document">
-              <Button type="link" icon={<EditOutlined />} onClick={() => handleEditDocument(record)} />
+              <Button
+                className={styles.editButton}
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEditDocument(record)}
+              />
             </Tooltip>
           </Col>
         </Row>
@@ -91,16 +96,23 @@ const Documents = () => {
     return (
       <Col xs={24} key={document.id}>
         <Card
-          title={<Title level={5}> {document.name} </Title>}
+          bodyStyle={{ padding: 10 }}
           actions={[
             <Tooltip title="Download document">
               <Button type="link" icon={<DownloadOutlined />} onClick={() => window.open(document.url)} />
             </Tooltip>,
             <Tooltip title="Edit document">
-              <Button type="link" icon={<EditOutlined />} onClick={() => handleEditDocument(document)} />
+              <Button
+                className={styles.editButton}
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEditDocument(document)}
+              />
             </Tooltip>,
           ]}
-        ></Card>
+        >
+          <Title level={5}> {document.name} </Title>
+        </Card>
       </Col>
     );
   };

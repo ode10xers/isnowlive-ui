@@ -16,6 +16,7 @@ import { profileFormItemLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
+// NOTE: For now, we don't support editing the document file, only the name
 const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) => {
   const [form] = Form.useForm();
 
@@ -86,7 +87,7 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
 
   return (
     <Modal
-      title="Upload New Document"
+      title={selectedDocument ? 'Edit document' : 'Upload new document'}
       centered={true}
       visible={visible}
       footer={null}
@@ -103,51 +104,70 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item
-                name="file_url"
-                label="Upload File"
-                valuePropName="fileList"
-                getValueFromEvent={normFile}
-                required={true}
-                rules={[
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      return fileUrl ? Promise.resolve() : Promise.reject(new Error('Please upload file'));
-                    },
-                  }),
-                ]}
-              >
-                <Row>
-                  <Col>
-                    <FileUpload name="file_url" value={fileUrl} onChange={handleFileUrlChange} listType="text" />
+              {selectedDocument ? (
+                <Row align="middle" gutter={[10, 10]}>
+                  <Col {...profileFormItemLayout.labelCol} className={styles.fileLabel}>
+                    File :
                   </Col>
-                  {fileUrl && (
-                    <Col>
-                      <Button
-                        type="text"
-                        icon={<FilePdfOutlined />}
-                        size="middle"
-                        onClick={() => window.open(fileUrl)}
-                        className={styles.filenameButton}
-                      >
-                        {fileUrl.split('_').slice(-1)[0]}
-                      </Button>
-                      <Tooltip title="Remove this file">
-                        <Button
-                          danger
-                          type="text"
-                          size="middle"
-                          icon={<CloseCircleOutlined />}
-                          onClick={() => {
-                            setFileUrl(null);
-                            form.validateFields(['file_url']);
-                          }}
-                        />
-                      </Tooltip>
-                    </Col>
-                  )}
+                  <Col {...profileFormItemLayout.wrapperCol}>
+                    <Button
+                      type="text"
+                      icon={<FilePdfOutlined />}
+                      size="middle"
+                      onClick={() => window.open(selectedDocument.url)}
+                      className={styles.filenameButton}
+                    >
+                      {selectedDocument.url.split('_').slice(-1)[0]}
+                    </Button>
+                  </Col>
                 </Row>
-              </Form.Item>
+              ) : (
+                <Form.Item
+                  name="file_url"
+                  label="Upload File"
+                  valuePropName="fileList"
+                  getValueFromEvent={normFile}
+                  required={true}
+                  rules={[
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        return fileUrl ? Promise.resolve() : Promise.reject(new Error('Please upload file'));
+                      },
+                    }),
+                  ]}
+                >
+                  <Row>
+                    <Col>
+                      <FileUpload name="file_url" value={fileUrl} onChange={handleFileUrlChange} listType="text" />
+                    </Col>
+                    {fileUrl && (
+                      <Col>
+                        <Button
+                          type="text"
+                          icon={<FilePdfOutlined />}
+                          size="middle"
+                          onClick={() => window.open(fileUrl)}
+                          className={styles.filenameButton}
+                        >
+                          {fileUrl.split('_').slice(-1)[0]}
+                        </Button>
+                        <Tooltip title="Remove this file">
+                          <Button
+                            danger
+                            type="text"
+                            size="middle"
+                            icon={<CloseCircleOutlined />}
+                            onClick={() => {
+                              setFileUrl(null);
+                              form.validateFields(['file_url']);
+                            }}
+                          />
+                        </Tooltip>
+                      </Col>
+                    )}
+                  </Row>
+                </Form.Item>
+              )}
             </Col>
           </Row>
           <Row className={styles.modalActionRow} gutter={10} justify="end">
