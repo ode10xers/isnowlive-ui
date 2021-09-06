@@ -522,7 +522,9 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                 name="validity"
                 label="Pass Validity (days)"
                 extra={
-                  <Text className={styles.helpText}>The duration in days this pass will be usable after purchase</Text>
+                  <Text className={styles.helpText}>
+                    The duration in days this pass will be usable after purchase date
+                  </Text>
                 }
                 rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
               >
@@ -661,9 +663,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                     name="classCount"
                     label="Pass Credits"
                     extra={
-                      <Text className={styles.helpText}>
-                        The maximum amount of live classes and videos bookable with this pass
-                      </Text>
+                      <Text className={styles.helpText}>The no of sessions or videos bookable with this pass</Text>
                     }
                     rules={[
                       {

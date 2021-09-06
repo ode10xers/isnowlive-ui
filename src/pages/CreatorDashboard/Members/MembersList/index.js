@@ -216,6 +216,7 @@ const MembersList = () => {
 
   const reactivateMember = async (memberId) => {
     setIsLoading(true);
+    setSelectedMember(null);
 
     try {
       const payload = {
@@ -236,6 +237,7 @@ const MembersList = () => {
   };
 
   const handleBanMemberClicked = (memberId) => {
+    setSelectedMember(null);
     Modal.confirm({
       title: 'Remove member?',
       content: (
@@ -323,11 +325,10 @@ const MembersList = () => {
         // Since currently actions are only related to tags, we will also show/hide
         // it based on whether or not creator has tags
         const actionsColumnObject = {
-          title: 'Actions',
-          width: '220px',
-          align: 'center',
+          title: '',
+          width: '180px',
           render: (record) => (
-            <Row gutter={[8, 8]} justify="end">
+            <Row gutter={[8, 8]}>
               {record.id === selectedMember?.id ? (
                 <>
                   <Col xs={12}>
@@ -341,29 +342,12 @@ const MembersList = () => {
                     </Button>
                   </Col>
                 </>
-              ) : archiveView === memberViews.ARCHIVED.value ? (
-                <Col xs={24} className={styles.textAlignCenter}>
-                  <Button type="primary" onClick={() => reactivateMember(record.id)}>
-                    Reactivate
+              ) : (
+                <Col xs={24}>
+                  <Button block type="link" onClick={() => setSelectedMember(record)}>
+                    Edit Tag
                   </Button>
                 </Col>
-              ) : (
-                <>
-                  <Col xs={12}>
-                    <Button block type="link" onClick={() => setSelectedMember(record)}>
-                      Edit Tag
-                    </Button>
-                  </Col>
-                  <Col xs={12}>
-                    <Button
-                      className={styles.orangeBtn}
-                      type="primary"
-                      onClick={() => handleBanMemberClicked(record.id)}
-                    >
-                      Remove
-                    </Button>
-                  </Col>
-                </>
               )}
             </Row>
           ),
@@ -371,6 +355,23 @@ const MembersList = () => {
 
         initialColumns.splice(tagColumnPosition, 0, tagColumnObject, actionsColumnObject);
       }
+
+      const banMemberActions = {
+        title: '',
+        width: '80px',
+        render: (record) =>
+          archiveView === memberViews.ARCHIVED.value ? (
+            <Button type="primary" onClick={() => reactivateMember(record.id)}>
+              Reactivate
+            </Button>
+          ) : (
+            <Button className={styles.orangeBtn} type="primary" onClick={() => handleBanMemberClicked(record.id)}>
+              Remove
+            </Button>
+          ),
+      };
+
+      initialColumns.push(banMemberActions);
 
       if (isPrivateCommunity && archiveView === memberViews.ACTIVE.value) {
         // For this column we will put it in the last column, so we can use push()

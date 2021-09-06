@@ -3,12 +3,13 @@ import React from 'react';
 import Passes from 'components/EmbeddableComponents/Passes';
 import Videos from 'components/EmbeddableComponents/Videos';
 import Courses from 'components/EmbeddableComponents/Courses';
-import SessionsList from 'components/EmbeddableComponents/SessionsList';
+import SessionsList from 'components/EmbeddableComponents/SessionsCardsList';
 import Subscriptions from 'components/EmbeddableComponents/Subscriptions';
 import CalendarSessions from 'components/EmbeddableComponents/CalendarSessions';
 import AvailabilitiesPlugin from 'components/EmbeddableComponents/AvailabilitiesPlugin';
 
 import { widgetComponentsName } from 'utils/widgets';
+import InventoryList from 'components/EmbeddableComponents/InventoryList';
 
 // TODO: Might want to implement lazy loading here as well
 export default function EmbeddablePage({ widget }) {
@@ -27,6 +28,8 @@ export default function EmbeddablePage({ widget }) {
     componentToLoad = <SessionsList />;
   } else if (widget === widgetComponentsName.AVAILABILITY.value) {
     componentToLoad = <AvailabilitiesPlugin />;
+  } else if (widget === widgetComponentsName.INVENTORIES.value) {
+    componentToLoad = <InventoryList />;
   }
 
   window.addEventListener('message', (e) => {
