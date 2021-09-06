@@ -14,6 +14,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import SessionRegistration from 'components/SessionRegistration';
+import { showErrorModal } from 'components/Modals/modals';
 
 import type { Session, SessionInventory } from 'types/models/session';
 
@@ -24,7 +25,6 @@ import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/help
 import useQueryParamState from 'hooks/useQueryParamState';
 
 import styles from './styles.module.scss';
-import { showErrorModal } from 'components/Modals/modals';
 
 const {
   formatDate: { getTimeDiff },
@@ -64,7 +64,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         setSelectedMonth(months[0]);
       }
     }
-  }, [availability, months, inventoriesByDates, selectedMonth, setSelectedMonth]);
+  }, [availability, months, selectedMonth, setSelectedMonth]);
   const dates = useMemo<string[]>(
     () =>
       selectedMonth && inventoriesByDates[selectedMonth] !== undefined
@@ -137,7 +137,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       }
     } catch (error) {
       console.error(error);
-      showErrorModal('Failed to fetch availability details', error?.response?.data?.message || 'Something went wrong');
+      message.error(error?.response?.data?.message || 'Failed to fetch passes for availability');
     }
 
     setIsLoading(false);

@@ -11,6 +11,7 @@ import AuthModal from 'components/AuthModal';
 import { generateCardHeadingStyle } from 'components/ContainerCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -32,7 +33,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 
 const {
   formatDate: { toMonthYear },
@@ -446,19 +446,21 @@ const PassDetails = ({ match }) => {
   );
 
   const moreSessionsListView =
-    selectedPassDetails?.sessions?.length > 0 ? (
+    selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 ? (
       <Row gutter={[16, 16]}>
-        {selectedPassDetails?.sessions?.map((session) => (
-          <Col xs={24} md={12} lg={8} xl={6} key={`more_${session.session_external_id}`}>
-            <SessionListCard session={session} />
-          </Col>
-        ))}
+        {selectedPassDetails?.sessions
+          ?.filter((session) => session.type === 'NORMAL')
+          .map((session) => (
+            <Col xs={24} md={12} lg={8} xl={6} key={`more_${session.session_external_id}`}>
+              <SessionListCard session={session} />
+            </Col>
+          ))}
       </Row>
     ) : (
       <Empty description="No sessions to show" />
     );
 
-  const availabilityItemLimit = 1;
+  const availabilityItemLimit = 3;
 
   const passAvailabilityList = (
     <>
