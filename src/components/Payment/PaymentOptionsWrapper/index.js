@@ -61,6 +61,8 @@ const PaymentOptionsWrapper = ({
   const setupStripePaymentRequest = useCallback(async () => {
     try {
       if (stripe && creatorDetails) {
+        console.log('Setup');
+        console.log(amount);
         // Create Payment Request
         const paymentReq = stripe.paymentRequest({
           country: creatorDetails.country,
@@ -114,14 +116,19 @@ const PaymentOptionsWrapper = ({
       setupStripePaymentRequest();
     } else {
       setAvailablePaymentOptions(defaultAvailablePaymentOptions);
+      if (paymentRequest) {
+        paymentRequest.abort();
+      }
       setPaymentRequest(null);
       setSelectedPaymentOption(paymentMethodOptions.CARD.key);
     }
+    // eslint-disable-next-line
   }, [paymentPopupVisible, fetchAvailablePaymentMethods, creatorDetails, setupStripePaymentRequest]);
 
   // This use effect logic is to update the amount in the payment request
   // for dynamic amounts (Pay What You Want)
   useEffect(() => {
+    console.log(amount);
     if (paymentRequest) {
       paymentRequest.update({
         total: {
