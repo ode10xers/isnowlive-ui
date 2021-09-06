@@ -3,7 +3,14 @@ import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
-import { CaretDownOutlined, CheckCircleFilled, PlayCircleFilled, BookFilled, BarsOutlined } from '@ant-design/icons';
+import {
+  CaretDownOutlined,
+  CheckCircleFilled,
+  PlayCircleFilled,
+  BookFilled,
+  BarsOutlined,
+  CalendarFilled,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -11,6 +18,7 @@ import AuthModal from 'components/AuthModal';
 import { generateCardHeadingStyle } from 'components/ContainerCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -39,7 +47,7 @@ const {
 
 const { Title, Text } = Typography;
 
-const PassDetails = ({ match, history }) => {
+const PassDetails = ({ match }) => {
   const { showPaymentPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -257,6 +265,11 @@ const PassDetails = ({ match, history }) => {
     setBottomSheetsVisible(true);
   };
 
+  const handleSeeMoreAvailabilities = () => {
+    setMoreView('availabilities');
+    setBottomSheetsVisible(true);
+  };
+
   const handleCloseBottomSheets = () => {
     setBottomSheetsVisible(false);
   };
@@ -308,7 +321,7 @@ const PassDetails = ({ match, history }) => {
                 const IconElement = socialMediaIcons[socialMedia];
 
                 return (
-                  <a href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
+                  <a key={socialMedia} href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
                     <IconElement />
                   </a>
                 );
@@ -377,18 +390,23 @@ const PassDetails = ({ match, history }) => {
             className={styles.textAlignCenter}
             split={<Text className={styles.dotSeparator}>●</Text>}
           >
-            {selectedPassDetails?.sessions?.length > 0 && (
+            {selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
               <Text className={styles.passDetailItem}>
-                {' '}
-                <BookFilled className={styles.passDetailItemIcon} /> {selectedPassDetails?.sessions?.length} Accessible
-                Sessions{' '}
+                <BookFilled className={styles.passDetailItemIcon} />{' '}
+                {selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL').length ?? 0} Sessions
               </Text>
             )}
             {selectedPassDetails?.videos?.length > 0 && (
               <Text className={styles.passDetailItem}>
-                {' '}
-                <PlayCircleFilled className={styles.passDetailItemIcon} /> {selectedPassDetails?.videos?.length}{' '}
-                Accessible Videos{' '}
+                <PlayCircleFilled className={styles.passDetailItemIcon} /> {selectedPassDetails?.videos?.length ?? 0}{' '}
+                Videos
+              </Text>
+            )}
+            {selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+              <Text className={styles.passDetailItem}>
+                <CalendarFilled className={styles.passDetailItemIcon} />{' '}
+                {selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length ?? 0}{' '}
+                Availabilities
               </Text>
             )}
           </Space>
@@ -405,13 +423,16 @@ const PassDetails = ({ match, history }) => {
         Sessions purchasable with this pass
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
-        {selectedPassDetails?.sessions?.slice(0, sessionItemLimit).map((session) => (
-          <Col xs={18} md={16} lg={12} key={session.session_external_id}>
-            <SessionListCard session={session} />
-          </Col>
-        ))}
-        {selectedPassDetails?.sessions?.length > sessionItemLimit ? (
-          <Col xs={18} md={16} lg={12} className={styles.fadedItemContainer}>
+        {selectedPassDetails?.sessions
+          ?.filter((session) => session.type === 'NORMAL')
+          .slice(0, sessionItemLimit)
+          .map((session) => (
+            <Col xs={18} sm={16} md={14} lg={12} key={session.session_external_id}>
+              <SessionListCard session={session} />
+            </Col>
+          ))}
+        {selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL').length > sessionItemLimit ? (
+          <Col xs={18} sm={16} md={14} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreSessions}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -419,7 +440,11 @@ const PassDetails = ({ match, history }) => {
               </div>
             </div>
             <div className={styles.fadedItem}>
-              <SessionListCard session={selectedPassDetails?.sessions[sessionItemLimit]} />
+              <SessionListCard
+                session={
+                  selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL')[sessionItemLimit]
+                }
+              />
             </div>
           </Col>
         ) : null}
@@ -428,16 +453,73 @@ const PassDetails = ({ match, history }) => {
   );
 
   const moreSessionsListView =
-    selectedPassDetails?.sessions?.length > 0 ? (
+    selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 ? (
       <Row gutter={[16, 16]}>
-        {selectedPassDetails?.sessions?.map((session) => (
-          <Col xs={24} md={12} lg={8} xl={6} key={`more_${session.session_external_id}`}>
-            <SessionListCard session={session} />
-          </Col>
-        ))}
+        {selectedPassDetails?.sessions
+          ?.filter((session) => session.type === 'NORMAL')
+          .map((session) => (
+            <Col xs={24} md={12} lg={8} xl={6} key={`more_${session.session_external_id}`}>
+              <SessionListCard session={session} />
+            </Col>
+          ))}
       </Row>
     ) : (
       <Empty description="No sessions to show" />
+    );
+
+  const availabilityItemLimit = 3;
+
+  const passAvailabilityList = (
+    <>
+      <Title level={4} className={styles.sectionHeading}>
+        Availabilities purchasable with this pass
+      </Title>
+      <Row gutter={[8, 8]} className={styles.passContentContainer}>
+        {selectedPassDetails?.sessions
+          ?.filter((session) => session.type === 'AVAILABILITY')
+          .slice(0, availabilityItemLimit)
+          .map((session) => (
+            <Col xs={20} sm={16} md={14} lg={12} key={session.session_external_id}>
+              <AvailabilityListItem availability={session} />
+            </Col>
+          ))}
+        {selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length >
+        availabilityItemLimit ? (
+          <Col xs={20} sm={16} md={14} lg={12} className={styles.fadedItemContainer}>
+            <div className={styles.fadedOverlay}>
+              <div className={styles.seeMoreButton} onClick={handleSeeMoreAvailabilities}>
+                <BarsOutlined className={styles.seeMoreIcon} />
+                SEE MORE
+              </div>
+            </div>
+            <div className={styles.fadedItem}>
+              <AvailabilityListItem
+                availability={
+                  selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY')[
+                    availabilityItemLimit
+                  ]
+                }
+              />
+            </div>
+          </Col>
+        ) : null}
+      </Row>
+    </>
+  );
+
+  const moreAvailabilitiesListView =
+    selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 ? (
+      <Row gutter={[16, 16]}>
+        {selectedPassDetails?.sessions
+          ?.filter((session) => session.type === 'AVAILABILITY')
+          .map((session) => (
+            <Col xs={24} md={12} lg={8} xl={6} key={`more_${session.session_external_id}`}>
+              <AvailabilityListItem availability={session} />
+            </Col>
+          ))}
+      </Row>
+    ) : (
+      <Empty description="No availabilities to show" />
     );
 
   const videoItemLimit = 5;
@@ -449,12 +531,12 @@ const PassDetails = ({ match, history }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
         {selectedPassDetails?.videos?.slice(0, videoItemLimit).map((video) => (
-          <Col xs={16} lg={12} key={video.external_id}>
+          <Col xs={16} sm={14} lg={12} key={video.external_id}>
             <VideoListCard video={video} />
           </Col>
         ))}
         {selectedPassDetails?.videos?.length > videoItemLimit ? (
-          <Col xs={16} lg={12} className={styles.fadedItemContainer}>
+          <Col xs={16} sm={14} md={10} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreVideos}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -491,8 +573,7 @@ const PassDetails = ({ match, history }) => {
             <Avatar size={72} src={creatorProfile?.profile_image_url} className={styles.creatorProfileImage} />
             <div className={styles.creatorInfoContainer}>
               <Title level={5} className={styles.creatorName}>
-                {' '}
-                {creatorProfile?.first_name} {creatorProfile?.last_name}{' '}
+                {creatorProfile?.first_name} {creatorProfile?.last_name}
               </Title>
               <Text className={styles.joinTimeText}> Joined on {toMonthYear(creatorProfile?.signup_date)} </Text>
             </div>
@@ -630,21 +711,28 @@ const PassDetails = ({ match, history }) => {
                   </div>
                 </Col>
                 {/* Session Lists */}
-                {selectedPassDetails?.sessions?.length > 0 && (
+                {selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
                   <>
                     <Col xs={24}>
-                      {' '}
-                      <Divider />{' '}
+                      <Divider />
                     </Col>
                     <Col xs={24}>{passSessionList}</Col>
+                  </>
+                )}
+                {/* Availability Lists */}
+                {selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+                  <>
+                    <Col xs={24}>
+                      <Divider />
+                    </Col>
+                    <Col xs={24}>{passAvailabilityList}</Col>
                   </>
                 )}
                 {/* Video Lists */}
                 {selectedPassDetails?.videos?.length > 0 && (
                   <>
                     <Col xs={24}>
-                      {' '}
-                      <Divider />{' '}
+                      <Divider />
                     </Col>
                     <Col xs={24}>{passVideoList}</Col>
                   </>
@@ -680,7 +768,11 @@ const PassDetails = ({ match, history }) => {
           onClose={handleCloseBottomSheets}
           className={styles.moreContentDrawer}
         >
-          {moreView === 'sessions' ? moreSessionsListView : moreVideosListView}
+          {moreView === 'sessions'
+            ? moreSessionsListView
+            : moreView === 'videos'
+            ? moreVideosListView
+            : moreAvailabilitiesListView}
         </Drawer>
       </div>
       <div className={styles.mobileBuyButtonContainer}>

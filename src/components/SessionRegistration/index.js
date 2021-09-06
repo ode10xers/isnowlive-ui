@@ -59,6 +59,7 @@ const formInitialValues = {
   pwyw_price: null,
 };
 
+// TODO: Migrate from using isMobileDevice here
 const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDetails = false, fullWidth = false }) => {
   const {
     state: { userDetails },
@@ -207,7 +208,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
   useEffect(() => {
     if (classDetails) {
       if (isInventoryDetails) {
-        setSelectedInventory(classDetails);
+        if (classDetails.inventory_external_id) {
+          setSelectedInventory(classDetails);
+        }
       } else {
         const latestInventories = classDetails.inventory
           .filter((inventory) => isBeforeDate(inventory.end_time))
@@ -363,14 +366,13 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       title: 'Pass',
       dataIndex: 'name',
       key: 'name',
-      width: '50%',
     },
     {
       title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
-      width: '15%',
       align: 'right',
+      width: '75px',
       render: (text, record) => `${record.validity} days`,
     },
     {
@@ -378,7 +380,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '15%',
+      width: '85px',
       render: (text, record) =>
         record.total_price > 0 ? `${record.total_price} ${record.currency.toUpperCase()}` : 'Free',
     },
@@ -387,6 +389,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
+      width: '110px',
       render: (text, record) => {
         const btnText = record.limited
           ? record.user_usable
@@ -395,11 +398,11 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
           : 'Unlimited Credits ';
 
         return expandedRowKeys.includes(record.id) ? (
-          <Button className={styles.linkBtn} type="link" onClick={() => collapseRow(record.id)}>
+          <Button size="small" className={styles.linkBtn} type="link" onClick={() => collapseRow(record.id)}>
             {btnText} <UpOutlined />
           </Button>
         ) : (
-          <Button className={styles.linkBtn} type="link" onClick={() => expandRow(record.id)}>
+          <Button size="small" className={styles.linkBtn} type="link" onClick={() => expandRow(record.id)}>
             {btnText} <DownOutlined />
           </Button>
         );
@@ -412,7 +415,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       title: '',
       dataIndex: 'id',
       key: 'id',
-      width: '18px',
+      width: '16px',
       render: (text, record) => (
         <div
           className={selectedPass?.id === record.id ? undefined : styles.roundBtn}
@@ -432,36 +435,39 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       title: 'Credits Left',
       dataIndex: 'classes_remaining',
       key: 'classes_remaining',
-      width: '20%',
+      width: '95px',
       render: (text, record) => (record.limited ? `${record.classes_remaining}/${record.class_count}` : 'Unlimited'),
     },
     {
       title: 'Valid Till',
       dataIndex: 'expiry',
       key: 'expiry',
-      width: '20%',
+      width: '110px',
       render: (text, record) => toShortDate(record.expiry),
     },
   ];
 
   const renderPassDetails = (record) => (
     <Row gutter={[8, 8]}>
-      {record.sessions?.length > 0 && (
+      {record.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
         <>
           <Col xs={24}>
             <Text className={styles.ml20}> Sessions bookable with this pass </Text>
           </Col>
           <Col xs={24}>
             <div className={styles.ml20}>
-              {record?.sessions?.map((session) => (
-                <Tag
-                  key={`${record.id}_${session?.session_id}`}
-                  color="blue"
-                  onClick={() => redirectToSessionsPage(session)}
-                >
-                  {session?.name}
-                </Tag>
-              ))}
+              {record?.sessions
+                ?.filter((session) => session.type === 'NORMAL')
+                .map((session) => (
+                  <Tag
+                    className={styles.productTag}
+                    key={`${record.id}_${session?.session_id}`}
+                    color="blue"
+                    onClick={() => redirectToSessionsPage(session)}
+                  >
+                    {session?.name}
+                  </Tag>
+                ))}
             </div>
           </Col>
         </>
@@ -475,6 +481,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             <div className={styles.ml20}>
               {record?.videos?.map((video) => (
                 <Tag
+                  className={styles.productTag}
                   key={`${record.id}_${video?.external_id}`}
                   color="volcano"
                   onClick={() => redirectToVideosPage(video)}
@@ -482,6 +489,29 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                   {video?.title}
                 </Tag>
               ))}
+            </div>
+          </Col>
+        </>
+      )}
+      {record.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text className={styles.ml20}> Availabilities bookable with this pass </Text>
+          </Col>
+          <Col xs={24}>
+            <div className={styles.ml20}>
+              {record?.sessions
+                ?.filter((session) => session.type === 'AVAILABILITY')
+                .map((session) => (
+                  <Tag
+                    className={styles.productTag}
+                    key={`${record.id}_${session?.session_id}`}
+                    color="purple"
+                    onClick={() => redirectToSessionsPage(session)}
+                  >
+                    {session?.name}
+                  </Tag>
+                ))}
             </div>
           </Col>
         </>
@@ -539,22 +569,25 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
-            {pass?.sessions?.length > 0 && (
+            {pass?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
               <>
                 <Col xs={24}>
                   <Text className={styles.ml20}> Sessions bookable with this pass </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
-                    {pass?.sessions?.map((session) => (
-                      <Tag
-                        key={`${pass.id}_${session?.session_id}`}
-                        color="blue"
-                        onClick={() => redirectToSessionsPage(session)}
-                      >
-                        {session?.name}
-                      </Tag>
-                    ))}
+                    {pass?.sessions
+                      ?.filter((session) => session.type === 'NORMAL')
+                      .map((session) => (
+                        <Tag
+                          className={styles.productTag}
+                          key={`${pass.id}_${session?.session_id}`}
+                          color="blue"
+                          onClick={() => redirectToSessionsPage(session)}
+                        >
+                          {session?.name}
+                        </Tag>
+                      ))}
                   </div>
                 </Col>
               </>
@@ -568,6 +601,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                   <div className={styles.ml20}>
                     {pass?.videos?.map((video) => (
                       <Tag
+                        className={styles.productTag}
                         key={`${pass.id}_${video?.external_id}`}
                         color="volcano"
                         onClick={() => redirectToVideosPage(video)}
@@ -575,6 +609,29 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                         {video?.title}
                       </Tag>
                     ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Availabilities bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass?.sessions
+                      ?.filter((session) => session.type === 'AVAILABILITY')
+                      .map((session) => (
+                        <Tag
+                          className={styles.productTag}
+                          key={`${pass.id}_${session?.session_id}`}
+                          color="purple"
+                          onClick={() => redirectToSessionsPage(session)}
+                        >
+                          {session?.name}
+                        </Tag>
+                      ))}
                   </div>
                 </Col>
               </>
@@ -634,22 +691,25 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
-            {pass?.sessions?.length > 0 && (
+            {pass?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
               <>
                 <Col xs={24}>
                   <Text className={styles.ml20}> Sessions bookable with this pass </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
-                    {pass?.sessions?.map((session) => (
-                      <Tag
-                        key={`${pass.pass_order_id}_${session?.session_id}`}
-                        color="blue"
-                        onClick={() => redirectToSessionsPage(session)}
-                      >
-                        {session?.name}
-                      </Tag>
-                    ))}
+                    {pass?.sessions
+                      ?.filter((session) => session.type === 'NORMAL')
+                      .map((session) => (
+                        <Tag
+                          className={styles.productTag}
+                          key={`${pass.pass_order_id}_${session?.session_id}`}
+                          color="blue"
+                          onClick={() => redirectToSessionsPage(session)}
+                        >
+                          {session?.name}
+                        </Tag>
+                      ))}
                   </div>
                 </Col>
               </>
@@ -663,6 +723,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                   <div className={styles.ml20}>
                     {pass?.videos?.map((video) => (
                       <Tag
+                        className={styles.productTag}
                         key={`${pass.pass_order_id}_${video?.external_id}`}
                         color="volcano"
                         onClick={() => redirectToVideosPage(video)}
@@ -670,6 +731,29 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                         {video?.title}
                       </Tag>
                     ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Availabilities bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass?.sessions
+                      ?.filter((session) => session.type === 'AVAILABILITY')
+                      .map((session) => (
+                        <Tag
+                          className={styles.productTag}
+                          key={`${pass.pass_order_id}_${session?.session_id}`}
+                          color="purple"
+                          onClick={() => redirectToSessionsPage(session)}
+                        >
+                          {session?.name}
+                        </Tag>
+                      ))}
                   </div>
                 </Col>
               </>
@@ -1157,7 +1241,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                         <Row>
                           <Paragraph className={styles.bookingHelpText}>
                             Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
-                            class for{' '}
+                            {classDetails.type === 'NORMAL' ? 'class' : 'time slot'} for{' '}
                             <Text delete>
                               {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
                             </Text>
@@ -1170,7 +1254,11 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                         // Render User's Purchased Passes that's usable to book this session
                         <>
                           <div>
-                            <Title level={5}> Purchased pass(es) usable for this class </Title>
+                            <Title level={5}>
+                              {' '}
+                              Purchased pass(es) usable for this{' '}
+                              {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}{' '}
+                            </Title>
                             {isMobileDevice ? (
                               userPasses.map(renderUserPassItem)
                             ) : (
@@ -1186,7 +1274,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                             <Row>
                               <Paragraph className={styles.bookingHelpText}>
                                 Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
-                                class for{' '}
+                                {classDetails.type === 'NORMAL' ? 'class' : 'time slot'} for{' '}
                                 <Text delete>
                                   {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
                                 </Text>
@@ -1205,11 +1293,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                             <>
                               <div>
                                 <Title level={5}>
-                                  {' '}
-                                  Book {selectedInventory
-                                    ? toLongDateWithTime(selectedInventory.start_time)
-                                    : 'this'}{' '}
-                                  class{' '}
+                                  Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                                  {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}
                                 </Title>
                                 <Table
                                   size="small"
@@ -1222,9 +1307,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
                               <div className={styles.mt20}>
                                 <Title level={5}>
-                                  {' '}
                                   Buy pass & book{' '}
-                                  {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
+                                  {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                                  {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}
                                 </Title>
                                 {isMobileDevice ? (
                                   availablePasses.map(renderPassItem)

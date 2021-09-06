@@ -61,13 +61,19 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
               <Text className={styles.availabilityInfo}>
                 {availability.total_price > 0 ? `${availability.currency.toUpperCase()} ${availability.total_price}` : 'Free'}
               </Text>
-              <Text className={styles.availabilityInfoSeparator}>
-                {' ● '}
-              </Text>
-              <Text className={styles.availabilityInfo} >
-                {/* @ts-ignore */}
-                {getTimeDiff(moment(availability.inventory[0].end_time), moment(availability.inventory[0].start_time), 'minutes')} mins
-              </Text>
+
+              {availability.inventory?.length > 0 && (
+                <>
+                  <Text className={styles.availabilityInfoSeparator}>
+                    {' ● '}
+                  </Text>
+                  <Text className={styles.availabilityInfo} >
+                    {/* @ts-ignore */}
+                    {getTimeDiff(moment(availability.inventory[0]?.end_time), moment(availability.inventory[0]?.start_time), 'minutes')} mins
+                  </Text>
+                </>
+
+              )}
             </Row>
             <Title level={5} ellipsis={{ rows: 1 }} className={styles.availabilityTitle}>
               {availability.name}
