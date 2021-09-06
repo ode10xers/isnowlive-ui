@@ -308,8 +308,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     },
     {
       title: '',
-      dataIndex: 'price',
-      key: 'price',
+      dataIndex: 'total_price',
+      key: 'total_price',
       align: 'right',
       width: '50%',
       render: (text, record) =>
@@ -377,8 +377,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     },
     {
       title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
+      dataIndex: 'total_price',
+      key: 'total_price',
       align: 'left',
       width: '85px',
       render: (text, record) =>

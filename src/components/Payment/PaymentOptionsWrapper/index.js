@@ -58,38 +58,40 @@ const PaymentOptionsWrapper = ({
   // Because there can be a case where user don't have any
   // supported payment options for Wallet Payment
   // In that case we will not render that option
-  const setupStripePaymentRequest = useCallback(async () => {
-    try {
-      if (stripe && creatorDetails) {
-        // Create Payment Request
-        const paymentReq = stripe.paymentRequest({
-          country: creatorDetails.country,
-          currency: creatorDetails.currency,
-          total: {
-            label: 'Sub-Total',
-            // It seems that this amount includes sub-unit (e.g cents),
-            // so we need to * 100 for this to show correctly
-            amount: amount * 100,
-          },
-          requestPayerName: true,
-        });
+  const setupStripePaymentRequest = useCallback(
+    async (paymentAmount) => {
+      try {
+        if (stripe && creatorDetails) {
+          // Create Payment Request
+          const paymentReq = stripe.paymentRequest({
+            country: creatorDetails.country,
+            currency: creatorDetails.currency,
+            total: {
+              label: 'Sub-Total',
+              // It seems that this amount includes sub-unit (e.g cents),
+              // so we need to * 100 for this to show correctly
+              amount: paymentAmount * 100,
+            },
+            requestPayerName: true,
+          });
 
-        // Check availability of Payment Request API
-        // See more about the availability here
-        // https://stripe.com/docs/stripe-js/elements/payment-request-button?html-or-react=react#react-prerequisites
-        const result = await paymentReq.canMakePayment();
+          // Check availability of Payment Request API
+          // See more about the availability here
+          // https://stripe.com/docs/stripe-js/elements/payment-request-button?html-or-react=react#react-prerequisites
+          const result = await paymentReq.canMakePayment();
 
-        if (result) {
-          setPaymentRequest(paymentReq);
-        } else {
-          setPaymentRequest(null);
+          if (result) {
+            setPaymentRequest(paymentReq);
+          } else {
+            setPaymentRequest(null);
+          }
         }
+      } catch (error) {
+        console.error('Failed to create Payment Request');
       }
-    } catch (error) {
-      console.error('Failed to create Payment Request');
-    }
-    //eslint-disable-next-line
-  }, [stripe, creatorDetails]);
+    },
+    [stripe, creatorDetails]
+  );
 
   const fetchAvailablePaymentMethods = useCallback(async (currency) => {
     setIsLoading(true);
@@ -111,13 +113,16 @@ const PaymentOptionsWrapper = ({
   useEffect(() => {
     if (paymentPopupVisible) {
       fetchAvailablePaymentMethods(creatorDetails.currency);
-      setupStripePaymentRequest();
+      if (!paymentRequest) {
+        setupStripePaymentRequest(amount);
+      }
     } else {
       setAvailablePaymentOptions(defaultAvailablePaymentOptions);
       setPaymentRequest(null);
       setSelectedPaymentOption(paymentMethodOptions.CARD.key);
     }
-  }, [paymentPopupVisible, fetchAvailablePaymentMethods, creatorDetails, setupStripePaymentRequest]);
+    //eslint-disable-next-line
+  }, [paymentPopupVisible, paymentRequest, fetchAvailablePaymentMethods, creatorDetails, setupStripePaymentRequest]);
 
   // This use effect logic is to update the amount in the payment request
   // for dynamic amounts (Pay What You Want)
