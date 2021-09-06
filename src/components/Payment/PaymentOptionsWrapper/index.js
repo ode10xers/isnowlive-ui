@@ -62,8 +62,6 @@ const PaymentOptionsWrapper = ({
     async (paymentAmount) => {
       try {
         if (stripe && creatorDetails) {
-          console.log('Setup');
-          console.log(paymentAmount);
           // Create Payment Request
           const paymentReq = stripe.paymentRequest({
             country: creatorDetails.country,
@@ -129,7 +127,6 @@ const PaymentOptionsWrapper = ({
   // This use effect logic is to update the amount in the payment request
   // for dynamic amounts (Pay What You Want)
   useEffect(() => {
-    console.log(amount);
     if (paymentRequest) {
       paymentRequest.update({
         total: {
