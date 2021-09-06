@@ -208,7 +208,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
   useEffect(() => {
     if (classDetails) {
       if (isInventoryDetails) {
-        setSelectedInventory(classDetails);
+        if (classDetails.inventory_external_id) {
+          setSelectedInventory(classDetails);
+        }
       } else {
         const latestInventories = classDetails.inventory
           .filter((inventory) => isBeforeDate(inventory.end_time))

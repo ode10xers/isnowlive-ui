@@ -56,8 +56,15 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   const months = useMemo<string[]>(() => Object.keys(inventoriesByDates), [inventoriesByDates]);
   const [selectedMonth, setSelectedMonth] = useQueryParamState('monthYear');
   useEffect(() => {
-    if (selectedMonth === undefined) setSelectedMonth(months[0]);
-  }, [months, selectedMonth, setSelectedMonth]);
+    if (selectedMonth === undefined) {
+      const availInv = availability?.inventory.find((inv) => !(inv.num_participants > 0));
+      if (availInv) {
+        setSelectedMonth(moment(availInv.start_time).format('MMMM YYYY'));
+      } else {
+        setSelectedMonth(months[0]);
+      }
+    }
+  }, [availability, months, inventoriesByDates, selectedMonth, setSelectedMonth]);
   const dates = useMemo<string[]>(
     () =>
       selectedMonth && inventoriesByDates[selectedMonth] !== undefined
@@ -69,10 +76,16 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   useEffect(() => {
     if (selectedMonth) {
       if (selectedDate === undefined) {
-        setSelectedDate(dates[0]);
+        const availInv = availability?.inventory.filter((inv) => moment(inv.start_time).format('MMMM YYYY') === selectedMonth).find((inv) => !(inv.num_participants > 0));
+
+        if (availInv) {
+          setSelectedDate(moment(availInv.start_time).format('YYYY-MM-DD'));
+        } else {
+          setSelectedDate(dates[0]);
+        }
       }
     }
-  }, [selectedMonth, selectedDate, dates, setSelectedDate]);
+  }, [availability, selectedMonth, selectedDate, dates, setSelectedDate]);
 
   const inventories = inventoriesByDates[selectedMonth ?? '']?.[selectedDate ?? ''] ?? [];
   const [selectedInventoryId, setSelectedInventoryId] = useQueryParamState('inventory');
