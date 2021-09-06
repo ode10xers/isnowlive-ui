@@ -243,6 +243,7 @@ export default {
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),
+    updateDocument: (documentId, payload) => http.patch(`/secure/creator/documents/${documentId}`, payload),
   },
   legals: {
     createLegals: (payload) => http.post('/secure/creator/legal', payload),
