@@ -48,6 +48,7 @@ const Documents = () => {
 
   const hideCreateDocumentModal = (shouldRefresh = false) => {
     setCreateDocumentModalVisible(false);
+    setSelectedDocument(null);
 
     if (shouldRefresh) {
       getCreatorDocuments();
