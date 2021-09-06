@@ -16,20 +16,28 @@ import { profileFormItemLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
-// TODO: Modify and adjust when edit is available
-const CreateDocumentModal = ({ visible, closeModal }) => {
+const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) => {
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState(null);
 
   useEffect(() => {
-    if (!visible) {
+    if (visible) {
+      if (selectedDocument) {
+        form.setFieldsValue({
+          file_name: selectedDocument.name,
+          file_url: selectedDocument.url,
+        });
+
+        setFileUrl(selectedDocument.url);
+      }
+    } else {
       form.resetFields();
       setFileUrl(null);
       setIsLoading(false);
     }
-  }, [visible, form]);
+  }, [visible, form, selectedDocument]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -57,14 +65,20 @@ const CreateDocumentModal = ({ visible, closeModal }) => {
         url: fileUrl,
       };
 
-      const { status } = await apis.documents.createDocument(payload);
+      const { status } = selectedDocument
+        ? await apis.documents.updateDocument(selectedDocument.id, payload)
+        : await apis.documents.createDocument(payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Document saved!');
+        showSuccessModal(`Document ${selectedDocument ? 'updated' : 'saved'}!`);
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal('Failed to create document', error?.response?.data?.message || 'Something went wrong.');
+      console.error(error);
+      showErrorModal(
+        `Failed to ${selectedDocument ? 'update' : 'create'} document`,
+        error?.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setIsLoading(false);
@@ -138,7 +152,7 @@ const CreateDocumentModal = ({ visible, closeModal }) => {
           </Row>
           <Row className={styles.modalActionRow} gutter={10} justify="end">
             <Col xs={12} md={8} lg={6}>
-              <Button block type="default" onClick={() => closeModal(false)} loading={isLoading}>
+              <Button danger block type="default" onClick={() => closeModal(false)} loading={isLoading}>
                 Cancel
               </Button>
             </Col>
