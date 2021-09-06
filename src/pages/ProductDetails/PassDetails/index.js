@@ -3,7 +3,14 @@ import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
-import { CaretDownOutlined, CheckCircleFilled, PlayCircleFilled, BookFilled, BarsOutlined } from '@ant-design/icons';
+import {
+  CaretDownOutlined,
+  CheckCircleFilled,
+  PlayCircleFilled,
+  BookFilled,
+  BarsOutlined,
+  CalendarFilled,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -397,7 +404,7 @@ const PassDetails = ({ match }) => {
             )}
             {selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
               <Text className={styles.passDetailItem}>
-                <BookFilled className={styles.passDetailItemIcon} />{' '}
+                <CalendarFilled className={styles.passDetailItemIcon} />{' '}
                 {selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length ?? 0}{' '}
                 Availabilities
               </Text>
