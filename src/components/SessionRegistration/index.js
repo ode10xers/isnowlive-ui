@@ -1165,19 +1165,26 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                     </Title>
                   </Col>
                   <Col xs={24}>
-                    <Text className={styles.registrationHelpText}>
-                      <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are
-                      always available in your
-                      <a
-                        href={`${generateUrlFromUsername(
-                          classDetails?.creator_username ?? classDetails?.username ?? getUsernameFromUrl()
-                        )}${Routes.attendeeDashboard.rootPath}${Routes.attendeeDashboard.defaultPath}`}
-                      >
-                        {' '}
-                        dashboard
-                      </a>
-                      .
-                    </Text>
+                    {classDetails?.is_offline ? (
+                      <Text>
+                        This is an in-person event happening at the location mentioned above, please RSVP below and
+                        reach there 10 mins before the start time
+                      </Text>
+                    ) : (
+                      <Text>
+                        <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are
+                        always available in your
+                        <a
+                          href={`${generateUrlFromUsername(
+                            classDetails?.creator_username ?? classDetails?.username ?? getUsernameFromUrl()
+                          )}${Routes.attendeeDashboard.rootPath}${Routes.attendeeDashboard.defaultPath}`}
+                        >
+                          {' '}
+                          dashboard
+                        </a>
+                        .
+                      </Text>
+                    )}
                   </Col>
                   <Col xs={24} className={styles.formContainer}>
                     {/* Form used to handle both Sign Up and Session Booking */}
