@@ -56,8 +56,26 @@ const Plugins = () => {
     return `<iframe ${iframeOnloadHandler}id="${widgetId}" title="Passion.do Plugin Container" src="${widgetLink}" width="100%" height="700px" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; payment;" allowpaymentrequest="true" allowfullscreen="true" allowtransparency="true" style="border-width: 0;"> </iframe>`;
   }, [widgetLink, selectedWidget, widgetStyling]);
 
+  // TODO: Fix this implementation for plugin variations, very hacky
   useEffect(() => {
-    const generatedWidgetLink = generateWidgetLink(selectedWidget);
+    let queryParamData = {
+      isWidget: true,
+      widgetType: selectedWidget,
+    };
+
+    if (selectedWidget.startsWith('inventory-list-')) {
+      queryParamData = { ...queryParamData, widgetType: widgetComponentsName['INVENTORIES'].value };
+
+      if (selectedWidget.includes('image')) {
+        queryParamData = { ...queryParamData, showImage: true };
+      }
+
+      if (selectedWidget.includes('desc')) {
+        queryParamData = { ...queryParamData, showDesc: true };
+      }
+    }
+
+    const generatedWidgetLink = generateWidgetLink(queryParamData);
     setWidgetLink(generatedWidgetLink);
     setWidgetStyling(null);
   }, [selectedWidget]);
@@ -84,6 +102,30 @@ const Plugins = () => {
     setWidgetStyling(generateWidgetCSSVarsFromJSON(values));
   };
 
+  const renderPluginOptions = () => {
+    const groupedByProductPlugins = Object.values(widgetComponentsName).reduce(
+      (acc, val) => ({
+        ...acc,
+        [val.product]: {
+          groupLabel: val.product,
+          data: [...(acc[val.product]?.data ?? []), val],
+        },
+      }),
+      {}
+    );
+
+    return Object.values(groupedByProductPlugins).map((pluginData) => (
+      <Select.OptGroup
+        label={<Text className={styles.optionSeparatorText}>{pluginData.groupLabel}</Text>}
+        key={pluginData.groupLabel}
+      >
+        {pluginData.data.map((pluginOptions) => (
+          <Select.Option value={pluginOptions.value}>{pluginOptions.label}</Select.Option>
+        ))}
+      </Select.OptGroup>
+    ));
+  };
+
   return (
     <div className={styles.box}>
       <Row gutter={[20, 16]}>
@@ -108,9 +150,10 @@ const Plugins = () => {
                         className={styles.widgetSelect}
                         placeholder="Select page to show"
                         value={selectedWidget}
-                        options={Object.entries(widgetComponentsName).map(([key, val]) => val)}
                         onChange={handleSelectWidgetComponentChange}
-                      />
+                      >
+                        {renderPluginOptions()}
+                      </Select>
                     </Col>
                   </Row>
                 </Col>

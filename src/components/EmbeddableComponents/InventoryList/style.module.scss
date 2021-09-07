@@ -86,13 +86,15 @@
 
       .inventoryDesc {
         margin-top: 8px;
-        max-height: 78px;
+        max-height: 72px;
         overflow: hidden;
         font-size: 16px;
+        color: var(--inventory-list-plugin-inventory-font-color, #{map-get($colors, 'Black')}) !important;
       }
 
       .inventoryDesc * {
         background-color: transparent !important;
+        color: var(--inventory-list-plugin-inventory-font-color, #{map-get($colors, 'Black')}) !important;
         font-size: 14px !important;
       }
 
