@@ -188,21 +188,6 @@ const Plugins = () => {
                 <Title level={5}>Customize the look of your plugin:</Title>
               </Col>
               <Col xs={24}>
-                {/* <Space direction="vertical">
-                  <Paragraph>
-                    You can use this color picker to check the colors. Empty fields use the default colors. To replace the default color, copy the Hex value of the color you want into the input fields below
-                  </Paragraph>
-                  <div>
-                    <SketchPicker
-                      // Disable alpha for now
-                      disableAlpha={true}
-                      className={styles.colorPicker}
-                      color={previewColor}
-                      onChangeComplete={handleColorChange}
-                      presetColors={colorPickerChoices}
-                    />
-                  </div>
-                </Space> */}
                 <Row gutter={[8, 8]}>
                   <Col xs={24} sm={11} lg={24} xl={11}>
                     <Paragraph>
