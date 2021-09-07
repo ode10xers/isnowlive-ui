@@ -21,6 +21,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
+import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 
 const { Text, Paragraph } = Typography;
 
@@ -200,18 +201,20 @@ const PublicPassList = ({ passes }) => {
 
   const renderPassDetails = (record) => (
     <Row className={styles.passDetailsExpansion}>
-      {record?.sessions?.length > 0 && (
+      {record?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
         <>
           <Col xs={24}>
             <Text className={styles.expandableSectionHeader}>Sessions bookable with this pass</Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
             <Row gutter={[8, 8]}>
-              {record?.sessions?.map((session) => (
-                <Col xs={24} sm={12} key={session.session_external_id}>
-                  <SessionListCard session={session} />
-                </Col>
-              ))}
+              {record?.sessions
+                ?.filter((session) => session.type === 'NORMAL')
+                .map((session) => (
+                  <Col xs={24} sm={12} key={session.session_external_id}>
+                    <SessionListCard session={session} />
+                  </Col>
+                ))}
             </Row>
           </Col>
         </>
@@ -223,6 +226,24 @@ const PublicPassList = ({ passes }) => {
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
             <SimpleVideoCardsList passDetails={record} videos={record.videos} />
+          </Col>
+        </>
+      )}
+      {record?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text className={styles.expandableSectionHeader}>Availabilities bookable with this pass</Text>
+          </Col>
+          <Col xs={24} className={styles.passDetailsContainer}>
+            <Row gutter={[8, 8]}>
+              {record?.sessions
+                ?.filter((session) => session.type === 'AVAILABILITY')
+                .map((session) => (
+                  <Col xs={24} md={12} key={session.session_external_id}>
+                    <AvailabilityListItem availability={session} />
+                  </Col>
+                ))}
+            </Row>
           </Col>
         </>
       )}
@@ -284,18 +305,20 @@ const PublicPassList = ({ passes }) => {
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
-            {pass.sessions?.length > 0 && (
+            {pass.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
               <>
                 <Col xs={24}>
                   <Text> Sessions bookable with this pass </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
-                    {pass.sessions?.map((session) => (
-                      <Tag key={session?.key} color="blue" onClick={() => redirectToSessionsPage(session)}>
-                        {session?.name}
-                      </Tag>
-                    ))}
+                    {pass.sessions
+                      ?.filter((session) => session.type === 'NORMAL')
+                      .map((session) => (
+                        <Tag key={session?.key} color="blue" onClick={() => redirectToSessionsPage(session)}>
+                          {session?.name}
+                        </Tag>
+                      ))}
                   </div>
                 </Col>
               </>
@@ -312,6 +335,24 @@ const PublicPassList = ({ passes }) => {
                         {video?.title}
                       </Tag>
                     ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text> Availabilities bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.sessions
+                      ?.filter((session) => session.type === 'AVAILABILITY')
+                      .map((session) => (
+                        <Tag key={session?.key} color="purple" onClick={() => redirectToSessionsPage(session)}>
+                          {session?.name}
+                        </Tag>
+                      ))}
                   </div>
                 </Col>
               </>
