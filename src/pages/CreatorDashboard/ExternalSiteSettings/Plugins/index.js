@@ -9,9 +9,9 @@ import { CopyOutlined } from '@ant-design/icons';
 
 import { copyToClipboard, generateWidgetCSSVarsFromJSON } from 'utils/helper';
 import { generateWidgetLink, widgetComponentsName } from 'utils/widgets';
+import validationRules from 'utils/validation';
 
 import styles from './styles.module.scss';
-import validationRules from 'utils/validation';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -120,7 +120,9 @@ const Plugins = () => {
         key={pluginData.groupLabel}
       >
         {pluginData.data.map((pluginOptions) => (
-          <Select.Option value={pluginOptions.value}>{pluginOptions.label}</Select.Option>
+          <Select.Option key={pluginOptions.value} value={pluginOptions.value}>
+            {pluginOptions.label}
+          </Select.Option>
         ))}
       </Select.OptGroup>
     ));
