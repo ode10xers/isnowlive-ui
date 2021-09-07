@@ -84,6 +84,22 @@
         color: var(--inventory-list-plugin-inventory-font-color, #{map-get($colors, 'Black')}) !important;
       }
 
+      .inventoryDesc {
+        margin-top: 8px;
+        max-height: 78px;
+        overflow: hidden;
+        font-size: 16px;
+      }
+
+      .inventoryDesc * {
+        background-color: transparent !important;
+        font-size: 14px !important;
+      }
+
+      .inventoryImage {
+        width: 100%;
+      }
+
       .bookButton {
         background-color: var(--inventory-list-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
         border-color: var(--inventory-list-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
@@ -111,6 +127,14 @@
           font-size: 14px !important;
           line-height: 18px !important;
         }
+
+        .inventoryDesc {
+          font-size: 12px;
+        }
+
+        .inventoryDesc * {
+          font-size: 12px !important;
+        }
       }
     }
   }
@@ -137,13 +161,9 @@
 
     .dateInventoriesContainer {
       .inventoryItem {
-        .inventoryTitle {
-          font-size: 12px !important;
-          line-height: 14px !important;
-        }
-
         .bookButton {
           width: 100% !important;
+          max-width: 120px !important;
           height: 32px !important;
           font-size: 11px !important;
           padding: 3px !important;
