@@ -1,20 +1,27 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import ReactHtmlParser from 'react-html-parser';
 import moment from 'moment';
 
-import { Row, Col, Typography, Button, Spin, Empty, message } from 'antd';
+import { Row, Col, Grid, Typography, Button, Spin, Empty, Image, message } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
+import DefaultImage from 'components/Icons/DefaultImage';
+
 import { getDuration, isAPISuccess } from 'utils/helper';
 import { redirectToInventoryPage } from 'utils/redirect';
+import parseQueryString from 'utils/parseQueryString';
 
 import styles from './style.module.scss';
 
 const { Title, Paragraph, Text } = Typography;
+const { useBreakpoint } = Grid;
 
-// TODO: Try moving into using dateUtil
+// NOTE : Might want to implement infinite scrolling here
 const InventoryList = () => {
+  const { xs } = useBreakpoint();
+
   const [isLoading, setIsLoading] = useState(true);
   const [inventories, setInventories] = useState([]);
   const inventoriesByDates = useMemo(() => {
@@ -34,6 +41,11 @@ const InventoryList = () => {
   }, [inventories]);
   const months = useMemo(() => Object.keys(inventoriesByDates), [inventoriesByDates]);
   const [selectedMonthIdx, setSelectedMonthIdx] = useState(0);
+
+  // NOTE: If the values are present in query string, they are treated as string
+  const queryStringData = parseQueryString(window.location.search);
+  const showImage = queryStringData['showImage']?.toLowerCase() === 'true';
+  const showDesc = queryStringData['showDesc']?.toLowerCase() === 'true';
 
   const fetchUpcomingInventories = useCallback(async () => {
     setIsLoading(true);
@@ -69,33 +81,88 @@ const InventoryList = () => {
                 <div className={styles.dateHeading}>{moment(date).format('dddd, MMMM Do')}</div>
                 <div className={styles.dateInventoriesContainer}>
                   <Row gutter={[8, 8]}>
-                    {dateInventoriesInMonth[date].map((inventory) => (
-                      <Col xs={24} key={inventory.inventory_external_id} className={styles.inventoryItem}>
-                        <Row gutter={[8, 8]} align="middle" wrap={false}>
-                          <Col flex="0 0 100px" className={styles.p10}>
-                            <Text className={styles.inventoryStartTime}>
-                              {moment(inventory.start_time).format('h:mm A')}
-                            </Text>
-                            <Text className={styles.inventoryDuration}>
-                              {getDuration(inventory.start_time, inventory.end_time)}
-                            </Text>
+                    {dateInventoriesInMonth[date].map((inventory) => {
+                      const inventoryTime = (
+                        <>
+                          <Text className={styles.inventoryStartTime}>
+                            {moment(inventory.start_time).format('h:mm A')}
+                          </Text>
+                          <Text className={styles.inventoryDuration}>
+                            {getDuration(inventory.start_time, inventory.end_time)}
+                          </Text>
+                        </>
+                      );
+
+                      const invTitle = (
+                        <>
+                          <Text className={styles.inventoryTitle}>{inventory.name}</Text>
+                          {showDesc && (
+                            <div className={styles.inventoryDesc}>{ReactHtmlParser(inventory.description)}</div>
+                          )}
+                        </>
+                      );
+
+                      const inventoryDetails = showImage ? (
+                        <Row gutter={[8, 8]} align="middle">
+                          <Col xs={24} md={12} lg={10} xl={8}>
+                            <Image
+                              width="100%"
+                              loading="lazy"
+                              preview={false}
+                              fallback={DefaultImage()}
+                              src={inventory.session_image_url}
+                              className={styles.inventoryImage}
+                            />
                           </Col>
-                          <Col flex="1 1 auto" className={styles.p10}>
-                            <Text className={styles.inventoryTitle}>{inventory.name}</Text>
-                          </Col>
-                          <Col flex="0 0 60px" className={styles.p10}>
-                            <Button
-                              size="large"
-                              type="primary"
-                              className={styles.bookButton}
-                              onClick={() => redirectToInventoryPage(inventory)}
-                            >
-                              Book
-                            </Button>
+                          <Col xs={24} md={12} lg={14} xl={16}>
+                            {invTitle}
                           </Col>
                         </Row>
-                      </Col>
-                    ))}
+                      ) : (
+                        invTitle
+                      );
+
+                      const bookButton = (
+                        <Button
+                          size="large"
+                          type="primary"
+                          className={styles.bookButton}
+                          onClick={() => redirectToInventoryPage(inventory)}
+                        >
+                          BOOK
+                        </Button>
+                      );
+
+                      return (
+                        <Col xs={24} key={inventory.inventory_external_id} className={styles.inventoryItem}>
+                          {xs ? (
+                            <Row gutter={[8, 8]} align="middle">
+                              <Col xs={24} className={styles.textAlignCenter}>
+                                {inventoryDetails}
+                              </Col>
+                              <Col xs={12} className={styles.textAlignCenter}>
+                                {inventoryTime}
+                              </Col>
+                              <Col xs={12} className={styles.textAlignCenter}>
+                                {bookButton}
+                              </Col>
+                            </Row>
+                          ) : (
+                            <Row gutter={[8, 8]} align="middle" wrap={false}>
+                              <Col flex="0 0 100px" className={styles.p10}>
+                                {inventoryTime}
+                              </Col>
+                              <Col flex="1 1 auto" className={styles.p10}>
+                                {inventoryDetails}
+                              </Col>
+                              <Col flex="0 0 60px" className={styles.p10}>
+                                {bookButton}
+                              </Col>
+                            </Row>
+                          )}
+                        </Col>
+                      );
+                    })}
                   </Row>
                 </div>
               </div>

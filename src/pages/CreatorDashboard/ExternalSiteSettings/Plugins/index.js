@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-// import ReactHtmlParser from 'react-html-parser';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { TwitterPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 
-import { Row, Col, Select, Typography, Button, Tooltip, Space, Form, Input } from 'antd';
+import { Row, Col, Select, Typography, Button, Tooltip, Form, Input } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
 import { copyToClipboard, generateWidgetCSSVarsFromJSON } from 'utils/helper';
 import { generateWidgetLink, widgetComponentsName } from 'utils/widgets';
+import validationRules from 'utils/validation';
 
 import styles from './styles.module.scss';
-import validationRules from 'utils/validation';
 
 const { Title, Text, Paragraph } = Typography;
 
 const colorPickerChoices = [
-  '#f44336',
   '#e91e63',
   '#9c27b0',
   '#673ab7',
@@ -56,8 +54,26 @@ const Plugins = () => {
     return `<iframe ${iframeOnloadHandler}id="${widgetId}" title="Passion.do Plugin Container" src="${widgetLink}" width="100%" height="700px" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; payment;" allowpaymentrequest="true" allowfullscreen="true" allowtransparency="true" style="border-width: 0;"> </iframe>`;
   }, [widgetLink, selectedWidget, widgetStyling]);
 
+  // TODO: Fix this implementation for plugin variations, very hacky
   useEffect(() => {
-    const generatedWidgetLink = generateWidgetLink(selectedWidget);
+    let queryParamData = {
+      isWidget: true,
+      widgetType: selectedWidget,
+    };
+
+    if (selectedWidget.startsWith('inventory-list-')) {
+      queryParamData = { ...queryParamData, widgetType: widgetComponentsName['INVENTORIES'].value };
+
+      if (selectedWidget.includes('image')) {
+        queryParamData = { ...queryParamData, showImage: true };
+      }
+
+      if (selectedWidget.includes('desc')) {
+        queryParamData = { ...queryParamData, showDesc: true };
+      }
+    }
+
+    const generatedWidgetLink = generateWidgetLink(queryParamData);
     setWidgetLink(generatedWidgetLink);
     setWidgetStyling(null);
   }, [selectedWidget]);
@@ -84,6 +100,32 @@ const Plugins = () => {
     setWidgetStyling(generateWidgetCSSVarsFromJSON(values));
   };
 
+  const renderPluginOptions = () => {
+    const groupedByProductPlugins = Object.values(widgetComponentsName).reduce(
+      (acc, val) => ({
+        ...acc,
+        [val.product]: {
+          groupLabel: val.product,
+          data: [...(acc[val.product]?.data ?? []), val],
+        },
+      }),
+      {}
+    );
+
+    return Object.values(groupedByProductPlugins).map((pluginData) => (
+      <Select.OptGroup
+        label={<Text className={styles.optionSeparatorText}>{pluginData.groupLabel}</Text>}
+        key={pluginData.groupLabel}
+      >
+        {pluginData.data.map((pluginOptions) => (
+          <Select.Option key={pluginOptions.value} value={pluginOptions.value}>
+            {pluginOptions.label}
+          </Select.Option>
+        ))}
+      </Select.OptGroup>
+    ));
+  };
+
   return (
     <div className={styles.box}>
       <Row gutter={[20, 16]}>
@@ -108,9 +150,10 @@ const Plugins = () => {
                         className={styles.widgetSelect}
                         placeholder="Select page to show"
                         value={selectedWidget}
-                        options={Object.entries(widgetComponentsName).map(([key, val]) => val)}
                         onChange={handleSelectWidgetComponentChange}
-                      />
+                      >
+                        {renderPluginOptions()}
+                      </Select>
                     </Col>
                   </Row>
                 </Col>
@@ -145,21 +188,24 @@ const Plugins = () => {
                 <Title level={5}>Customize the look of your plugin:</Title>
               </Col>
               <Col xs={24}>
-                <Space direction="vertical">
-                  <Paragraph>
-                    {' '}
-                    You can use this color picker to check the colors. Empty fields use the default colors{' '}
-                  </Paragraph>
-                  <div style={{ borderColor: previewColor, borderWidth: 2, borderStyle: 'solid' }}>
-                    <TwitterPicker
-                      className={styles.colorPicker}
+                <Row gutter={[8, 8]}>
+                  <Col xs={24} sm={11} lg={24} xl={11}>
+                    <Paragraph>
+                      You can use this color picker to check the colors. Empty fields use the default colors. To replace
+                      the default color, copy the Hex value of the color you want into the input fields below
+                    </Paragraph>
+                  </Col>
+                  <Col xs={24} sm={13} lg={24} xl={13}>
+                    <SketchPicker
+                      // Disable alpha for now
+                      disableAlpha={true}
+                      // className={styles.colorPicker}
                       color={previewColor}
                       onChangeComplete={handleColorChange}
-                      triangle="hide"
-                      colors={colorPickerChoices}
+                      presetColors={colorPickerChoices}
                     />
-                  </div>
-                </Space>
+                  </Col>
+                </Row>
               </Col>
               <Col xs={24}>
                 <Form layout="vertical" form={form} onFinish={handleStylingFinished}>
