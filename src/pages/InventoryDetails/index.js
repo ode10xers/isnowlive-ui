@@ -151,7 +151,9 @@ const InventoryDetails = ({ match, history }) => {
           <Row>
             {session?.is_offline && (
               <Col xs={24}>
-                <Title level={5}> Session Location </Title>
+                <Title type="danger" level={5}>
+                  This is an in-person event happening at :
+                </Title>
                 <Text> {session?.offline_event_address} </Text>
               </Col>
             )}
