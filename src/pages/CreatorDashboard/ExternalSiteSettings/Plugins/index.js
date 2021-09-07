@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-// import ReactHtmlParser from 'react-html-parser';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { TwitterPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 
-import { Row, Col, Select, Typography, Button, Tooltip, Space, Form, Input } from 'antd';
+import { Row, Col, Select, Typography, Button, Tooltip, Form, Input } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
 import { copyToClipboard, generateWidgetCSSVarsFromJSON } from 'utils/helper';
@@ -16,7 +15,6 @@ import styles from './styles.module.scss';
 const { Title, Text, Paragraph } = Typography;
 
 const colorPickerChoices = [
-  '#f44336',
   '#e91e63',
   '#9c27b0',
   '#673ab7',
@@ -190,21 +188,39 @@ const Plugins = () => {
                 <Title level={5}>Customize the look of your plugin:</Title>
               </Col>
               <Col xs={24}>
-                <Space direction="vertical">
+                {/* <Space direction="vertical">
                   <Paragraph>
-                    {' '}
-                    You can use this color picker to check the colors. Empty fields use the default colors{' '}
+                    You can use this color picker to check the colors. Empty fields use the default colors. To replace the default color, copy the Hex value of the color you want into the input fields below
                   </Paragraph>
-                  <div style={{ borderColor: previewColor, borderWidth: 2, borderStyle: 'solid' }}>
-                    <TwitterPicker
+                  <div>
+                    <SketchPicker
+                      // Disable alpha for now
+                      disableAlpha={true}
                       className={styles.colorPicker}
                       color={previewColor}
                       onChangeComplete={handleColorChange}
-                      triangle="hide"
-                      colors={colorPickerChoices}
+                      presetColors={colorPickerChoices}
                     />
                   </div>
-                </Space>
+                </Space> */}
+                <Row gutter={[8, 8]}>
+                  <Col xs={24} sm={11} lg={24} xl={11}>
+                    <Paragraph>
+                      You can use this color picker to check the colors. Empty fields use the default colors. To replace
+                      the default color, copy the Hex value of the color you want into the input fields below
+                    </Paragraph>
+                  </Col>
+                  <Col xs={24} sm={13} lg={24} xl={13}>
+                    <SketchPicker
+                      // Disable alpha for now
+                      disableAlpha={true}
+                      // className={styles.colorPicker}
+                      color={previewColor}
+                      onChangeComplete={handleColorChange}
+                      presetColors={colorPickerChoices}
+                    />
+                  </Col>
+                </Row>
               </Col>
               <Col xs={24}>
                 <Form layout="vertical" form={form} onFinish={handleStylingFinished}>
