@@ -14,7 +14,12 @@ const SimpleVideoCardsList = ({ passDetails, videos }) => {
         {videos
           .sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : -1))
           .map((passVideo) => (
-            <Col xs={24} lg={12} key={`${passDetails?.id || passDetails?.pass_id || ''}_${passVideo.external_id}`}>
+            <Col
+              xs={24}
+              md={12}
+              lg={8}
+              key={`${passDetails?.id || passDetails?.pass_id || ''}_${passVideo.external_id}`}
+            >
               {/* <VideoCard video={passVideo} buyable={false} hoverable={true} showDetailsBtn={false} /> */}
               <VideoListCard video={passVideo} />
             </Col>

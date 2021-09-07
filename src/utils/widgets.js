@@ -3,39 +3,10 @@ import { getLocalUserDetails } from 'utils/storage';
 import parseQueryString from 'utils/parseQueryString';
 
 export const widgetComponentsName = {
-  INVENTORIES: {
-    value: 'inventory-list',
-    label: 'Simple Session List',
-    styling: [
-      {
-        key: '--inventory-list-plugin-month-font-color',
-        label: 'Month Heading Color',
-      },
-      {
-        key: '--inventory-list-plugin-inventory-font-color',
-        label: 'List Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-background-color',
-        label: 'Date Heading Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-font-color',
-        label: 'Date Heading Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-background-color',
-        label: 'Button Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-font-color',
-        label: 'Button Text Color',
-      },
-    ],
-  },
   CALENDAR: {
     value: 'calendar',
-    label: 'Calendar',
+    label: 'Sessions - Calendar',
+    product: 'Session',
     styling: [
       {
         key: '--calendar-plugin-heading-font-color',
@@ -63,9 +34,135 @@ export const widgetComponentsName = {
       },
     ],
   },
+  // TODO: Fix this implementation for plugin variations, very hacky
+  INVENTORIES: {
+    value: 'inventory-list',
+    label: 'Sessions - List (Name only)',
+    product: 'Session',
+    styling: [
+      {
+        key: '--inventory-list-plugin-month-font-color',
+        label: 'Month Heading Color',
+      },
+      {
+        key: '--inventory-list-plugin-inventory-font-color',
+        label: 'List Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-background-color',
+        label: 'Date Heading Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-font-color',
+        label: 'Date Heading Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+    ],
+  },
+  INVENTORIES_WITH_IMAGE: {
+    value: 'inventory-list-image',
+    label: 'Sessions - List (Name and Image)',
+    product: 'Session',
+    styling: [
+      {
+        key: '--inventory-list-plugin-month-font-color',
+        label: 'Month Heading Color',
+      },
+      {
+        key: '--inventory-list-plugin-inventory-font-color',
+        label: 'List Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-background-color',
+        label: 'Date Heading Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-font-color',
+        label: 'Date Heading Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+    ],
+  },
+  INVENTORIES_WITH_DESC: {
+    value: 'inventory-list-desc',
+    label: 'Sessions - List (Name and Description)',
+    product: 'Session',
+    styling: [
+      {
+        key: '--inventory-list-plugin-month-font-color',
+        label: 'Month Heading Color',
+      },
+      {
+        key: '--inventory-list-plugin-inventory-font-color',
+        label: 'List Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-background-color',
+        label: 'Date Heading Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-font-color',
+        label: 'Date Heading Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+    ],
+  },
+  INVENTORIES_WITH_IMAGE_DESC: {
+    value: 'inventory-list-image-desc',
+    label: 'Sessions - List (Name, Image, and Description)',
+    product: 'Session',
+    styling: [
+      {
+        key: '--inventory-list-plugin-month-font-color',
+        label: 'Month Heading Color',
+      },
+      {
+        key: '--inventory-list-plugin-inventory-font-color',
+        label: 'List Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-background-color',
+        label: 'Date Heading Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-date-heading-font-color',
+        label: 'Date Heading Text Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--inventory-list-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+    ],
+  },
   LIST: {
     value: 'list',
-    label: 'Sessions Card List',
+    label: 'Sessions - Cards',
+    product: 'Session',
     styling: [
       {
         key: '--session-list-card-background-color',
@@ -91,7 +188,8 @@ export const widgetComponentsName = {
   },
   AVAILABILITY: {
     value: 'availability',
-    label: 'Availabilities',
+    label: 'Availabilities - Cards',
+    product: 'Availability',
     styling: [
       {
         key: '--availability-card-background-color',
@@ -113,7 +211,8 @@ export const widgetComponentsName = {
   },
   PASSES: {
     value: 'passes',
-    label: 'Passes',
+    label: 'Passes - List',
+    product: 'Pass',
     styling: [
       {
         key: '--pass-plugin-heading-background-color',
@@ -147,7 +246,8 @@ export const widgetComponentsName = {
   },
   VIDEOS: {
     value: 'videos',
-    label: 'Videos',
+    label: 'Videos - Cards',
+    product: 'Video',
     styling: [
       {
         key: '--new-video-card-font-color ',
@@ -161,7 +261,8 @@ export const widgetComponentsName = {
   },
   COURSES: {
     value: 'courses',
-    label: 'Courses',
+    label: 'Courses - Cards',
+    product: 'Course',
     styling: [
       {
         key: '--course-widget-background-color',
@@ -183,7 +284,8 @@ export const widgetComponentsName = {
   },
   MEMBERSHIPS: {
     value: 'memberships',
-    label: 'Memberships',
+    label: 'Memberships - Cards',
+    product: 'Membership',
     styling: [],
   },
 };
@@ -199,14 +301,11 @@ export const publishedWidgets = [
   'inventory-list',
 ];
 
-export const generateWidgetLink = (widgetName, userNameValue = '') => {
+export const generateWidgetLink = (queryParamData, userNameValue = '') => {
   const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();
   const siteLink = generateUrlFromUsername(username);
 
-  const queryParams = Object.entries({
-    isWidget: true,
-    widgetType: widgetName || 'calendar',
-  })
+  const queryParams = Object.entries(queryParamData)
     .map(([key, val]) => `${key}=${val}`)
     .join('&');
 
