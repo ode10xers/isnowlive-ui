@@ -65,6 +65,8 @@ import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/int
 
 import styles from './style.module.scss';
 
+const maxInventoryLimitPerRequest = 1000;
+
 const { Title, Text, Paragraph, Link } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -283,9 +285,13 @@ const Session = ({ match, history }) => {
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
         if (isOnboarding) {
+          // TODO: Check with what to do here
           history.push(Routes.sessionCreate);
         } else {
-          history.push('/creator/dashboard' + Routes.creatorDashboard.createSessions);
+          history.push(
+            '/creator/dashboard' +
+              (isAvailability ? Routes.creatorDashboard.manageAvailabilities : Routes.creatorDashboard.manageSessions)
+          );
         }
       }
     },
@@ -699,9 +705,9 @@ const Session = ({ match, history }) => {
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         // NOTE : Investigate why we filter out booked inventories here
-        data.inventory = allInventoryList.filter(
-          (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
-        );
+        data.inventory = allInventoryList
+          .filter((slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0)
+          .slice(0, maxInventoryLimitPerRequest);
         if (deleteSlot && deleteSlot.length) {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
@@ -713,23 +719,28 @@ const Session = ({ match, history }) => {
           if (isAPISuccess(updatedSessionResponse.status)) {
             trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
 
-            Modal.confirm({
+            Modal.success({
               icon: <CheckCircleOutlined />,
-              title: `${data.name} session successfully updated`,
+              title: `${data.name} ${isAvailability ? 'availability' : 'session'} successfully updated`,
               className: styles.confirmModal,
               okText: 'Done',
-              cancelText: 'Add New',
-              onCancel: () => {
-                trackSimpleEvent(eventTagObject.addNewInModal);
-                const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
-                const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
-                getSessionDetails(match.params.id, startDate, endDate);
-                window.location.reload();
-                window.scrollTo(0, 0);
-              },
+              // onCancel: () => {
+              //   trackSimpleEvent(eventTagObject.addNewInModal);
+              //   const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
+              //   const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
+              //   getSessionDetails(match.params.id, startDate, endDate);
+              //   window.location.reload();
+              //   window.scrollTo(0, 0);
+              // },
               onOk: () => {
                 trackSimpleEvent(eventTagObject.doneInModal);
-                history.push(`${Routes.creatorDashboard.rootPath}/${Routes.creatorDashboard.createSessions}`);
+                history.push(
+                  `${Routes.creatorDashboard.rootPath}${
+                    isAvailability
+                      ? Routes.creatorDashboard.manageAvailabilities
+                      : Routes.creatorDashboard.manageSessions
+                  }`
+                );
                 window.scrollTo(0, 0);
               },
             });
@@ -757,7 +768,9 @@ const Session = ({ match, history }) => {
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
-              title: `${newSessionResponse.data.name} session successfully created`,
+              title: `${newSessionResponse.data.name} ${
+                isAvailability ? 'availability' : 'session'
+              } successfully created`,
               className: styles.confirmModal,
               okText: 'Done',
               cancelText: 'Add New',
@@ -768,7 +781,13 @@ const Session = ({ match, history }) => {
               },
               onOk: () => {
                 trackSimpleEvent(eventTagObject.doneInModal);
-                history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`);
+                history.push(
+                  `${Routes.creatorDashboard.rootPath}${
+                    isAvailability
+                      ? Routes.creatorDashboard.manageAvailabilities
+                      : Routes.creatorDashboard.manageSessions
+                  }`
+                );
               },
             });
           }
@@ -811,7 +830,11 @@ const Session = ({ match, history }) => {
               className={styles.headButton}
               onClick={() =>
                 trackAndNavigate(
-                  '/creator/dashboard/manage/sessions',
+                  // '/creator/dashboard/manage/sessions',
+                  Routes.creatorDashboard.rootPath +
+                    (isAvailability
+                      ? Routes.creatorDashboard.manageAvailabilities
+                      : Routes.creatorDashboard.manageSessions),
                   creator.click.sessions.manage.backToManageSessionsList
                 )
               }
@@ -1298,8 +1321,17 @@ const Session = ({ match, history }) => {
             <Row justify="center">
               <Col flex={4}>
                 <Title level={4} className={styles.scheduleCount}>
-                  {session?.inventory?.length || 0} Schedules will be created
+                  {session?.inventory?.length > maxInventoryLimitPerRequest
+                    ? maxInventoryLimitPerRequest
+                    : session?.inventory?.length || 0}{' '}
+                  Schedules will be created
                 </Title>
+                {session?.inventory?.length > maxInventoryLimitPerRequest && (
+                  <Text type="danger">
+                    For safety reasons, we limit the number of schedules you can set at one time to{' '}
+                    {maxInventoryLimitPerRequest} schedules.
+                  </Text>
+                )}
               </Col>
               <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
                 <Form.Item>
