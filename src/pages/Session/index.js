@@ -329,6 +329,7 @@ const Session = ({ match, history }) => {
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
+      // TODO: Properly reset states here
       getCreatorCurrencyDetails();
       form.setFieldsValue({
         ...form.getFieldsValue(),

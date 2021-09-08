@@ -70,7 +70,7 @@ const SessionsInventories = ({ match }) => {
   const getStaffSession = useCallback(
     async (sessionType) => {
       try {
-        const { data } = isAvailability
+        const { status, data } = isAvailability
           ? sessionType === 'past'
             ? await apis.availabilities.getPastAvailability()
             : await apis.availabilities.getUpcomingAvailability()
@@ -78,7 +78,7 @@ const SessionsInventories = ({ match }) => {
           ? await apis.session.getPastSession()
           : await apis.session.getUpcomingSession();
 
-        if (data && data.length > 0) {
+        if (isAPISuccess(status) && data) {
           const unfilteredSessions = data.map((i, index) => ({
             index,
             key: i?.inventory_id,
