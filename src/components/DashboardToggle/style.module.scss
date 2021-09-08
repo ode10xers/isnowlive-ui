@@ -6,6 +6,10 @@
   width: 100%;
   max-width: clamp(220px, 220px, 400px);
   display: inline-block;
+
+  @media screen and (max-width: 600px) {
+    margin-left: 40px;
+  }
 }
 
 .navSwitchItem {
