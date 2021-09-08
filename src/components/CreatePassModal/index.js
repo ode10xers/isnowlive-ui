@@ -95,7 +95,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
       }
     } catch (error) {
       console.error(error);
-      message.error(error?.response?.data?.message || 'Failed to fetch classes');
+      message.error(error?.response?.data?.message || 'Failed to fetch sessions');
     }
 
     setIsLoading(false);
@@ -298,8 +298,8 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
 
       if (noClassesSelected && noVideosSelected && noAvailabilitiesSelected) {
         showErrorModal(
-          'Select Class/Video/Availability',
-          'Please select some class, videos, or availabilities to include in the pass'
+          'Select Session/Video/Availability',
+          'Please select some sessions, videos, or availabilities to include in the pass'
         );
         form.setFieldsValue(values);
         setIsSubmitting(false);
@@ -494,14 +494,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
               <Form.Item
                 id="classList"
                 name="classList"
-                label="Apply to Class(es)"
-                extra={<Text className={styles.helpText}> The classes that will be bookable using this pass </Text>}
+                label="Apply to session(s)"
+                extra={<Text className={styles.helpText}> The sessions that will be bookable using this pass </Text>}
               >
                 <Select
                   showArrow
                   allowClear
                   showSearch={false}
-                  placeholder="Select your class(es)"
+                  placeholder="Select your session(s)"
                   mode="multiple"
                   maxTagCount={2}
                   value={selectedClasses}
@@ -722,7 +722,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                     required: true,
                     validator: (_, value) => {
                       if (passType === passTypes.LIMITED.name && !value) {
-                        return Promise.reject('Please select the amount of classes');
+                        return Promise.reject('Please select the amount of credits');
                       }
                       return Promise.resolve();
                     },
