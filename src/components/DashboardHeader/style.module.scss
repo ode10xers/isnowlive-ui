@@ -10,6 +10,11 @@
   }
 }
 
+.siteButton {
+  margin-left: auto;
+  margin-right: 0;
+  float: right;
+}
 
 .logo {
   height: 40px;
@@ -22,7 +27,7 @@
 
 .logoWrapper {
   flex: 0 0 240px;
-  @media screen and (max-width: 525px) {
+  @media screen and (max-width: 600px) {
     flex: 1 1 auto;
     display: none;
   }
@@ -32,7 +37,7 @@
   flex : 1 1 auto;
   text-align: left;
   
-  @media screen and (max-width: 525px) {
+  @media screen and (max-width: 600px) {
     flex: 1 1 100%;
     text-align: center;
     align-self:center

@@ -855,7 +855,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
                     Edit
                   </Button>
                   <Button ghost type="primary" icon={<GlobalOutlined />} onClick={handleNavigateToPublicPage}>
-                    Public Page
+                    My Website
                   </Button>
                 </>
               )}

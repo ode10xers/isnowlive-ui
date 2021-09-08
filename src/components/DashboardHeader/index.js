@@ -1,13 +1,34 @@
 import React from 'react';
-import { Row, Col } from 'antd';
+import { Row, Col, Button, Grid } from 'antd';
+import { GlobalOutlined } from '@ant-design/icons';
 
 import DashboardToggle from 'components/DashboardToggle';
+
+import { generateUrlFromUsername } from 'utils/helper';
+
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
 const logo = require('assets/images/passion-orange-logo.png');
 
+const { useBreakpoint } = Grid;
+
 const DashboardHeader = () => {
+  const { xs } = useBreakpoint();
+
+  const {
+    state: {
+      userDetails: { username },
+    },
+  } = useGlobalContext();
+
+  const handleRedirectToPublicPage = () => {
+    if (username) {
+      window.open(generateUrlFromUsername(username));
+    }
+  };
+
   return (
     <Row className={styles.headerContainer} gutter={[20, 8]}>
       <Col className={styles.logoWrapper}>
@@ -15,6 +36,19 @@ const DashboardHeader = () => {
       </Col>
       <Col className={styles.navItemWrapper}>
         <DashboardToggle />
+        {xs ? (
+          <Button
+            ghost
+            type="primary"
+            className={styles.siteButton}
+            onClick={handleRedirectToPublicPage}
+            icon={<GlobalOutlined />}
+          />
+        ) : (
+          <Button ghost type="primary" className={styles.siteButton} onClick={handleRedirectToPublicPage}>
+            My Website
+          </Button>
+        )}
       </Col>
     </Row>
   );
