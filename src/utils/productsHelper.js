@@ -22,9 +22,14 @@ export const formatPassesData = (data) => {
 };
 
 export const getLiveCoursesFromCourses = (data) => {
-  return data.filter((course) => course.type === courseType.MIXED || course.type === 'live');
+  return data.filter((course) => course.type === courseType.MIXED || course.type === 'LIVE');
 };
 
 export const getVideoCoursesFromCourses = (data) => {
-  return data.filter((course) => course.type === courseType.VIDEO_NON_SEQ || course.type === courseType.VIDEO_SEQ);
+  return data.filter(
+    (course) =>
+      course.type === courseType.VIDEO_NON_SEQ ||
+      course.type === courseType.VIDEO_SEQ ||
+      course.type === courseType.VIDEO
+  );
 };
