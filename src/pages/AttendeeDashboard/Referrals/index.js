@@ -27,7 +27,7 @@ const Referrals = () => {
     const siteLink = generateUrlFromUsername(username);
     const referralCode = getLocalUserDetails().referral_code;
 
-    return siteLink + '?ref=' + referralCode;
+    return siteLink + '?invite=' + referralCode;
   };
 
   const generateUserName = () => {

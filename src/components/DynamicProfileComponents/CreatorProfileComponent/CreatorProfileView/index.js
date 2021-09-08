@@ -20,7 +20,7 @@ const { Title } = Typography;
 const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
   let { search } = useLocation();
   const query = new URLSearchParams(search);
-  localStorage.setItem('ref', JSON.stringify(query.get('ref')));
+  localStorage.setItem('invite', JSON.stringify(query.get('invite')));
 
   const { cover_image_url, profile_image_url, profile: profileData } = creatorProfile ?? {};
 
