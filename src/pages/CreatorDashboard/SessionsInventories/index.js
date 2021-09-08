@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card, Radio, Empty, Tooltip } from 'antd';
+import { Row, Col, Typography, Popconfirm, Button, Card, Radio, Empty, Tooltip, Space, Grid } from 'antd';
 import {
   DeleteOutlined,
   DownCircleOutlined,
@@ -46,12 +46,22 @@ const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLongDateWithLongDay, toLocaleDate },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { useBreakpoint } = Grid;
 const { creator } = mixPanelEventTags;
 
 const whiteColor = '#FFFFFF';
 
+const bookingViews = {
+  ALL: 'all',
+  BOOKED: 'booked',
+  EMPTY: 'empty',
+};
+
+// TODO: Rework the isMobileDevice usage here to use useBreakpoint hooks
 const SessionsInventories = ({ match }) => {
   const { showSendEmailPopup } = useGlobalContext();
+
+  const { xs } = useBreakpoint();
 
   const history = useHistory();
   const location = useLocation();
@@ -67,16 +77,23 @@ const SessionsInventories = ({ match }) => {
   const [offlineEventAddressModalVisible, setOfflineEventAddressModalVisible] = useState(false);
   const [selectedInventoryForModal, setSelectedInventoryForModal] = useState(null);
 
+  const [bookingViewFilter, setBookingViewFilter] = useState(bookingViews.ALL);
+
   const getStaffSession = useCallback(
     async (sessionType) => {
       try {
-        const { status, data } = isAvailability
+        const targetAPI = isAvailability
           ? sessionType === 'past'
-            ? await apis.availabilities.getPastAvailability()
-            : await apis.availabilities.getUpcomingAvailability()
+            ? apis.availabilities.getPastAvailability
+            : apis.availabilities.getUpcomingAvailability
           : sessionType === 'past'
-          ? await apis.session.getPastSession()
-          : await apis.session.getUpcomingSession();
+          ? apis.session.getPastSession
+          : apis.session.getUpcomingSession;
+
+        const { status, data } =
+          bookingViewFilter === bookingViews.ALL
+            ? await targetAPI()
+            : await targetAPI(bookingViewFilter === bookingViews.BOOKED);
 
         if (isAPISuccess(status) && data) {
           const unfilteredSessions = data.map((i, index) => ({
@@ -136,7 +153,7 @@ const SessionsInventories = ({ match }) => {
         setIsLoading(false);
       }
     },
-    [isAvailability]
+    [isAvailability, bookingViewFilter]
   );
 
   useEffect(() => {
@@ -588,6 +605,8 @@ const SessionsInventories = ({ match }) => {
     }
   };
 
+  const handleBookingFilterChanged = (e) => setBookingViewFilter(e.target.value);
+
   return (
     <>
       <EventAddressModal
@@ -602,7 +621,7 @@ const SessionsInventories = ({ match }) => {
       />
       <div className={styles.box}>
         <Row gutter={[8, 8]}>
-          <Col xs={24} md={18} lg={20}>
+          <Col xs={24}>
             <Title level={4}>
               {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availabilities' : 'Sessions'}
             </Title>
@@ -610,11 +629,6 @@ const SessionsInventories = ({ match }) => {
               <Radio.Button value="list">List</Radio.Button>
               <Radio.Button value="calendar">Calendar</Radio.Button>
             </Radio.Group>
-          </Col>
-          <Col xs={24} md={6} lg={4}>
-            <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
-              {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-            </Button>
           </Col>
 
           <Col xs={24}>
@@ -636,85 +650,102 @@ const SessionsInventories = ({ match }) => {
                 )}
               </Loader>
             ) : (
-              <>
-                {isMobileDevice ? (
-                  <Loader
-                    loading={isLoading}
-                    size="large"
-                    text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}
-                  >
-                    {sessions.length > 0 ? (
-                      <Table
-                        columns={mobileTableColumns}
-                        tableLayout="fixed"
-                        data={filteredByDateSession.map((session) => ({
-                          session_id: session.session_id,
-                          start_time: session.start_time,
-                          name: session.name,
-                          is_date: session.is_date,
-                          sessions: session.children,
-                        }))}
-                        loading={isLoading}
-                        showHeader={false}
-                        rowKey={(record) =>
-                          record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
-                        }
-                        expandable={{
-                          expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
-                          expandRowByClick: true,
-                          onExpand: (expanded, record) => {
-                            if (expanded) {
-                              expandRow(record.start_time);
-                            } else {
-                              collapseRow(record.start_time);
-                            }
-                          },
-                          expandedRowKeys: expandedRowKeys,
-                          expandIcon: ({ expanded, onExpand, record }) =>
-                            expanded ? (
-                              <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                            ) : (
-                              <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                            ),
-                        }}
-                      />
-                    ) : (
-                      <div className="text-empty">
-                        No {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availability' : 'Session'}
-                      </div>
-                    )}
-                  </Loader>
-                ) : filteredByDateSession.length > 0 ? (
-                  <Table
-                    sticky={true}
-                    columns={dateColumns}
-                    data={filteredByDateSession}
-                    loading={isLoading}
-                    rowKey={(record) =>
-                      record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
-                    }
-                    rowClassName={(record, index) =>
-                      !record.is_date && !record.is_published ? styles.unpublished : ''
-                    }
-                    expandable={{
-                      expandedRowKeys: expandedRowKeys,
-                      rowExpandable: (record) => record.is_date,
+              <Row gutter={[8, 8]}>
+                <Col xs={24} sm={19}>
+                  <Space direction={xs ? 'vertical' : 'horizontal'} align={xs ? 'start' : 'center'}>
+                    <Text> Only show {isAvailability ? 'availabilities' : 'sessions'} that are : </Text>
+                    <Radio.Group buttonStyle="solid" value={bookingViewFilter} onChange={handleBookingFilterChanged}>
+                      <Radio.Button value={bookingViews.ALL}> Show all </Radio.Button>
+                      <Radio.Button value={bookingViews.BOOKED}> Booked </Radio.Button>
+                      <Radio.Button value={bookingViews.EMPTY}> Empty </Radio.Button>
+                    </Radio.Group>
+                  </Space>
+                </Col>
+                <Col xs={24} sm={5} className={styles.textAlignRight}>
+                  <Button block={xs} ghost type="primary" onClick={() => toggleExpandAll()}>
+                    {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                  </Button>
+                </Col>
+                <Col xs={24}>
+                  {isMobileDevice ? (
+                    <Loader
+                      loading={isLoading}
+                      size="large"
+                      text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}
+                    >
+                      {sessions.length > 0 ? (
+                        <Table
+                          columns={mobileTableColumns}
+                          tableLayout="fixed"
+                          data={filteredByDateSession.map((session) => ({
+                            session_id: session.session_id,
+                            start_time: session.start_time,
+                            name: session.name,
+                            is_date: session.is_date,
+                            sessions: session.children,
+                          }))}
+                          loading={isLoading}
+                          showHeader={false}
+                          rowKey={(record) =>
+                            record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
+                          }
+                          expandable={{
+                            expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
+                            expandRowByClick: true,
+                            onExpand: (expanded, record) => {
+                              if (expanded) {
+                                expandRow(record.start_time);
+                              } else {
+                                collapseRow(record.start_time);
+                              }
+                            },
+                            expandedRowKeys: expandedRowKeys,
+                            expandIcon: ({ expanded, onExpand, record }) =>
+                              expanded ? (
+                                <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                              ) : (
+                                <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                              ),
+                          }}
+                        />
+                      ) : (
+                        <div className="text-empty">
+                          No {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availability' : 'Session'}
+                        </div>
+                      )}
+                    </Loader>
+                  ) : filteredByDateSession.length > 0 ? (
+                    <Table
+                      sticky={true}
+                      columns={dateColumns}
+                      data={filteredByDateSession}
+                      loading={isLoading}
+                      rowKey={(record) =>
+                        record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
+                      }
+                      rowClassName={(record, index) =>
+                        !record.is_date && !record.is_published ? styles.unpublished : ''
+                      }
+                      expandable={{
+                        expandedRowKeys: expandedRowKeys,
+                        rowExpandable: (record) => record.is_date,
 
-                      onExpand: (expanded, record) => {
-                        if (expanded) {
-                          expandRow(record.start_time);
-                        } else {
-                          collapseRow(record.start_time);
-                        }
-                      },
-                    }}
-                  />
-                ) : (
-                  <div className="text-empty">
-                    No {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availability' : 'Session'}
-                  </div>
-                )}
-              </>
+                        onExpand: (expanded, record) => {
+                          if (expanded) {
+                            expandRow(record.start_time);
+                          } else {
+                            collapseRow(record.start_time);
+                          }
+                        },
+                      }}
+                    />
+                  ) : (
+                    <div className="text-empty">
+                      No {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availability' : 'Session'}
+                    </div>
+                  )}
+                </Col>
+              </Row>
             )}
           </Col>
         </Row>

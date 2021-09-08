@@ -59,8 +59,18 @@ export default {
       http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
     create: (payload) => http.post('/secure/creator/sessions', payload),
     update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
-    getPastAvailability: () => http.get('/secure/creator/inventories/past?type=AVAILABILITY'),
-    getUpcomingAvailability: () => http.get('/secure/creator/inventories/upcoming?type=AVAILABILITY'),
+    getPastAvailability: (bookingType = undefined) =>
+      http.get(
+        `/secure/creator/inventories/past?type=AVAILABILITY${
+          typeof bookingType === typeof true ? `&booked=${bookingType}` : ''
+        }`
+      ),
+    getUpcomingAvailability: (bookingType = undefined) =>
+      http.get(
+        `/secure/creator/inventories/upcoming?type=AVAILABILITY${
+          typeof bookingType === typeof true ? `&booked=${bookingType}` : ''
+        }`
+      ),
     publishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
     unpublishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
   },
@@ -71,8 +81,12 @@ export default {
     update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
     getSession: () => http.get('/secure/creator/sessions'),
     delete: (payload) => http.delete('secure/creator/inventories/bulk', payload),
-    getPastSession: () => http.get('/secure/creator/inventories/past'),
-    getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
+    getPastSession: (bookingType = undefined) =>
+      http.get(`/secure/creator/inventories/past${typeof bookingType === typeof true ? `?booked=${bookingType}` : ''}`),
+    getUpcomingSession: (bookingType = undefined) =>
+      http.get(
+        `/secure/creator/inventories/upcoming${typeof bookingType === typeof true ? `?booked=${bookingType}` : ''}`
+      ),
     getAttendeePastSession: () => http.get('/secure/customer/orders/past'),
     getAttendeeUpcomingSession: () => http.get('/secure/customer/orders/upcoming'),
     getSessionDetails: (sessionId) => http.get(`/session/${sessionId}`),

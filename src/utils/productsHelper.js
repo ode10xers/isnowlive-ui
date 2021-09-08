@@ -22,7 +22,7 @@ export const formatPassesData = (data) => {
 };
 
 export const getLiveCoursesFromCourses = (data) => {
-  return data.filter((course) => course.type === courseType.MIXED || course.type === 'LIVE');
+  return data.filter((course) => course.type === courseType.MIXED || course.type === courseType.LIVE);
 };
 
 export const getVideoCoursesFromCourses = (data) => {
