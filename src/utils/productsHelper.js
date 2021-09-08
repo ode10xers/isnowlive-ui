@@ -21,8 +21,13 @@ export const formatPassesData = (data) => {
   }));
 };
 
+// NOTE: This will now only return LIVE courses and doesn't include MIXED
 export const getLiveCoursesFromCourses = (data) => {
-  return data.filter((course) => course.type === courseType.MIXED || course.type === courseType.LIVE);
+  return data.filter((course) => course.type === courseType.LIVE);
+};
+
+export const getMixedCoursesFromCourses = (data) => {
+  return data.filter((course) => course.type === courseType.MIXED);
 };
 
 export const getVideoCoursesFromCourses = (data) => {
