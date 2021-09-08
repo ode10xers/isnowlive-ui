@@ -27,7 +27,7 @@ const Affiliates = () => {
     const referralCode = getLocalUserDetails().referral_code;
 
     // Since this is for referring other creators, we'll direct them to marketing site
-    return 'https://passion.do?ref=' + referralCode;
+    return 'https://passion.do?invite=' + referralCode;
   };
 
   const copyWidgetSnippet = () => copyToClipboard(generateWidgetText());
@@ -67,7 +67,23 @@ const Affiliates = () => {
       title: 'Joining Date',
       key: 'joining_date',
       dataIndex: 'joining_date',
+      width: '200px',
       render: (text) => toLongDateWithDayTime(text),
+    },
+    {
+      title: 'Month 1 Revenue',
+      width: '200px',
+      render: (record, text) => `Your earnings from 1st month will be shown here`,
+    },
+    {
+      title: 'Month 2 Revenue',
+      width: '200px',
+      render: (record, text) => `Your earnings from 2nd month will be shown here`,
+    },
+    {
+      title: 'Month 3 Revenue',
+      width: '200px',
+      render: (record, text) => `Your earnings from 3rd month will be shown here`,
     },
   ];
 

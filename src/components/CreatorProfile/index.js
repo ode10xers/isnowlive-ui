@@ -30,7 +30,7 @@ const { Title } = Typography;
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
   let { search } = useLocation();
   const query = new URLSearchParams(search);
-  localStorage.setItem('ref', JSON.stringify(query.get('ref')));
+  localStorage.setItem('invite', JSON.stringify(query.get('invite')));
 
   const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
   const [creatorProfile, setCreatorProfile] = useState(profile || null);
