@@ -90,7 +90,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
 
   const signupUser = async (values) => {
     setIsLoading(true);
-    const referenceCode = JSON.parse(localStorage.getItem('ref'));
+    const referenceCode = JSON.parse(localStorage.getItem('invite'));
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -103,7 +103,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         logIn(data, true, isWidgetUrl());
         closeModal();
         onLoggedInCallback();
-        localStorage.removeItem('ref');
+        localStorage.removeItem('invite');
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
