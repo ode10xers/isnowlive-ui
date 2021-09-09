@@ -1371,9 +1371,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
                       {classDetails?.type === 'AVAILABILITY' &&
                       classDetails?.is_course &&
-                      availablePasses.length <= 0 &&
-                      user &&
-                      userPasses.length <= 0 ? null : (
+                      ((user && userPasses.length <= 0) || (!user && availablePasses.length <= 0)) ? null : (
                         <div className={styles.mt10}>
                           <Item {...sessionRegistrationTailLayout}>
                             <Row gutter={[8, 8]}>
