@@ -182,6 +182,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         email: values.email,
         is_creator: false,
         referrer: referenceCode,
+        timezone_info: getTimezoneLocation(),
       });
       if (data) {
         setIsLoading(false);

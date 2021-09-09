@@ -70,8 +70,12 @@
   border-radius: 8px;
   width: 100%;
   padding: 8px 12px;
-  margin: 4px auto;
   cursor: pointer;
+  min-height: 64px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &:hover {
     transition: 0.2s linear;
@@ -84,5 +88,6 @@
   .linkItemTitle {
     margin-bottom: 0;
     text-align: center;
+    line-height:1.2;
   }
 }
