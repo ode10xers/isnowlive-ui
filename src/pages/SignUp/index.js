@@ -4,6 +4,9 @@ import { Form, Input, Button, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 
+import validationRules from 'utils/validation';
+import dateUtil from 'utils/date';
+
 import { useGlobalContext } from 'services/globalContext';
 import {
   mixPanelEventTags,
@@ -13,12 +16,14 @@ import {
 } from 'services/integrations/mixpanel';
 import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
-import validationRules from 'utils/validation';
-
 import styles from './style.module.scss';
 
 const { Item } = Form;
 const { user } = mixPanelEventTags;
+
+const {
+  timezoneUtils: { getTimezoneLocation },
+} = dateUtil;
 
 const SignUp = ({ history }) => {
   const [form] = Form.useForm();
@@ -34,6 +39,7 @@ const SignUp = ({ history }) => {
         email: values.email,
         is_creator: true,
         referrer: referenceCode,
+        timezone_info: getTimezoneLocation(),
       });
       if (data) {
         pushToDataLayer(gtmTriggerEvents.CREATOR_SIGNUP, {
