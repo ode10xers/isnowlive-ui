@@ -358,14 +358,14 @@ const DashboardPage = ({ history }) => {
       title: 'Type',
       dataIndex: 'max_participants',
       key: 'max_participants',
-      width: '72px',
+      width: '76px',
       render: (text, record) => (record?.max_participants > 1 ? 'Group' : '1-on-1'),
     },
     {
       title: 'Day',
       dataIndex: 'inventory_external_id',
       key: 'inventory_external_id',
-      width: '100px',
+      width: '120px',
       render: (text, record) => (record?.start_time ? toLongDateWithDay(record?.start_time) : '-'),
     },
     {

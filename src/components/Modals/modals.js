@@ -627,12 +627,13 @@ export const showMemberUnapprovedJoinModal = async () => {
   }
 };
 
+//NOTE : We are kind of reusing the course flag and calling it another name for availability
 export const showCourseOptionsHelperModal = (productName = 'session') => {
   Modal.info({
     centered: true,
     closable: true,
     maskClosable: true,
-    title: 'Understanding the course options',
+    title: `Understanding the ${productName === 'availability' ? 'bundle' : 'course'} options`,
     width: 640,
     content: (
       <>
@@ -641,8 +642,9 @@ export const showCourseOptionsHelperModal = (productName = 'session') => {
           one off purchase.
         </Paragraph>
         <Paragraph>
-          Marking a {productName} as a Course {productName} prevents a customer from buying this {productName} alone,
-          they can only get it if they buy the whole course you add this {productName} to.
+          Marking a {productName} as a {productName === 'availability' ? 'Bundled' : 'Course'} {productName} prevents a
+          customer from buying this {productName} alone, they can only get it if they buy the{' '}
+          {productName === 'availability' ? 'pass' : 'whole course'} you add this {productName} to.
         </Paragraph>
         <Paragraph>If you are in doubt, choose normal for now. You can always change this later.</Paragraph>
       </>
