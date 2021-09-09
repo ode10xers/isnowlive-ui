@@ -1132,6 +1132,20 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       return;
     }
 
+    if (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass) {
+      showErrorModal(
+        'Please select a pass',
+        <>
+          <Paragraph>This is a bundled availability, so it can only be purchased with/using a pass.</Paragraph>
+          <Paragraph>
+            Please log in if you have purchased a pass usable for this and use it to book this availability, or select a
+            pass to buy (we will automatically book the selected timeslot for you)
+          </Paragraph>
+        </>
+      );
+      return;
+    }
+
     submitForm(values);
   };
 
@@ -1262,9 +1276,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                         <>
                           <div>
                             <Title level={5}>
-                              {' '}
                               Purchased pass(es) usable for this{' '}
-                              {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}{' '}
+                              {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}
                             </Title>
                             {isMobileDevice ? (
                               userPasses.map(renderUserPassItem)
@@ -1298,19 +1311,21 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                         <>
                           {availablePasses.length > 0 ? (
                             <>
-                              <div>
-                                <Title level={5}>
-                                  Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
-                                  {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}
-                                </Title>
-                                <Table
-                                  size="small"
-                                  showHeader={false}
-                                  columns={singleClassColumns}
-                                  data={[classDetails]}
-                                  rowKey={(record) => 'dropIn'}
-                                />
-                              </div>
+                              {classDetails?.type === 'AVAILABILITY' && classDetails?.is_course ? null : (
+                                <div>
+                                  <Title level={5}>
+                                    Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                                    {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}
+                                  </Title>
+                                  <Table
+                                    size="small"
+                                    showHeader={false}
+                                    columns={singleClassColumns}
+                                    data={[classDetails]}
+                                    rowKey={(record) => 'dropIn'}
+                                  />
+                                </div>
+                              )}
 
                               <div className={styles.mt20}>
                                 <Title level={5}>
@@ -1335,49 +1350,63 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                                 )}
                               </div>
                             </>
+                          ) : classDetails?.type === 'AVAILABILITY' && classDetails?.is_course ? (
+                            <Item {...sessionRegistrationTailLayout}>
+                              <Title level={5} className={styles.bookingHelpText}>
+                                You can only book this availability using a pass because it's a bundled availability.
+                              </Title>
+                            </Item>
                           ) : (
                             // Render simple help text if no passes are available for class
+                            // Do note that this should not show up for bundled availability
                             <Item {...sessionRegistrationTailLayout}>
                               <Title level={5} className={styles.bookingHelpText}>
                                 Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
-                                class
+                                {classDetails?.type === 'NORMAL' ? 'class' : 'time slot'}
                               </Title>
                             </Item>
                           )}
                         </>
                       )}
 
-                      <div className={styles.mt10}>
-                        <Item {...sessionRegistrationTailLayout}>
-                          <Row gutter={[8, 8]}>
-                            <Col xs={fullWidth ? 24 : 8} md={fullWidth ? 24 : 8} xl={fullWidth ? 24 : 6}>
-                              <Button
-                                block
-                                className={styles.bookBtn}
-                                size="large"
-                                type="primary"
-                                htmlType="submit"
-                                disabled={!selectedInventory}
-                              >
-                                {user &&
-                                classDetails?.total_price > 0 &&
-                                !(selectedPass && userPasses.length > 0) &&
-                                !usableUserSubscription
-                                  ? 'Buy'
-                                  : 'Register'}
-                              </Button>
-                            </Col>
-                            {!selectedInventory && (
-                              <Col xs={24}>
-                                <Paragraph>
-                                  Please select the date & time for the class you wish to attend
-                                  {isMobileDevice ? '' : ', in the calendar on the side'}
-                                </Paragraph>
+                      {classDetails?.type === 'AVAILABILITY' &&
+                      classDetails?.is_course &&
+                      ((user && userPasses.length <= 0) || (!user && availablePasses.length <= 0)) ? null : (
+                        <div className={styles.mt10}>
+                          <Item {...sessionRegistrationTailLayout}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={fullWidth ? 24 : 8} md={fullWidth ? 24 : 8} xl={fullWidth ? 24 : 6}>
+                                <Button
+                                  block
+                                  className={styles.bookBtn}
+                                  size="large"
+                                  type="primary"
+                                  htmlType="submit"
+                                  disabled={
+                                    !selectedInventory ||
+                                    (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass)
+                                  }
+                                >
+                                  {user &&
+                                  classDetails?.total_price > 0 &&
+                                  !(selectedPass && userPasses.length > 0) &&
+                                  !usableUserSubscription
+                                    ? 'Buy'
+                                    : 'Register'}
+                                </Button>
                               </Col>
-                            )}
-                          </Row>
-                        </Item>
-                      </div>
+                              {!selectedInventory && (
+                                <Col xs={24}>
+                                  <Paragraph>
+                                    Please select the date & time for the class you wish to attend
+                                    {isMobileDevice ? '' : ', in the calendar on the side'}
+                                  </Paragraph>
+                                </Col>
+                              )}
+                            </Row>
+                          </Item>
+                        </div>
+                      )}
                     </Form>
                   </Col>
                 </Row>

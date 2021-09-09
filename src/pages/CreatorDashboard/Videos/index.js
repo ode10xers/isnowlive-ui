@@ -395,17 +395,17 @@ const Videos = () => {
                     {record.status === 'UPLOAD_SUCCESS' ? (
                       <Tooltip title="Video uploaded">
                         <Button
-                          className={classNames(styles.detailsButton, styles.checkIcon)}
                           type="text"
                           icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                          className={classNames(styles.detailsButton, styles.checkIcon)}
                         />
                       </Tooltip>
                     ) : (
                       // Here we also use the UID to determine whether the video has been completely processed or not
                       <Tooltip title={record.video_uid?.length > 0 ? 'Video is being processed' : 'Upload Video'}>
                         <Button
-                          className={styles.detailsButton}
                           type="text"
+                          className={styles.detailsButton}
                           disabled={record.video_uid?.length > 0 ? true : false}
                           onClick={() => showUploadVideoModal(record, 2)}
                           icon={<CloudUploadOutlined />}

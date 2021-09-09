@@ -329,8 +329,8 @@ const Session = ({ match, history }) => {
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
-      // TODO: Properly reset states here
-      getCreatorCurrencyDetails();
+      // TODO: Prepare initial form values and
+      // change this to form.resetFields()
       form.setFieldsValue({
         ...form.getFieldsValue(),
         type: 'Group',
@@ -346,7 +346,19 @@ const Session = ({ match, history }) => {
         offline_event_address: '',
         meeting_provider: meetingTypes.ZOOM.value,
       });
+      setSession(initialSession);
+      setIsOfflineSession(false);
+      setOnlineMeetingType(meetingTypes.ZOOM.value);
+      setSessionImageUrl(null);
+      setIsSessionTypeGroup(true);
+      setIsSessionRecurring(true);
+      setSessionRefundable(true);
+      setRefundBeforeHours(24);
+      setRecurringDatesRanges([]);
+      setIsCourseSession(false);
+      setSelectedTagType('anyone');
       setColorCode(initialColor || whiteColor);
+      getCreatorCurrencyDetails();
       setIsLoading(false);
     }
   }, [
@@ -685,7 +697,7 @@ const Session = ({ match, history }) => {
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
-        is_course: isAvailability ? false : isCourseSession,
+        is_course: isCourseSession,
         tag_ids:
           selectedTagType === 'anyone'
             ? []
@@ -725,14 +737,6 @@ const Session = ({ match, history }) => {
               title: `${data.name} ${isAvailability ? 'availability' : 'session'} successfully updated`,
               className: styles.confirmModal,
               okText: 'Done',
-              // onCancel: () => {
-              //   trackSimpleEvent(eventTagObject.addNewInModal);
-              //   const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
-              //   const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
-              //   getSessionDetails(match.params.id, startDate, endDate);
-              //   window.location.reload();
-              //   window.scrollTo(0, 0);
-              // },
               onOk: () => {
                 trackSimpleEvent(eventTagObject.doneInModal);
                 history.push(
@@ -796,7 +800,7 @@ const Session = ({ match, history }) => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        message.error('Need at least 1 session to publish');
+        message.error('Need at least 1 schedule to publish');
       }
     } catch (error) {
       setIsLoading(false);
@@ -901,12 +905,10 @@ const Session = ({ match, history }) => {
             >
               <Radio.Group>
                 <Radio className={styles.radioOption} value="false">
-                  {' '}
-                  Online{' '}
+                  Online
                 </Radio>
                 <Radio className={styles.radioOption} value="true">
-                  {' '}
-                  Offline{' '}
+                  Offline
                 </Radio>
               </Radio.Group>
             </Form.Item>
@@ -1062,32 +1064,30 @@ const Session = ({ match, history }) => {
             </Form.Item>
 
             {/* ---- Session Course Type ---- */}
-            {!isAvailability && (
-              <Form.Item label={`${isAvailability ? 'Availability' : 'Session'} Type`} required>
-                <Form.Item
-                  name="session_course_type"
-                  id="session_course_type"
-                  rules={validationRules.requiredValidation}
-                  onChange={handleSessionCourseType}
-                  className={styles.inlineFormItem}
-                >
-                  <Radio.Group>
-                    <Radio value="normal">Normal {isAvailability ? 'Availability' : 'Session'}</Radio>
-                    <Radio value="course">Course {isAvailability ? 'Availability' : 'Session'}</Radio>
-                  </Radio.Group>
-                </Form.Item>
-                <Form.Item className={styles.inlineFormItem}>
-                  <Button
-                    size="small"
-                    type="link"
-                    onClick={() => showCourseOptionsHelperModal('session')}
-                    icon={<InfoCircleOutlined />}
-                  >
-                    Understanding the options
-                  </Button>
-                </Form.Item>
+            <Form.Item label={`${isAvailability ? 'Bundle' : 'Session'} Type`} required>
+              <Form.Item
+                name="session_course_type"
+                id="session_course_type"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionCourseType}
+                className={styles.inlineFormItem}
+              >
+                <Radio.Group>
+                  <Radio value="normal">Normal {isAvailability ? 'Availability' : 'Session'}</Radio>
+                  <Radio value="course">{isAvailability ? ' Bundled Availability' : 'Course Session'}</Radio>
+                </Radio.Group>
               </Form.Item>
-            )}
+              <Form.Item className={styles.inlineFormItem}>
+                <Button
+                  size="small"
+                  type="link"
+                  onClick={() => showCourseOptionsHelperModal(isAvailability ? 'availability' : 'session')}
+                  icon={<InfoCircleOutlined />}
+                >
+                  Understanding the options
+                </Button>
+              </Form.Item>
+            </Form.Item>
 
             {/* ---- Session Tag Type ---- */}
             <>

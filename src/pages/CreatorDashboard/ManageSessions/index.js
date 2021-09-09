@@ -440,13 +440,19 @@ const ManageSessions = () => {
             />
           )}
         </Panel>
-        <Panel header={<Title level={5}> Course {isAvailability ? 'Availabilities' : 'Sessions'} </Title>} key="Course">
+        <Panel
+          header={<Title level={5}>{isAvailability ? 'Bundled Availabilities' : 'Course Sessions'}</Title>}
+          key="Course"
+        >
           {isMobileDevice ? (
             <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availability' : 'session'}`}>
               {sessions?.filter((session) => session.is_course).length > 0 ? (
                 sessions?.filter((session) => session.is_course).map(renderSessionItem)
               ) : (
-                <div className="text-empty"> No Course {isAvailability ? 'Availabilities' : 'Sessions'} Found </div>
+                <div className="text-empty">
+                  {' '}
+                  No {isAvailability ? 'Bundled Availabilities' : 'Course Sessions'} Found{' '}
+                </div>
               )}
             </Loader>
           ) : (
