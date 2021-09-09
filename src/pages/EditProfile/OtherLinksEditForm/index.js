@@ -83,7 +83,7 @@ const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => 
                             name={[otherLinksName, 'title']}
                             rules={validationRules.requiredValidation}
                           >
-                            <Input placeholder="Text to show (max. 50)" maxLength={50} />
+                            <Input placeholder="Text to show (max. 75)" maxLength={75} />
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
