@@ -700,7 +700,7 @@ const VideoDetails = ({ match, history }) => {
                 <Col xs={24}>
                   <Paragraph className={styles.sectionHeading}> Description </Paragraph>
                   <div className={styles.videoDescription}>
-                    {ReactHtmlParser(videoData?.description.split('!~!~!~')[0])}
+                    {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
                   </div>
                 </Col>
               </Row>

@@ -349,7 +349,6 @@ const UploadVideoModal = ({
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
-        // setVideoDocumentUrl(editedVideo.description.split('!~!~!~')[1]);
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(
