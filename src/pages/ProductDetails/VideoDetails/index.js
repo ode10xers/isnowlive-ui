@@ -2,8 +2,15 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Spin, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
-import { LikeOutlined, ScheduleOutlined, GiftOutlined, DollarOutlined, BookOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Spin, List, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
+import {
+  LikeOutlined,
+  ScheduleOutlined,
+  GiftOutlined,
+  DollarOutlined,
+  BookOutlined,
+  FilePdfOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -614,6 +621,31 @@ const VideoDetails = ({ match, history }) => {
     return renderContainerComponent(commonContainerProps, componentChild);
   };
 
+  const renderVideoDocumentUrl = () => {
+    const documentUrl = videoData?.description.split('!~!~!~')[1];
+
+    if (!documentUrl) {
+      return null;
+    }
+
+    return (
+      <Col xs={24}>
+        <Paragraph className={styles.sectionHeading}> Video Pre-read file </Paragraph>
+        <List
+          size="small"
+          dataSource={[documentUrl]}
+          renderItem={(documentUrl) => (
+            <List.Item>
+              <Button type="link" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
+                {documentUrl.split('_').slice(-1)[0] || 'Download'}
+              </Button>
+            </List.Item>
+          )}
+        />
+      </Col>
+    );
+  };
+
   //#endregion End of UI Components
 
   return (
@@ -661,9 +693,15 @@ const VideoDetails = ({ match, history }) => {
                   </Space>
                 </Col>
 
+                {/* Video Document URL */}
+                {renderVideoDocumentUrl()}
+
                 {/* Video Description */}
                 <Col xs={24}>
-                  <div className={styles.videoDescription}>{ReactHtmlParser(videoData?.description)}</div>
+                  <Paragraph className={styles.sectionHeading}> Description </Paragraph>
+                  <div className={styles.videoDescription}>
+                    {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
+                  </div>
                 </Col>
               </Row>
             </Col>
