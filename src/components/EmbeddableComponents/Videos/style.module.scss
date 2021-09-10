@@ -5,9 +5,32 @@
   width: 100%;
 
   .videoListContainer {
-    max-width: var(--passion-profile-max-width, 767px);
-    min-height: 700px;
     margin: 0 auto;
-    padding: 8px 0;
+    padding: 12px;
+
+    .videoGroupName {
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .horizontalVideoList {
+      flex-flow: row nowrap !important;
+      overflow-x: scroll;
+      padding-bottom: 6px !important;
+    
+      &::-webkit-scrollbar {
+        height: 10px;
+      }
+    
+      &::-webkit-scrollbar-thumb {
+        border-radius: 20px;
+        background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'WhiteSmoke1')});
+        border: 3px solid var(--passion-profile-light-color, #{map-get($colors, 'White')});
+      }
+    
+      &::-webkit-scrollbar-track {
+        background: var(--passion-profile-lightest-color, #{map-get($colors, 'White1')});
+      }
+    }
   }
 }
