@@ -177,7 +177,7 @@ const mockData = [
 ];
 
 const otherVideosKey = 'Other Videos';
-const videoItemsLimit = 2;
+const videoItemsLimit = 6;
 
 const Videos = () => {
   const [videos, setVideos] = useState([]);
