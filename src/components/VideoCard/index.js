@@ -2,8 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
-import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
+import { Row, Col, Card, Button, Typography, Image, Space, Divider, List } from 'antd';
+import { PlayCircleOutlined, BookTwoTone, FilePdfOutlined } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
@@ -90,6 +90,31 @@ const VideoCard = ({
 
   const videoThumbnailUrl = video?.thumbnail_url || orderDetails?.thumbnail_url || 'error';
 
+  const renderVideoDocumentUrl = () => {
+    const documentUrl = (video?.description || orderDetails?.description)?.split('!~!~!~')[1];
+
+    if (!documentUrl) {
+      return null;
+    }
+
+    return (
+      <Col xs={24}>
+        <Title level={5}> Video Pre-read file </Title>
+        <List
+          size="small"
+          dataSource={[documentUrl]}
+          renderItem={(documentUrl) => (
+            <List.Item>
+              <Button type="link" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
+                {documentUrl.split('_').slice(-1)[0] || 'Download'}
+              </Button>
+            </List.Item>
+          )}
+        />
+      </Col>
+    );
+  };
+
   return (
     <Card
       className={styles.videoCard}
@@ -147,11 +172,15 @@ const VideoCard = ({
               )}
             </Col>
             {showDesc && (
-              <Col xs={24} className={styles.descWrapper}>
-                <div className={styles.videoDesc}>
-                  {ReactHtmlParser(video?.description || orderDetails?.description)}
-                </div>
-              </Col>
+              <>
+                {renderVideoDocumentUrl()}
+                <Col xs={24} className={styles.descWrapper}>
+                  <Title level={5}> Description </Title>
+                  <div className={styles.videoDesc}>
+                    {ReactHtmlParser((video?.description || orderDetails?.description)?.split('!~!~!~')[0] ?? '')}
+                  </div>
+                </Col>
+              </>
             )}
             {!showOrderDetails && (showDetailsBtn || buyable) && (
               <Col span={24} className={styles.buttonWrapper}>
