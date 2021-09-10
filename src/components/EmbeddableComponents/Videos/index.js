@@ -246,19 +246,28 @@ const Videos = () => {
         <div key={groupName}>
           <Row gutter={[8, 8]}>
             <Col xs={24}>
-              <Title level={4} className={styles.videoGroupName}>
-                {groupName}
-              </Title>
+              <Row gutter={[4, 4]} align="middle">
+                <Col flex="1 1 auto">
+                  <Title level={4} className={styles.videoGroupName}>
+                    {groupName}
+                  </Title>
+                </Col>
+                <Col flex="0 0 90px">
+                  <Button type="link" onClick={() => handleMoreClicked(groupName)}>
+                    See all ({groupVideos.length ?? 0})
+                  </Button>
+                </Col>
+              </Row>
             </Col>
             <Col xs={24}>
-              <Row gutter={[8, 8]} align="middle" className={styles.horizontalVideoList}>
+              <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
                 {groupVideos?.slice(0, videoItemsLimit).map((video) => (
-                  <Col xs={20} sm={18} md={7} lg={5}>
+                  <Col xs={20} sm={18} md={9} lg={7} xl={5}>
                     <VideoListCard video={video} handleClick={() => handleVideoItemClicked(video)} />
                   </Col>
                 ))}
                 {groupVideos?.length > videoItemsLimit && (
-                  <Col xs={20} sm={18} md={7} lg={5} className={styles.fadedItemContainer}>
+                  <Col xs={20} sm={18} md={9} lg={7} xl={5} className={styles.fadedItemContainer}>
                     <div className={styles.fadedOverlay}>
                       <div className={styles.seeMoreButton} onClick={() => handleMoreClicked(groupName)}>
                         <BarsOutlined className={styles.seeMoreIcon} />
@@ -279,7 +288,7 @@ const Videos = () => {
   );
 
   const moreVideoList = (
-    <Row gutter={[8, 8]}>
+    <Row gutter={[8, 16]}>
       <Col xs={24}>
         <Button ghost type="primary" onClick={() => setGroupView(null)} icon={<LeftOutlined />}>
           Back to video library
@@ -291,7 +300,7 @@ const Videos = () => {
         </Title>
       </Col>
       <Col xs={24}>
-        <Row gutter={[8, 8]} align="middle">
+        <Row gutter={[8, 8]}>
           {videosByGroup[groupView]?.map((video) => (
             <Col xs={24} sm={12} md={8} lg={6}>
               <VideoListCard video={video} handleClick={() => handleVideoItemClicked(video)} />
