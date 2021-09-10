@@ -98,6 +98,7 @@ const uploadVideoFormInitialValues = {
   youtube_url: '',
 };
 
+// TODO: Currently the document URL implementation is very hacky
 const UploadVideoModal = ({
   formPart,
   setFormPart,
@@ -135,6 +136,8 @@ const UploadVideoModal = ({
   const [selectedPassIds, setSelectedPassIds] = useState([]);
   const [creatorMemberships, setCreatorMemberships] = useState([]);
   const [selectedMembershipIds, setSelectedMembershipIds] = useState([]);
+
+  const [creatorDocuments, setCreatorDocuments] = useState([]);
 
   //#region Start of Uppy Related Methods
 
@@ -278,6 +281,18 @@ const UploadVideoModal = ({
     setIsLoading(false);
   }, []);
 
+  const fetchCreatorDocuments = useCallback(async () => {
+    try {
+      const { status, data } = await apis.documents.getCreatorDocuments();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorDocuments(data.data ?? []);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch user documents');
+    }
+  }, []);
+
   const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
 
@@ -306,17 +321,20 @@ const UploadVideoModal = ({
   //#region Start of Use Effects
 
   useEffect(() => {
+    fetchCreatorDocuments();
     fetchAllClassesForCreator();
     fetchPassesForCreator();
     fetchSubscriptionsForCreator();
-  }, [fetchAllClassesForCreator, fetchPassesForCreator, fetchSubscriptionsForCreator]);
+  }, [fetchAllClassesForCreator, fetchPassesForCreator, fetchSubscriptionsForCreator, fetchCreatorDocuments]);
 
   useEffect(() => {
     if (visible) {
       if (editedVideo) {
-        // TODO: Handle edit flow here later
+        // TODO: Current hacky implementation of document Url
         form.setFieldsValue({
           ...editedVideo,
+          description: editedVideo.description.split('!~!~!~')[0],
+          document_url: editedVideo.description.split('!~!~!~')[1],
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
@@ -331,6 +349,7 @@ const UploadVideoModal = ({
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
+        // setVideoDocumentUrl(editedVideo.description.split('!~!~!~')[1]);
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(
@@ -479,10 +498,12 @@ const UploadVideoModal = ({
               source: videoSourceTypes.CLOUDFLARE.value,
             };
 
+      // TODO: Current hacky implementation for document_url
+      // without involving BE
       let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
-        description: values.description,
+        description: `${values.description}!~!~!~${values.document_url ?? ''}`,
         price:
           videoType === videoPriceTypes.FREE.name
             ? 0
@@ -914,6 +935,18 @@ const UploadVideoModal = ({
                   rules={validationRules.requiredValidation}
                 >
                   <TextEditor name="description" form={form} placeholder="Enter description" />
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item id="document_url" name="document_url" label="Attached File">
+                  <Select
+                    showArrow
+                    placeholder="Select documents you want to include"
+                    options={creatorDocuments.map((document) => ({
+                      label: document.name,
+                      value: document.url,
+                    }))}
+                  />
                 </Form.Item>
               </Col>
               <Col xs={24}>
