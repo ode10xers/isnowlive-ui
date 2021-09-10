@@ -2,8 +2,8 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // import VideoDetailedListView from 'pages/DetailedListView/Videos';
 
-import { Spin, Row, Col, Button, Typography, message } from 'antd';
-import { BarsOutlined, LeftOutlined } from '@ant-design/icons';
+import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
+import { BarsOutlined, LeftOutlined, ControlOutlined } from '@ant-design/icons';
 
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
@@ -180,9 +180,12 @@ const otherVideosKey = 'Other Videos';
 const videoItemsLimit = 2;
 
 const Videos = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [videos, setVideos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [groupView, setGroupView] = useState(null);
+
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedVideoGroupFilter, setSelectedVideoGroupFilter] = useState([]);
 
   const fetchCreatorVideos = useCallback(async () => {
     setIsLoading(true);
@@ -231,6 +234,10 @@ const Videos = () => {
     }, {});
   }, [videos]);
 
+  const handleFilterToggleClicked = () => {
+    setShowFilter((prevValue) => !prevValue);
+  };
+
   const handleVideoItemClicked = (video) => {
     // TODO: Confirm what we want to do here
     console.log(video);
@@ -240,50 +247,88 @@ const Videos = () => {
     setGroupView(videoGroupName);
   };
 
-  const groupedVideoList = (
-    <>
-      {Object.entries(videosByGroup).map(([groupName, groupVideos]) => (
-        <div key={groupName}>
-          <Row gutter={[8, 8]}>
+  const groupFilters = (
+    <Row gutter={[8, 12]} className={styles.filterSection}>
+      <Col xs={24}>
+        <Button type="primary" icon={<ControlOutlined />} onClick={handleFilterToggleClicked}>
+          {showFilter ? 'Hide' : 'Show'} Filters
+        </Button>
+      </Col>
+      {showFilter && (
+        <Col xs={24} className={styles.filterContainer}>
+          <Row gutter={[12, 4]}>
             <Col xs={24}>
-              <Row gutter={[4, 4]} align="middle">
-                <Col flex="1 1 auto">
-                  <Title level={4} className={styles.videoGroupName}>
-                    {groupName}
-                  </Title>
-                </Col>
-                <Col flex="0 0 90px">
-                  <Button type="link" onClick={() => handleMoreClicked(groupName)}>
-                    See all ({groupVideos.length ?? 0})
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-            <Col xs={24}>
-              <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
-                {groupVideos?.slice(0, videoItemsLimit).map((video) => (
-                  <Col xs={20} sm={18} md={9} lg={7} xl={5}>
-                    <VideoListCard video={video} handleClick={() => handleVideoItemClicked(video)} />
-                  </Col>
-                ))}
-                {groupVideos?.length > videoItemsLimit && (
-                  <Col xs={20} sm={18} md={9} lg={7} xl={5} className={styles.fadedItemContainer}>
-                    <div className={styles.fadedOverlay}>
-                      <div className={styles.seeMoreButton} onClick={() => handleMoreClicked(groupName)}>
-                        <BarsOutlined className={styles.seeMoreIcon} />
-                        SEE MORE
-                      </div>
-                    </div>
-                    <div className={styles.fadedItem}>
-                      <VideoListCard video={groupVideos[videoItemsLimit]} />
-                    </div>
-                  </Col>
-                )}
-              </Row>
+              <Title level={5} className={styles.filterLabel}>
+                Categories
+              </Title>
+              <Select
+                allowClear
+                showArrow
+                mode="multiple"
+                placeholder="Select category that you want to see"
+                maxTagCount={3}
+                loading={isLoading}
+                className={styles.filterDropdown}
+                options={Object.keys(videosByGroup).map((group) => ({ label: group, value: group }))}
+                value={selectedVideoGroupFilter}
+                onChange={setSelectedVideoGroupFilter}
+              />
             </Col>
           </Row>
-        </div>
-      ))}
+        </Col>
+      )}
+    </Row>
+  );
+
+  const groupedVideoList = (
+    <>
+      {Object.entries(videosByGroup)
+        .filter(
+          ([groupName, groupVideos]) =>
+            selectedVideoGroupFilter.length === 0 || selectedVideoGroupFilter.includes(groupName)
+        )
+        .map(([groupName, groupVideos]) => (
+          <div key={groupName}>
+            <Row gutter={[8, 8]}>
+              <Col xs={24}>
+                <Row gutter={[4, 4]} align="middle">
+                  <Col flex="1 1 auto">
+                    <Title level={4} className={styles.videoGroupName}>
+                      {groupName}
+                    </Title>
+                  </Col>
+                  <Col flex="0 0 90px">
+                    <Button type="link" onClick={() => handleMoreClicked(groupName)}>
+                      See all ({groupVideos.length ?? 0})
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
+              <Col xs={24}>
+                <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
+                  {groupVideos?.slice(0, videoItemsLimit).map((video) => (
+                    <Col xs={20} sm={18} md={9} lg={7} xl={5}>
+                      <VideoListCard video={video} handleClick={() => handleVideoItemClicked(video)} />
+                    </Col>
+                  ))}
+                  {groupVideos?.length > videoItemsLimit && (
+                    <Col xs={20} sm={18} md={9} lg={7} xl={5} className={styles.fadedItemContainer}>
+                      <div className={styles.fadedOverlay}>
+                        <div className={styles.seeMoreButton} onClick={() => handleMoreClicked(groupName)}>
+                          <BarsOutlined className={styles.seeMoreIcon} />
+                          SEE MORE
+                        </div>
+                      </div>
+                      <div className={styles.fadedItem}>
+                        <VideoListCard video={groupVideos[videoItemsLimit]} />
+                      </div>
+                    </Col>
+                  )}
+                </Row>
+              </Col>
+            </Row>
+          </div>
+        ))}
     </>
   );
 
@@ -316,6 +361,7 @@ const Videos = () => {
       <div className={styles.videoListContainer}>
         <Spin spinning={isLoading} tip="Fetching videos..">
           {/* Filters */}
+          {!groupView && groupFilters}
 
           {/* List Groups */}
           {!groupView && videos.length > 0 && groupedVideoList}

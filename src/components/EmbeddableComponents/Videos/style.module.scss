@@ -4,6 +4,16 @@
   background-color: var(--video-widget-background-color);
   width: 100%;
 
+  .filterSection {
+    margin-bottom: 30px;
+
+    .filterContainer {
+      .filterDropdown {
+        min-width: 300px;
+      }
+    }
+  }
+
   .videoListContainer {
     margin: 0 auto;
     padding: 12px;
