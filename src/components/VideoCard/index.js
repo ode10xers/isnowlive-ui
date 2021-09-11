@@ -99,13 +99,13 @@ const VideoCard = ({
 
     return (
       <Col xs={24}>
-        <Title level={5}> Video Pre-read file </Title>
+        <Title level={5}> This video includes a downloadable PDF file </Title>
         <List
           size="small"
           dataSource={[documentUrl]}
           renderItem={(documentUrl) => (
             <List.Item>
-              <Button type="link" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
+              <Button ghost type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
                 {documentUrl.split('_').slice(-1)[0] || 'Download'}
               </Button>
             </List.Item>
