@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 import {
   Row,
   Col,
@@ -18,6 +19,8 @@ import {
   Tabs,
   message,
   Popconfirm,
+  Switch,
+  Space,
 } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
@@ -45,13 +48,13 @@ import { isAPISuccess } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
 import { fetchCreatorCurrency } from 'utils/payment';
 import { generateYoutubeThumbnailURL } from 'utils/video';
+import { getLocalUserDetails } from 'utils/storage';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
-import styles from './styles.module.scss';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
-import { getLocalUserDetails } from 'utils/storage';
-import moment from 'moment';
+
+import styles from './styles.module.scss';
 
 const { Text, Paragraph } = Typography;
 
@@ -138,6 +141,7 @@ const UploadVideoModal = ({
   const [selectedMembershipIds, setSelectedMembershipIds] = useState([]);
 
   const [creatorDocuments, setCreatorDocuments] = useState([]);
+  const [downloadableBeforePurchase, setDownloadableBeforePurchase] = useState(false);
 
   //#region Start of Uppy Related Methods
 
@@ -334,7 +338,7 @@ const UploadVideoModal = ({
         form.setFieldsValue({
           ...editedVideo,
           description: editedVideo.description.split('!~!~!~')[0],
-          document_url: editedVideo.description.split('!~!~!~')[1],
+          document_url: editedVideo.description.split('!~!~!~')[1] ?? '',
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
@@ -349,6 +353,7 @@ const UploadVideoModal = ({
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
+        setDownloadableBeforePurchase(editedVideo.description.split('!~!~!~')[2] ?? false);
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(
@@ -502,7 +507,7 @@ const UploadVideoModal = ({
       let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
-        description: `${values.description}!~!~!~${values.document_url ?? ''}`,
+        description: `${values.description}!~!~!~${values.document_url ?? ''}!~!~!~${downloadableBeforePurchase}`,
         price:
           videoType === videoPriceTypes.FREE.name
             ? 0
@@ -946,6 +951,13 @@ const UploadVideoModal = ({
                       value: document.url,
                     }))}
                   />
+                </Form.Item>
+                <Form.Item label="File accessible by customers">
+                  <Space>
+                    <Text> After buying </Text>
+                    <Switch checked={downloadableBeforePurchase} onChange={setDownloadableBeforePurchase} />
+                    <Text> Before buying </Text>
+                  </Space>
                 </Form.Item>
               </Col>
               <Col xs={24}>

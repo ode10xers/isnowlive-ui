@@ -99,7 +99,7 @@ const VideoCard = ({
 
     return (
       <Col xs={24}>
-        <Title level={5}> Video Pre-read file </Title>
+        <Title level={5}> This video includes a downloadable PDF file </Title>
         <List
           size="small"
           dataSource={[documentUrl]}
