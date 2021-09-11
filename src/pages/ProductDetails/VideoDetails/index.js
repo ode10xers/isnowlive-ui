@@ -629,6 +629,8 @@ const VideoDetails = ({ match, history }) => {
       return null;
     }
 
+    const filename = documentUrl.split('_').slice(-1)[0] || 'Download';
+
     return (
       <Col xs={24}>
         <Paragraph className={styles.sectionHeading}> This video includes a downloadable PDF file </Paragraph>
@@ -638,13 +640,11 @@ const VideoDetails = ({ match, history }) => {
           renderItem={(documentUrl) => (
             <List.Item>
               {isPublicDownloadable ? (
-                <Button type="link" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
-                  {documentUrl.split('_').slice(-1)[0] || 'Download'}
+                <Button ghost type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
+                  {filename}
                 </Button>
               ) : (
-                <Text>
-                  <FilePdfOutlined /> {documentUrl.split('_').slice(-1)[0] || 'Download'}
-                </Text>
+                <Text>{filename}</Text>
               )}
             </List.Item>
           )}

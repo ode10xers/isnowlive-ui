@@ -338,7 +338,7 @@ const UploadVideoModal = ({
         form.setFieldsValue({
           ...editedVideo,
           description: editedVideo.description.split('!~!~!~')[0],
-          document_url: editedVideo.description.split('!~!~!~')[1] ?? '',
+          document_url: editedVideo.description.split('!~!~!~')[1] ?? null,
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
