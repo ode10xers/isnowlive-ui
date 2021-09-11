@@ -1,15 +1,19 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-
+import { useHistory } from 'react-router';
 // import VideoDetailedListView from 'pages/DetailedListView/Videos';
 
 import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
-import { BarsOutlined, LeftOutlined, ControlOutlined } from '@ant-design/icons';
+import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-design/icons';
 
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import AuthModal from 'components/AuthModal';
 
 import { isAPISuccess } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './style.module.scss';
+import Routes from 'routes';
 
 const { Title } = Typography;
 
@@ -180,12 +184,20 @@ const otherVideosKey = 'Other Videos';
 const videoItemsLimit = 6;
 
 const Videos = () => {
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
+  const history = useHistory();
+
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [groupView, setGroupView] = useState(null);
 
   const [showFilter, setShowFilter] = useState(false);
   const [selectedVideoGroupFilter, setSelectedVideoGroupFilter] = useState([]);
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const fetchCreatorVideos = useCallback(async () => {
     setIsLoading(true);
@@ -234,22 +246,33 @@ const Videos = () => {
     }, {});
   }, [videos]);
 
-  const handleFilterToggleClicked = () => {
-    setShowFilter((prevValue) => !prevValue);
+  const closeAuthModal = () => {
+    setShowAuthModal(false);
   };
 
-  const handleVideoItemClicked = (video) => {
-    // TODO: Confirm what we want to do here
-    console.log(video);
+  const redirectToAttendeeDashboard = () => {
+    history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage);
+  };
+
+  const handleFilterToggleClicked = () => {
+    setShowFilter((prevValue) => !prevValue);
   };
 
   const handleMoreClicked = (videoGroupName) => {
     setGroupView(videoGroupName);
   };
 
+  const handleSignInClicked = () => {
+    if (userDetails) {
+      redirectToAttendeeDashboard();
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
   const groupFilters = (
     <Row gutter={[8, 12]} className={styles.filterSection}>
-      <Col xs={24}>
+      <Col xs={12}>
         <Button
           className={styles.filterButton}
           type="primary"
@@ -257,6 +280,11 @@ const Videos = () => {
           onClick={handleFilterToggleClicked}
         >
           {showFilter ? 'Hide' : 'Show'} Filters
+        </Button>
+      </Col>
+      <Col xs={12} className={styles.textAlignRight}>
+        <Button className={styles.linkButton} type="link" icon={<UserOutlined />} onClick={handleSignInClicked}>
+          Sign In/Up
         </Button>
       </Col>
       {showFilter && (
@@ -303,7 +331,7 @@ const Videos = () => {
                     </Title>
                   </Col>
                   <Col flex="0 0 90px">
-                    <Button className={styles.seeAllButton} type="link" onClick={() => handleMoreClicked(groupName)}>
+                    <Button className={styles.linkButton} type="link" onClick={() => handleMoreClicked(groupName)}>
                       See all ({groupVideos.length ?? 0})
                     </Button>
                   </Col>
@@ -313,7 +341,7 @@ const Videos = () => {
                 <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
                   {groupVideos?.slice(0, videoItemsLimit).map((video) => (
                     <Col xs={20} sm={18} md={9} lg={7} xl={5}>
-                      <VideoListCard video={video} handleClick={() => handleVideoItemClicked(video)} />
+                      <VideoListCard video={video} />
                     </Col>
                   ))}
                   {groupVideos?.length > videoItemsLimit && (
@@ -359,7 +387,7 @@ const Videos = () => {
         <Row gutter={[8, 8]}>
           {videosByGroup[groupView]?.map((video) => (
             <Col xs={24} sm={12} md={8} lg={6}>
-              <VideoListCard video={video} handleClick={() => handleVideoItemClicked(video)} />
+              <VideoListCard video={video} />
             </Col>
           ))}
         </Row>
@@ -370,6 +398,11 @@ const Videos = () => {
   return (
     <div className={styles.videoPluginContainer}>
       <div className={styles.videoListContainer}>
+        <AuthModal
+          visible={showAuthModal}
+          closeModal={closeAuthModal}
+          onLoggedInCallback={redirectToAttendeeDashboard}
+        />
         <Spin spinning={isLoading} tip="Fetching videos..">
           {/* Filters */}
           {!groupView && groupFilters}

@@ -33,7 +33,7 @@
       color: var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}) !important;
     }
 
-    .seeAllButton {
+    .linkButton {
       color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
       font-weight: 500;
     }
