@@ -622,23 +622,30 @@ const VideoDetails = ({ match, history }) => {
   };
 
   const renderVideoDocumentUrl = () => {
-    const documentUrl = videoData?.description.split('!~!~!~')[1];
+    const documentUrl = videoData?.description.split('!~!~!~')[1] ?? '';
+    const isPublicDownloadable = videoData?.description.split('!~!~!~')[2] ?? false;
 
     if (!documentUrl) {
       return null;
     }
 
+    const filename = documentUrl.split('_').slice(-1)[0] || 'Download';
+
     return (
       <Col xs={24}>
-        <Paragraph className={styles.sectionHeading}> Video Pre-read file </Paragraph>
+        <Paragraph className={styles.sectionHeading}> This video includes a downloadable PDF file </Paragraph>
         <List
           size="small"
           dataSource={[documentUrl]}
           renderItem={(documentUrl) => (
             <List.Item>
-              <Button type="link" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
-                {documentUrl.split('_').slice(-1)[0] || 'Download'}
-              </Button>
+              {isPublicDownloadable ? (
+                <Button ghost type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
+                  {filename}
+                </Button>
+              ) : (
+                <Text>{filename}</Text>
+              )}
             </List.Item>
           )}
         />
