@@ -49,7 +49,8 @@ const PaymentVerification = lazy(() => import('pages/PaymentVerification'));
 const PaymentRetry = lazy(() => import('pages/PaymentRetry'));
 const SessionReschedule = lazy(() => import('pages/SessionReschedule'));
 const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
-const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
+// const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
+const NewVideoDetails = lazy(() => import('pages/ProductDetails/NewVideoDetails'));
 const CourseDetails = lazy(() => import('pages/ProductDetails/CourseDetails'));
 const PassDetails = lazy(() => import('pages/ProductDetails/PassDetails'));
 const NewHome = lazy(() => import('pages/NewHome'));
@@ -301,7 +302,13 @@ function App() {
               path={Routes.previewPages.videos}
               component={VideoDetailPreview}
             />
-            <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+            {/* <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              exact
+              path={Routes.videoDetails}
+              component={NewVideoDetails}
+            />
             <RouteWithLayout
               layout={NavbarLayout}
               exact

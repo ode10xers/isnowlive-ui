@@ -56,8 +56,7 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-// NOTE : This page still has the logic to show related courses
-// Confirm with BE if the api is still valid, if no then we can remove it safely
+/** @deprecated */
 const VideoDetails = ({ match, history }) => {
   const videoId = match.params.video_id;
 

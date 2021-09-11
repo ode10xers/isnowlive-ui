@@ -1,0 +1,162 @@
+@import '../../../styles/variables.scss';
+
+.videoDetailsPage {
+  min-height: calc(100vh - 66px);
+
+  padding: 20px;
+  @media screen and (max-width: 768px) {
+    padding: 10px;
+  }
+
+  @media screen and (max-width: 526px) {
+    padding: 8px;
+  }
+
+  .videoTitle {
+    margin-bottom: 0 !important;
+    font-size: 28px !important;
+
+    @media screen and (max-width: 768px) {
+      font-size: 20px !important;
+    }
+
+    @media screen and (max-width: 526px) {
+      font-size: 24px !important;
+    }
+  }
+
+  .videoDetailsContainer {
+    .videoDetailItem {
+      .detailIcons {
+        margin-right: 6px;
+      }
+    }
+  }
+
+  .videoDescContainer {
+    min-width: 100%;
+
+    .videoDocumentUrl {
+      margin-top: 12px;
+    }
+
+    .videoDesc {
+      margin-top: 12px;
+    }
+
+    .videoDesc * {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+    }
+  }
+
+  .videoImageContainer {
+    padding: 8px;
+
+    .videoImage {
+      border-radius: 12px;
+      width: 100%;
+    }
+  }
+
+  .paymentInstrumentHeader {
+    @extend .videoTitle;
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+    margin: 12px 0 !important;
+  }
+
+  .paymentInstrumentOption {
+    padding: 4px;
+    border-right: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
+
+    &:last-child {
+      border-right: none;
+    }
+
+    .roundBtn {
+      cursor: pointer;
+      margin-top: 5px;
+      width: 14px;
+      height: 14px;
+      border-radius: 7px;
+      border: solid 1px map-get($colors, 'NightRider');
+    }
+  }
+
+  .buyMembershipContainer {
+    padding: 12px;
+    margin: 0 4px 8px !important;
+    width: 100%;
+    background-color: map-get($map: $colors, $key: 'Ivory');
+    border-radius: 8px;
+
+    .buyMembershipBtn {
+      background-color: map-get($map: $colors, $key: 'PolarGreen') !important;
+      color: map-get($map: $colors, $key: 'White') !important;
+      font-size: 16px;
+    }
+
+    .buyMembershipDesc {
+      text-align: center;
+      font-size: 14px;
+      color: map-get($map: $colors, $key: 'PolarGreen') !important;
+    }
+  }
+
+  .buyableMembershipListContainer {
+    padding: 8px;
+
+    &.error {
+      border: 1px solid map-get($map: $colors, $key: 'SunsetOrange');
+      border-radius: 8px;
+    }
+  }
+
+  .buyVideoContainer {
+    @extend .buyMembershipContainer;
+    background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')});
+
+    .buyVideoBtn {
+      background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+      border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+      &.darkText {
+        --video-button-text-color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')});
+      }
+
+      &.lightText {
+        --video-button-text-color : #{map-get($colors, 'White')};
+      }
+
+      color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+      .buyVideoBtnContent {
+        height: 24px; 
+        margin-left: 10px;
+        color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+
+        .buyBtnDivider {
+          border-left: 1px solid var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+          height: 20px;
+          margin: 0 8px;
+        }
+
+        .buyVideoBtnText {
+          font-size: 16px;
+          color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+
+          del {
+            text-decoration: solid line-through map-get($map: $colors, $key: 'Razzmatazz') 2px;
+          }
+        }
+      }
+    }
+
+    .buyVideoDesc {
+      color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+      text-align: center;
+      font-size: 14px;
+    }
+  }
+}
