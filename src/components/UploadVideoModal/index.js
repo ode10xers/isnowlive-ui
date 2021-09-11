@@ -6,6 +6,7 @@ import {
   Col,
   Modal,
   Form,
+  Collapse,
   Typography,
   Radio,
   Image,
@@ -57,6 +58,7 @@ import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/int
 import styles from './styles.module.scss';
 
 const { Text, Paragraph } = Typography;
+const { Panel } = Collapse;
 
 const videoPriceTypes = {
   FREE: {
@@ -961,227 +963,6 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item
-                  id="session_ids"
-                  name="session_ids"
-                  label="Related class(es) [for upselling]"
-                  extra={
-                    <Text className={styles.helpText}>
-                      This is an optional field. You can select any of your existing live sessions here to link this
-                      video to that live session. This helps you upsell this video on that live session’s page so that
-                      customers who can’t find a suitable time for your live session can instead buy your video and
-                      still learn while you still make a sale.
-                    </Text>
-                  }
-                >
-                  <Select
-                    showArrow
-                    showSearch={false}
-                    placeholder="Select your Class(es)"
-                    mode="multiple"
-                    maxTagCount={2}
-                    value={selectedSessionIds}
-                    onChange={setSelectedSessionIds}
-                    optionLabelProp="label"
-                  >
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                      key="Published Sessions"
-                    >
-                      {classes
-                        ?.filter((session) => session.is_active)
-                        .map((session) => (
-                          <Select.Option
-                            value={session.session_id}
-                            key={session.session_id}
-                            label={
-                              <>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </>
-                            }
-                          >
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17} className={styles.productName}>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </Col>
-                              <Col xs={7} className={styles.textAlignRight}>
-                                <Text strong>
-                                  {session.pay_what_you_want
-                                    ? `min. ${session.price}`
-                                    : session.price > 0
-                                    ? `${session.currency?.toUpperCase()} ${session.price}`
-                                    : 'Free'}
-                                </Text>
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {classes?.filter((session) => session.is_active).length <= 0 && (
-                        <Select.Option disabled value="no_published_session">
-                          <Text disabled> No published sessions </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-                      key="Unpublished Sessions"
-                    >
-                      {classes
-                        ?.filter((session) => !session.is_active)
-                        .map((session) => (
-                          <Select.Option
-                            value={session.session_id}
-                            key={session.session_id}
-                            label={
-                              <>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </>
-                            }
-                          >
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17} className={styles.productName}>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </Col>
-                              <Col xs={7} className={styles.textAlignRight}>
-                                <Text strong>
-                                  {session.pay_what_you_want
-                                    ? `min. ${session.price}`
-                                    : session.price > 0
-                                    ? `${session.currency?.toUpperCase()} ${session.price}`
-                                    : 'Free'}
-                                </Text>
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {classes?.filter((session) => !session.is_active).length <= 0 && (
-                        <Select.Option disabled value="no_unpublished_session">
-                          <Text disabled> No unpublished sessions </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={editedVideo ? 0 : 24}>
-                <Form.Item id="pass_ids" name="pass_ids" label="Related Pass(es)">
-                  <Select
-                    showArrow
-                    showSearch={false}
-                    mode="multiple"
-                    value={selectedPassIds}
-                    onChange={setSelectedPassIds}
-                    placeholder="Select the passes usable for this video"
-                    maxTagCount={2}
-                    optionLabelProp="label"
-                  >
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                      key="Published Passes"
-                    >
-                      {creatorPasses
-                        ?.filter((pass) => pass.is_published)
-                        .map((pass) => (
-                          <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{pass.name}</Col>
-                              <Col xs={7}>
-                                {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorPasses?.filter((pass) => pass.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_published_pass">
-                          <Text disabled> No published passes </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-                      key="Unpublished Passes"
-                    >
-                      {creatorPasses
-                        ?.filter((pass) => !pass.is_published)
-                        .map((pass) => (
-                          <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{pass.name}</Col>
-                              <Col xs={7}>
-                                {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorPasses?.filter((pass) => !pass.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_unpublished_pass">
-                          <Text disabled> No unpublished passes </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={editedVideo ? 0 : 24}>
-                <Form.Item id="membership_ids" name="membership_ids" label="Related Memberships(s)">
-                  <Select
-                    showArrow
-                    showSearch={false}
-                    mode="multiple"
-                    value={selectedMembershipIds}
-                    onChange={setSelectedMembershipIds}
-                    placeholder="Select the memberships usable for this video"
-                    maxTagCount={2}
-                    optionLabelProp="label"
-                  >
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                      key="Published Memberships"
-                    >
-                      {creatorMemberships
-                        ?.filter((subs) => subs.is_published)
-                        .map((subs) => (
-                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{subs.name}</Col>
-                              <Col xs={7}>
-                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorMemberships?.filter((subs) => subs.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_published_subs">
-                          <Text disabled> No published memberships </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-                      key="Unpublished Memberships"
-                    >
-                      {creatorMemberships
-                        ?.filter((subs) => !subs.is_published)
-                        .map((subs) => (
-                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{subs.name}</Col>
-                              <Col xs={7}>
-                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorMemberships?.filter((subs) => !subs.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_unpublished_subs">
-                          <Text disabled> No unpublished memberships </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24}>
                 <Form.Item label="Video Course Type" required>
                   <Form.Item
                     id="video_course_type"
@@ -1288,8 +1069,7 @@ const UploadVideoModal = ({
                     options={creatorMemberTags.map((tag) => ({
                       label: (
                         <>
-                          {' '}
-                          {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                          {tag.name} {tag.is_default ? <TagOutlined /> : null}
                         </>
                       ),
                       value: tag.external_id,
@@ -1327,6 +1107,239 @@ const UploadVideoModal = ({
                 >
                   <InputNumber min={1} placeholder="Watch Count" className={styles.numericInput} />
                 </Form.Item>
+              </Col>
+              <Col xs={24} className={styles.mb20}>
+                <Collapse ghost>
+                  <Panel header={<Text strong>Advanced Features</Text>}>
+                    <Row gutter={[8, 16]}>
+                      <Col xs={24}>
+                        <Form.Item
+                          id="session_ids"
+                          name="session_ids"
+                          label="Related class(es) [for upselling]"
+                          extra={
+                            <Text className={styles.helpText}>
+                              This is an optional field. You can select any of your existing live sessions here to link
+                              this video to that live session. This helps you upsell this video on that live session’s
+                              page so that customers who can’t find a suitable time for your live session can instead
+                              buy your video and still learn while you still make a sale.
+                            </Text>
+                          }
+                        >
+                          <Select
+                            showArrow
+                            showSearch={false}
+                            placeholder="Select your Class(es)"
+                            mode="multiple"
+                            maxTagCount={2}
+                            value={selectedSessionIds}
+                            onChange={setSelectedSessionIds}
+                            optionLabelProp="label"
+                          >
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                              key="Published Sessions"
+                            >
+                              {classes
+                                ?.filter((session) => session.is_active)
+                                .map((session) => (
+                                  <Select.Option
+                                    value={session.session_id}
+                                    key={session.session_id}
+                                    label={
+                                      <>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </>
+                                    }
+                                  >
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17} className={styles.productName}>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </Col>
+                                      <Col xs={7} className={styles.textAlignRight}>
+                                        <Text strong>
+                                          {session.pay_what_you_want
+                                            ? `min. ${session.price}`
+                                            : session.price > 0
+                                            ? `${session.currency?.toUpperCase()} ${session.price}`
+                                            : 'Free'}
+                                        </Text>
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {classes?.filter((session) => session.is_active).length <= 0 && (
+                                <Select.Option disabled value="no_published_session">
+                                  <Text disabled> No published sessions </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                              key="Unpublished Sessions"
+                            >
+                              {classes
+                                ?.filter((session) => !session.is_active)
+                                .map((session) => (
+                                  <Select.Option
+                                    value={session.session_id}
+                                    key={session.session_id}
+                                    label={
+                                      <>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </>
+                                    }
+                                  >
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17} className={styles.productName}>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </Col>
+                                      <Col xs={7} className={styles.textAlignRight}>
+                                        <Text strong>
+                                          {session.pay_what_you_want
+                                            ? `min. ${session.price}`
+                                            : session.price > 0
+                                            ? `${session.currency?.toUpperCase()} ${session.price}`
+                                            : 'Free'}
+                                        </Text>
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {classes?.filter((session) => !session.is_active).length <= 0 && (
+                                <Select.Option disabled value="no_unpublished_session">
+                                  <Text disabled> No unpublished sessions </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={editedVideo ? 0 : 24}>
+                        <Form.Item id="pass_ids" name="pass_ids" label="Related Pass(es)">
+                          <Select
+                            showArrow
+                            showSearch={false}
+                            mode="multiple"
+                            value={selectedPassIds}
+                            onChange={setSelectedPassIds}
+                            placeholder="Select the passes usable for this video"
+                            maxTagCount={2}
+                            optionLabelProp="label"
+                          >
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                              key="Published Passes"
+                            >
+                              {creatorPasses
+                                ?.filter((pass) => pass.is_published)
+                                .map((pass) => (
+                                  <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{pass.name}</Col>
+                                      <Col xs={7}>
+                                        {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorPasses?.filter((pass) => pass.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_published_pass">
+                                  <Text disabled> No published passes </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                              key="Unpublished Passes"
+                            >
+                              {creatorPasses
+                                ?.filter((pass) => !pass.is_published)
+                                .map((pass) => (
+                                  <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{pass.name}</Col>
+                                      <Col xs={7}>
+                                        {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorPasses?.filter((pass) => !pass.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_unpublished_pass">
+                                  <Text disabled> No unpublished passes </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={editedVideo ? 0 : 24}>
+                        <Form.Item id="membership_ids" name="membership_ids" label="Related Memberships(s)">
+                          <Select
+                            showArrow
+                            showSearch={false}
+                            mode="multiple"
+                            value={selectedMembershipIds}
+                            onChange={setSelectedMembershipIds}
+                            placeholder="Select the memberships usable for this video"
+                            maxTagCount={2}
+                            optionLabelProp="label"
+                          >
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                              key="Published Memberships"
+                            >
+                              {creatorMemberships
+                                ?.filter((subs) => subs.is_published)
+                                .map((subs) => (
+                                  <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{subs.name}</Col>
+                                      <Col xs={7}>
+                                        {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorMemberships?.filter((subs) => subs.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_published_subs">
+                                  <Text disabled> No published memberships </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                              key="Unpublished Memberships"
+                            >
+                              {creatorMemberships
+                                ?.filter((subs) => !subs.is_published)
+                                .map((subs) => (
+                                  <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{subs.name}</Col>
+                                      <Col xs={7}>
+                                        {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorMemberships?.filter((subs) => !subs.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_unpublished_subs">
+                                  <Text disabled> No unpublished memberships </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </Panel>
+                </Collapse>
               </Col>
             </Row>
             <Form.Item {...(!isMobileDevice && formTailLayout)}>
