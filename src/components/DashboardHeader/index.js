@@ -9,6 +9,7 @@ import { generateUrlFromUsername } from 'utils/helper';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { useLocation } from 'react-router';
 
 const logo = require('assets/images/passion-orange-logo.png');
 
@@ -16,6 +17,7 @@ const { useBreakpoint } = Grid;
 
 const DashboardHeader = () => {
   const { xs } = useBreakpoint();
+  const location = useLocation();
 
   const {
     state: {
@@ -36,7 +38,7 @@ const DashboardHeader = () => {
       </Col>
       <Col className={styles.navItemWrapper}>
         <DashboardToggle />
-        {xs ? (
+        {location.pathname.includes('attendee') ? null : xs ? (
           <Button
             ghost
             type="primary"

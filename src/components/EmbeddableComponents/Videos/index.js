@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useHistory } from 'react-router';
 // import VideoDetailedListView from 'pages/DetailedListView/Videos';
 
 import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
@@ -8,7 +7,7 @@ import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import AuthModal from 'components/AuthModal';
 
-import { isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -188,8 +187,6 @@ const Videos = () => {
     state: { userDetails },
   } = useGlobalContext();
 
-  const history = useHistory();
-
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [groupView, setGroupView] = useState(null);
@@ -251,7 +248,8 @@ const Videos = () => {
   };
 
   const redirectToAttendeeDashboard = () => {
-    history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage);
+    const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) || 'app';
+    window.open(`${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}`, '_self');
   };
 
   const handleFilterToggleClicked = () => {
