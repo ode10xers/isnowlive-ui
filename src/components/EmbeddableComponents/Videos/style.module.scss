@@ -1,13 +1,22 @@
 @import '../../../styles/variables.scss';
 
 .videoPluginContainer {
-  background-color: var(--video-widget-background-color);
+  background-color: var(--video-widget-background-color, transparent);
   width: 100%;
 
   .filterSection {
     margin-bottom: 30px;
 
+    .filterButton {
+      background-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      border-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      color: var(--video-plugin-cta-font-color, #{map-get($colors, 'White')}) !important;
+    }
+
     .filterContainer {
+      .filterLabel {
+        color: var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}) !important;
+      }
       .filterDropdown {
         min-width: 300px;
       }
@@ -21,6 +30,17 @@
     .videoGroupName {
       font-size: 20px;
       font-weight: 500;
+      color: var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}) !important;
+    }
+
+    .seeAllButton {
+      color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      font-weight: 500;
+    }
+
+    .backButton {
+      color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      border-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
     }
 
     .horizontalVideoList {
@@ -34,13 +54,8 @@
     
       &::-webkit-scrollbar-thumb {
         border-radius: 20px;
-        // background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'WhiteSmoke1')});
         border: 3px solid var(--passion-profile-light-color, #{map-get($colors, 'White')});
       }
-    
-      // &::-webkit-scrollbar-track {
-      //   background: var(--passion-profile-lightest-color, #{map-get($colors, 'White1')});
-      // }
     }
   }
 }

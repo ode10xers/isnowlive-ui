@@ -209,7 +209,7 @@ const Videos = () => {
   useEffect(() => {
     fetchCreatorVideos();
 
-    document.body.style.background = 'transparent';
+    document.body.style.background = 'var(--video-widget-background-color, transparent)';
   }, [fetchCreatorVideos]);
 
   const videosByGroup = useMemo(() => {
@@ -250,7 +250,12 @@ const Videos = () => {
   const groupFilters = (
     <Row gutter={[8, 12]} className={styles.filterSection}>
       <Col xs={24}>
-        <Button type="primary" icon={<ControlOutlined />} onClick={handleFilterToggleClicked}>
+        <Button
+          className={styles.filterButton}
+          type="primary"
+          icon={<ControlOutlined />}
+          onClick={handleFilterToggleClicked}
+        >
           {showFilter ? 'Hide' : 'Show'} Filters
         </Button>
       </Col>
@@ -298,7 +303,7 @@ const Videos = () => {
                     </Title>
                   </Col>
                   <Col flex="0 0 90px">
-                    <Button type="link" onClick={() => handleMoreClicked(groupName)}>
+                    <Button className={styles.seeAllButton} type="link" onClick={() => handleMoreClicked(groupName)}>
                       See all ({groupVideos.length ?? 0})
                     </Button>
                   </Col>
@@ -335,7 +340,13 @@ const Videos = () => {
   const moreVideoList = (
     <Row gutter={[8, 16]}>
       <Col xs={24}>
-        <Button ghost type="primary" onClick={() => setGroupView(null)} icon={<LeftOutlined />}>
+        <Button
+          className={styles.backButton}
+          ghost
+          type="primary"
+          onClick={() => setGroupView(null)}
+          icon={<LeftOutlined />}
+        >
           Back to video library
         </Button>
       </Col>
