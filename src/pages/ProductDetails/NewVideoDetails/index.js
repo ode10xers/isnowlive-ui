@@ -26,6 +26,7 @@ import {
 import AuthModal from 'components/AuthModal';
 import DefaultImage from 'components/Icons/DefaultImage';
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
+import PassesListItem from 'components/DynamicProfileComponents/PassesProfileComponent/PassesListItem';
 import SubscriptionListItem from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListItem';
 
 import {
@@ -717,6 +718,17 @@ const NewVideoDetails = ({ match }) => {
     setShowAuthModal(true);
   };
 
+  const handlePassBuyClicked = (e) => {
+    preventDefaults(e);
+
+    if (!selectedPass) {
+      setPassSelectionError(true);
+    } else {
+      setSelectedPass(paymentInstruments.PASS);
+      setShowAuthModal(true);
+    }
+  };
+
   const handleMembershipBuyClicked = (e) => {
     preventDefaults(e);
 
@@ -726,6 +738,11 @@ const NewVideoDetails = ({ match }) => {
       setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
       setShowAuthModal(true);
     }
+  };
+
+  const handleSelectBuyablePass = (pass) => {
+    setPassSelectionError(false);
+    setSelectedPass(pass);
   };
 
   const handleSelectBuyableSubscription = (subs) => {
@@ -767,6 +784,24 @@ const NewVideoDetails = ({ match }) => {
       </div>
     );
   };
+
+  const renderBuyablePassListItem = (pass) => (
+    <Col xs={24} key={pass.external_id}>
+      <Row gutter={12} align="middle">
+        <Col flex="0 0 16px">
+          <div
+            onClick={() => handleSelectBuyablePass(pass)}
+            className={selectedPass?.external_id === pass.external_id ? undefined : styles.roundBtn}
+          >
+            {selectedPass?.external_id === pass.external_id && <CheckCircleTwoTone twoToneColor="#52c41a" />}
+          </div>
+        </Col>
+        <Col flex="1 1 auto">
+          <PassesListItem pass={pass} />
+        </Col>
+      </Row>
+    </Col>
+  );
 
   const renderBuyableSubscriptionItem = (subs) => (
     <Col xs={24} key={subs.external_id}>
@@ -842,7 +877,22 @@ const NewVideoDetails = ({ match }) => {
           <TagsOutlined /> Buy with Pass
         </Title>
         <Row gutter={[12, 12]} justify="center" className={styles.buyPassContainer}>
-          <Col xs={24}></Col>
+          <Col xs={24}>
+            <Button block type="primary" size="large" className={styles.buyPassBtn} onClick={handlePassBuyClicked}>
+              GET PASS AND BOOK
+            </Button>
+          </Col>
+          <Col xs={24}>
+            <Paragraph className={styles.buyPassDesc}>Get a pass for a more worry-free payment experience.</Paragraph>
+          </Col>
+        </Row>
+        {passSelectionError && <Paragraph type="danger">Please select a pass below first</Paragraph>}
+        <Row
+          gutter={[12, 12]}
+          justify="center"
+          className={classNames(styles.buyablePassListContainer, passSelectionError ? styles.error : undefined)}
+        >
+          {relatedPasses?.map(renderBuyablePassListItem)}
         </Row>
       </Col>
     );
