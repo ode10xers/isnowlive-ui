@@ -41,6 +41,7 @@ const ImageUpload = ({
   const handleImageUpload = async (fileData) => {
     setIsLoading(true);
     try {
+      console.log('Doing upload');
       const formData = new FormData();
       // const reducer = ImageBlobReduce();
       // const reducedImageFile = await reducer.toBlob(fileData.file, { max: 600 });
