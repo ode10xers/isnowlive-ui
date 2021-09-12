@@ -386,8 +386,7 @@ const PaymentPopup = () => {
       const subscriptionDetails = paymentInstrumentDetails;
 
       textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${
-        subscriptionDetails.products[productType.toUpperCase()].credits -
-        subscriptionDetails.products[productType.toUpperCase()].credits_used
+        subscriptionDetails.product_credits - subscriptionDetails.product_credits_used
       } credits left`;
     }
 

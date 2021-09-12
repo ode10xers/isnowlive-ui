@@ -123,8 +123,8 @@ const VideoDetails = ({ match, history }) => {
           const usableSubscription =
             data.active.find(
               (subscription) =>
+                subscription.product_credits > subscription.product_credits_used &&
                 subscription.products['VIDEO'] &&
-                subscription.products['VIDEO']?.credits - subscription.products['VIDEO']?.credits_used > 0 &&
                 subscription.products['VIDEO']?.product_ids?.includes(videoExternalId)
             ) || null;
 
@@ -761,8 +761,7 @@ const VideoDetails = ({ match, history }) => {
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
                             purchased <b> {usableSubscription.subscription_name} </b> membership. You currently have
-                            {usableSubscription.products['VIDEO'].credits -
-                              usableSubscription.products['VIDEO'].credits_used}
+                            {usableSubscription.product_credits - usableSubscription.products_credits_used}
                             credits left.
                           </Paragraph>
                         </Col>

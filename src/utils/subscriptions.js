@@ -17,8 +17,7 @@ export const generateBaseCreditsText = (subscription, isCourse = false) => {
     calculatedBaseCredits = subscription?.products['COURSE']?.credits || 0;
     productText = 'Course';
   } else {
-    calculatedBaseCredits =
-      (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+    calculatedBaseCredits = subscription?.product_credits;
 
     let availableProducts = [];
 
