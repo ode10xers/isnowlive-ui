@@ -49,10 +49,10 @@
 
     .courseCoverImage {
       object-fit: cover;
-      min-height: 320px;
+      min-height: 550px;
 
       @media screen and (max-width:992px) {
-        min-height: 550px;
+        min-height: 320px;
       }
     }
 
