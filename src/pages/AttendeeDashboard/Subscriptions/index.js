@@ -270,18 +270,12 @@ const Subscriptions = () => {
     let totalCredits = 0;
 
     if (isCourse) {
+      // TODO: Once we support course in subs, rework this based on new implementation
       remainingCredits = subscription?.products['COURSE']?.credits - subscription?.products['COURSE']?.credits_used;
       totalCredits = subscription?.products['COURSE']?.credits;
     } else {
-      remainingCredits =
-        (subscription?.products['SESSION']
-          ? subscription?.products['SESSION']?.credits - subscription?.products['SESSION']?.credits_used
-          : 0) +
-        (subscription?.products['VIDEO']
-          ? subscription?.products['VIDEO']?.credits - subscription?.products['VIDEO']?.credits_used
-          : 0);
-      totalCredits =
-        (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+      totalCredits = subscription?.product_credits;
+      remainingCredits = totalCredits - subscription?.product_credits_used;
     }
 
     return (

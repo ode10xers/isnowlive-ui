@@ -573,17 +573,12 @@ const UploadVideoModal = ({
           try {
             await Promise.all(
               targetMemberships.map(async (subs) => {
-                let sessionsProductInfo = subs.products['SESSION'] ?? null;
                 let videosProductInfo = subs.products['VIDEO'] ?? null;
 
                 if (videosProductInfo) {
                   videosProductInfo.product_ids = [...new Set([...videosProductInfo.product_ids, data.external_id])];
-                } else if (sessionsProductInfo) {
-                  const totalCredits = sessionsProductInfo.credits;
-
-                  sessionsProductInfo.credits = Math.floor(totalCredits / 2) + (totalCredits % 2);
+                } else {
                   videosProductInfo = {
-                    credits: Math.floor(totalCredits / 2),
                     product_ids: [data.external_id],
                   };
                 }
@@ -592,6 +587,7 @@ const UploadVideoModal = ({
                   VIDEO: videosProductInfo,
                 };
 
+                let sessionsProductInfo = subs.products['SESSION'] ?? null;
                 if (sessionsProductInfo) {
                   productsData.SESSION = sessionsProductInfo;
                 }
@@ -602,6 +598,7 @@ const UploadVideoModal = ({
                   validity: subs.validity,
                   tag_id: subs.tag.external_id,
                   color_code: subs.color_code,
+                  product_credits: subs.product_credits,
                   products: productsData,
                 };
 
