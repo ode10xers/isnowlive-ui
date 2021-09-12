@@ -159,9 +159,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
         subscriptionTagType: editedSubscription?.tag?.external_id ? 'selected' : 'anyone',
         selectedMemberTag: editedSubscription?.tag?.external_id || null,
         subscriptionPeriod: editedSubscription?.validity || 30,
-        subscriptionCredits:
-          (editedSubscription?.products['SESSION']?.credits || 0) +
-          (editedSubscription?.products['VIDEO']?.credits || 0),
+        subscriptionCredits: editedSubscription?.product_credits ?? 1,
         includedProducts: Object.entries(editedSubscription?.products)
           .map(([key, val]) => key)
           .filter((key) => key !== 'COURSE'),
@@ -330,9 +328,10 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
 
     values.includedProducts.forEach((product) => {
       productsData[product] = {
-        credits:
-          Math.floor(values.subscriptionCredits / values.includedProducts.length) +
-          (product === 'SESSION' ? values.subscriptionCredits % values.includedProducts.length : 0),
+        // NOTE : Previously we split the credits, now we don't
+        // credits:
+        //   Math.floor(values.subscriptionCredits / values.includedProducts.length) +
+        //   (product === 'SESSION' ? values.subscriptionCredits % values.includedProducts.length : 0),
         product_ids: product === 'SESSION' ? selectedSessions : selectedVideos,
       };
     });
@@ -351,6 +350,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
         validity: values.subscriptionPeriod,
         tag_id: selectedTagType === 'anyone' ? '' : values.selectedMemberTag || selectedMemberTag || '',
         color_code: values.colorCode || colorCode || defaultBorderColor,
+        product_credits: values.subscriptionCredits,
         products: productsData,
       };
 
