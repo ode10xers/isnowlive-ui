@@ -59,7 +59,7 @@ const ImageUpload = ({
   };
 
   return (
-    <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image" resizeMaxSize={2048}>
+    <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image" resizeMaxSize={1080}>
       <Upload
         className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
         listType={listType}
