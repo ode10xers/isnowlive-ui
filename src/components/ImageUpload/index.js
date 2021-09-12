@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Upload, Row, Col, message } from 'antd';
-import ImgCrop from 'antd-img-crop';
+// import ImgCrop from 'antd-img-crop';
+import ImgCrop from '@hugorezende/antd-img-crop';
 import { PlusOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -58,7 +59,7 @@ const ImageUpload = ({
   };
 
   return (
-    <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image">
+    <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image" resizeMaxSize={2048}>
       <Upload
         className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
         listType={listType}
