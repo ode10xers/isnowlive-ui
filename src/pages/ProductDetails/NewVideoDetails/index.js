@@ -160,8 +160,6 @@ const NewVideoDetails = ({ match }) => {
         setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
       } else if (userPass) {
         setSelectedPaymentInstrument(paymentInstruments.PASS);
-      } else {
-        setSelectedPaymentInstrument(paymentInstruments.ONE_OFF);
       }
     },
     [getUsableSubscriptionForVideo, getUsablePassForVideo]
@@ -298,11 +296,8 @@ const NewVideoDetails = ({ match }) => {
     } else {
       setUsablePass(null);
       setUsableSubscription(null);
-      setSelectedPass(null);
-      setSelectedSubscription(null);
       setPassSelectionError(false);
       setSubscriptionSelectionError(false);
-      setSelectedPaymentInstrument(paymentInstruments.ONE_OFF);
     }
   }, [videoId, userDetails, fetchUserPaymentInstruments]);
 
@@ -562,6 +557,8 @@ const NewVideoDetails = ({ match }) => {
     let userPurchasedPass = usablePass;
     let userPurchasedSubscription = usableSubscription;
 
+    console.log(selectedPaymentInstrument);
+
     if (!shouldFollowUpGetVideo) {
       // If user logged in from AuthModal
       // We fetch the usable subscriptions/pass info
@@ -708,14 +705,21 @@ const NewVideoDetails = ({ match }) => {
   //#region Start of Event handlers
 
   const closeAuthModal = () => {
-    setSelectedPaymentInstrument(paymentInstruments.ONE_OFF);
     setShowAuthModal(false);
+  };
+
+  const handleBuy = () => {
+    if (userDetails) {
+      showConfirmPaymentPopup();
+    } else {
+      setShowAuthModal(true);
+    }
   };
 
   const handleVideoBuyClicked = (e) => {
     preventDefaults(e);
     setSelectedPaymentInstrument(paymentInstruments.ONE_OFF);
-    setShowAuthModal(true);
+    handleBuy();
   };
 
   const handlePassBuyClicked = (e) => {
@@ -724,8 +728,8 @@ const NewVideoDetails = ({ match }) => {
     if (!selectedPass) {
       setPassSelectionError(true);
     } else {
-      setSelectedPass(paymentInstruments.PASS);
-      setShowAuthModal(true);
+      setSelectedPaymentInstrument(paymentInstruments.PASS);
+      handleBuy();
     }
   };
 
@@ -736,7 +740,7 @@ const NewVideoDetails = ({ match }) => {
       setSubscriptionSelectionError(true);
     } else {
       setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
-      setShowAuthModal(true);
+      handleBuy();
     }
   };
 
