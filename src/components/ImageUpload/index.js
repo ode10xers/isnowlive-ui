@@ -58,6 +58,11 @@ const ImageUpload = ({
     setIsLoading(false);
   };
 
+  const handleOnChange = (values) => {
+    console.log('On Change Handler');
+    console.log(values);
+  };
+
   return (
     <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image" resizeMaxSize={1080}>
       <Upload
@@ -68,6 +73,7 @@ const ImageUpload = ({
         customRequest={handleImageUpload}
         beforeUpload={beforeUpload}
         showUploadList={showUploadList}
+        onChange={handleOnChange}
       >
         <Loader loading={isLoading} text="Uploading new image...">
           {value ? (
