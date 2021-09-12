@@ -818,9 +818,9 @@ const VideoDetails = ({ match }) => {
                                     <Text className={styles.blueText} strong>
                                       Credits :{' '}
                                       {`${
-                                        usableUserSubscription?.products_credits -
-                                        usableUserSubscription?.products_credits_used
-                                      }/${usableUserSubscription?.products_credits}`}
+                                        usableUserSubscription?.product_credits -
+                                        usableUserSubscription?.product_credits_used
+                                      }/${usableUserSubscription?.product_credits}`}
                                     </Text>
                                   </Col>
                                 </Row>
