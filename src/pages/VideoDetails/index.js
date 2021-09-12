@@ -185,8 +185,8 @@ const VideoDetails = ({ match }) => {
             const usableSubscription =
               data.active.find(
                 (subscription) =>
+                  subscription.product_credits > subscription.product_credits_used &&
                   subscription.products['VIDEO'] &&
-                  subscription.products['VIDEO']?.credits - subscription.products['VIDEO']?.credits_used > 0 &&
                   subscription.products['VIDEO']?.product_ids?.includes(videoId)
               ) || null;
 
@@ -818,9 +818,9 @@ const VideoDetails = ({ match }) => {
                                     <Text className={styles.blueText} strong>
                                       Credits :{' '}
                                       {`${
-                                        usableUserSubscription?.products['VIDEO'].credits -
-                                        usableUserSubscription?.products['VIDEO'].credits_used
-                                      }/${usableUserSubscription?.products['VIDEO'].credits}`}
+                                        usableUserSubscription?.product_credits -
+                                        usableUserSubscription?.product_credits_used
+                                      }/${usableUserSubscription?.product_credits}`}
                                     </Text>
                                   </Col>
                                 </Row>
