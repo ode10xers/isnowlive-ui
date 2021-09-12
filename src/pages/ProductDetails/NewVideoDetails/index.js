@@ -20,6 +20,8 @@ import {
   showGetVideoWithPassSuccessModal,
   showPurchaseSingleVideoSuccessModal,
   showGetVideoWithSubscriptionSuccessModal,
+  showPurchasePassAndGetVideoSuccessModal,
+  showPurchaseSubscriptionAndGetVideoSuccessModal,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
 import DefaultImage from 'components/Icons/DefaultImage';
@@ -46,6 +48,7 @@ import { generateColorPalletteForProfile } from 'utils/colors';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { generateBaseCreditsText } from 'utils/subscriptions';
 
 const {
   formatDate: { getVideoMinutesDuration },
@@ -365,6 +368,67 @@ const NewVideoDetails = ({ match }) => {
     };
   };
 
+  const buyPassAndGetVideo = async (couponCode = '') => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        pass_id: selectedPass.external_id,
+        price: selectedPass.total_price,
+        currency: selectedPass.currency.toLowerCase(),
+        coupon_code: couponCode,
+      };
+
+      const { status, data } = await apis.passes.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
+        if (data.payment_required) {
+          return {
+            ...data,
+            is_successful_order: true,
+            payment_order_id: data.pass_order_id,
+            payment_order_type: orderType.PASS,
+            follow_up_booking_info: {
+              productType: productType.VIDEO,
+              productId: videoData.external_id,
+            },
+          };
+        } else {
+          // It's a free pass, so we immediately book the video after this
+          const followUpGetVideo = await purchaseVideo({
+            video_id: videoData.external_id,
+            payment_source: paymentSource.PASS,
+            source_id: data.pass_order_id,
+            user_timezone_location: getTimezoneLocation(),
+          });
+
+          if (isAPISuccess(followUpGetVideo.status)) {
+            showPurchasePassAndGetVideoSuccessModal(data.pass_order_id);
+            setIsLoading(false);
+          }
+
+          return {
+            ...data,
+            is_successful_order: true,
+          };
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+        showAlreadyBookedModal(productType.VIDEO);
+      } else if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
+    }
+
+    return {
+      is_successful_order: false,
+    };
+  };
+
   const buyVideoUsingPass = async () => {
     setIsLoading(true);
 
@@ -389,6 +453,66 @@ const NewVideoDetails = ({ match }) => {
     } catch (error) {
       setIsLoading(false);
 
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+        showAlreadyBookedModal(productType.VIDEO);
+      } else if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
+    }
+
+    return {
+      is_successful_order: false,
+    };
+  };
+
+  const buySubscriptionAndGetVideo = async (couponCode = '') => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        subscription_id: selectedSubscription.external_id,
+        coupon_code: couponCode,
+        user_timezone_location: getTimezoneLocation(),
+      };
+
+      const { status, data } = await apis.subscriptions.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
+        if (data.payment_required) {
+          return {
+            ...data,
+            is_successful_order: true,
+            payment_order_type: orderType.SUBSCRIPTION,
+            payment_order_id: data.subscription_order_id,
+            follow_up_booking_info: {
+              productType: productType.VIDEO,
+              productId: videoData.external_id,
+            },
+          };
+        } else {
+          // It's a free pass, so we immediately book the video after this
+          const followUpGetVideo = await purchaseVideo({
+            video_id: videoData.external_id,
+            payment_source: paymentSource.SUBSCRIPTION,
+            source_id: data.subscription_order_id,
+            user_timezone_location: getTimezoneLocation(),
+          });
+
+          if (isAPISuccess(followUpGetVideo.status)) {
+            showPurchaseSubscriptionAndGetVideoSuccessModal();
+            setIsLoading(false);
+          }
+
+          return {
+            ...data,
+            is_successful_order: true,
+          };
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO);
       } else if (!isUnapprovedUserError(error.response)) {
@@ -433,7 +557,6 @@ const NewVideoDetails = ({ match }) => {
     };
   };
 
-  // TODO: Add more flows here (buy pass + video and buy subs + video)
   const showConfirmPaymentPopup = async () => {
     let userPurchasedPass = usablePass;
     let userPurchasedSubscription = usableSubscription;
@@ -479,6 +602,26 @@ const NewVideoDetails = ({ match }) => {
         showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription());
       } else {
         // Buy Membership + Video flow
+        const paymentPopupData = {
+          productId: selectedSubscription.external_id,
+          productType: productType.SUBSCRIPTION,
+          itemList: [
+            {
+              name: selectedSubscription.name,
+              description: generateBaseCreditsText(selectedSubscription, false),
+              currency: selectedSubscription.currency,
+              price: selectedSubscription.total_price,
+            },
+            {
+              name: videoData.title,
+              description: videoDesc,
+              currency: videoData.currency,
+              price: 0,
+            },
+          ],
+        };
+
+        showPaymentPopup(paymentPopupData, buySubscriptionAndGetVideo);
       }
     } else if (selectedPaymentInstrument === paymentInstruments.PASS && videoData?.total_price > 0) {
       if (userPurchasedPass) {
@@ -507,6 +650,27 @@ const NewVideoDetails = ({ match }) => {
         showPaymentPopup(paymentPopupData, async () => await buyVideoUsingPass());
       } else {
         // Buy Pass with Video flow
+
+        const paymentPopupData = {
+          productId: selectedPass.external_id,
+          productType: productType.PASS,
+          itemList: [
+            {
+              name: selectedPass.name,
+              description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
+              currency: selectedPass.currency,
+              price: selectedPass.total_price,
+            },
+            {
+              name: videoData.title,
+              description: videoDesc,
+              currency: videoData.currency,
+              price: 0,
+            },
+          ],
+        };
+
+        showPaymentPopup(paymentPopupData, buyPassAndGetVideo);
       }
     } else {
       // Buy Single Video Flow

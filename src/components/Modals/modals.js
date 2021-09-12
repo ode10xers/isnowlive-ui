@@ -429,7 +429,7 @@ export const showPurchaseSubscriptionSuccessModal = () => {
     center: true,
     closable: true,
     maskClosable: false,
-    title: 'Subscription purchased',
+    title: 'Membership purchased',
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
@@ -438,7 +438,37 @@ export const showPurchaseSubscriptionSuccessModal = () => {
       )),
     content: (
       <>
-        <Paragraph>You have successfully purchased this subscription.</Paragraph>
+        <Paragraph>You have successfully purchased this membership.</Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+    afterClose: resetBodyStyle,
+  });
+};
+
+export const showPurchaseSubscriptionAndGetVideoSuccessModal = () => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Purchase successful',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
+      )),
+    content: (
+      <>
+        <Paragraph>You have successfully purchased this membership.</Paragraph>
+        <Paragraph>We have also purchased this video for you using 1 credit from this membership</Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
@@ -463,7 +493,7 @@ export const showGetVideoWithSubscriptionSuccessModal = () => {
       )),
     content: (
       <>
-        <Paragraph>We have purchased this video using 1 credit from your subscription</Paragraph>
+        <Paragraph>We have purchased this video using 1 credit from your membership</Paragraph>
         <Paragraph>
           You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
@@ -495,7 +525,7 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
       )),
     content: (
       <>
-        <Paragraph>We have booked this session using 1 credit from your subscription</Paragraph>
+        <Paragraph>We have booked this session using 1 credit from your membership</Paragraph>
         <Paragraph>
           You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
@@ -508,6 +538,7 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
   });
 };
 
+// NOTE : currently unused since we don't support course in subs
 export const showGetCourseWithSubscriptionSuccessModal = () => {
   const userEmail = getLocalUserDetails().email;
   const username = getUsernameFromUrl();
