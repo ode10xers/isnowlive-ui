@@ -41,7 +41,6 @@ const ImageUpload = ({
   const handleImageUpload = async (fileData) => {
     setIsLoading(true);
     try {
-      console.log('Doing upload');
       const formData = new FormData();
       // const reducer = ImageBlobReduce();
       // const reducedImageFile = await reducer.toBlob(fileData.file, { max: 600 });
@@ -59,11 +58,6 @@ const ImageUpload = ({
     setIsLoading(false);
   };
 
-  const handleOnChange = (values) => {
-    console.log('On Change Handler');
-    console.log(values);
-  };
-
   return (
     <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image" resizeMaxSize={1080}>
       <Upload
@@ -74,7 +68,6 @@ const ImageUpload = ({
         customRequest={handleImageUpload}
         beforeUpload={beforeUpload}
         showUploadList={showUploadList}
-        onChange={handleOnChange}
       >
         <Loader loading={isLoading} text="Uploading new image...">
           {value ? (
