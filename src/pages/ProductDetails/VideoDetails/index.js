@@ -761,7 +761,7 @@ const VideoDetails = ({ match, history }) => {
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
                             purchased <b> {usableSubscription.subscription_name} </b> membership. You currently have
-                            {usableSubscription.product_credits - usableSubscription.products_credits_used}
+                            {usableSubscription.product_credits - usableSubscription.product_credits_used}
                             credits left.
                           </Paragraph>
                         </Col>
