@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SketchPicker } from 'react-color';
 
 import { Row, Col, Button, Form, Input, Collapse, Space, Typography, Tooltip } from 'antd';
 import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -8,11 +9,35 @@ import { preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const { Title } = Typography;
+const { Title, Paragraph, Text, Link } = Typography;
 const { Panel } = Collapse;
+
+const colorPickerChoices = [
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#1890ff',
+  '#009688',
+  '#4caf50',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#607d8b',
+  '#9ae2b6',
+  '#bf6d11',
+  '#f379b2',
+  '#34727c',
+  '#5030fd',
+];
 
 const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => {
   const [expandedAccordionKeys, setExpandedAccordionKeys] = useState([]);
+  const [previewColor, setPreviewColor] = useState('#1890ff');
+
+  const handleColorChange = (color) => {
+    setPreviewColor(color.hex || '#1890ff');
+  };
 
   return (
     <>
@@ -26,6 +51,25 @@ const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => 
         rules={validationRules.requiredValidation}
       >
         <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
+      </Form.Item>
+      <Form.Item>
+        <Row gutter={[8, 8]}>
+          <Col xs={{ span: 24 }} lg={{ span: 20, offset: 4 }}>
+            <Paragraph>Here's a color picker to help you choose the colors for the link items.</Paragraph>
+            <Paragraph>
+              You can look for the color you want, and then copy the <Text strong>Hex</Text>
+              value of the color and paste it into the input.
+            </Paragraph>
+            <div className={styles.colorPickerContainer}>
+              <SketchPicker
+                disableAlpha={true}
+                color={previewColor}
+                onChangeComplete={handleColorChange}
+                presetColors={colorPickerChoices}
+              />
+            </div>
+          </Col>
+        </Row>
       </Form.Item>
       <Form.Item
         labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
@@ -88,12 +132,18 @@ const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => 
                         </Col>
                         <Col xs={24} md={12}>
                           <Form.Item
-                            className={styles.compactFormItem}
                             {...otherLinksRestField}
                             label="Link URL"
-                            fieldKey={[otherLinksFieldKey, 'url']}
+                            className={styles.compactFormItem}
                             name={[otherLinksName, 'url']}
+                            fieldKey={[otherLinksFieldKey, 'url']}
                             rules={validationRules.urlValidation}
+                            extra={
+                              <Text type="secondary">
+                                The link that this item will redirect to, for example{' '}
+                                <Link href="https://passion.do">https://passion.do</Link>
+                              </Text>
+                            }
                           >
                             <Input placeholder="Paste your URL here" type="url" />
                           </Form.Item>
