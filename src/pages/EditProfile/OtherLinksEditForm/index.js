@@ -52,9 +52,9 @@ const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => 
       >
         <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
       </Form.Item>
-      <Form.Item>
+      <Form.Item wrapperCol={{ xs: { span: 24 }, lg: { span: 20, offset: 4 } }}>
         <Row gutter={[8, 8]}>
-          <Col xs={{ span: 24 }} lg={{ span: 20, offset: 4 }}>
+          <Col xs={24}>
             <Paragraph>Here's a color picker to help you choose the colors for the link items.</Paragraph>
             <Paragraph>
               You can look for the color you want, and then copy the <Text strong>Hex</Text>
