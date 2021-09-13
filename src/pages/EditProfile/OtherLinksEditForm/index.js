@@ -57,8 +57,8 @@ const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => 
           <Col xs={24}>
             <Paragraph>Here's a color picker to help you choose the colors for the link items.</Paragraph>
             <Paragraph>
-              You can look for the color you want, and then copy the <Text strong>Hex</Text>
-              value of the color and paste it into the input.
+              You can look for the color you want, and then copy the <Text strong>Hex</Text> value of the color and
+              paste it into the input.
             </Paragraph>
             <div className={styles.colorPickerContainer}>
               <SketchPicker
