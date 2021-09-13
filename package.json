@@ -5,14 +5,16 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@cloudflare/stream-react": "^0.2.0",
+    "@hugorezende/antd-img-crop": "^3.15.1",
     "@stripe/react-stripe-js": "^1.4.0",
     "@stripe/stripe-js": "^1.13.2",
     "@uppy/core": "^1.16.0",
     "@uppy/react": "^1.11.2",
     "@uppy/tus": "^1.8.4",
     "antd": "^4.14.0",
-    "antd-img-crop": "^3.12.0",
+    "antd-img-crop": "^3.16.0",
     "axios": "^0.21.1",
+    "babel-plugin-react-remove-properties": "^0.3.0",
     "classnames": "^2.2.6",
     "draft-js": "^0.11.7",
     "draftjs-to-html": "^0.9.1",
@@ -29,6 +31,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-add-to-calendar": "^0.1.5",
+    "react-app-rewired": "^2.1.8",
     "react-beautiful-dnd": "^13.1.0",
     "react-big-calendar": "^0.30.0",
     "react-color": "^2.19.3",
@@ -48,15 +51,15 @@
     "swiper": "^6.8.1"
   },
   "scripts": {
-    "start": "react-scripts start",
     "lint": "eslint --fix src/.",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build:prod": "env-cmd -f ./.env.production react-scripts build",
-    "build:stage": "env-cmd -f ./.env.staging react-scripts build"
+    "start": "react-app-rewired start",
+    "test": "react-app-rewired test",
+    "build": "react-app-rewired build",
+    "build:prod": "env-cmd -f ./.env.production react-app-rewired build",
+    "build:stage": "env-cmd -f ./.env.staging react-app-rewired build",
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [

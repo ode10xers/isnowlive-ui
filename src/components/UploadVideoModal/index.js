@@ -575,17 +575,12 @@ const UploadVideoModal = ({
           try {
             await Promise.all(
               targetMemberships.map(async (subs) => {
-                let sessionsProductInfo = subs.products['SESSION'] ?? null;
                 let videosProductInfo = subs.products['VIDEO'] ?? null;
 
                 if (videosProductInfo) {
                   videosProductInfo.product_ids = [...new Set([...videosProductInfo.product_ids, data.external_id])];
-                } else if (sessionsProductInfo) {
-                  const totalCredits = sessionsProductInfo.credits;
-
-                  sessionsProductInfo.credits = Math.floor(totalCredits / 2) + (totalCredits % 2);
+                } else {
                   videosProductInfo = {
-                    credits: Math.floor(totalCredits / 2),
                     product_ids: [data.external_id],
                   };
                 }
@@ -594,6 +589,7 @@ const UploadVideoModal = ({
                   VIDEO: videosProductInfo,
                 };
 
+                let sessionsProductInfo = subs.products['SESSION'] ?? null;
                 if (sessionsProductInfo) {
                   productsData.SESSION = sessionsProductInfo;
                 }
@@ -604,6 +600,7 @@ const UploadVideoModal = ({
                   validity: subs.validity,
                   tag_id: subs.tag.external_id,
                   color_code: subs.color_code,
+                  product_credits: subs.product_credits,
                   products: productsData,
                 };
 
@@ -944,25 +941,6 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item id="document_url" name="document_url" label="Attached File">
-                  <Select
-                    showArrow
-                    placeholder="Select documents you want to include"
-                    options={creatorDocuments.map((document) => ({
-                      label: document.name,
-                      value: document.url,
-                    }))}
-                  />
-                </Form.Item>
-                <Form.Item label="File accessible by customers">
-                  <Space>
-                    <Text> After buying </Text>
-                    <Switch checked={downloadableBeforePurchase} onChange={setDownloadableBeforePurchase} />
-                    <Text> Before buying </Text>
-                  </Space>
-                </Form.Item>
-              </Col>
-              <Col xs={24}>
                 <Form.Item label="Video Course Type" required>
                   <Form.Item
                     id="video_course_type"
@@ -1109,9 +1087,28 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24} className={styles.mb20}>
-                <Collapse ghost>
-                  <Panel header={<Text strong>Advanced Features</Text>}>
+                <Collapse>
+                  <Panel header={<Text strong>Advanced Options</Text>}>
                     <Row gutter={[8, 16]}>
+                      <Col xs={24}>
+                        <Form.Item id="document_url" name="document_url" label="Attached File">
+                          <Select
+                            showArrow
+                            placeholder="Select documents you want to include"
+                            options={creatorDocuments.map((document) => ({
+                              label: document.name,
+                              value: document.url,
+                            }))}
+                          />
+                        </Form.Item>
+                        <Form.Item label="File accessible by customers">
+                          <Space>
+                            <Text> After buying </Text>
+                            <Switch checked={downloadableBeforePurchase} onChange={setDownloadableBeforePurchase} />
+                            <Text> Before buying </Text>
+                          </Space>
+                        </Form.Item>
+                      </Col>
                       <Col xs={24}>
                         <Form.Item
                           id="session_ids"

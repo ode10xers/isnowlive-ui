@@ -50,7 +50,8 @@ const SubscriptionCards = ({
   );
 
   const getBaseCreditsCount = () => {
-    return (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+    // return (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+    return subscription?.product_credits;
   };
 
   const cardData = [
