@@ -340,7 +340,7 @@ const UploadVideoModal = ({
         form.setFieldsValue({
           ...editedVideo,
           description: editedVideo.description.split('!~!~!~')[0],
-          document_url: editedVideo.description.split('!~!~!~')[1] ?? null,
+          document_url: editedVideo.document_url ?? '',
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
@@ -355,7 +355,7 @@ const UploadVideoModal = ({
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
-        setDownloadableBeforePurchase(editedVideo.description.split('!~!~!~')[2] ?? false);
+        setDownloadableBeforePurchase(editedVideo.is_public_video);
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(
@@ -509,7 +509,9 @@ const UploadVideoModal = ({
       let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
-        description: `${values.description}!~!~!~${values.document_url ?? ''}!~!~!~${downloadableBeforePurchase}`,
+        description: values.description ?? '',
+        document_url: values.document_url ?? '',
+        is_public_video: downloadableBeforePurchase ?? false,
         price:
           videoType === videoPriceTypes.FREE.name
             ? 0

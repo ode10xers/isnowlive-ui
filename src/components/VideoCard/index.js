@@ -91,7 +91,7 @@ const VideoCard = ({
   const videoThumbnailUrl = video?.thumbnail_url || orderDetails?.thumbnail_url || 'error';
 
   const renderVideoDocumentUrl = () => {
-    const documentUrl = (video?.description || orderDetails?.description)?.split('!~!~!~')[1];
+    const documentUrl = video?.document_url || orderDetails?.document_url;
 
     if (!documentUrl) {
       return null;
