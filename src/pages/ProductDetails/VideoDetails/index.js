@@ -623,7 +623,7 @@ const VideoDetails = ({ match, history }) => {
 
   const renderVideoDocumentUrl = () => {
     const documentUrl = videoData?.document_url ?? '';
-    const isPublicDownloadable = videoData?.is_public_document ?? false;
+    // const isPublicDownloadable = videoData?.is_public_document ?? false;
 
     if (!documentUrl) {
       return null;
@@ -632,33 +632,43 @@ const VideoDetails = ({ match, history }) => {
     return (
       <Col xs={24}>
         <Paragraph className={styles.sectionHeading}>
-          This video includes a downloadable PDF file
-          {isPublicDownloadable ? '(click to download)' : `that's only available after purchase`}
+          This video includes a downloadable PDF file (click to download)
+          {/* {isPublicDownloadable ? '(click to download)' : `that's only available after purchase`} */}
         </Paragraph>
-        {
-          isPublicDownloadable ? (
-            <Button
-              className={classNames(
-                styles.fileNameDownload,
-                isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-                  ? styles.darkText
-                  : styles.lightText
-              )}
-              type="primary"
-              icon={<FilePdfOutlined />}
-              onClick={() => window.open(documentUrl)}
-            >
-              {documentUrl.split('_').splice(1).join('_') || 'Download'}
-            </Button>
-          ) : null
-          // (
-          // <div className={styles.fileContainer}>
-          //   <Text className={styles.fileName}>
-          //     <FilePdfOutlined /> {filename}
-          //   </Text>
-          // </div>
-          // )
-        }
+        <Button
+          className={classNames(
+            styles.fileNameDownload,
+            isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+              ? styles.darkText
+              : styles.lightText
+          )}
+          type="primary"
+          icon={<FilePdfOutlined />}
+          onClick={() => window.open(documentUrl)}
+        >
+          {documentUrl.split('_').splice(1).join('_') || 'Download'}
+        </Button>
+        {/* {isPublicDownloadable ? (
+          <Button
+            className={classNames(
+              styles.fileNameDownload,
+              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                ? styles.darkText
+                : styles.lightText
+            )}
+            type="primary"
+            icon={<FilePdfOutlined />}
+            onClick={() => window.open(documentUrl)}
+          >
+            {documentUrl.split('_').splice(1).join('_') || 'Download'}
+          </Button>
+        ) : (
+          <div className={styles.fileContainer}>
+            <Text className={styles.fileName}>
+              <FilePdfOutlined /> {filename}
+            </Text>
+          </div>
+        )} */}
       </Col>
     );
   };
