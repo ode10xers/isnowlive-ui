@@ -106,7 +106,7 @@ const VideoCard = ({
           renderItem={(documentUrl) => (
             <List.Item>
               <Button ghost type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
-                {documentUrl.split('_').slice(-1)[0] || 'Download'}
+                {documentUrl.split('_').splice(1).join('_') || 'Download'}
               </Button>
             </List.Item>
           )}

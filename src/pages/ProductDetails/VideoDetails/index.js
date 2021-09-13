@@ -648,7 +648,7 @@ const VideoDetails = ({ match, history }) => {
               icon={<FilePdfOutlined />}
               onClick={() => window.open(documentUrl)}
             >
-              {documentUrl.split('_').slice(-1)[0] || 'Download'}
+              {documentUrl.split('_').splice(1).join('_') || 'Download'}
             </Button>
           ) : null
           // (
