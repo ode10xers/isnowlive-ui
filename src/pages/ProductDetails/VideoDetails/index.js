@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Spin, List, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
+import { Row, Col, Button, Spin, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
 import {
   LikeOutlined,
   ScheduleOutlined,
@@ -629,26 +629,36 @@ const VideoDetails = ({ match, history }) => {
       return null;
     }
 
-    const filename = documentUrl.split('_').slice(-1)[0] || 'Download';
-
     return (
       <Col xs={24}>
-        <Paragraph className={styles.sectionHeading}> This video includes a downloadable PDF file </Paragraph>
-        <List
-          size="small"
-          dataSource={[documentUrl]}
-          renderItem={(documentUrl) => (
-            <List.Item>
-              {isPublicDownloadable ? (
-                <Button ghost type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
-                  {filename}
-                </Button>
-              ) : (
-                <Text>{filename}</Text>
+        <Paragraph className={styles.sectionHeading}>
+          This video includes a downloadable PDF file
+          {isPublicDownloadable ? '(click to download)' : `that's only available after purchase`}
+        </Paragraph>
+        {
+          isPublicDownloadable ? (
+            <Button
+              className={classNames(
+                styles.fileNameDownload,
+                isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                  ? styles.darkText
+                  : styles.lightText
               )}
-            </List.Item>
-          )}
-        />
+              type="primary"
+              icon={<FilePdfOutlined />}
+              onClick={() => window.open(documentUrl)}
+            >
+              {documentUrl.split('_').slice(-1)[0] || 'Download'}
+            </Button>
+          ) : null
+          // (
+          // <div className={styles.fileContainer}>
+          //   <Text className={styles.fileName}>
+          //     <FilePdfOutlined /> {filename}
+          //   </Text>
+          // </div>
+          // )
+        }
       </Col>
     );
   };
