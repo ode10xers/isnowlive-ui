@@ -382,8 +382,18 @@ const Session = ({ match, history }) => {
     setIsCourseSession(e.target.value === 'course');
 
     if (e.target.value === 'course') {
-      form.setFieldsValue({ ...form.getFieldsValue(), type: 'Group', max_participants: 2 });
-      setSession({ ...session, max_participants: 2 });
+      if (!isSessionTypeGroup) {
+        form.setFieldsValue({
+          ...form.getFieldsValue(),
+          session_course_type: 'course',
+          type: 'Group',
+          max_participants: 2,
+        });
+        setSession({ ...session, is_course: true, max_participants: 2 });
+      } else {
+        form.setFieldsValue({ ...form.getFieldsValue(), session_course_type: 'course', type: 'Group' });
+        setSession({ ...session, is_course: true });
+      }
       setIsSessionTypeGroup(true);
     }
   };
