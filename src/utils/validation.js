@@ -11,7 +11,7 @@ const validationRules = {
     {
       required: true,
       type: 'url',
-      message: 'Please input a valid URL',
+      message: 'Please input a valid URL (e.g. https://google.com)',
     },
   ],
   emailValidation: [{ type: 'email', required: true, message: 'Please input your email' }],
