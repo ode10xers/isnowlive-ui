@@ -717,14 +717,6 @@ const Session = ({ match, history }) => {
         type: isAvailability ? 'AVAILABILITY' : null,
       };
 
-      if (isSessionRecurring) {
-        data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
-        data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
-      } else {
-        data.beginning = moment().startOf('day').utc().format();
-        data.expiry = moment().endOf('day').utc().format();
-      }
-
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         // NOTE : Investigate why we filter out booked inventories here
@@ -734,6 +726,18 @@ const Session = ({ match, history }) => {
         if (deleteSlot && deleteSlot.length) {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
+
+        if (isSessionRecurring) {
+          data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
+          data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
+        } else {
+          data.beginning = moment(allInventoryList[0].start_time).startOf('day').utc().format();
+          data.expiry = moment(allInventoryList[allInventoryList.length - 1].end_time)
+            .endOf('day')
+            .utc()
+            .format();
+        }
+
         if (session.session_id) {
           const updatedSessionResponse = isAvailability
             ? await apis.availabilities.update(session.session_id, data)
