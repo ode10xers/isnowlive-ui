@@ -355,7 +355,7 @@ const UploadVideoModal = ({
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
-        setDownloadableBeforePurchase(editedVideo.is_public_video);
+        setDownloadableBeforePurchase(editedVideo.is_public_document);
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(
@@ -511,7 +511,7 @@ const UploadVideoModal = ({
         title: values.title,
         description: values.description ?? '',
         document_url: values.document_url ?? '',
-        is_public_video: downloadableBeforePurchase ?? false,
+        is_public_document: downloadableBeforePurchase ?? false,
         price:
           videoType === videoPriceTypes.FREE.name
             ? 0

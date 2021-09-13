@@ -623,7 +623,7 @@ const VideoDetails = ({ match, history }) => {
 
   const renderVideoDocumentUrl = () => {
     const documentUrl = videoData?.document_url ?? '';
-    const isPublicDownloadable = videoData?.is_public_video ?? false;
+    const isPublicDownloadable = videoData?.is_public_document ?? false;
 
     if (!documentUrl) {
       return null;
