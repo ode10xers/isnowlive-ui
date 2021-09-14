@@ -253,6 +253,41 @@ const PaymentAccount = () => {
     });
   };
 
+  const paypalModal = (
+    <Modal
+      centered={true}
+      closable={true}
+      visible={paypalAccountModalVisible}
+      onCancel={() => setPaypalAccountModalVisible(false)}
+      afterClose={resetBodyStyle}
+      footer={null}
+      title="Enter your PayPal Email"
+    >
+      <Row gutter={[8, 8]}>
+        <Col xs={24}>
+          <Text>Please enter the email to use with your PayPal Account.</Text>
+        </Col>
+        <Col xs={24}>
+          <Input
+            placeholder="The email associated with your PayPal Account"
+            maxLength={50}
+            onChange={(e) => setCreatorPaypalEmail(e.target.value)}
+            value={creatorPaypalEmail}
+          />
+        </Col>
+        <Col xs={24}>
+          <Row justify="end">
+            <Col>
+              <Button type="primary" loading={isLoading} onClick={handleConnectPaypalAccountClicked}>
+                Connect PayPal Account
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    </Modal>
+  );
+
   let view = null;
   if (paymentConnected === StripeAccountStatus.NOT_CONNECTED) {
     if (showComparePaymentProvider) {
@@ -349,6 +384,7 @@ const PaymentAccount = () => {
 
       view = (
         <div className={styles.comparisonContainer}>
+          {paypalModal}
           <Row gutter={[8, 12]}>
             <Col xs={24}>
               <Button icon={<LeftOutlined />} onClick={() => setShowComparePaymentProvider(false)}>
@@ -390,38 +426,7 @@ const PaymentAccount = () => {
     } else {
       view = (
         <Section>
-          <Modal
-            centered={true}
-            closable={true}
-            visible={paypalAccountModalVisible}
-            onCancel={() => setPaypalAccountModalVisible(false)}
-            afterClose={resetBodyStyle}
-            footer={null}
-            title="Enter your PayPal Email"
-          >
-            <Row gutter={[8, 8]}>
-              <Col xs={24}>
-                <Text>Please enter the email to use with your PayPal Account.</Text>
-              </Col>
-              <Col xs={24}>
-                <Input
-                  placeholder="The email associated with your PayPal Account"
-                  maxLength={50}
-                  onChange={(e) => setCreatorPaypalEmail(e.target.value)}
-                  value={creatorPaypalEmail}
-                />
-              </Col>
-              <Col xs={24}>
-                <Row justify="end">
-                  <Col>
-                    <Button type="primary" loading={isLoading} onClick={handleConnectPaypalAccountClicked}>
-                      Connect PayPal Account
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </Modal>
+          {paypalModal}
 
           <Title level={2}>Get Paid</Title>
 
