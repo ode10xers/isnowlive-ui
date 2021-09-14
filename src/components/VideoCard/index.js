@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Row, Col, Card, Button, Typography, Image, Space, Divider, List } from 'antd';
+import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
 import { PlayCircleOutlined, BookTwoTone, FilePdfOutlined } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
@@ -91,26 +91,20 @@ const VideoCard = ({
   const videoThumbnailUrl = video?.thumbnail_url || orderDetails?.thumbnail_url || 'error';
 
   const renderVideoDocumentUrl = () => {
-    const documentUrl = video?.document_url || orderDetails?.document_url;
-
-    if (!documentUrl) {
+    if (!video?.document) {
       return null;
     }
+
+    const documentData = video?.document || orderDetails?.document;
+    const documentUrl = documentData.url;
+    const documentName = documentData.name || documentUrl.split('_').splice(1).join('_') || 'Download';
 
     return (
       <Col xs={24}>
         <Title level={5}> This video includes a downloadable PDF file </Title>
-        <List
-          size="small"
-          dataSource={[documentUrl]}
-          renderItem={(documentUrl) => (
-            <List.Item>
-              <Button ghost type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
-                {documentUrl.split('_').splice(1).join('_') || 'Download'}
-              </Button>
-            </List.Item>
-          )}
-        />
+        <Button type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
+          {documentName}
+        </Button>
       </Col>
     );
   };

@@ -340,7 +340,7 @@ const UploadVideoModal = ({
         form.setFieldsValue({
           ...editedVideo,
           description: editedVideo.description.split('!~!~!~')[0],
-          document_url: editedVideo.document_url ?? '',
+          document_id: editedVideo.document?.id ?? '',
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
@@ -504,13 +504,12 @@ const UploadVideoModal = ({
               source: videoSourceTypes.CLOUDFLARE.value,
             };
 
-      // TODO: Current hacky implementation for document_url
       // without involving BE
       let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
         description: values.description ?? '',
-        document_url: values.document_url ?? '',
+        document_id: values.document_id ?? '',
         is_public_document: downloadableBeforePurchase ?? false,
         price:
           videoType === videoPriceTypes.FREE.name
@@ -1094,13 +1093,13 @@ const UploadVideoModal = ({
                   <Panel header={<Text strong>Advanced Options</Text>}>
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
-                        <Form.Item id="document_url" name="document_url" label="Attached File">
+                        <Form.Item id="document_id" name="document_id" label="Attached File">
                           <Select
                             showArrow
                             placeholder="Select documents you want to include"
                             options={creatorDocuments.map((document) => ({
                               label: document.name,
-                              value: document.url,
+                              value: document.id,
                             }))}
                           />
                         </Form.Item>

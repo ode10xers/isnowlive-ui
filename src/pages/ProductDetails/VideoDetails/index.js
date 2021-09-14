@@ -622,18 +622,21 @@ const VideoDetails = ({ match, history }) => {
   };
 
   const renderVideoDocumentUrl = () => {
-    const documentUrl = videoData?.document_url ?? '';
-    // const isPublicDownloadable = videoData?.is_public_document ?? false;
+    const documentData = videoData?.document ?? null;
+    const isPublicDownloadable = videoData?.is_public_document ?? false;
 
-    if (!documentUrl) {
+    if (!documentData) {
       return null;
     }
+
+    const documentUrl = documentData.url;
+    const filename = documentData.name || documentData.url.split('_').splice(1).join('_') || 'Download';
 
     return (
       <Col xs={24}>
         <Paragraph className={styles.sectionHeading}>
           This video includes a downloadable PDF file (click to download)
-          {/* {isPublicDownloadable ? '(click to download)' : `that's only available after purchase`} */}
+          {isPublicDownloadable ? '(click to download)' : `that's only available after purchase`}
         </Paragraph>
         <Button
           className={classNames(
@@ -646,9 +649,9 @@ const VideoDetails = ({ match, history }) => {
           icon={<FilePdfOutlined />}
           onClick={() => window.open(documentUrl)}
         >
-          {documentUrl.split('_').splice(1).join('_') || 'Download'}
+          {filename}
         </Button>
-        {/* {isPublicDownloadable ? (
+        {isPublicDownloadable ? (
           <Button
             className={classNames(
               styles.fileNameDownload,
@@ -660,7 +663,7 @@ const VideoDetails = ({ match, history }) => {
             icon={<FilePdfOutlined />}
             onClick={() => window.open(documentUrl)}
           >
-            {documentUrl.split('_').splice(1).join('_') || 'Download'}
+            {filename}
           </Button>
         ) : (
           <div className={styles.fileContainer}>
@@ -668,7 +671,7 @@ const VideoDetails = ({ match, history }) => {
               <FilePdfOutlined /> {filename}
             </Text>
           </div>
-        )} */}
+        )}
       </Col>
     );
   };
