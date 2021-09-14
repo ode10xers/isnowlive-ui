@@ -775,6 +775,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
             {...provided.draggableProps}
             ref={provided.innerRef}
             id={targetComponent.elementId ?? component.key}
+            style={{ padding: 0 }}
           >
             <Suspense fallback={<Spin spinning={true} tip="Loading..." />}>
               <RenderedComponent
@@ -907,7 +908,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
                   droppableId={creatorProfileData?.external_id || 'creator-profile-column'}
                 >
                   {(provided) => (
-                    <Row gutter={[8, 24]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
+                    <Row gutter={[8, 4]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
                       {editingMode
                         ? tempCreatorUIConfig?.map(renderDraggableCustomComponents)
                         : creatorUIConfig.map(renderDraggableCustomComponents)}
