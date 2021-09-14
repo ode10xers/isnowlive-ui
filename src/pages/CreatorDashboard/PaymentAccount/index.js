@@ -24,7 +24,7 @@ import StripeLogo from 'assets/icons/stripe/StripeLogo';
 import PaypalLogo from 'assets/icons/paypal/PaypalLogo';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph, Text, Link } = Typography;
 const { Option } = Select;
 const { creator } = mixPanelEventTags;
 
@@ -253,6 +253,18 @@ const PaymentAccount = () => {
     });
   };
 
+  const generatePaypalFeesLink = () => {
+    if (!selectedCountry) {
+      return '#';
+    }
+
+    const selectedCountryCode = countries.find(
+      ([countryName, countryData]) => countryData.country_code === selectedCountry
+    )[1].country_code;
+
+    return `https://www.paypal.com/${selectedCountryCode.toLowerCase()}/webapps/mpp/merchant-fees`;
+  };
+
   const paypalModal = (
     <Modal
       centered={true}
@@ -308,13 +320,27 @@ const PaymentAccount = () => {
           key: 'local_fees',
           rowDetails: 'Local Payment Fees',
           stripeInfo: <Text>1.4% + €0.25 (0.30 USD equivalent in your currency)</Text>,
-          paypalInfo: <Text>3.9% + 0.30 USD</Text>,
+          paypalInfo: (
+            <div>
+              <Paragraph>Usually 3.9% + 0.30 USD</Paragraph>
+              <Link href={generatePaypalFeesLink()} target="_blank">
+                See exact fees on PayPal's site
+              </Link>
+            </div>
+          ),
         },
         {
           key: 'international_fees',
           rowDetails: 'International Payment Fees',
           stripeInfo: <Text>2.9% + €0.25 (0.30 USD equivalent in your currency)</Text>,
-          paypalInfo: <Text>4.4% + 0.30 USD</Text>,
+          paypalInfo: (
+            <div>
+              <Paragraph>Usually 4.4% + 0.30 USD</Paragraph>
+              <Link href={generatePaypalFeesLink()} target="_blank">
+                See exact fees on PayPal's site
+              </Link>
+            </div>
+          ),
         },
         {
           key: 'subscriptions',
