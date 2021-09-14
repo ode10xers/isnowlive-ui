@@ -314,7 +314,17 @@ const PaymentAccount = () => {
           key: 'currency',
           rowDetails: 'Your offering currency',
           stripeInfo: <Text>All offering priced in your bank account's local currency (EUR, CAD, AUD, etc)</Text>,
-          paypalInfo: <Text>All offerings priced in USD only</Text>,
+          paypalInfo: (
+            <Text>
+              Check support for your currency{' '}
+              <Link
+                href="https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/"
+                target="_blank"
+              >
+                here
+              </Link>
+            </Text>
+          ),
         },
         {
           key: 'local_fees',
@@ -322,7 +332,7 @@ const PaymentAccount = () => {
           stripeInfo: <Text>1.4% + €0.25 (0.30 USD equivalent in your currency)</Text>,
           paypalInfo: (
             <div>
-              <Paragraph>Usually 3.9% + 0.30 USD</Paragraph>
+              <Paragraph>Usually 4.4% + 0.30 USD</Paragraph>
               <Link href={generatePaypalFeesLink()} target="_blank">
                 See exact fees on PayPal's site
               </Link>
@@ -347,12 +357,12 @@ const PaymentAccount = () => {
           rowDetails: 'Sell auto renewing memberships',
           stripeInfo: <Text>Possible right now</Text>,
           paypalInfo: (
-            <Paragraph>
+            <Text>
               Not right now,{' '}
               <Button style={{ padding: 0 }} type="link" onClick={openFreshChatWidget}>
                 Express your interest
               </Button>
-            </Paragraph>
+            </Text>
           ),
         },
         {
@@ -435,12 +445,18 @@ const PaymentAccount = () => {
                 rowKey={(data) => data.key}
                 renderItem={(data) => (
                   <List.Item>
-                    <Row gutter={[8, 8]} align="middle">
-                      <Col xs={8}>
-                        <Text strong>{data.rowDetails}</Text>
+                    <Row gutter={[8, 12]} align="stretch">
+                      <Col xs={data.key === 'logo' ? 0 : 24} md={8}>
+                        <Text strong className={styles.listDescription}>
+                          {data.rowDetails}
+                        </Text>
                       </Col>
-                      <Col xs={8}>{data.stripeInfo}</Col>
-                      <Col xs={8}>{data.paypalInfo}</Col>
+                      <Col xs={12} md={8}>
+                        {data.stripeInfo}
+                      </Col>
+                      <Col xs={12} md={8}>
+                        {data.paypalInfo}
+                      </Col>
                     </Row>
                   </List.Item>
                 )}
@@ -513,87 +529,3 @@ const PaymentAccount = () => {
 };
 
 export default PaymentAccount;
-
-/*
-        <div className={styles.comparisonContainer}>
-          <Row gutter={[8, 8]}>
-            <Col xs={24}>
-              <Button icon={<LeftOutlined />} onClick={() => setShowComparePaymentProvider(false)}>
-                Back to select country
-              </Button>
-            </Col>
-            <Col xs={24}>
-              <Row gutter={[8, 8]}>
-                <Col xs={24} md={11}>
-                  <Row gutter={[8, 12]} justify="center">
-                    <Col xs={24}>
-                      <div className={styles.brandLogoContainer}>
-                        <StripeLogo height={64} width={128} />
-                      </div>
-                    </Col>
-                    <Col xs={24}>
-                      <Button type="primary" onClick={onboardUserToStripe}>
-                        {' '}
-                        Connect existing Stripe account{' '}
-                      </Button>
-                    </Col>
-                    <Col xs={24}>
-                      <Button type="primary" onClick={onboardUserToStripe}>
-                        {' '}
-                        Create a free Stripe account{' '}
-                      </Button>
-                    </Col>
-                    <Col xs={24}>
-                      <Paragraph>All offerings priced in your bank's local currency (EUR, CAD, AUD, etc)</Paragraph>
-                      <Paragraph>Domestic Fees = 1.4% + €0.25 (0.30 USD equivalent in your currency)</Paragraph>
-                      <Paragraph>International Fees = 2.9% + €0.25 (0.30 USD equivalent in your currency)</Paragraph>
-                      <Paragraph>Recurring Subscription Payment : Possible right now.</Paragraph>
-                    </Col>
-                  </Row>
-                </Col>
-                <Col xs={24} md={1}>
-                  <div className={styles.dividerWrapper}>
-                    <div className={styles.lineDivider}></div>
-                    <div className={styles.lineWordWrapper}>
-                      <div className={styles.lineWord}>OR</div>
-                    </div>
-                  </div>
-                </Col>
-                <Col xs={24} md={12}>
-                  <Row gutter={[8, 12]} justify="center">
-                    <Col xs={24}>
-                      <div className={styles.brandLogoContainer}>
-                        <PaypalLogo height={64} width={128} />
-                      </div>
-                    </Col>
-                    <Col xs={24}>
-                      <Button type="primary" onClick={() => setPaypalAccountModalVisible(true)}>
-                        {' '}
-                        Connect existing PayPal account{' '}
-                      </Button>
-                    </Col>
-                    <Col xs={24}>
-                      <Button type="primary" onClick={() => window.open('https://www.paypal.com/us/welcome/signup')}>
-                        {' '}
-                        Create a free PayPal account{' '}
-                      </Button>
-                    </Col>
-                    <Col xs={24}>
-                      <Paragraph>All offerings priced in USD only</Paragraph>
-                      <Paragraph>Domestic Fees (in USD) = 3.9% + 0.30 USD</Paragraph>
-                      <Paragraph>International Fees (in USD) = 4.4% + 0.30 USD</Paragraph>
-                      <Paragraph>
-                        Recurring Subscription Payment : Not right now,{' '}
-                        <Button style={{ padding: 0 }} type="link" onClick={openFreshChatWidget}>
-                          {' '}
-                          Express your interest{' '}
-                        </Button>
-                      </Paragraph>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </div>
-*/
