@@ -1,6 +1,10 @@
 import React from 'react';
+import { useLocation } from 'react-router';
+
 import { Row, Col, Button, Grid } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
+
+import Routes from 'routes';
 
 import DashboardToggle from 'components/DashboardToggle';
 
@@ -9,8 +13,6 @@ import { generateUrlFromUsername } from 'utils/helper';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { useLocation } from 'react-router';
-import Routes from 'routes';
 
 const logo = require('assets/images/passion-orange-logo.png');
 
@@ -18,8 +20,8 @@ const { useBreakpoint } = Grid;
 
 const DashboardHeader = () => {
   const { xs } = useBreakpoint();
-
   const location = useLocation();
+
   const isAttendeeDashboard = location.pathname.includes(Routes.attendeeDashboard.rootPath);
 
   const {

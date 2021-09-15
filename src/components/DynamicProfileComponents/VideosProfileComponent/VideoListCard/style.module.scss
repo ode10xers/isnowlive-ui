@@ -35,19 +35,19 @@
       .youtubeThumbnail {
         object-fit: cover;
         border-radius: 12px;
-        max-height: 160px;
+        height: 160px;
         border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
 
         @media screen and (max-width: 992px) and (min-width:767px) {
-          max-height: 130px;
+          height: 130px;
         }
 
         @media screen and (max-width: 767px) {
-          max-height: 210px;
+          height: 210px;
         }
 
         @media screen and (max-width: 530px) {
-          max-height: 150px;
+          height: 150px;
         }
       }
 
@@ -79,15 +79,10 @@
   }
 
   .videoTitle {
-    color: var(--passion-profile-darker-color, var(--new-video-card-font-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}));
+    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}));
     padding: 12px;
 
     margin-top: -10px;
-    font-size: 18px;
-    text-align: center;
-
-    @media screen and (max-width: 325px) {
-      font-size: 16px;
-    }
+    font-size: 16px;
   }
 }
