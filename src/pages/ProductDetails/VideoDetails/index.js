@@ -639,7 +639,7 @@ const VideoDetails = ({ match, history }) => {
   const renderVideoDocument = () => {
     const documentData = videoData?.document ?? null;
     const isAccessibleByPublic = videoData?.is_public_document ?? false;
-    const isDownloadable = videoData?.is_document_downloadabale ?? false;
+    const isDownloadable = videoData?.is_document_downloadable ?? false;
 
     if (!documentData) {
       return null;
