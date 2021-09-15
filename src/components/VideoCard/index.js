@@ -105,12 +105,12 @@ const VideoCard = ({
   };
 
   const renderVideoDocumentUrl = () => {
-    if (!video?.document) {
+    if (!orderDetails?.document) {
       return null;
     }
 
-    const isDownloadable = video?.is_document_downloadable ?? orderDetails?.is_document_downloadable;
-    const documentData = video?.document || orderDetails?.document;
+    const isDownloadable = orderDetails?.is_document_downloadable;
+    const documentData = orderDetails?.document;
     const documentUrl = documentData.url;
     const documentName = documentData.name || documentUrl.split('_').splice(1).join('_') || 'View';
 
@@ -130,7 +130,7 @@ const VideoCard = ({
   };
 
   const renderDocumentModal = () => {
-    const documentData = video.document || orderDetails.document;
+    const documentData = orderDetails.document;
 
     if (!documentData || !documentData.url) {
       return null;

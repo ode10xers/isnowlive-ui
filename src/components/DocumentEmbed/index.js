@@ -61,7 +61,8 @@ const DocumentEmbed = ({ documentLink = null }) => {
   return !documentLink ? null : (
     <div>
       <Document
-        file={`${documentLink}?origin=${window.location.host}`}
+        // file={`${documentLink}?origin=${window.location.host}`}
+        file={documentLink}
         onLoadSuccess={onDocumentLoadSuccess}
         externalLinkTarget="_blank"
         loading={<Spin tip="Loading document..." size="large" />}
