@@ -6,6 +6,7 @@ import {
   Col,
   Modal,
   Form,
+  Collapse,
   Typography,
   Radio,
   Image,
@@ -21,7 +22,6 @@ import {
   Popconfirm,
   Switch,
   Space,
-  Collapse,
 } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
@@ -940,7 +940,6 @@ const UploadVideoModal = ({
                   <TextEditor name="description" form={form} placeholder="Enter description" />
                 </Form.Item>
               </Col>
-
               <Col xs={24}>
                 <Form.Item label="Video Course Type" required>
                   <Form.Item

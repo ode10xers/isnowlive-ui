@@ -250,12 +250,20 @@ export const widgetComponentsName = {
     product: 'Video',
     styling: [
       {
-        key: '--new-video-card-font-color ',
-        label: 'Card Text Color',
-      },
-      {
         key: '--video-widget-background-color',
         label: 'Plugin Background',
+      },
+      {
+        key: '--video-plugin-text-color',
+        label: 'Text Color',
+      },
+      {
+        key: '--video-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--video-plugin-cta-font-color',
+        label: 'Button Text Color',
       },
     ],
   },
