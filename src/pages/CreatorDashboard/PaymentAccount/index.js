@@ -33,24 +33,22 @@ const PaymentAccount = () => {
   const history = useHistory();
 
   const {
-    state: {
-      userDetails: {
-        profile: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
-      },
-      setUserDetails,
-    },
+    state: { userDetails, setUserDetails },
   } = useGlobalContext();
+
+  const payment_account_status = userDetails?.profile?.payment_account_status ?? StripeAccountStatus.NOT_CONNECTED;
+
+  const validateAccount = location?.state?.validateAccount;
 
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [countries, setCountries] = useState([]);
   const [paypalAccountModalVisible, setPaypalAccountModalVisible] = useState(false);
   const [creatorPaypalEmail, setCreatorPaypalEmail] = useState(getLocalUserDetails().email);
+
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
   const [showComparePaymentProvider, setShowComparePaymentProvider] = useState(false);
-
-  const validateAccount = location?.state?.validateAccount;
 
   const openStripeConnect = useCallback(
     (url) => {
