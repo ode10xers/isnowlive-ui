@@ -28,8 +28,13 @@ const formatDate = {
   getISODayOfWeek: (date) => moment(date).isoWeekday(),
   getVideoMinutesDuration: (durationSeconds) =>
     `${Math.round(moment.duration(durationSeconds, 'seconds').asMinutes())} mins`,
-  getVideoDuration: (durationSeconds) =>
-    moment.utc(moment.duration(durationSeconds, 'seconds').asMilliseconds()).format('HH:mm:ss'),
+  getVideoDuration: (durationSeconds) => {
+    const durationMinutes = Math.floor(durationSeconds / 60);
+
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    return `${hours > 0 ? `${hours} Hr` : ''} ${minutes > 0 ? `${minutes} mins` : ''}`;
+  },
 };
 
 const timezoneUtils = {
