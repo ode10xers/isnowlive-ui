@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
+import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack';
 // import { Document, Page, pdfjs } from 'react-pdf';
 
 import { Spin, Button, Space, Typography, Grid } from 'antd';
 
 import styles from './style.module.scss';
 // import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+pdfjs.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
 
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
