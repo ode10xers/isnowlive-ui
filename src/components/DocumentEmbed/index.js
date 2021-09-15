@@ -7,8 +7,8 @@ import { Spin, Button, Space, Typography, Grid } from 'antd';
 
 import styles from './style.module.scss';
 // import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-// pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -58,18 +58,11 @@ const DocumentEmbed = ({ documentLink = null }) => {
   //   setHasOutline(outline && outline?.length > 0);
   // };
 
-  const fileObject = {
-    url: documentLink,
-    httpHeaders: {
-      'sec-fetch-mode': 'no-cors',
-    },
-  };
-
   return !documentLink ? null : (
     <div>
       <Document
         // file={`${documentLink}?origin=${window.location.protocol}//${window.location.host}`}
-        file={fileObject}
+        file={documentLink}
         onLoadSuccess={onDocumentLoadSuccess}
         externalLinkTarget="_blank"
         loading={<Spin tip="Loading document..." size="large" />}
