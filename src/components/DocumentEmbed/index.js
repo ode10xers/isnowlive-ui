@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Document, Page, Outline, pdfjs } from 'react-pdf';
 
 import { Spin } from 'antd';
-import documentLink from './Deploying_to_OpenShift.pdf';
 
 import styles from './style.module.scss';
 // import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -10,12 +9,13 @@ import styles from './style.module.scss';
 pdfjs.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
 
 // const documentLink = 'https://dkfqbuenrrvge.cloudfront.net/document/V6bLQBuhqnHbFOnl_gdpr-for-dummies-beginners-guide-to-gdpr.pdf';
-// const documentLink = 'https://dkfqbuenrrvge.cloudfront.net/document/UaFhbOG7wyfZLFXF_utm-tracking-cheatsheet.pdf';
+const documentLink = 'https://dkfqbuenrrvge.cloudfront.net/document/UaFhbOG7wyfZLFXF_utm-tracking-cheatsheet.pdf';
 
 const DocumentEmbed = () => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [hasOutline, setHasOutline] = useState(false);
+  console.log(hasOutline);
 
   const onDocumentLoadSuccess = (data) => {
     console.log(data);
