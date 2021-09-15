@@ -9,6 +9,11 @@
   }
 }
 
+.comparisonContainer {
+  @extend .box;
+  height: 100%;
+}
+
 @media (max-width: 768px) {
   .stripeContainer {
     padding: 20px;
@@ -16,5 +21,9 @@
       margin-top: 20px;
       text-align: left;
     }
+  }
+
+  .listDescription {
+    font-size: 18px;
   }
 }

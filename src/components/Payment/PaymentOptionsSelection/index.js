@@ -69,7 +69,9 @@ export const paymentMethodOptions = {
   },
   ONLINE_BANKING: {
     key: 'online_banking_payment',
-    options: Object.entries(BANK_REDIRECT_OPTIONS).map(([key, val]) => val.key),
+    // options: Object.entries(BANK_REDIRECT_OPTIONS).map(([key, val]) => val.key),
+    // TODO : Right now we only support iDeal, change this when we support others
+    options: [BANK_REDIRECT_OPTIONS.IDEAL.key],
     can_save_payment_details: false,
   },
   DEBIT: {
