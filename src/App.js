@@ -71,7 +71,6 @@ const InventoryDetailsPreview = lazy(() => import('pages/PreviewPages/InventoryD
 // const CookieConsentPopup = lazy(() => import('components/CookieConsentPopup'));
 const PaymentPopup = lazy(() => import('components/PaymentPopup'));
 const SendCustomerEmailModal = lazy(() => import('components/SendCustomerEmailModal'));
-const DocumentEmbed = lazy(() => import('components/DocumentEmbed'));
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -232,7 +231,6 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
-            <RouteWithLayout layout={FullWidthLayout} path="/doc-embed" component={DocumentEmbed} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute
               layout={SideNavWithHeaderLayout}

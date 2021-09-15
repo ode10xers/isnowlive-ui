@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Spin, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
+import { Row, Col, Button, Spin, Modal, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
 import {
   LikeOutlined,
   ScheduleOutlined,
@@ -10,6 +10,7 @@ import {
   DollarOutlined,
   BookOutlined,
   FilePdfOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -20,6 +21,7 @@ import {
   showGetVideoWithPassSuccessModal,
   showPurchaseSingleVideoSuccessModal,
   showGetVideoWithSubscriptionSuccessModal,
+  resetBodyStyle,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
 import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
@@ -48,6 +50,7 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import DocumentEmbed from 'components/DocumentEmbed';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -84,6 +87,8 @@ const VideoDetails = ({ match, history }) => {
   // Bottom Sheet States
   const [bottomSheetsView, setBottomSheetsView] = useState(null);
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
+
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
 
   //#region Start of API Calls
 
@@ -517,6 +522,16 @@ const VideoDetails = ({ match, history }) => {
 
   //#region Start of UI Logics
 
+  const handleShowDocumentPreview = (e) => {
+    preventDefaults(e);
+    setShowDocumentModal(true);
+  };
+
+  const handleDocumentModalClose = (e) => {
+    preventDefaults(e);
+    setShowDocumentModal(false);
+  };
+
   const handleMembershipBuyClicked = (e) => {
     preventDefaults(e);
     setBottomSheetsView('membership');
@@ -621,50 +636,50 @@ const VideoDetails = ({ match, history }) => {
     return renderContainerComponent(commonContainerProps, componentChild);
   };
 
-  const renderVideoDocumentUrl = () => {
+  const renderVideoDocument = () => {
     const documentData = videoData?.document ?? null;
-    const isPublicDownloadable = videoData?.is_public_document ?? false;
+    const isAccessibleByPublic = videoData?.is_public_document ?? false;
+    const isDownloadable = videoData?.is_document_downloadabale ?? false;
 
     if (!documentData) {
       return null;
     }
 
     const documentUrl = documentData.url;
-    const filename = documentData.name || documentData.url.split('_').splice(1).join('_') || 'Download';
+    const filename =
+      documentData.name || documentData.url.split('_').splice(1).join('_') || (isAccessibleByPublic ? 'View' : '');
 
     return (
       <Col xs={24}>
         <Paragraph className={styles.sectionHeading}>
-          This video includes a downloadable PDF file (click to download)
-          {isPublicDownloadable ? '(click to download)' : `that's only available after purchase`}
+          This video includes a downloadable PDF file
+          {isAccessibleByPublic ? '' : ` that's only available after purchase`}
         </Paragraph>
-        <Button
-          className={classNames(
-            styles.fileNameDownload,
-            isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-              ? styles.darkText
-              : styles.lightText
-          )}
-          type="primary"
-          icon={<FilePdfOutlined />}
-          onClick={() => window.open(documentUrl)}
-        >
-          {filename}
-        </Button>
-        {isPublicDownloadable ? (
-          <Button
-            className={classNames(
-              styles.fileNameDownload,
-              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-                ? styles.darkText
-                : styles.lightText
-            )}
-            type="primary"
-            icon={<FilePdfOutlined />}
-            onClick={() => window.open(documentUrl)}
-          >
-            {filename}
-          </Button>
+        {isAccessibleByPublic ? (
+          <Space>
+            <Button
+              className={classNames(
+                styles.filePreviewButton,
+                isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                  ? styles.darkText
+                  : styles.lightText
+              )}
+              type="primary"
+              icon={<FilePdfOutlined />}
+              onClick={handleShowDocumentPreview}
+            >
+              {filename}
+            </Button>
+            {isDownloadable ? (
+              <Button
+                ghost
+                className={styles.fileDownloadButton}
+                type="primary"
+                icon={<DownloadOutlined />}
+                onClick={() => window.open(documentUrl)}
+              />
+            ) : null}
+          </Space>
         ) : (
           <div className={styles.fileContainer}>
             <Text className={styles.fileName}>
@@ -676,6 +691,22 @@ const VideoDetails = ({ match, history }) => {
     );
   };
 
+  const documentModal =
+    videoData && videoData?.is_public_document && videoData?.document?.url ? (
+      <Modal
+        title="Attached Document"
+        footer={null}
+        forceRender={true}
+        visible={showDocumentModal}
+        onCancel={handleDocumentModalClose}
+        afterClose={resetBodyStyle}
+        centered={true}
+        width={640}
+      >
+        <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
+      </Modal>
+    ) : null;
+
   //#endregion End of UI Components
 
   return (
@@ -685,6 +716,7 @@ const VideoDetails = ({ match, history }) => {
         <Row gutter={[8, 8]}>
           {videoData && (
             <Col xs={24}>
+              {documentModal}
               <Row gutter={[8, 8]} className={styles.videoDataContainer}>
                 {/* Video Thumbnail */}
                 <Col xs={24}>
@@ -724,7 +756,7 @@ const VideoDetails = ({ match, history }) => {
                 </Col>
 
                 {/* Video Document URL */}
-                {renderVideoDocumentUrl()}
+                {renderVideoDocument()}
 
                 {/* Video Description */}
                 <Col xs={24}>

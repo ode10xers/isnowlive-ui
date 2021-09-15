@@ -5,6 +5,27 @@
   color : var(--passion-profile-darker-color, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
+.filePreviewButton {
+  background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+  
+  &.darkText {
+    --video-button-text-color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')});
+  }
+
+  &.lightText {
+    --video-button-text-color : #{map-get($colors, 'White')};
+  }
+
+  color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+}
+
+.fileDownloadButton {
+  border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+}
+
 .videoDetailsPage {
   padding: 10px;
 
