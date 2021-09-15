@@ -652,7 +652,7 @@ const VideoDetails = ({ match, history }) => {
     return (
       <Col xs={24}>
         <Paragraph className={styles.sectionHeading}>
-          This video includes a downloadable PDF file
+          This video includes a PDF file
           {isAccessibleByPublic ? '' : ` that's only available after purchase`}
         </Paragraph>
         {isAccessibleByPublic ? (
