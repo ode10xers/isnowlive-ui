@@ -143,7 +143,8 @@ const UploadVideoModal = ({
   const [selectedMembershipIds, setSelectedMembershipIds] = useState([]);
 
   const [creatorDocuments, setCreatorDocuments] = useState([]);
-  const [downloadableBeforePurchase, setDownloadableBeforePurchase] = useState(false);
+  const [accessibleBeforePurchase, setAccessibleBeforePurchase] = useState(false);
+  const [isDocumentDownloadable, setIsDocumentDownloadable] = useState(false);
 
   //#region Start of Uppy Related Methods
 
@@ -336,11 +337,10 @@ const UploadVideoModal = ({
   useEffect(() => {
     if (visible) {
       if (editedVideo) {
-        // TODO: Current hacky implementation of document Url
         form.setFieldsValue({
           ...editedVideo,
           description: editedVideo.description.split('!~!~!~')[0],
-          document_url: editedVideo.description.split('!~!~!~')[1] ?? null,
+          document_id: editedVideo.document?.id,
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
@@ -355,7 +355,8 @@ const UploadVideoModal = ({
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
-        setDownloadableBeforePurchase(editedVideo.description.split('!~!~!~')[2] ?? false);
+        setAccessibleBeforePurchase(editedVideo.is_public_document ?? false);
+        setIsDocumentDownloadable(editedVideo.is_document_downloadable ?? false);
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(
@@ -399,6 +400,8 @@ const UploadVideoModal = ({
       setSelectedSessionIds([]);
       setSelectedPassIds([]);
       setSelectedMembershipIds([]);
+      setAccessibleBeforePurchase(false);
+      setIsDocumentDownloadable(false);
       setVideoType(videoPriceTypes.FREE.name);
       setVideoPreviewTime('');
       setIsCourseVideo(false);
@@ -504,12 +507,14 @@ const UploadVideoModal = ({
               source: videoSourceTypes.CLOUDFLARE.value,
             };
 
-      // TODO: Current hacky implementation for document_url
       // without involving BE
       let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
-        description: `${values.description}!~!~!~${values.document_url ?? ''}!~!~!~${downloadableBeforePurchase}`,
+        description: values.description ?? '',
+        document_id: values.document_id ?? '',
+        is_public_document: accessibleBeforePurchase ?? false,
+        is_document_downloadable: isDocumentDownloadable ?? false,
         price:
           videoType === videoPriceTypes.FREE.name
             ? 0
@@ -691,6 +696,9 @@ const UploadVideoModal = ({
         currency: currency.toLowerCase(),
         title: editedVideo.title,
         description: editedVideo.description,
+        document_id: editedVideo.document?.id ?? '',
+        is_public_document: editedVideo.is_public_document ?? false,
+        is_document_downloadable: editedVideo.is_document_downloadable ?? false,
         price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
         validity: editedVideo.validity,
         session_ids: selectedSessionIds || editedVideo.session_ids || [],
@@ -780,6 +788,9 @@ const UploadVideoModal = ({
         currency: currency.toLowerCase(),
         title: editedVideo.title,
         description: editedVideo.description,
+        document_id: editedVideo.document?.id ?? '',
+        is_public_document: editedVideo.is_public_document ?? false,
+        is_document_downloadable: editedVideo.is_document_downloadable ?? false,
         price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
         validity: editedVideo.validity,
         session_ids: selectedSessionIds || editedVideo.session_ids || [],
@@ -1092,21 +1103,28 @@ const UploadVideoModal = ({
                   <Panel header={<Text strong>Advanced Options</Text>}>
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
-                        <Form.Item id="document_url" name="document_url" label="Attached File">
+                        <Form.Item id="document_id" name="document_id" label="Attached File">
                           <Select
                             showArrow
-                            placeholder="Select documents you want to include"
+                            placeholder="Select document you want to include"
                             options={creatorDocuments.map((document) => ({
                               label: document.name,
-                              value: document.url,
+                              value: document.id,
                             }))}
                           />
                         </Form.Item>
                         <Form.Item label="File accessible by customers">
                           <Space>
                             <Text> After buying </Text>
-                            <Switch checked={downloadableBeforePurchase} onChange={setDownloadableBeforePurchase} />
+                            <Switch checked={accessibleBeforePurchase} onChange={setAccessibleBeforePurchase} />
                             <Text> Before buying </Text>
+                          </Space>
+                        </Form.Item>
+                        <Form.Item label="File downloadable">
+                          <Space>
+                            <Text> Not Downloadable </Text>
+                            <Switch checked={isDocumentDownloadable} onChange={setIsDocumentDownloadable} />
+                            <Text> Downloadable </Text>
                           </Space>
                         </Form.Item>
                       </Col>

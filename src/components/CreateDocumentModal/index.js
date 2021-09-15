@@ -117,7 +117,7 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
                       onClick={() => window.open(selectedDocument.url)}
                       className={styles.filenameButton}
                     >
-                      {selectedDocument.url.split('_').slice(-1)[0]}
+                      {selectedDocument.url.split('_').splice(1).join('_')}
                     </Button>
                   </Col>
                 </Row>
@@ -149,7 +149,7 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
                           onClick={() => window.open(fileUrl)}
                           className={styles.filenameButton}
                         >
-                          {fileUrl.split('_').slice(-1)[0]}
+                          {fileUrl.split('_').splice(1).join('_')}
                         </Button>
                         <Tooltip title="Remove this file">
                           <Button
