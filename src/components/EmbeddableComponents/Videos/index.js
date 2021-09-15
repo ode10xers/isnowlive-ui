@@ -4,6 +4,9 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
 import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-design/icons';
 
+import apis from 'apis';
+import Routes from 'routes';
+
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import AuthModal from 'components/AuthModal';
 
@@ -12,174 +15,10 @@ import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import Routes from 'routes';
 
 const { Title } = Typography;
 
-const mockData = [
-  {
-    title: 'PWYW But Cloned',
-    description: '<p>Desc</p>\n',
-    validity: 1,
-    price: 15,
-    pay_what_you_want: true,
-    thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/FQoQHkWjaGuH17g5_sample_trainer_cover.png',
-    watch_limit: 3,
-    is_course: false,
-    source: 'CLOUDFLARE',
-    video_uid: 'd75813aaa24dbb36049c84f362f69096',
-    currency: 'sgd',
-    external_id: 'd6afe01c-f9bf-433d-a162-fe87a833c9e2',
-    is_published: true,
-    duration: 489,
-    status: 'UPLOAD_SUCCESS',
-    creator_username: 'ellianto',
-    tags: [],
-    total_price: 15,
-    sessions: [],
-    groups: ['Yoga 101', 'Intermediate Level'],
-  },
-  {
-    title: 'Metube Video',
-    description: '<p>Videos are not mine, shoutout to fireship.io (check out his site)</p>\n',
-    validity: 1,
-    price: 5,
-    pay_what_you_want: false,
-    thumbnail_url: 'https://img.youtube.com/vi/biOMz4puGt8/hqdefault.jpg',
-    watch_limit: 1,
-    is_course: false,
-    source: 'YOUTUBE',
-    currency: 'sgd',
-    external_id: '9b19b511-3fa3-43fa-bd95-09b2a65db7b5',
-    is_published: true,
-    duration: 1,
-    status: 'UPLOAD_SUCCESS',
-    creator_username: 'ellianto',
-    tags: [],
-    total_price: 5,
-    groups: ['Yoga 101'],
-    sessions: [
-      {
-        price: 16,
-        currency: 'sgd',
-        max_participants: 10,
-        name: 'Yoga at the Park (Guided by: Irini Lembessis) LAVAL',
-        session_image_url:
-          'https://dkfqbuenrrvge.cloudfront.net/image/6xC6Fn7yFOsqrEo0_desert safari facebook cover.png',
-        document_urls: [],
-        beginning: '2021-08-28T17:00:00Z',
-        expiry: '2021-09-30T16:59:59Z',
-        prerequisites: '',
-        pay_what_you_want: false,
-        recurring: true,
-        is_refundable: false,
-        refund_before_hours: 0,
-        user_timezone_offset: 420,
-        user_timezone: 'Indochina Time',
-        color_code: '#ff9800',
-        is_course: false,
-        is_offline: true,
-        total_price: 16,
-        type: 'NORMAL',
-        session_id: 382,
-        group: true,
-        is_active: true,
-        session_external_id: '29ce0e74-113d-4756-a723-eec687f623a9',
-        creator_username: 'ellianto',
-        tags: [],
-      },
-    ],
-  },
-  {
-    title: 'Upload in Custom Domain',
-    groups: ['Intermediate Level'],
-    description: '<p>Testing</p>\n',
-    validity: 1,
-    price: 8,
-    pay_what_you_want: false,
-    thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/FutfpgrTfKvQBqaE_white-bg.jpg',
-    watch_limit: 1,
-    is_course: false,
-    source: 'CLOUDFLARE',
-    video_uid: '57a8d23c72d4cf603a97f9fb76522039',
-    currency: 'sgd',
-    external_id: 'cfb057f8-74e4-4a0c-8221-dbfd385631e7',
-    is_published: true,
-    duration: 489,
-    status: 'UPLOAD_SUCCESS',
-    creator_username: 'ellianto',
-    tags: [],
-    total_price: 8,
-    sessions: [],
-  },
-  {
-    title: 'Create, Upload, Cancel after Fix',
-    description: '<p>Test</p>\n',
-    validity: 1,
-    price: 8,
-    pay_what_you_want: false,
-    thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/icpyj903a88nfzHZ_thumbnail.gif',
-    watch_limit: 1,
-    is_course: false,
-    source: 'CLOUDFLARE',
-    video_uid: '11458eea7ad9e069add75a2fb569df50',
-    currency: 'sgd',
-    external_id: 'cb4a9cd4-8dc7-4526-9fed-72fb43257a44',
-    is_published: true,
-    duration: 489,
-    status: 'UPLOAD_SUCCESS',
-    creator_username: 'ellianto',
-    tags: [],
-    total_price: 9.6,
-    sessions: [],
-    groups: ['Pilates', 'Intermediate Level'],
-  },
-  {
-    title: 'Fees on Mees',
-    description: '<p>Testing</p>\n',
-    validity: 1,
-    price: 10,
-    pay_what_you_want: false,
-    thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/kV0U0f8MH8Bnju8F_desert safari facebook cover.png',
-    watch_limit: 1,
-    is_course: false,
-    source: 'CLOUDFLARE',
-    video_uid: '57a8d23c72d4cf603a97f9fb76522039',
-    currency: 'sgd',
-    external_id: '95a3ed95-66bc-4a9e-a0be-71d23ed12254',
-    is_published: true,
-    duration: 489,
-    status: 'UPLOAD_SUCCESS',
-    creator_username: 'ellianto',
-    tags: [],
-    total_price: 10,
-    groups: ['Intermediate Level'],
-    sessions: [],
-  },
-  {
-    title: 'auto add to membership',
-    description: '<p>Desc</p>\n',
-    validity: 1,
-    price: 21,
-    pay_what_you_want: false,
-    thumbnail_url: 'https://img.youtube.com/vi/705XCEruZFs/hqdefault.jpg',
-    watch_limit: 1,
-    is_course: false,
-    source: 'YOUTUBE',
-    currency: 'sgd',
-    external_id: 'c03876cf-4ebd-4b86-a684-e174f87b7e53',
-    is_published: true,
-    duration: 1,
-    status: 'UPLOAD_SUCCESS',
-    creator_username: 'ellianto',
-    tags: [],
-    total_price: 21,
-    groups: [],
-    sessions: [],
-  },
-];
-
-const otherVideosKey = 'Other Videos';
+const otherVideosKey = 'All Videos';
 const videoItemsLimit = 6;
 
 const Videos = () => {
@@ -191,7 +30,7 @@ const Videos = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [groupView, setGroupView] = useState(null);
 
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(true);
   const [selectedVideoGroupFilter, setSelectedVideoGroupFilter] = useState([]);
 
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -199,11 +38,7 @@ const Videos = () => {
   const fetchCreatorVideos = useCallback(async () => {
     setIsLoading(true);
     try {
-      // TODO: Integrate API Here
-      const { status, data } = {
-        status: 200,
-        data: mockData,
-      };
+      const { status, data } = await apis.videos.getVideosByUsername();
 
       if (isAPISuccess(status) && data) {
         setVideos(data);
@@ -225,7 +60,9 @@ const Videos = () => {
     return videos.reduce((acc, video) => {
       let newAcc = { ...acc };
 
-      if (video.groups?.length <= 0) {
+      // NOTE: BE is not implemented yet, so we make a workaround
+      // and group every video under the otherVideosKey
+      if ((video.groups ?? []).length <= 0) {
         return {
           ...newAcc,
           [otherVideosKey]: [...(newAcc[otherVideosKey] ?? []), video],
@@ -281,7 +118,7 @@ const Videos = () => {
         </Button>
       </Col>
       <Col xs={12} className={styles.textAlignRight}>
-        <Button className={styles.linkButton} type="link" icon={<UserOutlined />} onClick={handleSignInClicked}>
+        <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
           Sign In/Up
         </Button>
       </Col>
