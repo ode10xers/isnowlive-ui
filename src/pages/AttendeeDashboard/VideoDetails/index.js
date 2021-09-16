@@ -272,7 +272,7 @@ const VideoDetails = ({ match }) => {
             />
           )}
         </Col>
-        {videoOrderDetails?.document && videoOrderDetails?.document?.id && (
+        {videoOrderDetails?.document && videoOrderDetails?.document?.id && videoOrderDetails?.document?.url && (
           <Col xs={24}>
             <div className={styles.fileAttachmentContainer}>{renderVideoDocumentUrl()}</div>
             {renderDocumentPreview()}
