@@ -17,7 +17,7 @@ import styles from './styles.module.scss';
 const { Title, Text } = Typography;
 
 const {
-  formatDate: { toLongDateWithDayTime },
+  formatDate: { toShortDateWithYear },
 } = dateUtil;
 
 const noop = () => {};
@@ -43,8 +43,7 @@ const VideoCard = ({
       return video.source === videoSourceType.CLOUDFLARE ? (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-            {toLongDateWithDayTime(orderDetails.expiry)}
+            Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
           </Text>
           <Divider className={classNames(styles.divider, styles.horizontal)} />
           <Text strong className={styles.blueText}>
@@ -58,8 +57,7 @@ const VideoCard = ({
       ) : (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-            {toLongDateWithDayTime(orderDetails.expiry)}
+            Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
           </Text>
         </Space>
       );
@@ -68,8 +66,7 @@ const VideoCard = ({
     return video.source === videoSourceType.CLOUDFLARE ? (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-          {toLongDateWithDayTime(orderDetails.expiry)}
+          Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
         </Title>
         <Title level={5} className={styles.blueText}>
           Allowed Watches : {orderDetails.watch_limit}
@@ -81,8 +78,7 @@ const VideoCard = ({
     ) : (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-          {toLongDateWithDayTime(orderDetails.expiry)}
+          Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
         </Title>
       </Space>
     );
