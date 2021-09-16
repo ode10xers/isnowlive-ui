@@ -10,6 +10,16 @@
   width: 100%;
 }
 
+.fileAttachmentContainer {
+  padding: 10px 64px;
+}
+
+.documentPreviewContainer {
+  max-width: 1080px;
+  padding: 10px;
+  margin: auto;
+}
+
 .imageWrapper {
   position: relative;
   margin: 64px !important;
@@ -66,7 +76,7 @@
 }
 
 @media (max-width: 768px) {
-  .showcaseCardContainer {
+  .showcaseCardContainer, .fileAttachmentContainer {
     padding: 10px !important;
   }
   .profilePreviewContainer {

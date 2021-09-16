@@ -18,11 +18,11 @@ import { paymentProvider } from 'utils/constants';
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
+import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
-import styles from './styles.module.scss';
 import StripeLogo from 'assets/icons/stripe/StripeLogo';
 import PaypalLogo from 'assets/icons/paypal/PaypalLogo';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+import styles from './styles.module.scss';
 
 const { Title, Paragraph, Text, Link } = Typography;
 const { Option } = Select;
@@ -33,24 +33,23 @@ const PaymentAccount = () => {
   const history = useHistory();
 
   const {
-    state: {
-      userDetails: {
-        profile: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
-      },
-      setUserDetails,
-    },
+    state: { userDetails },
+    setUserDetails,
   } = useGlobalContext();
+
+  const payment_account_status = userDetails?.profile?.payment_account_status ?? StripeAccountStatus.NOT_CONNECTED;
+
+  const validateAccount = location?.state?.validateAccount;
 
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [countries, setCountries] = useState([]);
   const [paypalAccountModalVisible, setPaypalAccountModalVisible] = useState(false);
   const [creatorPaypalEmail, setCreatorPaypalEmail] = useState(getLocalUserDetails().email);
+
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
   const [showComparePaymentProvider, setShowComparePaymentProvider] = useState(false);
-
-  const validateAccount = location?.state?.validateAccount;
 
   const openStripeConnect = useCallback(
     (url) => {

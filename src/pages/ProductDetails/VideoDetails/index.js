@@ -10,6 +10,7 @@ import {
   DollarOutlined,
   BookOutlined,
   FilePdfOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -22,6 +23,7 @@ import {
   showGetVideoWithSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
+import DocumentEmbed from 'components/DocumentEmbed';
 import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
 import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 import PassesListItem from 'components/DynamicProfileComponents/PassesProfileComponent/PassesListItem';
@@ -84,6 +86,8 @@ const VideoDetails = ({ match, history }) => {
   // Bottom Sheet States
   const [bottomSheetsView, setBottomSheetsView] = useState(null);
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
+
+  const [showDocumentPreview, setShowDocumentPreview] = useState(false);
 
   //#region Start of API Calls
 
@@ -517,6 +521,16 @@ const VideoDetails = ({ match, history }) => {
 
   //#region Start of UI Logics
 
+  const handleShowDocumentPreview = (e) => {
+    preventDefaults(e);
+    setShowDocumentPreview((prevState) => !prevState);
+  };
+
+  const handleHideDocumentPreview = (e) => {
+    preventDefaults(e);
+    setShowDocumentPreview(false);
+  };
+
   const handleMembershipBuyClicked = (e) => {
     preventDefaults(e);
     setBottomSheetsView('membership');
@@ -621,37 +635,66 @@ const VideoDetails = ({ match, history }) => {
     return renderContainerComponent(commonContainerProps, componentChild);
   };
 
-  const renderVideoDocumentUrl = () => {
-    const documentUrl = videoData?.description.split('!~!~!~')[1] ?? '';
-    const isPublicDownloadable = videoData?.description.split('!~!~!~')[2] ?? false;
+  const documentPreview =
+    showDocumentPreview && videoData && videoData?.is_public_document && videoData?.document?.url ? (
+      <div className={styles.filePreviewContainer}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} className={styles.textAlignCenter}>
+            <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
+              Close Preview
+            </Button>
+          </Col>
+          <Col xs={24}>
+            <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
+          </Col>
+        </Row>
+      </div>
+    ) : null;
 
-    if (!documentUrl) {
+  const renderVideoDocument = () => {
+    const documentData = videoData?.document ?? null;
+    const isAccessibleByPublic = videoData?.is_public_document ?? false;
+    const isDownloadable = videoData?.is_document_downloadable ?? false;
+
+    if (!documentData) {
       return null;
     }
 
-    const filename = documentUrl.split('_').slice(-1)[0] || '';
+    const documentUrl = documentData.url;
+    const filename =
+      documentData.name || documentData.url.split('_').splice(1).join('_') || (isAccessibleByPublic ? 'View' : '');
 
     return (
       <Col xs={24}>
         <Paragraph className={styles.sectionHeading}>
-          {' '}
-          This video includes a downloadable PDF file (
-          {isPublicDownloadable ? 'click to download' : 'available after purchase'}){' '}
+          This video includes a PDF file
+          {isAccessibleByPublic ? '' : ` that's only available after purchase`}
         </Paragraph>
-        {isPublicDownloadable ? (
-          <Button
-            className={classNames(
-              styles.fileNameDownload,
-              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-                ? styles.darkText
-                : styles.lightText
-            )}
-            type="primary"
-            icon={<FilePdfOutlined />}
-            onClick={() => window.open(documentUrl)}
-          >
-            {filename}
-          </Button>
+        {isAccessibleByPublic ? (
+          <Space>
+            <Button
+              className={classNames(
+                styles.filePreviewButton,
+                isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                  ? styles.darkText
+                  : styles.lightText
+              )}
+              type="primary"
+              icon={<FilePdfOutlined />}
+              onClick={handleShowDocumentPreview}
+            >
+              {filename}
+            </Button>
+            {isDownloadable ? (
+              <Button
+                ghost
+                className={styles.fileDownloadButton}
+                type="primary"
+                icon={<DownloadOutlined />}
+                onClick={() => window.open(documentUrl)}
+              />
+            ) : null}
+          </Space>
         ) : (
           <div className={styles.fileContainer}>
             <Text className={styles.fileName}>
@@ -659,6 +702,7 @@ const VideoDetails = ({ match, history }) => {
             </Text>
           </div>
         )}
+        {documentPreview}
       </Col>
     );
   };
@@ -710,8 +754,8 @@ const VideoDetails = ({ match, history }) => {
                   </Space>
                 </Col>
 
-                {/* Video Document URL */}
-                {renderVideoDocumentUrl()}
+                {/* Video Document */}
+                {renderVideoDocument()}
 
                 {/* Video Description */}
                 <Col xs={24}>
