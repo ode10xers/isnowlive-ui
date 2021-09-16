@@ -169,14 +169,10 @@ const VideoDetails = ({ match }) => {
   };
 
   const renderVideoDocumentUrl = () => {
-    if (!videoOrderDetails?.document) {
-      return null;
-    }
-
     const isDownloadable = videoOrderDetails?.is_document_downloadable;
     const documentData = videoOrderDetails?.document;
-    const documentUrl = documentData.url;
-    const documentName = documentData.name || documentUrl.split('_').splice(1).join('_') || 'View';
+    const documentUrl = documentData.url ?? '';
+    const documentName = (documentData.name ?? '') || documentUrl.split('_').splice(1).join('_') || 'View';
 
     return (
       <>
@@ -276,10 +272,12 @@ const VideoDetails = ({ match }) => {
             />
           )}
         </Col>
-        <Col xs={24}>
-          <div className={styles.fileAttachmentContainer}>{renderVideoDocumentUrl()}</div>
-          {renderDocumentPreview()}
-        </Col>
+        {videoOrderDetails?.document && videoOrderDetails?.document?.id && videoOrderDetails?.document?.url && (
+          <Col xs={24}>
+            <div className={styles.fileAttachmentContainer}>{renderVideoDocumentUrl()}</div>
+            {renderDocumentPreview()}
+          </Col>
+        )}
         <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
         <Col xs={24}>
           {video && (
