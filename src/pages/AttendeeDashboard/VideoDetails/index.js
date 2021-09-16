@@ -201,16 +201,18 @@ const VideoDetails = ({ match }) => {
     }
 
     return (
-      <Row gutter={[8, 8]} className={styles.documentPreviewContainer}>
-        <Col xs={24} className={styles.textAlignCenter}>
-          <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
-            Close Preview
-          </Button>
-        </Col>
-        <Col xs={24}>
-          <DocumentEmbed documentLink={documentData.url ?? null} />
-        </Col>
-      </Row>
+      <div className={styles.documentPreviewContainer}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} className={styles.textAlignCenter}>
+            <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
+              Close Preview
+            </Button>
+          </Col>
+          <Col xs={24}>
+            <DocumentEmbed documentLink={documentData.url ?? null} />
+          </Col>
+        </Row>
+      </div>
     );
   };
 

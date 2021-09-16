@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 
 import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack';
 
-import { Spin, Button, Space, Typography, Grid } from 'antd';
+import { Spin, Button, Space, Typography } from 'antd';
 
 import styles from './style.module.scss';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const { Text } = Typography;
-const { useBreakpoint } = Grid;
 
 const DocumentEmbed = ({ documentLink = null }) => {
-  const { xs } = useBreakpoint();
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   // const [hasOutline, setHasOutline] = useState(false);
@@ -83,7 +81,6 @@ const DocumentEmbed = ({ documentLink = null }) => {
             renderAnnotationLayer={false}
             renderInteractiveForms={false}
             renderTextLayer={false}
-            width={xs ? 300 : 500}
           />
         </div>
       </Document>

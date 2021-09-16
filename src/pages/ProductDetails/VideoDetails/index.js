@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Spin, Modal, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
+import { Row, Col, Button, Spin, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
 import {
   LikeOutlined,
   ScheduleOutlined,
@@ -21,7 +21,6 @@ import {
   showGetVideoWithPassSuccessModal,
   showPurchaseSingleVideoSuccessModal,
   showGetVideoWithSubscriptionSuccessModal,
-  resetBodyStyle,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
 import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
@@ -88,7 +87,7 @@ const VideoDetails = ({ match, history }) => {
   const [bottomSheetsView, setBottomSheetsView] = useState(null);
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
 
-  const [showDocumentModal, setShowDocumentModal] = useState(false);
+  const [showDocumentPreview, setShowDocumentPreview] = useState(false);
 
   //#region Start of API Calls
 
@@ -524,12 +523,12 @@ const VideoDetails = ({ match, history }) => {
 
   const handleShowDocumentPreview = (e) => {
     preventDefaults(e);
-    setShowDocumentModal(true);
+    setShowDocumentPreview((prevState) => !prevState);
   };
 
-  const handleDocumentModalClose = (e) => {
+  const handleHideDocumentPreview = (e) => {
     preventDefaults(e);
-    setShowDocumentModal(false);
+    setShowDocumentPreview(false);
   };
 
   const handleMembershipBuyClicked = (e) => {
@@ -636,6 +635,22 @@ const VideoDetails = ({ match, history }) => {
     return renderContainerComponent(commonContainerProps, componentChild);
   };
 
+  const documentPreview =
+    showDocumentPreview && videoData && videoData?.is_public_document && videoData?.document?.url ? (
+      <div className={styles.filePreviewContainer}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} className={styles.textAlignCenter}>
+            <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
+              Close Preview
+            </Button>
+          </Col>
+          <Col xs={24}>
+            <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
+          </Col>
+        </Row>
+      </div>
+    ) : null;
+
   const renderVideoDocument = () => {
     const documentData = videoData?.document ?? null;
     const isAccessibleByPublic = videoData?.is_public_document ?? false;
@@ -687,25 +702,26 @@ const VideoDetails = ({ match, history }) => {
             </Text>
           </div>
         )}
+        {documentPreview}
       </Col>
     );
   };
 
-  const documentModal =
-    videoData && videoData?.is_public_document && videoData?.document?.url ? (
-      <Modal
-        title="Attached Document"
-        footer={null}
-        forceRender={true}
-        visible={showDocumentModal}
-        onCancel={handleDocumentModalClose}
-        afterClose={resetBodyStyle}
-        centered={true}
-        width={640}
-      >
-        <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
-      </Modal>
-    ) : null;
+  // const documentModal =
+  //   videoData && videoData?.is_public_document && videoData?.document?.url ? (
+  //     <Modal
+  //       title="Attached Document"
+  //       footer={null}
+  //       forceRender={true}
+  //       visible={showDocumentModal}
+  //       onCancel={handleDocumentModalClose}
+  //       afterClose={resetBodyStyle}
+  //       centered={true}
+  //       width={640}
+  //     >
+  //       <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
+  //     </Modal>
+  //   ) : null;
 
   //#endregion End of UI Components
 
@@ -716,7 +732,6 @@ const VideoDetails = ({ match, history }) => {
         <Row gutter={[8, 8]}>
           {videoData && (
             <Col xs={24}>
-              {documentModal}
               <Row gutter={[8, 8]} className={styles.videoDataContainer}>
                 {/* Video Thumbnail */}
                 <Col xs={24}>
@@ -755,7 +770,7 @@ const VideoDetails = ({ match, history }) => {
                   </Space>
                 </Col>
 
-                {/* Video Document URL */}
+                {/* Video Document */}
                 {renderVideoDocument()}
 
                 {/* Video Description */}

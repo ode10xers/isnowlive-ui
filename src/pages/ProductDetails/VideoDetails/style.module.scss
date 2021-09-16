@@ -5,6 +5,11 @@
   color : var(--passion-profile-darker-color, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
+.filePreviewContainer {
+  text-align: center;
+  margin: 12px auto;
+}
+
 .filePreviewButton {
   background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
