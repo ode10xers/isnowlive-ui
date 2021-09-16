@@ -329,7 +329,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients = [], targetEm
                       onClick={() => window.open(emailDocumentUrl)}
                       className={styles.filenameButton}
                     >
-                      {emailDocumentUrl.split('_').slice(-1)[0]}
+                      {emailDocumentUrl.split('_').splice(1).join('_')}
                     </Button>
                     <Tooltip title="Remove this file">
                       <Button

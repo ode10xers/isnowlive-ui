@@ -2,22 +2,22 @@ import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Row, Col, Card, Button, Typography, Image, Space, Divider, List } from 'antd';
-import { PlayCircleOutlined, BookTwoTone, FilePdfOutlined } from '@ant-design/icons';
+import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
+import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { videoSourceType } from 'utils/helper';
 import { redirectToVideosPage } from 'utils/redirect';
+import { videoSourceType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
 const {
-  formatDate: { toLongDateWithDayTime },
+  formatDate: { toShortDateWithYear },
 } = dateUtil;
 
 const noop = () => {};
@@ -43,8 +43,7 @@ const VideoCard = ({
       return video.source === videoSourceType.CLOUDFLARE ? (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-            {toLongDateWithDayTime(orderDetails.expiry)}
+            Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
           </Text>
           <Divider className={classNames(styles.divider, styles.horizontal)} />
           <Text strong className={styles.blueText}>
@@ -58,8 +57,7 @@ const VideoCard = ({
       ) : (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-            {toLongDateWithDayTime(orderDetails.expiry)}
+            Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
           </Text>
         </Space>
       );
@@ -68,8 +66,7 @@ const VideoCard = ({
     return video.source === videoSourceType.CLOUDFLARE ? (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-          {toLongDateWithDayTime(orderDetails.expiry)}
+          Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
         </Title>
         <Title level={5} className={styles.blueText}>
           Allowed Watches : {orderDetails.watch_limit}
@@ -81,39 +78,13 @@ const VideoCard = ({
     ) : (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-          {toLongDateWithDayTime(orderDetails.expiry)}
+          Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
         </Title>
       </Space>
     );
   };
 
   const videoThumbnailUrl = video?.thumbnail_url || orderDetails?.thumbnail_url || 'error';
-
-  const renderVideoDocumentUrl = () => {
-    const documentUrl = (video?.description || orderDetails?.description)?.split('!~!~!~')[1];
-
-    if (!documentUrl) {
-      return null;
-    }
-
-    return (
-      <Col xs={24}>
-        <Title level={5}> This video includes a downloadable PDF file </Title>
-        <List
-          size="small"
-          dataSource={[documentUrl]}
-          renderItem={(documentUrl) => (
-            <List.Item>
-              <Button ghost type="primary" icon={<FilePdfOutlined />} onClick={() => window.open(documentUrl)}>
-                {documentUrl.split('_').slice(-1)[0] || 'Download'}
-              </Button>
-            </List.Item>
-          )}
-        />
-      </Col>
-    );
-  };
 
   return (
     <Card
@@ -173,7 +144,6 @@ const VideoCard = ({
             </Col>
             {showDesc && (
               <>
-                {renderVideoDocumentUrl()}
                 <Col xs={24} className={styles.descWrapper}>
                   <Title level={5}> Description </Title>
                   <div className={styles.videoDesc}>
