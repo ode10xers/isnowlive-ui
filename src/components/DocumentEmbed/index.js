@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 
 import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack';
-// import { Document, Page, pdfjs } from 'react-pdf';
 
 import { Spin, Button, Space, Typography, Grid } from 'antd';
 
 import styles from './style.module.scss';
-// import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -65,7 +63,11 @@ const DocumentEmbed = ({ documentLink = null }) => {
         file={documentLink}
         onLoadSuccess={onDocumentLoadSuccess}
         externalLinkTarget="_blank"
-        loading={<Spin tip="Loading document..." size="large" />}
+        loading={
+          <div className={styles.textAlignCenter}>
+            <Spin tip="Loading document..." size="large" />
+          </div>
+        }
       >
         {/* <div className={styles.pdfOutlineContainer}>
           <Outline
