@@ -23,6 +23,7 @@ import {
   showGetVideoWithSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
+import DocumentEmbed from 'components/DocumentEmbed';
 import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
 import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 import PassesListItem from 'components/DynamicProfileComponents/PassesProfileComponent/PassesListItem';
@@ -49,7 +50,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import DocumentEmbed from 'components/DocumentEmbed';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -706,22 +706,6 @@ const VideoDetails = ({ match, history }) => {
       </Col>
     );
   };
-
-  // const documentModal =
-  //   videoData && videoData?.is_public_document && videoData?.document?.url ? (
-  //     <Modal
-  //       title="Attached Document"
-  //       footer={null}
-  //       forceRender={true}
-  //       visible={showDocumentModal}
-  //       onCancel={handleDocumentModalClose}
-  //       afterClose={resetBodyStyle}
-  //       centered={true}
-  //       width={640}
-  //     >
-  //       <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
-  //     </Modal>
-  //   ) : null;
 
   //#endregion End of UI Components
 
