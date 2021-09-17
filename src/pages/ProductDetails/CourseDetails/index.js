@@ -12,6 +12,7 @@ import {
   MinusOutlined,
   PlusOutlined,
   NotificationOutlined,
+  FilePdfOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -331,6 +332,8 @@ const CourseDetails = ({ match }) => {
 
     const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
     const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
+    // TODO: Get input for mobile UI
+    // const docContentCount = getCourseDocumentContentCount(course.modules ?? []);
 
     return (
       <Row justify="center" align="middle">
@@ -394,9 +397,11 @@ const CourseDetails = ({ match }) => {
   const renderContentIcon = (productType) =>
     productType.toUpperCase() === 'SESSION' ? (
       <VideoCameraOutlined className={styles.contentIcon} />
-    ) : (
+    ) : productType.toUpperCase() === 'VIDEO' ? (
       <PlayCircleOutlined className={styles.contentIcon} />
-    );
+    ) : productType.toUpperCase() === 'DOCUMENT' ? (
+      <FilePdfOutlined className={styles.contentIcon} />
+    ) : null;
 
   const renderContentDetails = (contentData) => {
     switch (contentData.product_type?.toUpperCase()) {
@@ -418,6 +423,8 @@ const CourseDetails = ({ match }) => {
             </Text>
           </Space>
         );
+      case 'DOCUMENT':
+        return <Text type="secondary">{contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable</Text>;
       default:
         break;
     }
