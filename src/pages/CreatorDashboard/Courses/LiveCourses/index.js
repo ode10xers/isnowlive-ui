@@ -28,6 +28,7 @@ const {
 } = dateUtil;
 
 // NOTE: Currently unused
+/** @deprecated */
 const LiveCourses = ({
   liveCourses,
   showEditModal,

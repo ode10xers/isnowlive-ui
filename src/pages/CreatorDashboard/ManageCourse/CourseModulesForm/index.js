@@ -27,6 +27,7 @@ import {
   PlusCircleOutlined,
   MinusCircleTwoTone,
   DeleteOutlined,
+  FilePdfOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -37,6 +38,7 @@ import { showErrorModal, showSuccessModal, resetBodyStyle } from 'components/Mod
 
 import SessionContentPopup from '../SessionContentPopup';
 import VideoContentPopup from '../VideoContentPopup';
+import FileContentPopup from '../FileContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -191,8 +193,10 @@ const CourseModulesForm = ({ match, history }) => {
 
   const [videoPopupVisible, setVideoPopupVisible] = useState(false);
   const [sessionPopupVisible, setSessionPopupVisible] = useState(false);
+  const [filePopupVisible, setFilePopupVisible] = useState(false);
   const [addVideoContentMethod, setAddVideoContentMethod] = useState(null);
   const [addSessionContentMethod, setAddSessionContentMethod] = useState(null);
+  const [addFileContentMethod, setAddFileContentMethod] = useState(null);
 
   const [courseDetails, setCourseDetails] = useState(null);
   const [expandedModulesKeys, setExpandedModulesKeys] = useState([]);
@@ -201,6 +205,7 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseEndDate, setCourseEndDate] = useState(null);
 
   const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
+  const [excludedFilesInModal, setExcludedFilesInModal] = useState([]);
 
   //#region Start of Helper functions
 
@@ -354,9 +359,28 @@ const CourseModulesForm = ({ match, history }) => {
     ),
   ];
 
+  const getFileContentIDsFromModules = (modules = []) => [
+    ...new Set(
+      modules.reduce(
+        (acc, module) =>
+          (acc = acc.concat(
+            module.module_content
+              .filter((content) => content?.product_type?.toUpperCase() === 'DOCUMENT')
+              .map((content) => content.product_id)
+          )),
+        []
+      )
+    ),
+  ];
+
   const getExcludedVideoContentsForModal = () => {
     const currModules = form.getFieldValue('modules');
     return getVideoContentIDsFromModules(currModules);
+  };
+
+  const getExcludedFileContentsForModal = () => {
+    const currModules = form.getFieldValue('modules');
+    return getFileContentIDsFromModules(currModules);
   };
 
   const isVideoContentModified = (newModules) => {
@@ -374,7 +398,7 @@ const CourseModulesForm = ({ match, history }) => {
     showErrorModal(
       'Issue detected',
       <>
-        <Paragraph>You have some empty curriculum item ( outlines ).</Paragraph>
+        <Paragraph>You have some empty curriculum item (outlines).</Paragraph>
         <Paragraph>Please either add content in them or remove them to update this course</Paragraph>
       </>
     );
@@ -424,7 +448,8 @@ const CourseModulesForm = ({ match, history }) => {
 
     const validModuleContents = await Promise.all(
       moduleContents
-        .filter((content) => content.product_id && content.product_type)
+        // We skip this check for documents
+        .filter((content) => content.product_id && content.product_type && content.product_type !== 'DOCUMENT')
         .map(async (content) => await fetchContentDetails(content.product_id, content.product_type))
     );
 
@@ -582,7 +607,7 @@ const CourseModulesForm = ({ match, history }) => {
       saveCourseCurriculum({ ...payload, new_videos_to_orders: false });
     }
   };
-
+  // TODO: Modify this or make a new one for file contents
   const initializeAddContentFunction = (moduleIndex) => {
     // We return a function that will be set as a state
     // This function will accept the content data that will be added
@@ -607,7 +632,10 @@ const CourseModulesForm = ({ match, history }) => {
 
       // Check if there's an empty content to replace with
       const targetContentIndex = targetModuleContents.findIndex(
-        (moduleContent) => moduleContent.product_type !== 'SESSION' && moduleContent.product_type !== 'VIDEO'
+        (moduleContent) =>
+          moduleContent.product_type !== 'SESSION' &&
+          moduleContent.product_type !== 'VIDEO' &&
+          moduleContent.product_type !== 'DOCUMENT'
       );
 
       if (targetContentIndex >= 0) {
@@ -700,12 +728,29 @@ const CourseModulesForm = ({ match, history }) => {
     setExcludedVideosInModal([]);
   };
 
+  const openFilePopup = (moduleIndex) => {
+    const addContentFunction = initializeAddContentFunction(moduleIndex);
+    setAddFileContentMethod(() => addContentFunction);
+    setExcludedFilesInModal(getExcludedFileContentsForModal());
+    setFilePopupVisible(true);
+  };
+
+  const closeFilePopup = () => {
+    setFilePopupVisible(false);
+    setExcludedFilesInModal([]);
+  };
+
   //#endregion End of UI Handlers
 
   const renderContentDetails = (moduleName, contentName) => {
     const contentData = form.getFieldValue(['modules', moduleName, 'module_content', contentName]);
-
-    return <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />;
+    return contentData.product_type === 'DOCUMENT' ? (
+      <Text type={contentData?.is_downloadable ?? false ? 'success' : 'danger'}>
+        {contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable
+      </Text>
+    ) : (
+      <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />
+    );
   };
 
   return (
@@ -724,6 +769,12 @@ const CourseModulesForm = ({ match, history }) => {
         addContentMethod={addVideoContentMethod}
         excludedVideos={excludedVideosInModal}
       />
+      <FileContentPopup
+        visible={filePopupVisible}
+        closeModal={closeFilePopup}
+        addContentMethod={addFileContentMethod}
+        excludedDocumentIds={excludedFilesInModal}
+      />
       <div className={styles.box}>
         <Loader size="large" loading={isLoading}>
           <Form
@@ -737,16 +788,7 @@ const CourseModulesForm = ({ match, history }) => {
           >
             <Row gutter={[12, 12]} className={styles.coursePageContainer}>
               <Col xs={24}>
-                <PageHeader
-                  title="Manage Course Curriculum"
-                  onBack={() =>
-                    history.push(
-                      Routes.creatorDashboard.rootPath +
-                        Routes.creatorDashboard.courses +
-                        (courseId ? `/${courseId}/edit` : '')
-                    )
-                  }
-                />
+                <PageHeader title="Manage Course Curriculum" onBack={() => history.goBack()} />
               </Col>
               {/* Course Module Informations */}
               <Col xs={24}>
@@ -1013,7 +1055,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         ) : (
                                                                           <>
                                                                             <Col
-                                                                              xs={14}
+                                                                              xs={12}
                                                                               className={styles.textAlignRight}
                                                                             >
                                                                               <Text
@@ -1022,6 +1064,22 @@ const CourseModulesForm = ({ match, history }) => {
                                                                               >
                                                                                 Select content to add
                                                                               </Text>
+                                                                            </Col>
+                                                                            <Col
+                                                                              xs={3}
+                                                                              className={styles.textAlignCenter}
+                                                                            >
+                                                                              <Tooltip title="Add File Content">
+                                                                                <Button
+                                                                                  block
+                                                                                  size="large"
+                                                                                  type="link"
+                                                                                  icon={<FilePdfOutlined />}
+                                                                                  onClick={() =>
+                                                                                    openFilePopup(moduleFieldName)
+                                                                                  }
+                                                                                />
+                                                                              </Tooltip>
                                                                             </Col>
                                                                             <Col
                                                                               xs={3}

@@ -9,6 +9,7 @@ import {
   DownOutlined,
   UpOutlined,
   EyeInvisibleOutlined,
+  ProfileOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -33,7 +34,7 @@ import styles from './styles.module.scss';
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 const {
-  formatDate: { toShortDateWithYear, toDateAndTime },
+  formatDate: { toShortDate, toDateAndTime },
 } = dateUtil;
 
 const Courses = ({ history }) => {
@@ -163,6 +164,10 @@ const Courses = ({ history }) => {
     history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/edit`);
   };
 
+  const redirectToEditModules = (courseExternalId) => {
+    history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
+  };
+
   //#endregion End Of Business Logics
 
   //#region Start Of Expandable Logics
@@ -239,7 +244,7 @@ const Courses = ({ history }) => {
         render: (text, record) =>
           record?.type === 'VIDEO'
             ? `${record?.validity ?? 0} days`
-            : `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
+            : `${toShortDate(record.start_date)} - ${toShortDate(record.end_date)}`,
       },
       {
         title: 'Course Content',
@@ -283,7 +288,7 @@ const Courses = ({ history }) => {
             {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         ),
-        width: '250px',
+        width: '270px',
         align: 'right',
         render: (text, record) => (
           <Row gutter={4} justify="end">
@@ -293,13 +298,18 @@ const Courses = ({ history }) => {
               </Tooltip>
             </Col>
             <Col xs={3}>
-              <Tooltip title="Edit Course">
+              <Tooltip title="Edit Course Details">
                 <Button
                   block
                   type="text"
                   onClick={() => redirectToEditCourse(record.id)}
                   icon={<EditTwoTone twoToneColor="#08979c" />}
                 />
+              </Tooltip>
+            </Col>
+            <Col xs={3}>
+              <Tooltip title="Edit Course Modules">
+                <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
               </Tooltip>
             </Col>
             <Col xs={3}>
@@ -322,7 +332,7 @@ const Courses = ({ history }) => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={10}>
+            <Col xs={7}>
               {record.is_published ? (
                 expandedPublishedRowKeys.includes(record.id) ? (
                   <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
@@ -504,7 +514,7 @@ const Courses = ({ history }) => {
             <Text>
               {course?.type === 'VIDEO'
                 ? `${course?.validity ?? 0} days`
-                : `${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`}
+                : `${toShortDate(course.start_date)} - ${toShortDate(course.end_date)}`}
             </Text>
           )}
           {layout(

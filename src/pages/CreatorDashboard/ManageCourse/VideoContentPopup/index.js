@@ -30,6 +30,7 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
         setVideos(data.filter((data) => !excludedVideos.includes(data.external_id)));
       }
     } catch (error) {
+      console.error(error);
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
