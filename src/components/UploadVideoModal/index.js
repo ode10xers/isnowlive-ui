@@ -103,7 +103,6 @@ const uploadVideoFormInitialValues = {
   youtube_url: '',
 };
 
-// TODO: Currently the document URL implementation is very hacky
 const UploadVideoModal = ({
   formPart,
   setFormPart,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Row, Col, Typography, Spin, Button, Empty, message } from 'antd';
-import { DownloadOutlined, LeftOutlined } from '@ant-design/icons';
+import { Row, Col, Spin, Button, Empty, PageHeader, message } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -12,8 +12,6 @@ import { attendeeProductOrderTypes } from 'utils/constants';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
-
-const { Title } = Typography;
 
 const DocumentDetails = ({ match, history }) => {
   const productTypeParams = match.params.product_type;
@@ -54,28 +52,36 @@ const DocumentDetails = ({ match, history }) => {
   }, [productTypeParams, productOrderIdParams, documentIdParams, fetchDocumentDetails]);
 
   return (
-    <div className={styles.p10}>
+    <div className={styles.documentPageContainer}>
       <Spin spinning={isLoading} tip="Fetching file details">
-        <Row gutter={[8, 12]}>
+        <Row gutter={[8, 2]}>
           <Col xs={24}>
-            <Button ghost type="primary" icon={<LeftOutlined />} onClick={() => history.goBack()}>
+            <PageHeader
+              className={styles.pageHeader}
+              onBack={() => history.goBack()}
+              title={documentDetails?.name ?? ''}
+              subTitle={
+                documentDetails?.is_downloadable ? (
+                  <Button
+                    icon={<DownloadOutlined />}
+                    onClick={() => window.open(documentDetails?.url)}
+                    className={styles.ml10}
+                  >
+                    Download
+                  </Button>
+                ) : null
+              }
+            />
+            {/* <Button ghost type="primary" icon={<LeftOutlined />} onClick={() => history.goBack()}>
               Back
-            </Button>
+            </Button> */}
           </Col>
-          {documentDetails ? (
-            <>
-              <Col xs={24}>
-                <Title level={3}>
-                  {documentDetails?.name}{' '}
-                  {documentDetails?.is_downloadable ? (
-                    <Button icon={<DownloadOutlined />} onClick={() => window.open(documentDetails?.url)} />
-                  ) : null}
-                </Title>
-              </Col>
-              <Col xs={24}>
+          {documentDetails?.url ? (
+            <Col xs={24} className={styles.textAlignCenter}>
+              <div className={styles.fileViewer}>
                 <DocumentEmbed documentLink={documentDetails.url ?? null} />
-              </Col>
-            </>
+              </div>
+            </Col>
           ) : (
             <Col xs={24}>
               <Empty description="No valid file found" />

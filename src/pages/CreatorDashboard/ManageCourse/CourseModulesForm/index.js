@@ -417,6 +417,8 @@ const CourseModulesForm = ({ match, history }) => {
       return false;
     }
 
+    // NOTE : Currently, FE puts a check of not allowing ONLY document contents
+    // to exists in a course. Once a decision has been made about that, adjust this
     if (
       courseCurriculumType === courseCurriculumTypes.VIDEO.name &&
       moduleContents.some((content) => content.product_type === 'SESSION')
@@ -619,7 +621,7 @@ const CourseModulesForm = ({ match, history }) => {
       saveCourseCurriculum({ ...payload, new_videos_to_orders: false });
     }
   };
-  // TODO: Modify this or make a new one for file contents
+
   const initializeAddContentFunction = (moduleIndex) => {
     // We return a function that will be set as a state
     // This function will accept the content data that will be added

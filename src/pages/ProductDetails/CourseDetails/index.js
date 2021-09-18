@@ -332,7 +332,6 @@ const CourseDetails = ({ match }) => {
 
     const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
     const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
-    // TODO: Get input for mobile UI
     const docContentCount = getCourseDocumentContentCount(course.modules ?? []);
 
     return (
@@ -514,7 +513,7 @@ const CourseDetails = ({ match }) => {
     ));
   };
 
-  // TODO: Currently this component only supports type = YOUTUBE
+  // NOTE: Currently this component only supports type = YOUTUBE
   const coursePreviewEmbed = (
     <div className={styles.coursePreviewContainer}>
       <Row gutter={[10, 10]}>
