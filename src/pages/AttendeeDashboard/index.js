@@ -11,11 +11,13 @@ const Subscriptions = lazy(() => import('pages/AttendeeDashboard/Subscriptions')
 const Referrals = lazy(() => import('pages/AttendeeDashboard/Referrals'));
 const CourseOrderDetails = lazy(() => import('pages/AttendeeDashboard/CourseOrderDetails'));
 const DashboardPage = lazy(() => import('pages/AttendeeDashboard/DashboardPage'));
+const DocumentDetails = lazy(() => import('pages/AttendeeDashboard/DocumentDetails'));
 
 const AttendeeDashboard = ({ match }) => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Switch>
+        <Route exact path={match.url + Routes.attendeeDashboard.documentDetails} component={DocumentDetails} />
         <Route exact path={match.url + Routes.attendeeDashboard.dashboardPage} component={DashboardPage} />
         <Route exact path={match.url + Routes.attendeeDashboard.sessions} component={SessionsInventories} />
         <Route exact path={match.url + Routes.attendeeDashboard.passes} component={ClassPassList} />

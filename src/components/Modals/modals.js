@@ -589,7 +589,6 @@ export const showMemberUnapprovedJoinModal = async () => {
     if (reservedDomainName.includes(creatorUsername)) {
       showErrorModal('Something went wrong');
     } else {
-      // TODO: later change this to get creator details from LS
       const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
 
       if (creatorProfileData) {

@@ -12,6 +12,7 @@ import {
   MinusOutlined,
   PlusOutlined,
   NotificationOutlined,
+  FilePdfOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -24,7 +25,7 @@ import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBooked
 import dateUtil from 'utils/date';
 import { generateColorPalletteForProfile } from 'utils/colors';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
-import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
 import {
   isAPISuccess,
@@ -331,11 +332,12 @@ const CourseDetails = ({ match }) => {
 
     const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
     const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
+    const docContentCount = getCourseDocumentContentCount(course.modules ?? []);
 
     return (
       <Row justify="center" align="middle">
         {sessionContentCount > 0 ? (
-          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+          <Col xs={{ flex: '3 2 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
             {renderCourseInfoItem({
               icon: <VideoCameraOutlined className={styles.courseInfoIcon} />,
               title: 'Live sessions',
@@ -344,7 +346,7 @@ const CourseDetails = ({ match }) => {
           </Col>
         ) : null}
         {videoContentCount > 0 ? (
-          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+          <Col xs={{ flex: '3 2 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
             {renderCourseInfoItem({
               icon: <PlayCircleOutlined className={styles.courseInfoIcon} />,
               title: 'Recorded videos',
@@ -352,7 +354,16 @@ const CourseDetails = ({ match }) => {
             })}
           </Col>
         ) : null}
-        <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+        {docContentCount > 0 ? (
+          <Col xs={{ flex: '3 2 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+            {renderCourseInfoItem({
+              icon: <FilePdfOutlined className={styles.courseInfoIcon} />,
+              title: 'Included Files',
+              content: docContentCount,
+            })}
+          </Col>
+        ) : null}
+        <Col xs={{ flex: '3 3 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
           {renderCourseInfoItem({
             icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
             title: 'Course duration',
@@ -366,7 +377,7 @@ const CourseDetails = ({ match }) => {
           })}
         </Col>
         {course?.type !== 'VIDEO' && (
-          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+          <Col xs={{ flex: '3 3 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
             {renderCourseInfoItem({
               icon: <NotificationOutlined className={styles.courseInfoIcon} />,
               title: 'Starts at',
@@ -394,9 +405,11 @@ const CourseDetails = ({ match }) => {
   const renderContentIcon = (productType) =>
     productType.toUpperCase() === 'SESSION' ? (
       <VideoCameraOutlined className={styles.contentIcon} />
-    ) : (
+    ) : productType.toUpperCase() === 'VIDEO' ? (
       <PlayCircleOutlined className={styles.contentIcon} />
-    );
+    ) : productType.toUpperCase() === 'DOCUMENT' ? (
+      <FilePdfOutlined className={styles.contentIcon} />
+    ) : null;
 
   const renderContentDetails = (contentData) => {
     switch (contentData.product_type?.toUpperCase()) {
@@ -418,6 +431,8 @@ const CourseDetails = ({ match }) => {
             </Text>
           </Space>
         );
+      case 'DOCUMENT':
+        return <Text type="secondary">{contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable</Text>;
       default:
         break;
     }
@@ -498,7 +513,7 @@ const CourseDetails = ({ match }) => {
     ));
   };
 
-  // TODO: Currently this component only supports type = YOUTUBE
+  // NOTE: Currently this component only supports type = YOUTUBE
   const coursePreviewEmbed = (
     <div className={styles.coursePreviewContainer}>
       <Row gutter={[10, 10]}>

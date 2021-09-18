@@ -4,8 +4,6 @@
   padding: 8px;
 }
 
-// TODO: This is a better way to override certain styling on rendering HTML
-// Replace this on other style sheets (search for p, span)
 .contentContainer * {
   background-color: transparent !important;
   color: var(--passion-profile-dark-color, #{map-get($colors, 'Zeus')}) !important;

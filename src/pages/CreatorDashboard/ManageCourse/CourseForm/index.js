@@ -33,6 +33,7 @@ import { isAPISuccess } from 'utils/helper';
 import { courseCreatePageLayout, coursePageTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import { generatePath } from 'react-router';
 
 const coursePriceTypes = {
   FREE: {
@@ -317,7 +318,10 @@ const CourseForm = ({ match, history }) => {
 
       const courseExternalId = await handleFinish(form.getFieldsValue(), false);
       if (courseExternalId) {
-        history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
+        history.push(
+          Routes.creatorDashboard.rootPath +
+            generatePath(Routes.creatorDashboard.createCourseModule, { course_id: courseExternalId })
+        );
       }
     } catch (error) {
       form.scrollToField(error.errorFields[0].name);

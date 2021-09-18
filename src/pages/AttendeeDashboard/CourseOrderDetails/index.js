@@ -1,9 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { generatePath } from 'react-router';
 import ReactHtmlParser from 'react-html-parser';
 import moment from 'moment';
 
 import { Row, Col, Image, Collapse, Button, Divider, List, Typography, Spin, Popover, Space, Card, Tag } from 'antd';
-import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  DownOutlined,
+  VideoCameraOutlined,
+  PlayCircleOutlined,
+  FilePdfOutlined,
+} from '@ant-design/icons';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -22,9 +29,14 @@ import {
   deepCloneObject,
   videoSourceType,
 } from 'utils/helper';
-import { getCourseOrderSessionContentCount, getCourseOrderVideoContentCount } from 'utils/course';
+import {
+  getCourseDocumentContentCount,
+  getCourseOrderSessionContentCount,
+  getCourseOrderVideoContentCount,
+} from 'utils/course';
 
 import styles from './style.module.scss';
+import { attendeeProductOrderTypes } from 'utils/constants';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -52,7 +64,7 @@ const CourseOrderDetails = ({ match, history }) => {
               try {
                 tempModuleData.module_content = await Promise.all(
                   courseModule.module_content
-                    .filter((content) => content.order_id)
+                    .filter((content) => content.order_id || content.product_type === 'DOCUMENT')
                     .map(async (moduleContent) => {
                       let productData = null;
                       let targetAPI = null;
@@ -151,14 +163,27 @@ const CourseOrderDetails = ({ match, history }) => {
     );
   };
 
+  const redirectToDocumentDetails = (content) => {
+    history.push(
+      Routes.attendeeDashboard.rootPath +
+        generatePath(Routes.attendeeDashboard.documentDetails, {
+          product_type: attendeeProductOrderTypes.COURSE,
+          product_order_id: courseOrderID,
+          document_id: content.product_id,
+        })
+    );
+  };
+
   const renderCourseOrderContent = (courseOrder) => {
-    const sessionCount = getCourseOrderSessionContentCount(courseOrder.modules);
-    const videoCount = getCourseOrderVideoContentCount(courseOrder.modules);
+    const sessionCount = getCourseOrderSessionContentCount(courseOrder.modules ?? []);
+    const videoCount = getCourseOrderVideoContentCount(courseOrder.modules ?? []);
+    const docCount = getCourseDocumentContentCount(courseOrder.modules ?? []);
 
     return (
-      <Space split={<Divider type="vertical" />}>
-        {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
-        {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
+      <Space>
+        {sessionCount > 0 ? <Tag color="blue">{`${sessionCount} sessions`}</Tag> : null}
+        {videoCount > 0 ? <Tag color="purple">{`${videoCount} videos`}</Tag> : null}
+        {docCount > 0 ? <Tag color="magenta">{`${docCount} files`}</Tag> : null}
       </Space>
     );
   };
@@ -172,27 +197,12 @@ const CourseOrderDetails = ({ match, history }) => {
         <Col xs={24} md={12} lg={16}>
           <Space direction="vertical">
             <Title level={5} className={styles.courseTitle}>
-              {' '}
-              {orderDetails.course.name}{' '}
+              {orderDetails.course.name}
             </Title>
             <div className={styles.courseDescription}>{ReactHtmlParser(orderDetails.course.description)}</div>
-            <Tag color="blue" className={styles.contentTag}>
-              {renderCourseOrderContent(orderDetails.course)}
-            </Tag>
+            {renderCourseOrderContent(orderDetails.course)}
           </Space>
         </Col>
-        {/* <Col xs={4}>
-          <Progress
-            type="circle"
-            success={{ percent: 40 }}
-            format={(percent, successPercent) => (
-              <Text className={styles.progressPercent}>
-                {' '}
-                <span className={styles.percentText}> {successPercent}% </span> <br /> Completed{' '}
-              </Text>
-            )}
-          />
-        </Col> */}
       </Row>
     </div>
   );
@@ -200,9 +210,11 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderContentIcon = (contentType) =>
     contentType === 'SESSION' ? (
       <VideoCameraOutlined className={styles.blueText} />
-    ) : (
+    ) : contentType === 'VIDEO' ? (
       <PlayCircleOutlined className={styles.blueText} />
-    );
+    ) : contentType === 'DOCUMENT' ? (
+      <FilePdfOutlined className={styles.blueText} />
+    ) : null;
 
   const renderExtraContent = (content, contentType) =>
     contentType === 'SESSION' ? (
@@ -253,7 +265,7 @@ const CourseOrderDetails = ({ match, history }) => {
           </Button>
         )}
       </Space>
-    ) : (
+    ) : contentType === 'VIDEO' ? (
       <Space align="center" size="large">
         {content.product_data?.source === videoSourceType.YOUTUBE ? (
           <Text> Video </Text>
@@ -264,7 +276,11 @@ const CourseOrderDetails = ({ match, history }) => {
           Watch Now
         </Button>
       </Space>
-    );
+    ) : contentType === 'DOCUMENT' ? (
+      <Button type="primary" onClick={() => redirectToDocumentDetails(content)}>
+        View File
+      </Button>
+    ) : null;
 
   const renderMobileModuleContent = (content) => (
     <Col xs={24} key={content.product_id}>
@@ -326,11 +342,19 @@ const CourseOrderDetails = ({ match, history }) => {
                   </Button>
                 ),
               ]
-            : [
+            : content?.product_type === 'VIDEO'
+            ? [
                 <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
                   Watch Now
                 </Button>,
               ]
+            : content?.product_type === 'DOCUMENT'
+            ? [
+                <Button type="primary" onClick={() => redirectToDocumentDetails(content)}>
+                  View File
+                </Button>,
+              ]
+            : []
         }
       >
         <Row gutter={[4, 10]} align="middle">
@@ -344,11 +368,17 @@ const CourseOrderDetails = ({ match, history }) => {
                 : {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}{' '}
               </Col>
             </>
-          ) : content.product_data?.source === videoSourceType.YOUTUBE ? (
-            <Text> Video </Text>
-          ) : (
-            <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
-          )}
+          ) : content?.product_type === 'VIDEO' ? (
+            content.product_data?.source === videoSourceType.YOUTUBE ? (
+              <Text> Video </Text>
+            ) : (
+              <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
+            )
+          ) : content?.product_type === 'DOCUMENT' ? (
+            <Button type="primary" onClick={() => redirectToDocumentDetails(content)}>
+              View File
+            </Button>
+          ) : null}
         </Row>
       </Card>
     </Col>
