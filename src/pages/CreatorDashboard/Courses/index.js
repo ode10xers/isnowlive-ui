@@ -262,30 +262,28 @@ const Courses = ({ history }) => {
           const docCount = getCourseDocumentContentCount(record?.modules ?? []);
           const emptyCount = getCourseEmptyContentCount(record?.modules ?? []);
 
-          if (!sessionCount && !videoCount) {
-            return <Text type="secondary"> {`${emptyCount} outlines`} </Text>;
+          if (!sessionCount && !videoCount && !docCount) {
+            return <Tag>{`${emptyCount} outlines`}</Tag>;
           }
 
           return (
             <Space size={1} wrap={true}>
               {sessionCount > 0 ? (
                 <Tag className={styles.mb5} color="blue">
-                  {' '}
-                  {`${sessionCount} sessions`}{' '}
+                  {`${sessionCount} sessions`}
                 </Tag>
               ) : null}
               {videoCount > 0 ? (
                 <Tag className={styles.mb5} color="purple">
-                  {`${videoCount} videos`}{' '}
+                  {`${videoCount} videos`}
                 </Tag>
               ) : null}
               {docCount > 0 ? (
                 <Tag className={styles.mb5} color="magenta">
-                  {' '}
-                  {`${docCount} files`}{' '}
+                  {`${docCount} files`}
                 </Tag>
               ) : null}
-              {emptyCount > 0 ? <Tag> {`${emptyCount} outlines`} </Tag> : null}
+              {emptyCount > 0 ? <Tag>{`${emptyCount} outlines`}</Tag> : null}
             </Space>
           );
         },
