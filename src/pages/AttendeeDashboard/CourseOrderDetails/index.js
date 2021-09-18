@@ -36,6 +36,7 @@ import {
 } from 'utils/course';
 
 import styles from './style.module.scss';
+import { attendeeProductOrderTypes } from 'utils/constants';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -166,7 +167,7 @@ const CourseOrderDetails = ({ match, history }) => {
     history.push(
       Routes.attendeeDashboard.rootPath +
         generatePath(Routes.attendeeDashboard.documentDetails, {
-          product_type: 'course',
+          product_type: attendeeProductOrderTypes.COURSE,
           product_order_id: courseOrderID,
           document_id: content.product_id,
         })

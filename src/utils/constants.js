@@ -22,3 +22,7 @@ export const sessionMeetingTypes = {
   SYSTEM_GENERATED: 'SYSTEM_GENERATED_MEETING',
   CUSTOM_MEETING: 'CUSTOM_MEETING',
 };
+
+export const attendeeProductOrderTypes = {
+  COURSE: 'course',
+};
