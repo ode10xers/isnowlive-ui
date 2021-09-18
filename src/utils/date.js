@@ -22,6 +22,7 @@ const formatDate = {
   toLongDateWithTime: (date) => moment(date).format('lll'),
   toLongDateWithDayTime: (date) => moment(date).format('llll'),
   toShortDateWithYear: (date) => moment(date).format(`DD MMM 'YY`),
+  toShortDateMonth: (date) => moment(date).format(`DD MMM`),
   toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
   getTimeDiff: (startTime = moment(), endTime = moment(), unit = 'minutes') => moment(startTime).diff(endTime, unit),

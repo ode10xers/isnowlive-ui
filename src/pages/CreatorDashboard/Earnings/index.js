@@ -193,8 +193,6 @@ const Earnings = () => {
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'error while generating dashboard URL from stripe'
       ) {
-        // TODO: Add special handler here if selected country === IN (for India)
-
         relinkStripe();
       } else {
         message.error(error.response?.data?.message || 'Something went wrong.');

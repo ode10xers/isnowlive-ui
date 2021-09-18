@@ -107,6 +107,7 @@ const Routes = {
     subscriptions: '/subscriptions',
     referrals: '/referrals',
     dashboardPage: '/products',
+    documentDetails: '/:product_type/:product_order_id/document/:document_id',
   },
 };
 

@@ -492,7 +492,7 @@ const EditProfile = ({ match, history }) => {
     setIsLoading(true);
 
     try {
-      // TODO: Currently hardcoding this to new UI
+      // NOTE: Currently hardcoding this to new UI
       const payload = {
         ...creatorProfileData,
         ...values,

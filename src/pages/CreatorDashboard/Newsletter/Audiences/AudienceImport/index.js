@@ -270,8 +270,6 @@ const AudienceImport = () => {
     );
   };
 
-  // TODO: Add filter and select for mobile
-
   return (
     <div>
       <Loader loading={isSubmitting}>

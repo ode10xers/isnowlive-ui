@@ -12,12 +12,20 @@ export const getCourseVideoContentCount = (courseModules = []) =>
     0
   );
 
+export const getCourseDocumentContentCount = (courseModules = []) =>
+  courseModules.reduce(
+    (acc, module) =>
+      (acc += module.module_content.filter((content) => content.product_type.toUpperCase() === 'DOCUMENT').length ?? 0),
+    0
+  );
+
 export const getCourseEmptyContentCount = (courseModules = []) =>
   courseModules.reduce(
     (acc, module) => (acc += module.module_content.filter((content) => !content.product_type).length ?? 0),
     0
   );
 
+// TODO: Remove the ones below if it's the same
 // This is a separate method because
 // We need to filter out contents without orders
 export const getCourseOrderSessionContentCount = (courseModules = []) =>

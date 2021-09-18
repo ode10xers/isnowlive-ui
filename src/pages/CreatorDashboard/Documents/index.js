@@ -60,7 +60,6 @@ const Documents = () => {
     showCreateDocumentModal();
   };
 
-  // TODO: Add other buttons/columns as necessary
   const documentsColumns = [
     {
       title: 'Name',

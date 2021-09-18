@@ -9,13 +9,12 @@
 .pdfPageContainer {
   margin: 0 auto;
   width: 100%;
-  // max-width: 300px;
   max-height: 500px;
   overflow: scroll;
 
   @media screen and (min-width: 576px) {
     // max-width: 520px;
-    max-height: 736px;
+    max-height: 560px;
   }
 
   :global {
