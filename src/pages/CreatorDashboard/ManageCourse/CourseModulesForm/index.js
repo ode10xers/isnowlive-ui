@@ -997,12 +997,10 @@ const CourseModulesForm = ({ match, history }) => {
                                                                 className={styles.contentListItem}
                                                                 align="middle"
                                                                 wrap={false}
+                                                                {...contentDraggableProvided.dragHandleProps}
                                                               >
                                                                 <Col flex="30px">
-                                                                  <div
-                                                                    className={styles.contentDragHandle}
-                                                                    {...contentDraggableProvided.dragHandleProps}
-                                                                  />
+                                                                  <div className={styles.contentDragHandle} />
                                                                 </Col>
                                                                 <Col flex="auto">
                                                                   <Row
