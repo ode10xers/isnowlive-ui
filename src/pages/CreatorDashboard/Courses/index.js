@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Collapse, Card, Tag, Tooltip, Space, Divider } from 'antd';
+import { Row, Col, Typography, Button, Collapse, Card, Tag, Tooltip, Space, Divider, Grid } from 'antd';
 import {
   MailOutlined,
   CopyOutlined,
@@ -22,7 +22,6 @@ import TagListPopup from 'components/TagListPopup';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import {
   getCourseSessionContentCount,
@@ -38,11 +37,13 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+const { useBreakpoint } = Grid;
 const {
   formatDate: { toShortDateMonth, toDateAndTime },
 } = dateUtil;
 
 const Courses = ({ history }) => {
+  const { md } = useBreakpoint();
   const { showSendEmailPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState([]);
@@ -245,7 +246,7 @@ const Courses = ({ history }) => {
         title: 'Duration',
         dataIndex: 'start_time',
         key: 'start_time',
-        width: '120px',
+        width: md ? '80px' : '120px',
         render: (text, record) =>
           record?.type === 'VIDEO'
             ? `${record?.validity ?? 0} days`
@@ -305,16 +306,16 @@ const Courses = ({ history }) => {
             {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         ),
-        width: '310px',
+        width: md ? '200px' : '310px',
         align: 'right',
         render: (text, record) => (
           <Row gutter={4} justify="end">
-            <Col xs={6} md={3}>
+            <Col xs={6} lg={3}>
               <Tooltip title="Send Customer Email">
                 <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} lg={3}>
               <Tooltip title="Edit Course Details">
                 <Button
                   block
@@ -324,17 +325,17 @@ const Courses = ({ history }) => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} lg={3}>
               <Tooltip title="Edit Course Modules">
                 <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} lg={3}>
               <Tooltip title="Copy Course Link">
                 <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={12} md={4}>
+            <Col xs={12} lg={4}>
               {record.is_published ? (
                 <Tooltip title="Hide Course">
                   <Button danger block type="link" onClick={() => unpublishCourse(record)}>
@@ -349,7 +350,7 @@ const Courses = ({ history }) => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={12} md={8}>
+            <Col xs={12} lg={8}>
               {record.is_published ? (
                 expandedPublishedRowKeys.includes(record.id) ? (
                   <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
@@ -581,7 +582,7 @@ const Courses = ({ history }) => {
           <Loader loading={isLoading} size="large" text="Fetching Courses">
             <Collapse defaultActiveKey={['published', 'unpublished']}>
               <Panel header={<Title level={5}> Published </Title>} key="published">
-                {isMobileDevice ? (
+                {!md ? (
                   <Row gutter={[8, 16]}>
                     <Col xs={24}>
                       <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
@@ -607,7 +608,7 @@ const Courses = ({ history }) => {
                 )}
               </Panel>
               <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
-                {isMobileDevice ? (
+                {!md ? (
                   <Row gutter={[8, 16]}>
                     <Col xs={24}>
                       <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
