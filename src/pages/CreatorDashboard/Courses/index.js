@@ -34,6 +34,7 @@ import { isAPISuccess, productType, copyToClipboard, generateUrlFromUsername, pr
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { generatePath } from 'react-router';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -43,7 +44,7 @@ const {
 } = dateUtil;
 
 const Courses = ({ history }) => {
-  const { md } = useBreakpoint();
+  const { md, xl } = useBreakpoint();
   const { showSendEmailPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState([]);
@@ -167,11 +168,21 @@ const Courses = ({ history }) => {
   };
 
   const redirectToEditCourse = (courseExternalId) => {
-    history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/edit`);
+    history.push(
+      Routes.creatorDashboard.rootPath +
+        generatePath(Routes.creatorDashboard.updateCourse, {
+          course_id: courseExternalId,
+        })
+    );
   };
 
   const redirectToEditModules = (courseExternalId) => {
-    history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
+    history.push(
+      Routes.creatorDashboard.rootPath +
+        generatePath(Routes.creatorDashboard.createCourseModule, {
+          course_id: courseExternalId,
+        })
+    );
   };
 
   //#endregion End Of Business Logics
@@ -246,7 +257,7 @@ const Courses = ({ history }) => {
         title: 'Duration',
         dataIndex: 'start_time',
         key: 'start_time',
-        width: md ? '80px' : '120px',
+        width: !xl ? '80px' : '120px',
         render: (text, record) =>
           record?.type === 'VIDEO'
             ? `${record?.validity ?? 0} days`
@@ -306,16 +317,16 @@ const Courses = ({ history }) => {
             {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         ),
-        width: md ? '200px' : '310px',
+        width: !xl ? '200px' : '310px',
         align: 'right',
         render: (text, record) => (
           <Row gutter={4} justify="end">
-            <Col xs={6} lg={3}>
+            <Col xs={6} xl={3}>
               <Tooltip title="Send Customer Email">
                 <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={6} lg={3}>
+            <Col xs={6} xl={3}>
               <Tooltip title="Edit Course Details">
                 <Button
                   block
@@ -325,17 +336,17 @@ const Courses = ({ history }) => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={6} lg={3}>
+            <Col xs={6} xl={3}>
               <Tooltip title="Edit Course Modules">
                 <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={6} lg={3}>
+            <Col xs={6} xl={3}>
               <Tooltip title="Copy Course Link">
                 <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={12} lg={4}>
+            <Col xs={12} xl={4}>
               {record.is_published ? (
                 <Tooltip title="Hide Course">
                   <Button danger block type="link" onClick={() => unpublishCourse(record)}>
@@ -350,7 +361,7 @@ const Courses = ({ history }) => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={12} lg={8}>
+            <Col xs={12} xl={8}>
               {record.is_published ? (
                 expandedPublishedRowKeys.includes(record.id) ? (
                   <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
