@@ -424,10 +424,22 @@ const CourseModulesForm = ({ match, history }) => {
       showErrorModal('You have a session content in a Video Only session! Please review the curriculum');
       return false;
     } else if (
+      courseCurriculumType === courseCurriculumTypes.VIDEO.name &&
+      !moduleContents.some((content) => content.product_type === 'VIDEO')
+    ) {
+      showErrorModal('A video course requires at least 1 video content!');
+      return false;
+    } else if (
       courseCurriculumType === courseCurriculumTypes.LIVE.name &&
       moduleContents.some((content) => content.product_type === 'VIDEO')
     ) {
       showErrorModal('You have a video content in a Session Only session! Please review the curriculum');
+      return false;
+    } else if (
+      courseCurriculumType === courseCurriculumTypes.LIVE.name &&
+      !moduleContents.some((content) => content.product_type === 'SESSION')
+    ) {
+      showErrorModal('Live sessions course requires at least 1 session added as content');
       return false;
     } else if (
       courseCurriculumType === courseCurriculumTypes.MIXED.name &&
