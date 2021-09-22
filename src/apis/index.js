@@ -225,8 +225,10 @@ export default {
       http.get(
         `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
       ),
-    getCreatorAudiences: (pageNo, perPage) =>
-      http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorAudiences: (pageNo, perPage, userType = null) =>
+      http.get(
+        `/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}${userType ? `&user_type=${userType}` : ''}`
+      ),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
     updateMemberTag: (payload) => http.put('secure/creator/audience', payload),
