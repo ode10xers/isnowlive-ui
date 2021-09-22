@@ -106,7 +106,12 @@ const EmailList = () => {
     setIsLoading(false);
   }, []);
 
-  // TODO: Also add logic similar to getAudienceList
+  // TODO: Also add logic similar as getAudienceList
+  // We've adjusted the filter logic to be on the API level, but
+  // currently it only applies to the getAudienceList method (which is called
+  // when the user selects "All Audience/Member" in the email list)
+  // The method below is the equivalent of getAudienceList in case the user
+  // selects another email list
   const fetchEmailListDetails = useCallback(async (emailListId, pageNumber, itemsPerPage) => {
     setIsLoading(true);
 
