@@ -20,13 +20,19 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
   const [audienceList, setAudienceList] = useState([]);
   const [selectedAudiences, setSelectedAudiences] = useState([]);
 
+  // TODO: Filter audiences/members which is already included in the email list here
+  // So it doesn't show up and confuses the user (the problem is it's currently paginated)
   const getAudienceList = useCallback(async (pageNumber, itemsPerPage) => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.audiences.getCreatorAudiences(pageNumber, itemsPerPage);
 
       if (isAPISuccess(status) && data) {
-        setAudienceList((audienceList) => [...audienceList, ...data.data]);
+        if (pageNumber === 1) {
+          setAudienceList(data.data ?? []);
+        } else {
+          setAudienceList((audienceList) => [...audienceList, ...(data.data ?? [])]);
+        }
         setCanShowMore(data.next_page);
       }
     } catch (error) {
@@ -58,6 +64,7 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
       const { status } = await apis.newsletter.updateEmailList(listID, payload);
 
       if (isAPISuccess(status)) {
+        setSelectedAudiences([]);
         showSuccessModal(`Email List successfully updated with new audiences`);
         closeModal(true);
       }
@@ -80,14 +87,21 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
       title: 'First Name',
       dataIndex: 'first_name',
       key: 'first_name',
-      width: '32%',
+      width: '150px',
     },
     {
       title: 'Last Name',
       dataIndex: 'last_name',
       key: 'last_name',
-      width: '32%',
+      width: '150px',
       render: (text, record) => record.last_name || '-',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: '170px',
+      ellipsis: true,
     },
     {
       title: 'Type',

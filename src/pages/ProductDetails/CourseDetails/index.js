@@ -204,16 +204,21 @@ const CourseDetails = ({ match }) => {
 
     let desc = [];
 
-    const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
-    const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
+    // const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
+    // const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
+    // const docContentCount = getCourseDocumentContentCount(course.modules ?? []);
 
-    if (sessionContentCount > 0) {
-      desc.push(`${sessionContentCount} Sessions`);
-    }
+    // if (sessionContentCount > 0) {
+    //   desc.push(`${sessionContentCount} Sessions`);
+    // }
 
-    if (videoContentCount > 0) {
-      desc.push(`${videoContentCount} Videos`);
-    }
+    // if (videoContentCount > 0) {
+    //   desc.push(`${videoContentCount} Videos`);
+    // }
+
+    // if (docContentCount > 0) {
+    //   desc.push(`${docContentCount} Files`);
+    // }
 
     let paymentPopupData = {
       productId: course.id,
