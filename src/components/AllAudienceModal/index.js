@@ -79,7 +79,6 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
   };
 
   const onSelectAudienceRow = (selectedRowKeys, selectedRows) => {
-    console.log(selectedRows);
     setSelectedAudiences(selectedRows);
   };
 
