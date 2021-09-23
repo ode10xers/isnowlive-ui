@@ -11,6 +11,7 @@ import { isAPISuccess } from 'utils/helper';
 
 const { Title } = Typography;
 
+// TODO: Reconsider Mobile UI for this, since currently using Table is not looking good
 const AllAudienceModal = ({ visible, closeModal, listID }) => {
   const totalItemsPerPage = 10;
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +65,6 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
       const { status } = await apis.newsletter.updateEmailList(listID, payload);
 
       if (isAPISuccess(status)) {
-        setSelectedAudiences([]);
         showSuccessModal(`Email List successfully updated with new audiences`);
         closeModal(true);
       }
@@ -79,6 +79,7 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
   };
 
   const onSelectAudienceRow = (selectedRowKeys, selectedRows) => {
+    console.log(selectedRows);
     setSelectedAudiences(selectedRows);
   };
 
@@ -87,26 +88,27 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
       title: 'First Name',
       dataIndex: 'first_name',
       key: 'first_name',
-      width: '150px',
+      width: '170px',
     },
     {
       title: 'Last Name',
       dataIndex: 'last_name',
       key: 'last_name',
-      width: '150px',
+      width: '170px',
       render: (text, record) => record.last_name || '-',
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      width: '170px',
+
       ellipsis: true,
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
+      width: '100px',
       render: (text, record) => `${record.type[0]}${record.type.slice(1).toLowerCase()}`,
       filterIcon: (filtered) => (
         <Tooltip defaultVisible={true} title="Click here to filter">
@@ -151,6 +153,7 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
                 rowKey={(record) => record.id}
                 rowSelection={{
                   onChange: onSelectAudienceRow,
+                  selectedRowKeys: selectedAudiences.map((audience) => audience.id),
                 }}
               />
             </Col>
