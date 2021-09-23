@@ -70,17 +70,16 @@ const EmailList = () => {
 
   //#region Start of Data Fetch
 
-  const getAudienceList = useCallback(async (pageNumber, itemsPerPage, userType = null) => {
+  const getAudienceList = useCallback(async (pageNumber, itemsPerPage, userType = null, emailList = null) => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.audiences.getCreatorAudiences(pageNumber, itemsPerPage, userType);
+      const { status, data } = await apis.audiences.getCreatorAudiences(pageNumber, itemsPerPage, userType, emailList);
 
       if (isAPISuccess(status) && data) {
-        console.log(pageNumber);
         if (pageNumber === 1) {
-          setAudienceList(data.data ?? []);
+          setAudienceList(data.data ?? data.audiences ?? []);
         } else {
-          setAudienceList((audienceList) => [...audienceList, ...(data.data ?? [])]);
+          setAudienceList((audienceList) => [...audienceList, ...(data.data ?? data.audiences ?? [])]);
         }
         setCanShowMore(data.next_page);
       }
@@ -106,33 +105,27 @@ const EmailList = () => {
     setIsLoading(false);
   }, []);
 
-  // TODO: Also add logic similar as getAudienceList
-  // We've adjusted the filter logic to be on the API level, but
-  // currently it only applies to the getAudienceList method (which is called
-  // when the user selects "All Audience/Member" in the email list)
-  // The method below is the equivalent of getAudienceList in case the user
-  // selects another email list
-  const fetchEmailListDetails = useCallback(async (emailListId, pageNumber, itemsPerPage) => {
-    setIsLoading(true);
+  // const fetchEmailListDetails = useCallback(async (emailListId, pageNumber, itemsPerPage) => {
+  //   setIsLoading(true);
 
-    try {
-      const { status, data } = await apis.newsletter.getEmailListDetails(emailListId, pageNumber, itemsPerPage);
+  //   try {
+  //     const { status, data } = await apis.newsletter.getEmailListDetails(emailListId, pageNumber, itemsPerPage);
 
-      if (isAPISuccess(status) && data) {
-        if (pageNumber === 1) {
-          setAudienceList(data.audiences);
-        } else {
-          setAudienceList((audienceList) => [...audienceList, ...data.audiences]);
-        }
+  //     if (isAPISuccess(status) && data) {
+  //       if (pageNumber === 1) {
+  //         setAudienceList(data.audiences);
+  //       } else {
+  //         setAudienceList((audienceList) => [...audienceList, ...data.audiences]);
+  //       }
 
-        setCanShowMore(data.next_page);
-      }
-    } catch (error) {
-      showErrorModal('Failed fetching creator email list', error?.response?.data?.message || 'Something went wrong.');
-    }
+  //       setCanShowMore(data.next_page);
+  //     }
+  //   } catch (error) {
+  //     showErrorModal('Failed fetching creator email list', error?.response?.data?.message || 'Something went wrong.');
+  //   }
 
-    setIsLoading(false);
-  }, []);
+  //   setIsLoading(false);
+  // }, []);
 
   //#endregion End of Data Fetch
 
@@ -143,16 +136,22 @@ const EmailList = () => {
   }, [fetchCreatorEmailList]);
 
   useEffect(() => {
-    if (isCreating) {
-      getAudienceList(
-        pageNumber,
-        totalItemsPerPage,
-        audienceViewFilter === audienceView.ALL ? null : audienceViewFilter
-      );
-    } else {
-      fetchEmailListDetails(selectedEmailList, pageNumber, totalItemsPerPage);
-    }
-  }, [getAudienceList, fetchEmailListDetails, pageNumber, selectedEmailList, isCreating, audienceViewFilter]);
+    getAudienceList(
+      pageNumber,
+      totalItemsPerPage,
+      audienceViewFilter === audienceView.ALL ? null : audienceViewFilter,
+      isCreating ? null : selectedEmailList
+    );
+    // if (isCreating) {
+    //   getAudienceList(
+    //     pageNumber,
+    //     totalItemsPerPage,
+    //     audienceViewFilter === audienceView.ALL ? null : audienceViewFilter
+    //   );
+    // } else {
+    //   fetchEmailListDetails(selectedEmailList, pageNumber, totalItemsPerPage);
+    // }
+  }, [getAudienceList, pageNumber, selectedEmailList, isCreating, audienceViewFilter]);
 
   //#endregion End of Use Effects
 
@@ -296,7 +295,6 @@ const EmailList = () => {
   const hideAllAudienceModal = (shouldRefresh = false) => {
     if (shouldRefresh) {
       setPageNumber(1);
-      fetchEmailListDetails(selectedEmailList, 1, totalItemsPerPage);
     }
     setAllAudienceModalVisible(false);
   };
@@ -465,12 +463,12 @@ const EmailList = () => {
                 {/* CTA Sections */}
                 <Col xs={24} md={12} lg={14}>
                   <Row gutter={[8, 8]} justify="end">
-                    <Col xs={24} md={12} lg={{ span: 10, offset: 14 }}>
+                    <Col xs={24} md={12} lg={{ span: 12, offset: 12 }}>
                       <Button block type="primary" onClick={() => showSendAudienceEmailModal()}>
-                        Send Email to {isCreating ? 'selected audiences/members' : 'this email list'}
+                        Send email to {isCreating ? 'selected audience/member' : 'this email list'}
                       </Button>
                     </Col>
-                    <Col xs={24} md={12} lg={10}>
+                    <Col xs={24} md={12} lg={12}>
                       <Form.Item noStyle hidden={isCreating} wrapperCol={24}>
                         <Popconfirm
                           arrowPointAtCenter
@@ -487,7 +485,7 @@ const EmailList = () => {
                         </Popconfirm>
                       </Form.Item>
                     </Col>
-                    <Col xs={24} md={12} lg={10}>
+                    <Col xs={24} md={12} lg={12}>
                       <Button block type="primary" className={styles.greenBtn} htmlType="submit">
                         {isCreating ? 'Create new email' : 'Add more audience/member to'} list
                       </Button>
