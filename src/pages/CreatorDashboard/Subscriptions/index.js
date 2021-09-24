@@ -5,6 +5,7 @@ import { Row, Col, Button, Typography, List, Modal, Divider, Space, Result } fro
 import { ToolOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
@@ -13,11 +14,11 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import { paymentProvider } from 'utils/constants';
+
 import { useGlobalContext } from 'services/globalContext';
+import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './styles.module.scss';
-import Routes from 'routes';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 const { Title, Text, Paragraph } = Typography;
 
