@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Row, Col, Spin, Button, Empty, PageHeader, message } from 'antd';
+import { Row, Col, Spin, Button, Empty, PageHeader, Image, message } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -72,16 +72,19 @@ const DocumentDetails = ({ match, history }) => {
                 ) : null
               }
             />
-            {/* <Button ghost type="primary" icon={<LeftOutlined />} onClick={() => history.goBack()}>
-              Back
-            </Button> */}
           </Col>
           {documentDetails?.url ? (
-            <Col xs={24} className={styles.textAlignCenter}>
-              <div className={styles.fileViewer}>
-                <DocumentEmbed documentLink={documentDetails.url ?? null} />
-              </div>
-            </Col>
+            documentDetails?.url.includes('image') ? (
+              <Col xs={24} className={styles.textAlignCenter}>
+                <Image width="100%" preview={true} className={styles.mt10} src={documentDetails?.url} />
+              </Col>
+            ) : (
+              <Col xs={24} className={styles.textAlignCenter}>
+                <div className={styles.fileViewer}>
+                  <DocumentEmbed documentLink={documentDetails.url ?? null} />
+                </div>
+              </Col>
+            )
           ) : (
             <Col xs={24}>
               <Empty description="No valid file found" />
