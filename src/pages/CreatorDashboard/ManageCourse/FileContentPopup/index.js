@@ -27,14 +27,15 @@ const FileContentPopup = ({ visible, closeModal, addContentMethod = null, exclud
 
       if (isAPISuccess(status) && data) {
         const documentsArr = data.data ?? [];
-        setDocuments(documentsArr.filter((data) => !excludedDocumentIds.includes(data.id)));
+        setDocuments(documentsArr);
+        // setDocuments(documentsArr.filter((data) => !excludedDocumentIds.includes(data.id)));
       }
     } catch (error) {
       console.error(error);
       showErrorModal('Failed to fetch documents', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
-  }, [excludedDocumentIds]);
+  }, []);
 
   const resetModalState = useCallback(() => {
     setSelectedDocuments([]);

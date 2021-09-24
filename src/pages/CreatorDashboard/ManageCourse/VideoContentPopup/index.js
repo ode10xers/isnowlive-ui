@@ -27,14 +27,15 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        setVideos(data.filter((data) => !excludedVideos.includes(data.external_id)));
+        setVideos(data);
+        // setVideos(data.filter((data) => !excludedVideos.includes(data.external_id)));
       }
     } catch (error) {
       console.error(error);
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
-  }, [excludedVideos]);
+  }, []);
 
   useEffect(() => {
     if (visible) {
