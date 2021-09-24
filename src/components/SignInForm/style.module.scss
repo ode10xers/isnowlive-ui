@@ -1,7 +1,6 @@
 @import '../../styles/variables.scss';
 
 .signInWrapper {
-  // background: var(--passion-profile-light-color, #{map-get($colors, 'White1')});
   background: map-get($colors, 'White1');
   border-radius: 6px;
   padding: 15px;
@@ -25,14 +24,6 @@
 
 .formContainer {
   margin-top : 10px;
-  
-  // :global {
-  //   .ant-form-item-label {
-  //     label {
-  //       color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
-  //     }
-  //   }
-  // }
 }
 
 .linkBtn {

@@ -1,7 +1,7 @@
 @import '../../../styles/variables.scss';
 
 .stickyHeader {
-  background-color: var(--passion-profile-light-color, var(--session-list-bar-color, #{map-get($colors, 'ColumbiaBlue')}));
+  background-color: var(--session-list-bar-color, var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}));
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
 
@@ -11,7 +11,7 @@
 }
 
 .sessionDateSeparator {
-  color: var(--passion-profile-dark-color, var(--session-list-date-font-color, #{map-get($map: $colors, $key: 'SunsetOrange')})) !important;
+  color: var(--session-list-date-font-color, var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'SunsetOrange')})) !important;
   font-size: 16px !important;
 }
 
@@ -26,7 +26,8 @@
     cursor: pointer !important;
     text-align: center;
     font-size: 18px !important;
-    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+    // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+    color: map-get($map: $colors, $key: 'Smalt')!important;
   }
 }
 
