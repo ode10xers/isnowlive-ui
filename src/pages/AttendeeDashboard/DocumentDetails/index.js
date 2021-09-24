@@ -74,17 +74,17 @@ const DocumentDetails = ({ match, history }) => {
             />
           </Col>
           {documentDetails?.url ? (
-            documentDetails?.url.includes('image') ? (
+            documentDetails?.url.includes('/image/') ? (
               <Col xs={24} className={styles.textAlignCenter}>
                 <Image width="100%" preview={true} className={styles.mt10} src={documentDetails?.url} />
               </Col>
-            ) : (
+            ) : documentDetails?.url.includes('.pdf') ? (
               <Col xs={24} className={styles.textAlignCenter}>
                 <div className={styles.fileViewer}>
                   <DocumentEmbed documentLink={documentDetails.url ?? null} />
                 </div>
               </Col>
-            )
+            ) : null
           ) : (
             <Col xs={24}>
               <Empty description="No valid file found" />
