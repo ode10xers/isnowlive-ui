@@ -76,7 +76,7 @@ const DocumentDetails = ({ match, history }) => {
           {documentDetails?.url ? (
             documentDetails?.url.includes('/image/') ? (
               <Col xs={24} className={styles.textAlignCenter}>
-                <Image width="100%" preview={true} className={styles.mt10} src={documentDetails?.url} />
+                <Image width="100%" preview={false} className={styles.mt10} src={documentDetails?.url} />
               </Col>
             ) : documentDetails?.url.includes('.pdf') ? (
               <Col xs={24} className={styles.textAlignCenter}>
