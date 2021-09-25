@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import { Row, Col, Typography, Image, Button, Space, message } from 'antd';
 import { ArrowLeftOutlined, PlayCircleOutlined, FilePdfOutlined, DownloadOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
@@ -28,6 +27,7 @@ import {
 import styles from './style.module.scss';
 import NextCourseContentButton from 'components/NextCourseContentButton';
 import { localStorageActiveCourseContentDataKey } from 'utils/course';
+import Routes from 'routes';
 
 const { Text, Title } = Typography;
 
@@ -35,9 +35,7 @@ const {
   timeCalculation: { isBeforeDate },
 } = dateUtil;
 
-const VideoDetails = ({ match }) => {
-  const history = useHistory();
-
+const VideoDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -214,6 +212,10 @@ const VideoDetails = ({ match }) => {
     );
   };
 
+  const handleGoBack = () => {
+    history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+  };
+
   const isActiveCourseContent = () => {
     const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
     return (
@@ -224,14 +226,14 @@ const VideoDetails = ({ match }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
-      <Row justify="start" className={styles.mb50}>
+      <Row className={styles.headerButtons} gutter={[8, 8]}>
         <Col xs={24} md={12}>
-          <Button className={styles.headButton} onClick={() => history.goBack()} icon={<ArrowLeftOutlined />}>
-            Back
+          <Button onClick={handleGoBack} icon={<ArrowLeftOutlined />}>
+            Back to videos
           </Button>
         </Col>
         {isActiveCourseContent() && (
-          <Col xs={24} md={12} className={styles.textAlignRight}>
+          <Col xs={24} md={12} className={styles.courseButtonsContainer}>
             <NextCourseContentButton />
           </Col>
         )}

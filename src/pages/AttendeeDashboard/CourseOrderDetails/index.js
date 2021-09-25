@@ -49,7 +49,7 @@ const {
 } = dateUtil;
 
 const CourseOrderDetails = ({ match, history }) => {
-  const courseOrderID = match.params.course_id;
+  const courseOrderID = match.params.course_order_id;
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrderDetails, setCourseOrderDetails] = useState(null);
   const [expandedCourseModules, setExpandedCourseModules] = useState([]);

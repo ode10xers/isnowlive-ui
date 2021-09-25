@@ -1,1 +1,7 @@
 @import '../../styles/variables.scss';
+
+.buttonsContainer {
+  @media screen and (max-width: 576px) {
+    padding: 8px 0;
+  }
+}

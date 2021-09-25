@@ -1,8 +1,8 @@
 import React from 'react';
 import { useHistory, generatePath } from 'react-router';
 
-import { Button } from 'antd';
-import { RightOutlined } from '@ant-design/icons';
+import { Space, Button } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 
@@ -68,37 +68,70 @@ const NextCourseContentButton = () => {
 
   const nextViewableContent = getNextViewableContent();
 
-  if (!nextViewableContent) {
+  const getPrevViewableContent = () => {
+    for (let moduleIterator = module_idx; moduleIterator >= 0; moduleIterator--) {
+      for (
+        let contentIterator =
+          moduleIterator === module_idx
+            ? module_content_idx - 1
+            : courseModules[moduleIterator].module_content.length - 1;
+        contentIterator >= 0;
+        contentIterator--
+      ) {
+        const productData = courseModules[moduleIterator].module_content[contentIterator];
+
+        if (isViewableContent(productData)) {
+          return { module_idx: moduleIterator, content_idx: contentIterator, ...productData };
+        }
+      }
+    }
+
     return null;
-  }
+  };
 
-  const handleNextRedirection = () => {
-    console.log(nextViewableContent);
-    storeActiveCourseContentInfoInLS(nextViewableContent.module_idx, nextViewableContent);
+  const prevViewableContent = getPrevViewableContent();
 
-    if (nextViewableContent.product_type === 'DOCUMENT') {
+  const handleContentRedirection = (contentData) => {
+    storeActiveCourseContentInfoInLS(contentData.module_idx, contentData);
+
+    if (contentData.product_type === 'DOCUMENT') {
       history.push(
         Routes.attendeeDashboard.rootPath +
           generatePath(Routes.attendeeDashboard.documentDetails, {
             product_type: attendeeProductOrderTypes.COURSE,
             product_order_id: activeCourseData.course_order_id,
-            document_id: nextViewableContent.product_id,
+            document_id: contentData.product_id,
           })
       );
-    } else if (nextViewableContent.product_type === 'VIDEO' && nextViewableContent.order_id) {
+    } else if (contentData.product_type === 'VIDEO' && contentData.order_id) {
       history.push(
         Routes.attendeeDashboard.rootPath +
           Routes.attendeeDashboard.videos +
-          `/${nextViewableContent.product_id}/${nextViewableContent.order_id}`
+          `/${contentData.product_id}/${contentData.order_id}`
       );
     }
   };
 
   return (
-    <div>
-      <Button ghost type="primary" onClick={handleNextRedirection}>
-        Go to next course content <RightOutlined className={styles.ml5} />
-      </Button>
+    <div className={styles.buttonsContainer}>
+      <Space align="center">
+        {prevViewableContent ? (
+          <Button
+            ghost
+            size="small"
+            type="primary"
+            icon={<LeftOutlined />}
+            onClick={() => handleContentRedirection(prevViewableContent)}
+          >
+            Prev. course content
+          </Button>
+        ) : null}
+        {nextViewableContent ? (
+          <Button ghost size="small" type="primary" onClick={() => handleContentRedirection(nextViewableContent)}>
+            Next course content <RightOutlined className={styles.ml5} />
+          </Button>
+        ) : null}
+      </Space>
     </div>
   );
 };

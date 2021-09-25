@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { generatePath } from 'react-router';
 
-import { Row, Col, Spin, Button, Empty, PageHeader, Image, message } from 'antd';
+import { Row, Col, Spin, Button, Empty, PageHeader, Image, Grid, message } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import DocumentEmbed from 'components/DocumentEmbed';
 import { showErrorModal } from 'components/Modals/modals';
@@ -15,7 +17,11 @@ import { localStorageActiveCourseContentDataKey } from 'utils/course';
 
 import styles from './style.module.scss';
 
+const { useBreakpoint } = Grid;
+
 const DocumentDetails = ({ match, history }) => {
+  const { xs } = useBreakpoint();
+
   const productTypeParams = match.params.product_type;
   const productOrderIdParams = match.params.product_order_id;
   const documentIdParams = match.params.document_id;
@@ -53,6 +59,17 @@ const DocumentDetails = ({ match, history }) => {
     fetchDocumentDetails(productTypeParams, productOrderIdParams, documentIdParams);
   }, [productTypeParams, productOrderIdParams, documentIdParams, fetchDocumentDetails]);
 
+  const handleGoBack = () => {
+    if (productTypeParams === attendeeProductOrderTypes.COURSE) {
+      history.push(
+        Routes.attendeeDashboard.rootPath +
+          generatePath(Routes.attendeeDashboard.courseDetails, { course_order_id: productOrderIdParams })
+      );
+    } else {
+      history.goBack();
+    }
+  };
+
   const isActiveCourseContent = () => {
     const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
     return (
@@ -69,7 +86,7 @@ const DocumentDetails = ({ match, history }) => {
           <Col xs={24}>
             <PageHeader
               className={styles.pageHeader}
-              onBack={() => history.goBack()}
+              onBack={handleGoBack}
               title={documentDetails?.name ?? ''}
               subTitle={
                 documentDetails?.is_downloadable ? (
@@ -82,9 +99,14 @@ const DocumentDetails = ({ match, history }) => {
                   </Button>
                 ) : null
               }
-              extra={isActiveCourseContent() ? [<NextCourseContentButton />] : []}
+              extra={isActiveCourseContent() && !xs ? [<NextCourseContentButton key="course_buttons" />] : []}
             />
           </Col>
+          {xs && (
+            <Col xs={24} className={styles.textAlignCenter}>
+              <NextCourseContentButton />
+            </Col>
+          )}
           {documentDetails?.url ? (
             documentDetails?.url.includes('/image/') ? (
               <Col xs={24} className={styles.textAlignCenter}>
