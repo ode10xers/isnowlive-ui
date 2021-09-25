@@ -23,7 +23,7 @@ import styles from './style.module.scss';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 const PublicPassList = ({ passes }) => {
   const { showPaymentPopup } = useGlobalContext();
@@ -368,15 +368,6 @@ const PublicPassList = ({ passes }) => {
       <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
-          <Col xs={24}>
-            <Paragraph className={styles.descText}>
-              Passes enable you to make a single payment and forget the hassle of paying for each product seperately.
-            </Paragraph>
-            <Paragraph className={styles.descText}>
-              Depending on the pass you buy, you can use the credits and book the class or video products made available
-              in that pass for free. A Pass is valid from the date you buy it until the validity period.
-            </Paragraph>
-          </Col>
           <Col xs={24}>
             {isMobileDevice ? (
               passes.length > 0 ? (
