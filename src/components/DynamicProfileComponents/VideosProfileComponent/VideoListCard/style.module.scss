@@ -79,7 +79,7 @@
   }
 
   .videoTitle {
-    color: var(--video-plugin-text-color, var(--passion-profile-darker-color,  #{map-get($map: $colors, $key: 'ResolutionBlue')}));
+    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}));
     padding: 12px;
 
     margin-top: -10px;
