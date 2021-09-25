@@ -7,9 +7,11 @@ import apis from 'apis';
 
 import DocumentEmbed from 'components/DocumentEmbed';
 import { showErrorModal } from 'components/Modals/modals';
+import NextCourseContentButton from 'components/NextCourseContentButton';
 
 import { attendeeProductOrderTypes } from 'utils/constants';
 import { isAPISuccess } from 'utils/helper';
+import { localStorageActiveCourseContentDataKey } from 'utils/course';
 
 import styles from './style.module.scss';
 
@@ -51,6 +53,15 @@ const DocumentDetails = ({ match, history }) => {
     fetchDocumentDetails(productTypeParams, productOrderIdParams, documentIdParams);
   }, [productTypeParams, productOrderIdParams, documentIdParams, fetchDocumentDetails]);
 
+  const isActiveCourseContent = () => {
+    const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
+    return (
+      productTypeParams === attendeeProductOrderTypes.COURSE &&
+      activeCourseContentMetadata.product_type === 'DOCUMENT' &&
+      documentIdParams === activeCourseContentMetadata.product_id
+    );
+  };
+
   return (
     <div className={styles.documentPageContainer}>
       <Spin spinning={isLoading} tip="Fetching file details">
@@ -71,6 +82,7 @@ const DocumentDetails = ({ match, history }) => {
                   </Button>
                 ) : null
               }
+              extra={isActiveCourseContent() ? [<NextCourseContentButton />] : []}
             />
           </Col>
           {documentDetails?.url ? (

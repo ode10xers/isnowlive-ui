@@ -33,10 +33,12 @@ import {
   getCourseDocumentContentCount,
   getCourseOrderSessionContentCount,
   getCourseOrderVideoContentCount,
+  localStorageAttendeeCourseDataKey,
+  storeActiveCourseContentInfoInLS,
 } from 'utils/course';
+import { attendeeProductOrderTypes } from 'utils/constants';
 
 import styles from './style.module.scss';
-import { attendeeProductOrderTypes } from 'utils/constants';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -57,7 +59,7 @@ const CourseOrderDetails = ({ match, history }) => {
     if (courseData.course.modules?.length > 0) {
       try {
         tempCourseData.course.modules = await Promise.all(
-          courseData.course.modules.map(async (courseModule) => {
+          courseData.course.modules.map(async (courseModule, module_idx) => {
             let tempModuleData = deepCloneObject(courseModule);
 
             if (courseModule.module_content?.length > 0) {
@@ -65,7 +67,7 @@ const CourseOrderDetails = ({ match, history }) => {
                 tempModuleData.module_content = await Promise.all(
                   courseModule.module_content
                     .filter((content) => content.order_id || content.product_type === 'DOCUMENT')
-                    .map(async (moduleContent) => {
+                    .map(async (moduleContent, content_idx) => {
                       let productData = null;
                       let targetAPI = null;
 
@@ -90,6 +92,7 @@ const CourseOrderDetails = ({ match, history }) => {
 
                       return {
                         ...moduleContent,
+                        content_idx,
                         product_data: productData,
                       };
                     })
@@ -100,7 +103,7 @@ const CourseOrderDetails = ({ match, history }) => {
               }
             }
 
-            return tempModuleData;
+            return { ...tempModuleData, module_idx };
           })
         );
 
@@ -127,6 +130,9 @@ const CourseOrderDetails = ({ match, history }) => {
           const activeData = data.active;
           const targetCourse = activeData.find((course) => course.course_order_id === courseOrderID);
 
+          // NOTE : If the target course size is too big, might be an issue. Few ways to mitigate this is
+          // By removing unused keys
+          localStorage.setItem(localStorageAttendeeCourseDataKey, JSON.stringify(targetCourse));
           fetchCourseContentDetails(targetCourse);
         }
       } catch (error) {
@@ -157,13 +163,15 @@ const CourseOrderDetails = ({ match, history }) => {
     history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses);
   };
 
-  const redirectToVideoOrderDetails = (content, isExpired = false) => {
+  const redirectToVideoOrderDetails = (moduleIdx, content) => {
+    storeActiveCourseContentInfoInLS(moduleIdx, content);
     history.push(
       Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos + `/${content.product_id}/${content.order_id}`
     );
   };
 
-  const redirectToDocumentDetails = (content) => {
+  const redirectToDocumentDetails = (moduleIdx, content) => {
+    storeActiveCourseContentInfoInLS(moduleIdx, content);
     history.push(
       Routes.attendeeDashboard.rootPath +
         generatePath(Routes.attendeeDashboard.documentDetails, {
@@ -216,7 +224,7 @@ const CourseOrderDetails = ({ match, history }) => {
       <FilePdfOutlined className={styles.blueText} />
     ) : null;
 
-  const renderExtraContent = (content, contentType) =>
+  const renderExtraContent = (moduleIdx, content, contentType) =>
     contentType === 'SESSION' ? (
       <Space align="center" size="large">
         <Text>{toLongDateWithDay(content?.product_data?.start_time)}</Text>
@@ -272,17 +280,17 @@ const CourseOrderDetails = ({ match, history }) => {
         ) : (
           <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
         )}
-        <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
+        <Button type="primary" onClick={() => redirectToVideoOrderDetails(moduleIdx, content)}>
           Watch Now
         </Button>
       </Space>
     ) : contentType === 'DOCUMENT' ? (
-      <Button type="primary" onClick={() => redirectToDocumentDetails(content)}>
+      <Button type="primary" onClick={() => redirectToDocumentDetails(moduleIdx, content)}>
         View File
       </Button>
     ) : null;
 
-  const renderMobileModuleContent = (content) => (
+  const renderMobileModuleContent = (moduleIdx, content) => (
     <Col xs={24} key={content.product_id}>
       <Card
         title={content.name}
@@ -344,13 +352,13 @@ const CourseOrderDetails = ({ match, history }) => {
               ]
             : content?.product_type === 'VIDEO'
             ? [
-                <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
+                <Button type="primary" onClick={() => redirectToVideoOrderDetails(moduleIdx, content)}>
                   Watch Now
                 </Button>,
               ]
             : content?.product_type === 'DOCUMENT'
             ? [
-                <Button type="primary" onClick={() => redirectToDocumentDetails(content)}>
+                <Button type="primary" onClick={() => redirectToDocumentDetails(moduleIdx, content)}>
                   View File
                 </Button>,
               ]
@@ -375,7 +383,7 @@ const CourseOrderDetails = ({ match, history }) => {
               <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
             )
           ) : content?.product_type === 'DOCUMENT' ? (
-            <Button type="primary" onClick={() => redirectToDocumentDetails(content)}>
+            <Button type="primary" onClick={() => redirectToDocumentDetails(moduleIdx, content)}>
               View File
             </Button>
           ) : null}
@@ -384,7 +392,7 @@ const CourseOrderDetails = ({ match, history }) => {
     </Col>
   );
 
-  const renderModuleContents = (content) => (
+  const renderModuleContents = (moduleIdx, content) => (
     <List.Item key={content.product_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
         <Col xs={24} md={6} xl={10}>
@@ -394,7 +402,7 @@ const CourseOrderDetails = ({ match, history }) => {
           </Space>
         </Col>
         <Col xs={24} md={18} xl={14} className={styles.textAlignRight}>
-          <Text type="secondary"> {renderExtraContent(content, content.product_type)} </Text>
+          <Text type="secondary"> {renderExtraContent(moduleIdx, content, content.product_type)} </Text>
         </Col>
       </Row>
     </List.Item>
@@ -405,14 +413,16 @@ const CourseOrderDetails = ({ match, history }) => {
       <Panel key={courseModule.name} header={<Text className={styles.moduleHeader}> {courseModule.name} </Text>}>
         {isMobileDevice ? (
           <Row gutter={[8, 8]} justify="center" className={styles.mobileCourseModuleContainer}>
-            {courseModule?.module_content?.map(renderMobileModuleContent)}
+            {courseModule?.module_content?.map((content) =>
+              renderMobileModuleContent(courseModule.module_idx, content)
+            )}
           </Row>
         ) : (
           <List
             size="small"
-            rowKey={(record) => record.product_id}
+            rowKey={(record) => `${courseModule.module_idx}_${record.content_idx}_${record.product_id}`}
             dataSource={courseModule?.module_content}
-            renderItem={renderModuleContents}
+            renderItem={(content) => renderModuleContents(courseModule.module_idx, content)}
           />
         )}
       </Panel>

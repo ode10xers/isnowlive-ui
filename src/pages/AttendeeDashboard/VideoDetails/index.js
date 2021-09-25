@@ -26,6 +26,8 @@ import {
 } from 'utils/helper';
 
 import styles from './style.module.scss';
+import NextCourseContentButton from 'components/NextCourseContentButton';
+import { localStorageActiveCourseContentDataKey } from 'utils/course';
 
 const { Text, Title } = Typography;
 
@@ -212,14 +214,27 @@ const VideoDetails = ({ match }) => {
     );
   };
 
+  const isActiveCourseContent = () => {
+    const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
+    return (
+      activeCourseContentMetadata.product_type === 'VIDEO' &&
+      activeCourseContentMetadata.product_id === match.params.video_id
+    );
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
       <Row justify="start" className={styles.mb50}>
-        <Col xs={24} md={4}>
+        <Col xs={24} md={12}>
           <Button className={styles.headButton} onClick={() => history.goBack()} icon={<ArrowLeftOutlined />}>
-            Back to Video List
+            Back
           </Button>
         </Col>
+        {isActiveCourseContent() && (
+          <Col xs={24} md={12} className={styles.textAlignRight}>
+            <NextCourseContentButton />
+          </Col>
+        )}
       </Row>
       <Row gutter={[8, 24]} className={classNames(styles.p50, styles.box)}>
         <Col xs={24} className={styles.showcaseCardContainer}>
