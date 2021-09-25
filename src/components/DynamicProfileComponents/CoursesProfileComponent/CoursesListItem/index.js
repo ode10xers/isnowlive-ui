@@ -64,7 +64,7 @@ const CourseListItem = ({ course }) => {
           ? `VALIDITY : ${course?.validity} DAY${course?.validity > 1 ? 'S' : ''}`
           : `${renderCourseDate(course?.start_date)} - ${renderCourseDate(course?.end_date)}`}
       </Col>
-      <Col flex="0 0 70px" className={styles.priceText}>
+      <Col flex="0 0 80px" className={styles.priceText}>
         {renderCoursePrice()}
       </Col>
     </Row>
