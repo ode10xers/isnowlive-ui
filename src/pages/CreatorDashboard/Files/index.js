@@ -140,10 +140,9 @@ const Files = () => {
               />
             </Tooltip>,
             <Popconfirm
-              arrowPointAtCenter
               title="Are you sure you want to remove this file?"
               onConfirm={() => handleDeleteFileObj(fileObj)}
-              okText="Yes, remove file"
+              okText="Yes, I'm sure"
               okButtonProps={{ danger: true, type: 'primary' }}
               cancelText="No"
             >
