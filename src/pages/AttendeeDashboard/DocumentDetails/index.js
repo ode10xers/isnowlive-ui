@@ -72,12 +72,12 @@ const DocumentDetails = ({ match, history }) => {
 
     if (
       courseContentInfo &&
-      courseContentInfo?.product_id === activeCourseContentMetadata?.product_id &&
+      courseContentInfo?.product_id === documentIdParams &&
       courseContentInfo?.product_type === 'DOCUMENT'
     ) {
       setCourseContentDetails(courseContentInfo);
     }
-  }, []);
+  }, [documentIdParams]);
 
   useEffect(() => {
     fetchDocumentDetails(productTypeParams, productOrderIdParams, documentIdParams);
