@@ -219,8 +219,9 @@ const VideoDetails = ({ match, history }) => {
   const isActiveCourseContent = () => {
     const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
     return (
-      activeCourseContentMetadata.product_type === 'VIDEO' &&
-      activeCourseContentMetadata.product_id === match.params.video_id
+      activeCourseContentMetadata &&
+      activeCourseContentMetadata?.product_type === 'VIDEO' &&
+      activeCourseContentMetadata?.product_id === match.params.video_id
     );
   };
 

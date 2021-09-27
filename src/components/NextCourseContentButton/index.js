@@ -116,18 +116,12 @@ const NextCourseContentButton = () => {
     <div className={styles.buttonsContainer}>
       <Space align="center">
         {prevViewableContent ? (
-          <Button
-            ghost
-            size="small"
-            type="primary"
-            icon={<LeftOutlined />}
-            onClick={() => handleContentRedirection(prevViewableContent)}
-          >
+          <Button type="primary" icon={<LeftOutlined />} onClick={() => handleContentRedirection(prevViewableContent)}>
             Prev. course content
           </Button>
         ) : null}
         {nextViewableContent ? (
-          <Button ghost size="small" type="primary" onClick={() => handleContentRedirection(nextViewableContent)}>
+          <Button type="primary" onClick={() => handleContentRedirection(nextViewableContent)}>
             Next course content <RightOutlined className={styles.ml5} />
           </Button>
         ) : null}

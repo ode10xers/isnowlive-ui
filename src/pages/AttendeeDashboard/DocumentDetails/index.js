@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { generatePath } from 'react-router';
 
 import { Row, Col, Spin, Button, Empty, PageHeader, Image, Grid, message } from 'antd';
@@ -13,7 +13,7 @@ import NextCourseContentButton from 'components/NextCourseContentButton';
 
 import { attendeeProductOrderTypes } from 'utils/constants';
 import { isAPISuccess } from 'utils/helper';
-import { localStorageActiveCourseContentDataKey } from 'utils/course';
+import { localStorageActiveCourseContentDataKey, localStorageAttendeeCourseDataKey } from 'utils/course';
 
 import styles from './style.module.scss';
 
@@ -27,6 +27,7 @@ const DocumentDetails = ({ match, history }) => {
   const documentIdParams = match.params.document_id;
 
   const [documentDetails, setDocumentDetails] = useState(null);
+  const [courseContentDetails, setCourseContentDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchDocumentDetails = useCallback(async (productType, productOrderId, documentId) => {
@@ -55,9 +56,33 @@ const DocumentDetails = ({ match, history }) => {
     setIsLoading(false);
   }, []);
 
+  const fetchCourseContentInfo = useCallback(() => {
+    const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
+    const activeCourseInfo = JSON.parse(localStorage.getItem(localStorageAttendeeCourseDataKey));
+
+    if (!activeCourseContentMetadata || !activeCourseInfo) {
+      setCourseContentDetails(null);
+      return;
+    }
+
+    const courseContentInfo =
+      activeCourseInfo?.course?.modules[activeCourseContentMetadata?.module_idx ?? 0]?.module_content[
+        activeCourseContentMetadata?.module_content_idx ?? 0
+      ];
+
+    if (
+      courseContentInfo &&
+      courseContentInfo?.product_id === activeCourseContentMetadata?.product_id &&
+      courseContentInfo?.product_type === 'DOCUMENT'
+    ) {
+      setCourseContentDetails(courseContentInfo);
+    }
+  }, []);
+
   useEffect(() => {
     fetchDocumentDetails(productTypeParams, productOrderIdParams, documentIdParams);
-  }, [productTypeParams, productOrderIdParams, documentIdParams, fetchDocumentDetails]);
+    fetchCourseContentInfo();
+  }, [productTypeParams, productOrderIdParams, documentIdParams, fetchDocumentDetails, fetchCourseContentInfo]);
 
   const handleGoBack = () => {
     if (productTypeParams === attendeeProductOrderTypes.COURSE) {
@@ -70,14 +95,15 @@ const DocumentDetails = ({ match, history }) => {
     }
   };
 
-  const isActiveCourseContent = () => {
+  const isActiveCourseContent = useMemo(() => {
     const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
+
     return (
       productTypeParams === attendeeProductOrderTypes.COURSE &&
       activeCourseContentMetadata.product_type === 'DOCUMENT' &&
       documentIdParams === activeCourseContentMetadata.product_id
     );
-  };
+  }, [productTypeParams, documentIdParams]);
 
   return (
     <div className={styles.documentPageContainer}>
@@ -87,7 +113,7 @@ const DocumentDetails = ({ match, history }) => {
             <PageHeader
               className={styles.pageHeader}
               onBack={handleGoBack}
-              title={documentDetails?.name ?? ''}
+              title={courseContentDetails?.name ?? documentDetails?.name ?? ''}
               subTitle={
                 documentDetails?.is_downloadable ? (
                   <Button
@@ -99,7 +125,7 @@ const DocumentDetails = ({ match, history }) => {
                   </Button>
                 ) : null
               }
-              extra={isActiveCourseContent() && !xs ? [<NextCourseContentButton key="course_buttons" />] : []}
+              extra={isActiveCourseContent && !xs ? [<NextCourseContentButton key="course_buttons" />] : []}
             />
           </Col>
           {xs && (
