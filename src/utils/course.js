@@ -41,3 +41,17 @@ export const getCourseOrderVideoContentCount = (courseModules = []) =>
       (acc += module.module_content.filter((content) => content.product_type.toUpperCase() === 'VIDEO').length ?? 0),
     0
   );
+
+export const localStorageAttendeeCourseDataKey = 'passion_active_course_for_attendee';
+// NOTE : The metadata saved in the key below should refer to the same content in the course data saved in the key above
+export const localStorageActiveCourseContentDataKey = 'passion_active_course_content_for_attendee';
+
+export const storeActiveCourseContentInfoInLS = (moduleIdx, contentData) => {
+  const contentMetadata = {
+    module_idx: moduleIdx,
+    product_type: contentData.product_type,
+    product_id: contentData.product_id,
+    module_content_idx: contentData.content_idx,
+  };
+  localStorage.setItem(localStorageActiveCourseContentDataKey, JSON.stringify(contentMetadata));
+};
