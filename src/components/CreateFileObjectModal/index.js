@@ -16,8 +16,8 @@ import { profileFormItemLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
-// NOTE: For now, we don't support editing the document file, only the name
-const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) => {
+// NOTE: For now, we don't support editing the file itself, only the name
+const CreateFileObjectModal = ({ visible, closeModal, selectedFileObject = null }) => {
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -25,20 +25,20 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
 
   useEffect(() => {
     if (visible) {
-      if (selectedDocument) {
+      if (selectedFileObject) {
         form.setFieldsValue({
-          file_name: selectedDocument.name,
-          file_url: selectedDocument.url,
+          file_name: selectedFileObject.name,
+          file_url: selectedFileObject.url,
         });
 
-        setFileUrl(selectedDocument.url);
+        setFileUrl(selectedFileObject.url);
       }
     } else {
       form.resetFields();
       setFileUrl(null);
       setIsLoading(false);
     }
-  }, [visible, form, selectedDocument]);
+  }, [visible, form, selectedFileObject]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -66,18 +66,18 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
         url: fileUrl,
       };
 
-      const { status } = selectedDocument
-        ? await apis.documents.updateDocument(selectedDocument.id, payload)
+      const { status } = selectedFileObject
+        ? await apis.documents.updateDocument(selectedFileObject.id, payload)
         : await apis.documents.createDocument(payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal(`Document ${selectedDocument ? 'updated' : 'saved'}!`);
+        showSuccessModal(`File ${selectedFileObject ? 'updated' : 'saved'}!`);
         closeModal(true);
       }
     } catch (error) {
       console.error(error);
       showErrorModal(
-        `Failed to ${selectedDocument ? 'update' : 'create'} document`,
+        `Failed to ${selectedFileObject ? 'update' : 'create'} file`,
         error?.response?.data?.message || 'Something went wrong.'
       );
     }
@@ -87,7 +87,7 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
 
   return (
     <Modal
-      title={selectedDocument ? 'Edit document' : 'Upload new document'}
+      title={selectedFileObject ? 'Edit file' : 'Upload new file'}
       centered={true}
       visible={visible}
       footer={null}
@@ -104,7 +104,7 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
               </Form.Item>
             </Col>
             <Col xs={24}>
-              {selectedDocument ? (
+              {selectedFileObject ? (
                 <Row align="middle" gutter={[10, 10]}>
                   <Col {...profileFormItemLayout.labelCol} className={styles.fileLabel}>
                     File :
@@ -114,10 +114,10 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
                       type="text"
                       icon={<FilePdfOutlined />}
                       size="middle"
-                      onClick={() => window.open(selectedDocument.url)}
+                      onClick={() => window.open(selectedFileObject.url)}
                       className={styles.filenameButton}
                     >
-                      {selectedDocument.url.split('_').splice(1).join('_')}
+                      {selectedFileObject.url.split('_').splice(1).join('_')}
                     </Button>
                   </Col>
                 </Row>
@@ -188,4 +188,4 @@ const CreateDocumentModal = ({ visible, closeModal, selectedDocument = null }) =
   );
 };
 
-export default CreateDocumentModal;
+export default CreateFileObjectModal;

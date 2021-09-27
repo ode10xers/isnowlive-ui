@@ -23,7 +23,7 @@ const Audiences = lazy(() => import('pages/CreatorDashboard/Newsletter/Audiences
 const EmailTemplates = lazy(() => import('pages/CreatorDashboard/Newsletter/EmailTemplates'));
 const AccountSettings = lazy(() => import('pages/CreatorDashboard/SiteSettings/AccountSettings'));
 const Legals = lazy(() => import('pages/CreatorDashboard/SiteSettings/Legals'));
-const Documents = lazy(() => import('pages/CreatorDashboard/Documents'));
+const Documents = lazy(() => import('pages/CreatorDashboard/Files'));
 const Plugins = lazy(() => import('pages/CreatorDashboard/ExternalSiteSettings/Plugins'));
 const CustomDomain = lazy(() => import('pages/CreatorDashboard/ExternalSiteSettings/CustomDomain'));
 const MembersList = lazy(() => import('pages/CreatorDashboard/Members/MembersList'));
