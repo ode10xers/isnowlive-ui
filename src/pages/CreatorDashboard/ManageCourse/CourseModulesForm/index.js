@@ -18,6 +18,7 @@ import {
   Radio,
   DatePicker,
   Space,
+  Switch,
   message,
 } from 'antd';
 import {
@@ -756,12 +757,33 @@ const CourseModulesForm = ({ match, history }) => {
 
   //#endregion End of UI Handlers
 
+  const handleChangeDownloadableFlagForDocumentContent = (moduleName, contentName, contentData, downloadableFlag) => {
+    const modulesData = deepCloneObject(form.getFieldsValue().modules);
+
+    modulesData[moduleName].module_content[contentName].is_downloadable = downloadableFlag;
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      modules: modulesData,
+    });
+  };
+
   const renderContentDetails = (moduleName, contentName) => {
     const contentData = form.getFieldValue(['modules', moduleName, 'module_content', contentName]);
     return contentData.product_type === 'DOCUMENT' ? (
-      <Text type={contentData?.is_downloadable ?? false ? 'success' : 'danger'}>
-        {contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable
-      </Text>
+      // <Text type={contentData?.is_downloadable ?? false ? 'success' : 'danger'}>
+      //   {contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable
+      // </Text>
+      <Space size="small">
+        <Text> Downloadable : </Text>
+        <Switch
+          checked={contentData?.is_downloadable}
+          onChange={(checked) =>
+            handleChangeDownloadableFlagForDocumentContent(moduleName, contentName, contentData, checked)
+          }
+          checkedChildren="Yes"
+          unCheckedChildren="No"
+        />
+      </Space>
     ) : (
       <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />
     );

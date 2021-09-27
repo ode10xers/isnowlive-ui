@@ -23,7 +23,7 @@ const Audiences = lazy(() => import('pages/CreatorDashboard/Newsletter/Audiences
 const EmailTemplates = lazy(() => import('pages/CreatorDashboard/Newsletter/EmailTemplates'));
 const AccountSettings = lazy(() => import('pages/CreatorDashboard/SiteSettings/AccountSettings'));
 const Legals = lazy(() => import('pages/CreatorDashboard/SiteSettings/Legals'));
-const Documents = lazy(() => import('pages/CreatorDashboard/Documents'));
+const Files = lazy(() => import('pages/CreatorDashboard/Files'));
 const Plugins = lazy(() => import('pages/CreatorDashboard/ExternalSiteSettings/Plugins'));
 const CustomDomain = lazy(() => import('pages/CreatorDashboard/ExternalSiteSettings/CustomDomain'));
 const MembersList = lazy(() => import('pages/CreatorDashboard/Members/MembersList'));
@@ -75,7 +75,7 @@ const CreatorDashboard = ({ match }) => {
         <Route exact path={match.url + Routes.creatorDashboard.audiences} component={Audiences} />
         <Route exact path={match.url + Routes.creatorDashboard.emailTemplates} component={EmailTemplates} />
         <Route exact path={match.url + Routes.creatorDashboard.legals} component={Legals} />
-        <Route exact path={match.url + Routes.creatorDashboard.documents} component={Documents} />
+        <Route exact path={match.url + Routes.creatorDashboard.documents} component={Files} />
         <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
         <Route exact path={match.url + Routes.creatorDashboard.plugins} component={Plugins} />
         <Route exact path={match.url + Routes.creatorDashboard.domains} component={CustomDomain} />
