@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, generatePath } from 'react-router-dom';
 import moment from 'moment';
 import { Row, Col, Button, Typography, Card, Collapse, Tag, Space, Image, Grid } from 'antd';
 
@@ -50,7 +50,10 @@ const CourseList = () => {
 
   const redirectToCourseOrderDetails = (courseOrder) => {
     if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
-      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`);
+      history.push(
+        Routes.attendeeDashboard.rootPath +
+          generatePath(Routes.attendeeDashboard.courseDetails, { course_order_id: courseOrder.course_order_id })
+      );
     }
   };
 

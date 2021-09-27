@@ -1,10 +1,12 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import { Row, Col, Typography, Image, Button, Space, message } from 'antd';
-import { ArrowLeftOutlined, PlayCircleOutlined, FilePdfOutlined, DownloadOutlined } from '@ant-design/icons';
+import { generatePath } from 'react-router';
 import classNames from 'classnames';
 
+import { Row, Col, Typography, Image, Button, Space, message } from 'antd';
+import { ArrowLeftOutlined, PlayCircleOutlined, FilePdfOutlined, DownloadOutlined } from '@ant-design/icons';
+
 import apis from 'apis';
+import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
@@ -14,9 +16,11 @@ import DocumentEmbed from 'components/DocumentEmbed';
 import CreatorProfile from 'components/CreatorProfile';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal, showWarningModal } from 'components/Modals/modals';
+import NextCourseContentButton from 'components/NextCourseContentButton';
 
 import dateUtil from 'utils/date';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
+import { localStorageActiveCourseContentDataKey, localStorageAttendeeCourseDataKey } from 'utils/course';
 import {
   isAPISuccess,
   reservedDomainName,
@@ -33,9 +37,7 @@ const {
   timeCalculation: { isBeforeDate },
 } = dateUtil;
 
-const VideoDetails = ({ match }) => {
-  const history = useHistory();
-
+const VideoDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -212,14 +214,44 @@ const VideoDetails = ({ match }) => {
     );
   };
 
+  const isActiveCourseContent = () => {
+    const activeCourseContentMetadata = JSON.parse(localStorage.getItem(localStorageActiveCourseContentDataKey));
+    return (
+      activeCourseContentMetadata &&
+      activeCourseContentMetadata?.product_type === 'VIDEO' &&
+      activeCourseContentMetadata?.product_id === match.params.video_id
+    );
+  };
+
+  const handleGoBack = () => {
+    if (isActiveCourseContent()) {
+      const activeCourseInfo = JSON.parse(localStorage.getItem(localStorageAttendeeCourseDataKey));
+
+      if (activeCourseInfo && activeCourseInfo.course_order_id) {
+        history.push(
+          Routes.attendeeDashboard.rootPath +
+            generatePath(Routes.attendeeDashboard.courseDetails, { course_order_id: activeCourseInfo.course_order_id })
+        );
+        return;
+      }
+    }
+
+    history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
-      <Row justify="start" className={styles.mb50}>
-        <Col xs={24} md={4}>
-          <Button className={styles.headButton} onClick={() => history.goBack()} icon={<ArrowLeftOutlined />}>
-            Back to Video List
+      <Row className={styles.headerButtons} gutter={[8, 8]}>
+        <Col xs={24} md={12}>
+          <Button onClick={handleGoBack} icon={<ArrowLeftOutlined />}>
+            Back
           </Button>
         </Col>
+        {isActiveCourseContent() && (
+          <Col xs={24} md={12} className={styles.courseButtonsContainer}>
+            <NextCourseContentButton />
+          </Col>
+        )}
       </Row>
       <Row gutter={[8, 24]} className={classNames(styles.p50, styles.box)}>
         <Col xs={24} className={styles.showcaseCardContainer}>

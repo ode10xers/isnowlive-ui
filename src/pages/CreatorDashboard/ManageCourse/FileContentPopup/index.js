@@ -27,14 +27,15 @@ const FileContentPopup = ({ visible, closeModal, addContentMethod = null, exclud
 
       if (isAPISuccess(status) && data) {
         const documentsArr = data.data ?? [];
-        setDocuments(documentsArr.filter((data) => !excludedDocumentIds.includes(data.id)));
+        setDocuments(documentsArr);
+        // setDocuments(documentsArr.filter((data) => !excludedDocumentIds.includes(data.id)));
       }
     } catch (error) {
       console.error(error);
       showErrorModal('Failed to fetch documents', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
-  }, [excludedDocumentIds]);
+  }, []);
 
   const resetModalState = useCallback(() => {
     setSelectedDocuments([]);
@@ -113,7 +114,7 @@ const FileContentPopup = ({ visible, closeModal, addContentMethod = null, exclud
                 </Paragraph>
                 <Paragraph strong>
                   The downloadable settings will apply to all the files you select here. If you want a different setting
-                  for different file, please add them separately with the said setting.
+                  for different file, you can edit them after you've added them
                 </Paragraph>
               </Col>
               <Col xs={24}>
@@ -151,7 +152,7 @@ const FileContentPopup = ({ visible, closeModal, addContentMethod = null, exclud
             </>
           ) : (
             <Col xs={24}>
-              <Paragraph>You don't have any other files you can embed. Click the button below to add more.</Paragraph>
+              <Paragraph>You don't have any files you can embed. Click the button below to add more.</Paragraph>
               {/* Redirect them to Document Drive Section */}
               <Row justify="center">
                 <Col>

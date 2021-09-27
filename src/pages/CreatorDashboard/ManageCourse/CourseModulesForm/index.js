@@ -18,6 +18,7 @@ import {
   Radio,
   DatePicker,
   Space,
+  Switch,
   message,
 } from 'antd';
 import {
@@ -204,8 +205,8 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
 
-  const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
-  const [excludedFilesInModal, setExcludedFilesInModal] = useState([]);
+  // const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
+  // const [excludedFilesInModal, setExcludedFilesInModal] = useState([]);
 
   //#region Start of Helper functions
 
@@ -359,29 +360,29 @@ const CourseModulesForm = ({ match, history }) => {
     ),
   ];
 
-  const getFileContentIDsFromModules = (modules = []) => [
-    ...new Set(
-      modules.reduce(
-        (acc, module) =>
-          (acc = acc.concat(
-            module.module_content
-              .filter((content) => content?.product_type?.toUpperCase() === 'DOCUMENT')
-              .map((content) => content.product_id)
-          )),
-        []
-      )
-    ),
-  ];
+  // const getFileContentIDsFromModules = (modules = []) => [
+  //   ...new Set(
+  //     modules.reduce(
+  //       (acc, module) =>
+  //         (acc = acc.concat(
+  //           module.module_content
+  //             .filter((content) => content?.product_type?.toUpperCase() === 'DOCUMENT')
+  //             .map((content) => content.product_id)
+  //         )),
+  //       []
+  //     )
+  //   ),
+  // ];
 
-  const getExcludedVideoContentsForModal = () => {
-    const currModules = form.getFieldValue('modules');
-    return getVideoContentIDsFromModules(currModules);
-  };
+  // const getExcludedVideoContentsForModal = () => {
+  //   const currModules = form.getFieldValue('modules');
+  //   return getVideoContentIDsFromModules(currModules);
+  // };
 
-  const getExcludedFileContentsForModal = () => {
-    const currModules = form.getFieldValue('modules');
-    return getFileContentIDsFromModules(currModules);
-  };
+  // const getExcludedFileContentsForModal = () => {
+  //   const currModules = form.getFieldValue('modules');
+  //   return getFileContentIDsFromModules(currModules);
+  // };
 
   const isVideoContentModified = (newModules) => {
     if (!courseDetails?.modules) {
@@ -638,7 +639,7 @@ const CourseModulesForm = ({ match, history }) => {
 
       if (duplicateContentInstance) {
         message.warning({
-          content: 'Duplicate content will be skipped',
+          content: 'Duplicate content in the same module will be skipped',
           key: 'duplicate_content_message',
         });
         return;
@@ -733,35 +734,56 @@ const CourseModulesForm = ({ match, history }) => {
   const openVideoPopup = (moduleIndex) => {
     const addContentFunction = initializeAddContentFunction(moduleIndex);
     setAddVideoContentMethod(() => addContentFunction);
-    setExcludedVideosInModal(getExcludedVideoContentsForModal());
+    // setExcludedVideosInModal(getExcludedVideoContentsForModal());
     setVideoPopupVisible(true);
   };
 
   const closeVideoPopup = () => {
     setVideoPopupVisible(false);
-    setExcludedVideosInModal([]);
+    // setExcludedVideosInModal([]);
   };
 
   const openFilePopup = (moduleIndex) => {
     const addContentFunction = initializeAddContentFunction(moduleIndex);
     setAddFileContentMethod(() => addContentFunction);
-    setExcludedFilesInModal(getExcludedFileContentsForModal());
+    // setExcludedFilesInModal(getExcludedFileContentsForModal());
     setFilePopupVisible(true);
   };
 
   const closeFilePopup = () => {
     setFilePopupVisible(false);
-    setExcludedFilesInModal([]);
+    // setExcludedFilesInModal([]);
   };
 
   //#endregion End of UI Handlers
 
+  const handleChangeDownloadableFlagForDocumentContent = (moduleName, contentName, contentData, downloadableFlag) => {
+    const modulesData = deepCloneObject(form.getFieldsValue().modules);
+
+    modulesData[moduleName].module_content[contentName].is_downloadable = downloadableFlag;
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      modules: modulesData,
+    });
+  };
+
   const renderContentDetails = (moduleName, contentName) => {
     const contentData = form.getFieldValue(['modules', moduleName, 'module_content', contentName]);
     return contentData.product_type === 'DOCUMENT' ? (
-      <Text type={contentData?.is_downloadable ?? false ? 'success' : 'danger'}>
-        {contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable
-      </Text>
+      // <Text type={contentData?.is_downloadable ?? false ? 'success' : 'danger'}>
+      //   {contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable
+      // </Text>
+      <Space size="small">
+        <Text> Downloadable : </Text>
+        <Switch
+          checked={contentData?.is_downloadable}
+          onChange={(checked) =>
+            handleChangeDownloadableFlagForDocumentContent(moduleName, contentName, contentData, checked)
+          }
+          checkedChildren="Yes"
+          unCheckedChildren="No"
+        />
+      </Space>
     ) : (
       <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />
     );
@@ -781,13 +803,13 @@ const CourseModulesForm = ({ match, history }) => {
         visible={videoPopupVisible}
         closeModal={closeVideoPopup}
         addContentMethod={addVideoContentMethod}
-        excludedVideos={excludedVideosInModal}
+        // excludedVideos={excludedVideosInModal}
       />
       <FileContentPopup
         visible={filePopupVisible}
         closeModal={closeFilePopup}
         addContentMethod={addFileContentMethod}
-        excludedDocumentIds={excludedFilesInModal}
+        // excludedDocumentIds={excludedFilesInModal}
       />
       <div className={styles.box}>
         <Loader size="large" loading={isLoading}>
