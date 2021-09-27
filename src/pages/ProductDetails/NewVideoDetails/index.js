@@ -3,13 +3,13 @@ import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 import { Row, Col, Button, Image, Typography, Space, Spin, Divider, message } from 'antd';
 import {
-  ClockCircleOutlined,
-  CalendarOutlined,
-  FilePdfOutlined,
-  CreditCardOutlined,
   TagsOutlined,
+  FilePdfOutlined,
+  CalendarOutlined,
   ScheduleOutlined,
+  CreditCardOutlined,
   CheckCircleTwoTone,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -19,8 +19,8 @@ import {
   showAlreadyBookedModal,
   showGetVideoWithPassSuccessModal,
   showPurchaseSingleVideoSuccessModal,
-  showGetVideoWithSubscriptionSuccessModal,
   showPurchasePassAndGetVideoSuccessModal,
+  showGetVideoWithSubscriptionSuccessModal,
   showPurchaseSubscriptionAndGetVideoSuccessModal,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
@@ -30,29 +30,30 @@ import PassesListItem from 'components/DynamicProfileComponents/PassesProfileCom
 import SubscriptionListItem from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListItem';
 
 import {
-  isAPISuccess,
-  preventDefaults,
-  paymentSource,
   orderType,
   productType,
+  isAPISuccess,
+  paymentSource,
+  preventDefaults,
   videoSourceType,
-  isUnapprovedUserError,
+  convertHexToRGB,
   getUsernameFromUrl,
   reservedDomainName,
   isBrightColorShade,
-  convertHexToRGB,
+  isUnapprovedUserError,
 } from 'utils/helper';
 import dateUtil from 'utils/date';
+import { isInIframeWidget } from 'utils/widgets';
 import { getLocalUserDetails } from 'utils/storage';
+import { generateBaseCreditsText } from 'utils/subscriptions';
 import { generateColorPalletteForProfile } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { generateBaseCreditsText } from 'utils/subscriptions';
 
 const {
-  formatDate: { getVideoMinutesDuration },
+  formatDate: { getVideoMinutesDuration, toShortDate },
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
@@ -191,6 +192,7 @@ const NewVideoDetails = ({ match }) => {
     }
   }, []);
 
+  // TODO: Test this case later
   const getCourseDetailsForVideo = useCallback(async (videoExternalId) => {
     try {
       const { status, data } = await apis.courses.getVideoCoursesByVideoId(videoExternalId);
@@ -262,7 +264,8 @@ const NewVideoDetails = ({ match }) => {
   useEffect(() => {
     let profileStyleObject = {};
 
-    if (creatorProfile && creatorProfile?.profile?.color) {
+    // Prevent any coloring to happen inside widget
+    if (!isInIframeWidget() && creatorProfile && creatorProfile?.profile?.color) {
       profileStyleObject = {
         ...profileStyleObject,
         ...generateColorPalletteForProfile(creatorProfile?.profile?.color, creatorProfile?.profile?.new_profile),
@@ -825,7 +828,6 @@ const NewVideoDetails = ({ match }) => {
     </Col>
   );
 
-  // TODO: Also handle showing purchased payment instrument
   const renderBuySection = () => {
     const colCount = 1 + (relatedPasses?.length > 0 ? 1 : 0) + (relatedSubscriptions?.length > 0 ? 1 : 0);
 
@@ -972,6 +974,125 @@ const NewVideoDetails = ({ match }) => {
       </Row>
     ) : null;
 
+  // TODO: Check and test this UI
+  const renderDynamicBuyButton = () => {
+    if (usableSubscription && videoData?.total_price > 0) {
+      return (
+        <div className={styles.buyUsingMembershipContainer}>
+          <Space direction="vertical">
+            <Button
+              className={styles.videoBuyBtn}
+              size="large"
+              type="primary"
+              onClick={() => {
+                setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
+                handleBuy();
+              }}
+            >
+              <Space split={<Divider className={styles.buyBtnDivider} />} className={styles.buyBtnTextContainer}>
+                <Text> BUY USING MEMBERSHIP </Text>
+                <Text>
+                  {videoData?.pay_what_you_want ? (
+                    <>
+                      <del>Flexible</del> 0
+                    </>
+                  ) : videoData?.total_price > 0 ? (
+                    <>
+                      <del>
+                        `${videoData?.currency?.toUpperCase() ?? ''} ${videoData?.total_price ?? 0}`
+                      </del>{' '}
+                      0
+                    </>
+                  ) : (
+                    'Free'
+                  )}
+                </Text>
+              </Space>
+            </Button>
+            <Row gutter={[8, 8]} wrap={false} justify="end">
+              <Col flex="1 1 auto">
+                <Space direction="vertical" size="small">
+                  <Text strong>{usableSubscription?.subscription_name ?? ''}</Text>
+                  <Text>
+                    {usableSubscription.product_credits - usableSubscription.product_credits_used}/
+                    {usableSubscription.product_credits} credits left.
+                  </Text>
+                </Space>
+              </Col>
+              <Col flex="0 0 100px">
+                <Space direction="vertical" size="small">
+                  <Text strong>Auto renews on</Text>
+                  <Text>{toShortDate(usableSubscription?.expiry)}</Text>
+                </Space>
+              </Col>
+            </Row>
+          </Space>
+        </div>
+      );
+    } else if (usablePass && videoData?.total_price > 0) {
+      return (
+        <div className={styles.buyUsingPassContainer}>
+          <Space direction="vertical">
+            <Button
+              className={styles.videoBuyBtn}
+              size="large"
+              type="primary"
+              onClick={() => {
+                setSelectedPaymentInstrument(paymentInstruments.PASS);
+                handleBuy();
+              }}
+            >
+              <Space split={<Divider className={styles.buyBtnDivider} />} className={styles.buyBtnTextContainer}>
+                <Text> BUY USING PASS </Text>
+                <Text>
+                  {videoData?.pay_what_you_want ? (
+                    <>
+                      <del>Flexible</del> 0
+                    </>
+                  ) : videoData?.total_price > 0 ? (
+                    <>
+                      <del>
+                        `${videoData?.currency?.toUpperCase() ?? ''} ${videoData?.total_price ?? 0}`
+                      </del>{' '}
+                      0
+                    </>
+                  ) : (
+                    'Free'
+                  )}
+                </Text>
+              </Space>
+            </Button>
+            <Row gutter={[8, 8]} wrap={false} justify="end">
+              <Col flex="1 1 auto">
+                <Text strong>{usablePass?.pass_name ?? ''}</Text>
+              </Col>
+              <Col flex="0 0 100px">
+                <Text strong>
+                  {usablePass?.classes_remaining}/{usablePass?.class_count} credits left.
+                </Text>
+              </Col>
+            </Row>
+          </Space>
+        </div>
+      );
+    }
+
+    return (
+      <Button className={styles.videoBuyBtn} size="large" type="primary" onClick={handleVideoBuyClicked}>
+        <Space split={<Divider className={styles.buyBtnDivider} />} className={styles.buyBtnTextContainer}>
+          <Text>BUY NOW</Text>
+          <Text>
+            {videoData?.pay_what_you_want
+              ? 'Flexible'
+              : videoData?.total_price > 0
+              ? `${videoData?.currency?.toUpperCase() ?? ''} ${videoData?.total_price ?? 0}`
+              : 'Free'}
+          </Text>
+        </Space>
+      </Button>
+    );
+  };
+
   //#endregion End of UI Components
 
   return (
@@ -1006,6 +1127,8 @@ const NewVideoDetails = ({ match }) => {
                       {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
                     </div>
                   </div>
+                  {/* TODO: Add buy button here */}
+                  {!videoData?.is_course && renderDynamicBuyButton()}
                 </Space>
               </Col>
               {/* Video Image */}
