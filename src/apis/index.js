@@ -262,6 +262,7 @@ export default {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),
     updateDocument: (documentId, payload) => http.patch(`/secure/creator/documents/${documentId}`, payload),
+    deleteDocument: (documentId) => http.delete(`/secure/creator/documents/${documentId}`),
     getAttendeeDocumentDetailsForCourse: (courseOrderId, documentId) =>
       http.get(`/secure/customer/courses/orders/${courseOrderId}/documents/${documentId}`),
   },

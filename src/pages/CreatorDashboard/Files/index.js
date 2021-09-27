@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Row, Col, Button, Typography, Tooltip, Card, Empty } from 'antd';
+import { Row, Col, Button, Typography, Tooltip, Card, Empty, Popconfirm } from 'antd';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -8,7 +8,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import Table from 'components/Table';
 import CreateFileObjectModal from 'components/CreateFileObjectModal';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
@@ -27,7 +27,7 @@ const Files = () => {
   const getCreatorFiles = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.files.getCreatorFiles();
+      const { status, data } = await apis.documents.getCreatorDocuments();
 
       if (isAPISuccess(status) && data) {
         setFiles(data.data);
@@ -60,7 +60,23 @@ const Files = () => {
     showCreateFileObjectModal();
   };
 
-  const handleDeleteFileObj = (fileObj) => {};
+  const handleDeleteFileObj = async (fileObj) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.documents.deleteDocument(fileObj.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('File removed successfully!');
+        getCreatorFiles();
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to delete file', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
 
   const filesColumns = [
     {
@@ -90,9 +106,16 @@ const Files = () => {
             </Tooltip>
           </Col>
           <Col xs={8}>
-            <Tooltip title="Delete file">
-              <Button danger type="link" icon={<DeleteOutlined />} onClick={() => handleDeleteFileObj(record)} />
-            </Tooltip>
+            <Popconfirm
+              arrowPointAtCenter
+              title="Are you sure you want to remove this file?"
+              onConfirm={() => handleDeleteFileObj(record)}
+              okText="Yes, remove file"
+              okButtonProps={{ danger: true, type: 'primary' }}
+              cancelText="No"
+            >
+              <Button danger type="link" icon={<DeleteOutlined />} />
+            </Popconfirm>
           </Col>
         </Row>
       ),
@@ -116,9 +139,16 @@ const Files = () => {
                 onClick={() => handleEditFileObj(fileObj)}
               />
             </Tooltip>,
-            <Tooltip title="Delete file">
-              <Button danger type="link" icon={<DeleteOutlined />} onClick={() => handleDeleteFileObj(fileObj)} />
-            </Tooltip>,
+            <Popconfirm
+              arrowPointAtCenter
+              title="Are you sure you want to remove this file?"
+              onConfirm={() => handleDeleteFileObj(fileObj)}
+              okText="Yes, remove file"
+              okButtonProps={{ danger: true, type: 'primary' }}
+              cancelText="No"
+            >
+              <Button danger type="link" icon={<DeleteOutlined />} />
+            </Popconfirm>,
           ]}
         >
           <Title level={5}> {fileObj.name} </Title>
