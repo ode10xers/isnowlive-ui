@@ -18,6 +18,7 @@ import {
   Radio,
   DatePicker,
   Space,
+  Switch,
   message,
 } from 'antd';
 import {
@@ -27,6 +28,7 @@ import {
   PlusCircleOutlined,
   MinusCircleTwoTone,
   DeleteOutlined,
+  FilePdfOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -37,6 +39,7 @@ import { showErrorModal, showSuccessModal, resetBodyStyle } from 'components/Mod
 
 import SessionContentPopup from '../SessionContentPopup';
 import VideoContentPopup from '../VideoContentPopup';
+import FileContentPopup from '../FileContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -191,8 +194,10 @@ const CourseModulesForm = ({ match, history }) => {
 
   const [videoPopupVisible, setVideoPopupVisible] = useState(false);
   const [sessionPopupVisible, setSessionPopupVisible] = useState(false);
+  const [filePopupVisible, setFilePopupVisible] = useState(false);
   const [addVideoContentMethod, setAddVideoContentMethod] = useState(null);
   const [addSessionContentMethod, setAddSessionContentMethod] = useState(null);
+  const [addFileContentMethod, setAddFileContentMethod] = useState(null);
 
   const [courseDetails, setCourseDetails] = useState(null);
   const [expandedModulesKeys, setExpandedModulesKeys] = useState([]);
@@ -200,7 +205,8 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
 
-  const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
+  // const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
+  // const [excludedFilesInModal, setExcludedFilesInModal] = useState([]);
 
   //#region Start of Helper functions
 
@@ -354,10 +360,29 @@ const CourseModulesForm = ({ match, history }) => {
     ),
   ];
 
-  const getExcludedVideoContentsForModal = () => {
-    const currModules = form.getFieldValue('modules');
-    return getVideoContentIDsFromModules(currModules);
-  };
+  // const getFileContentIDsFromModules = (modules = []) => [
+  //   ...new Set(
+  //     modules.reduce(
+  //       (acc, module) =>
+  //         (acc = acc.concat(
+  //           module.module_content
+  //             .filter((content) => content?.product_type?.toUpperCase() === 'DOCUMENT')
+  //             .map((content) => content.product_id)
+  //         )),
+  //       []
+  //     )
+  //   ),
+  // ];
+
+  // const getExcludedVideoContentsForModal = () => {
+  //   const currModules = form.getFieldValue('modules');
+  //   return getVideoContentIDsFromModules(currModules);
+  // };
+
+  // const getExcludedFileContentsForModal = () => {
+  //   const currModules = form.getFieldValue('modules');
+  //   return getFileContentIDsFromModules(currModules);
+  // };
 
   const isVideoContentModified = (newModules) => {
     if (!courseDetails?.modules) {
@@ -374,7 +399,7 @@ const CourseModulesForm = ({ match, history }) => {
     showErrorModal(
       'Issue detected',
       <>
-        <Paragraph>You have some empty curriculum item ( outlines ).</Paragraph>
+        <Paragraph>You have some empty curriculum item (outlines).</Paragraph>
         <Paragraph>Please either add content in them or remove them to update this course</Paragraph>
       </>
     );
@@ -393,6 +418,8 @@ const CourseModulesForm = ({ match, history }) => {
       return false;
     }
 
+    // NOTE : Currently, FE puts a check of not allowing ONLY document contents
+    // to exists in a course. Once a decision has been made about that, adjust this
     if (
       courseCurriculumType === courseCurriculumTypes.VIDEO.name &&
       moduleContents.some((content) => content.product_type === 'SESSION')
@@ -400,10 +427,22 @@ const CourseModulesForm = ({ match, history }) => {
       showErrorModal('You have a session content in a Video Only session! Please review the curriculum');
       return false;
     } else if (
+      courseCurriculumType === courseCurriculumTypes.VIDEO.name &&
+      !moduleContents.some((content) => content.product_type === 'VIDEO')
+    ) {
+      showErrorModal('A video course requires at least 1 video content!');
+      return false;
+    } else if (
       courseCurriculumType === courseCurriculumTypes.LIVE.name &&
       moduleContents.some((content) => content.product_type === 'VIDEO')
     ) {
       showErrorModal('You have a video content in a Session Only session! Please review the curriculum');
+      return false;
+    } else if (
+      courseCurriculumType === courseCurriculumTypes.LIVE.name &&
+      !moduleContents.some((content) => content.product_type === 'SESSION')
+    ) {
+      showErrorModal('Live sessions course requires at least 1 session added as content');
       return false;
     } else if (
       courseCurriculumType === courseCurriculumTypes.MIXED.name &&
@@ -424,7 +463,8 @@ const CourseModulesForm = ({ match, history }) => {
 
     const validModuleContents = await Promise.all(
       moduleContents
-        .filter((content) => content.product_id && content.product_type)
+        // We skip this check for documents
+        .filter((content) => content.product_id && content.product_type && content.product_type !== 'DOCUMENT')
         .map(async (content) => await fetchContentDetails(content.product_id, content.product_type))
     );
 
@@ -599,7 +639,7 @@ const CourseModulesForm = ({ match, history }) => {
 
       if (duplicateContentInstance) {
         message.warning({
-          content: 'Duplicate content will be skipped',
+          content: 'Duplicate content in the same module will be skipped',
           key: 'duplicate_content_message',
         });
         return;
@@ -607,7 +647,10 @@ const CourseModulesForm = ({ match, history }) => {
 
       // Check if there's an empty content to replace with
       const targetContentIndex = targetModuleContents.findIndex(
-        (moduleContent) => moduleContent.product_type !== 'SESSION' && moduleContent.product_type !== 'VIDEO'
+        (moduleContent) =>
+          moduleContent.product_type !== 'SESSION' &&
+          moduleContent.product_type !== 'VIDEO' &&
+          moduleContent.product_type !== 'DOCUMENT'
       );
 
       if (targetContentIndex >= 0) {
@@ -691,21 +734,59 @@ const CourseModulesForm = ({ match, history }) => {
   const openVideoPopup = (moduleIndex) => {
     const addContentFunction = initializeAddContentFunction(moduleIndex);
     setAddVideoContentMethod(() => addContentFunction);
-    setExcludedVideosInModal(getExcludedVideoContentsForModal());
+    // setExcludedVideosInModal(getExcludedVideoContentsForModal());
     setVideoPopupVisible(true);
   };
 
   const closeVideoPopup = () => {
     setVideoPopupVisible(false);
-    setExcludedVideosInModal([]);
+    // setExcludedVideosInModal([]);
+  };
+
+  const openFilePopup = (moduleIndex) => {
+    const addContentFunction = initializeAddContentFunction(moduleIndex);
+    setAddFileContentMethod(() => addContentFunction);
+    // setExcludedFilesInModal(getExcludedFileContentsForModal());
+    setFilePopupVisible(true);
+  };
+
+  const closeFilePopup = () => {
+    setFilePopupVisible(false);
+    // setExcludedFilesInModal([]);
   };
 
   //#endregion End of UI Handlers
 
+  const handleChangeDownloadableFlagForDocumentContent = (moduleName, contentName, contentData, downloadableFlag) => {
+    const modulesData = deepCloneObject(form.getFieldsValue().modules);
+
+    modulesData[moduleName].module_content[contentName].is_downloadable = downloadableFlag;
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      modules: modulesData,
+    });
+  };
+
   const renderContentDetails = (moduleName, contentName) => {
     const contentData = form.getFieldValue(['modules', moduleName, 'module_content', contentName]);
-
-    return <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />;
+    return contentData.product_type === 'DOCUMENT' ? (
+      // <Text type={contentData?.is_downloadable ?? false ? 'success' : 'danger'}>
+      //   {contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable
+      // </Text>
+      <Space size="small">
+        <Text> Downloadable : </Text>
+        <Switch
+          checked={contentData?.is_downloadable}
+          onChange={(checked) =>
+            handleChangeDownloadableFlagForDocumentContent(moduleName, contentName, contentData, checked)
+          }
+          checkedChildren="Yes"
+          unCheckedChildren="No"
+        />
+      </Space>
+    ) : (
+      <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />
+    );
   };
 
   return (
@@ -722,7 +803,13 @@ const CourseModulesForm = ({ match, history }) => {
         visible={videoPopupVisible}
         closeModal={closeVideoPopup}
         addContentMethod={addVideoContentMethod}
-        excludedVideos={excludedVideosInModal}
+        // excludedVideos={excludedVideosInModal}
+      />
+      <FileContentPopup
+        visible={filePopupVisible}
+        closeModal={closeFilePopup}
+        addContentMethod={addFileContentMethod}
+        // excludedDocumentIds={excludedFilesInModal}
       />
       <div className={styles.box}>
         <Loader size="large" loading={isLoading}>
@@ -737,16 +824,7 @@ const CourseModulesForm = ({ match, history }) => {
           >
             <Row gutter={[12, 12]} className={styles.coursePageContainer}>
               <Col xs={24}>
-                <PageHeader
-                  title="Manage Course Curriculum"
-                  onBack={() =>
-                    history.push(
-                      Routes.creatorDashboard.rootPath +
-                        Routes.creatorDashboard.courses +
-                        (courseId ? `/${courseId}/edit` : '')
-                    )
-                  }
-                />
+                <PageHeader title="Manage Course Curriculum" onBack={() => history.goBack()} />
               </Col>
               {/* Course Module Informations */}
               <Col xs={24}>
@@ -941,12 +1019,10 @@ const CourseModulesForm = ({ match, history }) => {
                                                                 className={styles.contentListItem}
                                                                 align="middle"
                                                                 wrap={false}
+                                                                {...contentDraggableProvided.dragHandleProps}
                                                               >
                                                                 <Col flex="30px">
-                                                                  <div
-                                                                    className={styles.contentDragHandle}
-                                                                    {...contentDraggableProvided.dragHandleProps}
-                                                                  />
+                                                                  <div className={styles.contentDragHandle} />
                                                                 </Col>
                                                                 <Col flex="auto">
                                                                   <Row
@@ -1013,7 +1089,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         ) : (
                                                                           <>
                                                                             <Col
-                                                                              xs={14}
+                                                                              xs={12}
                                                                               className={styles.textAlignRight}
                                                                             >
                                                                               <Text
@@ -1022,6 +1098,22 @@ const CourseModulesForm = ({ match, history }) => {
                                                                               >
                                                                                 Select content to add
                                                                               </Text>
+                                                                            </Col>
+                                                                            <Col
+                                                                              xs={3}
+                                                                              className={styles.textAlignCenter}
+                                                                            >
+                                                                              <Tooltip title="Add File Content">
+                                                                                <Button
+                                                                                  block
+                                                                                  size="large"
+                                                                                  type="link"
+                                                                                  icon={<FilePdfOutlined />}
+                                                                                  onClick={() =>
+                                                                                    openFilePopup(moduleFieldName)
+                                                                                  }
+                                                                                />
+                                                                              </Tooltip>
                                                                             </Col>
                                                                             <Col
                                                                               xs={3}

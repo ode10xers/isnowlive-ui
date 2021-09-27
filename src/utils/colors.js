@@ -1,4 +1,5 @@
 import { clamp } from 'utils/math';
+import { isInIframeWidget, isWidgetUrl } from './widgets';
 
 export const convertHSLToHex = (hslString) => {
   const regexString = /hsl\(\s*(\d+)\s*,\s*(\d+(?:\.\d+)?%)\s*,\s*(\d+(?:\.\d+)?%)\)/g;
@@ -74,6 +75,13 @@ export const convertHexToHSL = (hexColor) => {
 export const formatHSLStyleString = (h, s, l) => `hsl(${clamp(0, h, 360)}, ${clamp(0, s, 100)}%, ${clamp(0, l, 100)}%)`;
 
 export const generateColorPalletteForProfile = (primaryColor = '#1890ff', shouldColorNavbar = false) => {
+  // NOTE: In our CSS Styling, the profile variable is in priority
+  // However, we add an override here in case the site is shown in iframe widget
+  // We don't load the colors so the plugin styling can be applied
+  if (isWidgetUrl() || isInIframeWidget()) {
+    return {};
+  }
+
   const [h, s, l] = convertHexToHSL(primaryColor);
 
   const profileColors = {

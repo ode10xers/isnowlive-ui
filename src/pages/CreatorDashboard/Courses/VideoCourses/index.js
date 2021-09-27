@@ -28,7 +28,7 @@ const {
 } = dateUtil;
 
 // NOTE: Currently unused
-
+/** @deprecated */
 const VideoCourses = ({
   videoCourses,
   showEditModal,

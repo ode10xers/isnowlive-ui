@@ -27,13 +27,15 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        setVideos(data.filter((data) => !excludedVideos.includes(data.external_id)));
+        setVideos(data);
+        // setVideos(data.filter((data) => !excludedVideos.includes(data.external_id)));
       }
     } catch (error) {
+      console.error(error);
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
-  }, [excludedVideos]);
+  }, []);
 
   useEffect(() => {
     if (visible) {
@@ -173,9 +175,9 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
     >
       <Spin spinning={isLoading} tip="Processing">
         <Row gutter={[12, 12]} justify="center" align="middle">
-          <Col xs={24}>
+          {/* <Col xs={24}>
             <Text type="danger">Your videos already added to this course will not show up here.</Text>
-          </Col>
+          </Col> */}
           {videos.length > 0 ? (
             <Col xs={24}>
               <Collapse defaultActiveKey="published">
@@ -186,7 +188,8 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
                     ) : (
                       <Col xs={24}>
                         <Text className={styles.textAlignCenter}>
-                          Either you don’t have a video or have added all the published videos to this course already
+                          {/* Either you don’t have a video or have added all the published videos to this course already */}
+                          No Published Video
                         </Text>
                       </Col>
                     )}
@@ -199,7 +202,8 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
                     ) : (
                       <Col xs={24}>
                         <Text className={styles.textAlignCenter}>
-                          Either you don’t have a video or have added all the unpublished videos to this course already
+                          {/* Either you don’t have a video or have added all the unpublished videos to this course already */}
+                          No Unpublished Video
                         </Text>
                       </Col>
                     )}

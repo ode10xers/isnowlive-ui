@@ -13,7 +13,7 @@ export const deepCloneObject = (objData) => JSON.parse(JSON.stringify(objData));
 const FORBIDDEN = 403;
 const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing this action';
 export const isUnapprovedUserError = (errorResponse) =>
-  errorResponse.status === FORBIDDEN && errorResponse.data?.message === UNAPPROVED_USER_ERROR_MESSAGE;
+  errorResponse?.status === FORBIDDEN && errorResponse?.data?.message === UNAPPROVED_USER_ERROR_MESSAGE;
 
 export const isInCustomDomain = () =>
   !window.location.hostname.includes('passion.do') && !window.location.hostname.includes('localhost');

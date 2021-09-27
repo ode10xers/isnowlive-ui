@@ -5,6 +5,32 @@
   color : var(--passion-profile-darker-color, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
+.filePreviewContainer {
+  text-align: center;
+  margin: 12px auto;
+}
+
+.filePreviewButton {
+  background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+  
+  &.darkText {
+    --video-button-text-color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')});
+  }
+
+  &.lightText {
+    --video-button-text-color : #{map-get($colors, 'White')};
+  }
+
+  color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+}
+
+.fileDownloadButton {
+  border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+}
+
 .videoDetailsPage {
   padding: 10px;
 
@@ -29,6 +55,36 @@
       font-size: 16px;
       font-weight: 500;
       color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+    }
+
+    .fileNameDownload {
+      background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+      border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+      &.darkText {
+        --video-button-text-color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')});
+      }
+
+      &.lightText {
+        --video-button-text-color : #{map-get($colors, 'White')};
+      }
+
+      color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+    }
+
+    .fileContainer {
+      text-align: center;
+      width: fit-content;
+      padding: 8px;
+      border: 1px solid var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'ColumbiaBlue')});
+      background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')});
+
+      .fileName {
+        color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
+        font-weight: 500;
+        opacity: 0.7;
+        padding: 8px;
+      }
     }
 
     .videoDetailsContainer {

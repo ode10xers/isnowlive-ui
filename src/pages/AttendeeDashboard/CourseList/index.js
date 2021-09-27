@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, generatePath } from 'react-router-dom';
 import moment from 'moment';
-import { Row, Col, Button, Typography, Card, Collapse, Tag, Space, Divider, Image } from 'antd';
+import { Row, Col, Button, Typography, Card, Collapse, Tag, Space, Image, Grid } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -11,17 +11,18 @@ import Table from 'components/Table';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal } from 'components/Modals/modals';
 
-import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
-import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 
 import styles from './styles.module.scss';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
+const { useBreakpoint } = Grid;
 
 const CourseList = () => {
   const history = useHistory();
+  const { md } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrders, setCourseOrders] = useState([]);
 
@@ -49,21 +50,24 @@ const CourseList = () => {
 
   const redirectToCourseOrderDetails = (courseOrder) => {
     if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
-      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`);
+      history.push(
+        Routes.attendeeDashboard.rootPath +
+          generatePath(Routes.attendeeDashboard.courseDetails, { course_order_id: courseOrder.course_order_id })
+      );
     }
   };
 
   const renderCourseContents = (courseOrder) => {
     const sessionCount = getCourseSessionContentCount(courseOrder.course?.modules ?? []);
     const videoCount = getCourseVideoContentCount(courseOrder.course?.modules ?? []);
+    const docCount = getCourseDocumentContentCount(courseOrder.course?.modules ?? []);
 
     return (
-      <Tag color="blue">
-        <Space split={<Divider type="vertical" />}>
-          {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
-          {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
-        </Space>
-      </Tag>
+      <Space size={1} wrap={true}>
+        {sessionCount > 0 ? <Tag color="blue" className={styles.mb5}>{`${sessionCount} sessions`}</Tag> : null}
+        {videoCount > 0 ? <Tag color="purple" className={styles.mb5}>{`${videoCount} videos`}</Tag> : null}
+        {docCount > 0 ? <Tag color="magenta" className={styles.mb5}>{`${docCount} files`}</Tag> : null}
+      </Space>
     );
   };
 
@@ -75,7 +79,7 @@ const CourseList = () => {
           .add(1, 'second')
           .diff(moment(course.start_date).startOf('day'), 'days')} days`;
 
-  const renderCourseItem = (item) => {
+  const renderCourseItem = (item, isExpired = false) => {
     const layout = (label, value) => (
       <Row>
         <Col span={7}>
@@ -88,26 +92,46 @@ const CourseList = () => {
     );
 
     return (
-      <Card
-        key={item.course_order_id}
-        bodyStyle={{ padding: '10px' }}
-        title={
-          <div onClick={() => redirectToCourseOrderDetails(item)}>
-            <Text>{item?.course?.name}</Text>
+      <Col xs={24} key={item.course_order_id}>
+        <Card
+          bodyStyle={{ padding: '10px' }}
+          title={
+            <div
+              onClick={() => {
+                if (!isExpired) {
+                  redirectToCourseOrderDetails(item);
+                }
+              }}
+            >
+              <Text>{item?.course?.name}</Text>
+            </div>
+          }
+          actions={
+            isExpired
+              ? []
+              : [
+                  <Button type="link" onClick={() => redirectToCourseOrderDetails(item)}>
+                    Details
+                  </Button>,
+                ]
+          }
+        >
+          <div
+            onClick={() => {
+              if (!isExpired) {
+                redirectToCourseOrderDetails(item);
+              }
+            }}
+          >
+            {layout('Contents', renderCourseContents(item))}
+            {layout('Duration', <Text>{renderCourseDuration(item.course)}</Text>)}
+            {layout(
+              'Price',
+              <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>
+            )}
           </div>
-        }
-        actions={[
-          <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(item)}>
-            Details
-          </Button>,
-        ]}
-      >
-        <div onClick={() => redirectToCourseOrderDetails(item)}>
-          {layout('Contents', renderCourseContents(item))}
-          {layout('Duration', <Text>{renderCourseDuration(item.course)}</Text>)}
-          {layout('Price', <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>)}
-        </div>
-      </Card>
+        </Card>
+      </Col>
     );
   };
 
@@ -116,7 +140,7 @@ const CourseList = () => {
       title: '',
       dataIndex: ['course', 'course_image_url'],
       align: 'center',
-      width: '180px',
+      width: md ? '150px' : '180px',
       render: (text, record) => (
         <Image
           src={text || 'error'}
@@ -132,25 +156,24 @@ const CourseList = () => {
     },
     {
       title: 'Course Content',
-      width: '150px',
+      width: '165px',
       render: renderCourseContents,
     },
     {
       title: 'Duration',
-      width: '90px',
+      width: '98px',
       render: (text, record) => renderCourseDuration(record.course),
     },
     {
       title: 'Price',
       key: 'price',
       dataIndex: 'price',
-      width: '100px',
+      width: '90px',
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: '',
-      align: 'right',
-      width: '100px',
+      width: '70px',
       render: (text, record) => (
         <Row gutter={[8, 8]} justify="end">
           <Col>
@@ -172,14 +195,16 @@ const CourseList = () => {
         <Col xs={24}>
           <Collapse defaultActiveKey="Active">
             <Panel header={<Title level={5}> Active Courses </Title>} key="Active">
-              {isMobileDevice ? (
+              {!md ? (
                 <Loader loading={isLoading} size="large" text="Loading courses">
                   {courseOrders?.active?.length > 0 ? (
                     <>
                       <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
                         Click on the card to show course details
                       </Text>
-                      {courseOrders?.active?.map(renderCourseItem)}
+                      <Row gutter={[8, 8]}>
+                        {courseOrders?.active?.map((course) => renderCourseItem(course, false))}
+                      </Row>
                     </>
                   ) : (
                     <div className="text-empty"> No course found </div>
@@ -187,6 +212,7 @@ const CourseList = () => {
                 </Loader>
               ) : (
                 <Table
+                  size="small"
                   columns={courseColumns}
                   data={courseOrders?.active}
                   loading={isLoading}
@@ -195,14 +221,16 @@ const CourseList = () => {
               )}
             </Panel>
             <Panel header={<Title level={5}> Expired Courses </Title>} key="Expired">
-              {isMobileDevice ? (
+              {!md ? (
                 <Loader loading={isLoading} size="large" text="Loading courses">
                   {courseOrders?.expired?.length > 0 ? (
                     <>
                       <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
                         Click on the card to show course details
                       </Text>
-                      {courseOrders?.expired?.map(renderCourseItem)}
+                      <Row gutter={[8, 8]}>
+                        {courseOrders?.expired?.map((course) => renderCourseItem(course, true))}
+                      </Row>
                     </>
                   ) : (
                     <div className="text-empty"> No course found </div>
@@ -210,7 +238,8 @@ const CourseList = () => {
                 </Loader>
               ) : (
                 <Table
-                  columns={courseColumns}
+                  size="small"
+                  columns={courseColumns.slice(0, -1)}
                   data={courseOrders?.expired}
                   loading={isLoading}
                   rowKey={(record) => record.course_order_id}

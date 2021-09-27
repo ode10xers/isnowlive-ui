@@ -1,8 +1,22 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Row, Col, Button, Select, Typography, Tooltip, Popconfirm, Input, Form, message } from 'antd';
+import {
+  Row,
+  Col,
+  Button,
+  Select,
+  Space,
+  Radio,
+  Typography,
+  Grid,
+  Tooltip,
+  Popconfirm,
+  Input,
+  Form,
+  message,
+} from 'antd';
 
-import { DeleteOutlined, FilterFilled, MailOutlined } from '@ant-design/icons';
+import { DeleteOutlined, MailOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -20,12 +34,21 @@ import { emailListFormLayout } from 'layouts/FormLayouts';
 import styles from './styles.module.scss';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const defaultEmailListKey = 'blank';
 
 const totalItemsPerPage = 20;
 
+const audienceView = {
+  ALL: 'ALL',
+  MEMBER: 'MEMBER',
+  AUDIENCE: 'AUDIENCE',
+};
+
 const EmailList = () => {
+  const { xs } = useBreakpoint();
+
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -41,20 +64,22 @@ const EmailList = () => {
   const [selectedEmailList, setSelectedEmailList] = useState(defaultEmailListKey);
   const [allAudienceModalVisible, setAllAudienceModalVisible] = useState(false);
 
+  const [audienceViewFilter, setAudienceViewFilter] = useState(audienceView.ALL);
+
   const isCreating = useMemo(() => selectedEmailList === defaultEmailListKey, [selectedEmailList]);
 
   //#region Start of Data Fetch
 
-  const getAudienceList = useCallback(async (pageNumber, itemsPerPage) => {
+  const getAudienceList = useCallback(async (pageNumber, itemsPerPage, userType = null, emailList = null) => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.audiences.getCreatorAudiences(pageNumber, itemsPerPage);
+      const { status, data } = await apis.audiences.getCreatorAudiences(pageNumber, itemsPerPage, userType, emailList);
 
       if (isAPISuccess(status) && data) {
         if (pageNumber === 1) {
-          setAudienceList(data.data);
+          setAudienceList(data.data ?? []);
         } else {
-          setAudienceList((audienceList) => [...audienceList, ...data.data]);
+          setAudienceList((audienceList) => [...audienceList, ...(data.data ?? [])]);
         }
         setCanShowMore(data.next_page);
       }
@@ -80,28 +105,6 @@ const EmailList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchEmailListDetails = useCallback(async (emailListId, pageNumber, itemsPerPage) => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.newsletter.getEmailListDetails(emailListId, pageNumber, itemsPerPage);
-
-      if (isAPISuccess(status) && data) {
-        if (pageNumber === 1) {
-          setAudienceList(data.audiences);
-        } else {
-          setAudienceList((audienceList) => [...audienceList, ...data.audiences]);
-        }
-
-        setCanShowMore(data.next_page);
-      }
-    } catch (error) {
-      showErrorModal('Failed fetching creator email list', error?.response?.data?.message || 'Something went wrong.');
-    }
-
-    setIsLoading(false);
-  }, []);
-
   //#endregion End of Data Fetch
 
   //#region Start of Use Effects
@@ -111,12 +114,13 @@ const EmailList = () => {
   }, [fetchCreatorEmailList]);
 
   useEffect(() => {
-    if (isCreating) {
-      getAudienceList(pageNumber, totalItemsPerPage);
-    } else {
-      fetchEmailListDetails(selectedEmailList, pageNumber, totalItemsPerPage);
-    }
-  }, [getAudienceList, fetchEmailListDetails, pageNumber, selectedEmailList, isCreating]);
+    getAudienceList(
+      pageNumber,
+      totalItemsPerPage,
+      audienceViewFilter === audienceView.ALL ? null : audienceViewFilter,
+      isCreating ? null : selectedEmailList
+    );
+  }, [getAudienceList, pageNumber, selectedEmailList, isCreating, audienceViewFilter]);
 
   //#endregion End of Use Effects
 
@@ -259,10 +263,23 @@ const EmailList = () => {
 
   const hideAllAudienceModal = (shouldRefresh = false) => {
     if (shouldRefresh) {
-      setPageNumber(1);
-      fetchEmailListDetails(selectedEmailList, 1, totalItemsPerPage);
+      if (pageNumber === 1) {
+        getAudienceList(
+          pageNumber,
+          totalItemsPerPage,
+          audienceViewFilter === audienceView.ALL ? null : audienceViewFilter,
+          isCreating ? null : selectedEmailList
+        );
+      } else {
+        setPageNumber(1);
+      }
     }
     setAllAudienceModalVisible(false);
+  };
+
+  const handleAudienceViewFilterChanged = (e) => {
+    setAudienceViewFilter(e.target.value);
+    setPageNumber(1);
   };
 
   //#endregion End of Modal Handlers
@@ -272,7 +289,7 @@ const EmailList = () => {
   const emailListOptions = useMemo(() => {
     return [
       {
-        label: <Text strong> All Audiences </Text>,
+        label: <Text strong> All Audiences/Members </Text>,
         value: defaultEmailListKey,
       },
       ...creatorEmailLists.map((emailList) => ({
@@ -309,22 +326,6 @@ const EmailList = () => {
       key: 'type',
       width: '100px',
       render: (text, record) => `${record.type[0]}${record.type.slice(1).toLowerCase()}`,
-      filterIcon: (filtered) => (
-        <Tooltip defaultVisible={true} title="Click here to filter">
-          <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />{' '}
-        </Tooltip>
-      ),
-      filters: [
-        {
-          text: 'Audiences',
-          value: 'AUDIENCE',
-        },
-        {
-          text: 'Members',
-          value: 'MEMBER',
-        },
-      ],
-      onFilter: (value, record) => record.type === value,
     },
     {
       title: 'Actions',
@@ -338,7 +339,7 @@ const EmailList = () => {
               title={
                 <Text>
                   Are you sure you want to delete <br />
-                  this audience{isCreating ? '' : ' from this email list'}?
+                  this audience/member{isCreating ? '' : ' from this email list'}?
                 </Text>
               }
               onConfirm={() => (isCreating ? deleteAudience(record) : removeAudienceFromEmailList(record))}
@@ -349,7 +350,7 @@ const EmailList = () => {
             </Popconfirm>
           </Col>
           <Col xs={12}>
-            <Tooltip title="Send email to this audience" arrowPointAtCenter>
+            <Tooltip title="Send email to this audience/member" arrowPointAtCenter>
               <Button
                 block
                 type="link"
@@ -421,12 +422,12 @@ const EmailList = () => {
                 {/* CTA Sections */}
                 <Col xs={24} md={12} lg={14}>
                   <Row gutter={[8, 8]} justify="end">
-                    <Col xs={24} md={12} lg={{ span: 10, offset: 14 }}>
+                    <Col xs={24} md={12} lg={{ span: 12, offset: 12 }}>
                       <Button block type="primary" onClick={() => showSendAudienceEmailModal()}>
-                        Send Email to {isCreating ? 'selected audiences' : 'this email list'}
+                        Send email to {isCreating ? 'selected audience/member' : 'this email list'}
                       </Button>
                     </Col>
-                    <Col xs={24} md={12} lg={10}>
+                    <Col xs={24} md={12} lg={12}>
                       <Form.Item noStyle hidden={isCreating} wrapperCol={24}>
                         <Popconfirm
                           arrowPointAtCenter
@@ -443,9 +444,9 @@ const EmailList = () => {
                         </Popconfirm>
                       </Form.Item>
                     </Col>
-                    <Col xs={24} md={12} lg={10}>
+                    <Col xs={24} md={12} lg={12}>
                       <Button block type="primary" className={styles.greenBtn} htmlType="submit">
-                        {isCreating ? 'Create new email' : 'Add more audience to'} list
+                        {isCreating ? 'Create new email' : 'Add more audience/member to'} list
                       </Button>
                     </Col>
                   </Row>
@@ -453,6 +454,18 @@ const EmailList = () => {
               </Row>
             </Loader>
           </Form>
+        </Col>
+
+        {/* Filters */}
+        <Col xs={24}>
+          <Space direction={xs ? 'vertical' : 'horizontal'} align={xs ? 'start' : 'center'}>
+            <Text> Only show : </Text>
+            <Radio.Group buttonStyle="solid" value={audienceViewFilter} onChange={handleAudienceViewFilterChanged}>
+              <Radio.Button value={audienceView.ALL}> Show all </Radio.Button>
+              <Radio.Button value={audienceView.MEMBER}> Members </Radio.Button>
+              <Radio.Button value={audienceView.AUDIENCE}> Audiences </Radio.Button>
+            </Radio.Group>
+          </Space>
         </Col>
 
         {/* Audience Section */}
@@ -482,7 +495,7 @@ const EmailList = () => {
                 disabled={!canShowMore}
                 onClick={() => setPageNumber(pageNumber + 1)}
               >
-                Show more audience
+                Show more
               </Button>
             </Col>
           </Row>

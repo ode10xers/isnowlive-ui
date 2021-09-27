@@ -5,21 +5,24 @@ import { Row, Col, Button, Typography, List, Modal, Divider, Space, Result } fro
 import { ToolOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
 import SubscriptionCards from 'components/SubscriptionCards';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import { paymentProvider } from 'utils/constants';
+
 import { useGlobalContext } from 'services/globalContext';
+import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './styles.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
 
-const Subscriptions = () => {
+const Subscriptions = ({ history }) => {
   const {
     state: { userDetails },
   } = useGlobalContext();
@@ -97,15 +100,62 @@ const Subscriptions = () => {
   }, []);
 
   useEffect(() => {
-    getCreatorSubscriptions();
-    fetchCreatorMemberTags();
-  }, [getCreatorSubscriptions, fetchCreatorMemberTags]);
+    // TODO: Currently we only support membership for stripe. Remove some of these checks when PayPal membership is supported
+    if (
+      userDetails?.profile?.currency &&
+      userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
+      userDetails?.profile?.payment_account_status === StripeAccountStatus.CONNECTED
+    ) {
+      getCreatorSubscriptions();
+      fetchCreatorMemberTags();
+    }
+  }, [userDetails, getCreatorSubscriptions, fetchCreatorMemberTags]);
 
   useEffect(() => {
-    if (userDetails?.profile?.payment_provider === paymentProvider.PAYPAL && subscriptions.length > 0) {
-      hideAllSubscriptions(subscriptions);
+    if (
+      !userDetails?.profile?.currency ||
+      (userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
+        userDetails?.profile?.payment_account_status !== StripeAccountStatus.CONNECTED)
+    ) {
+      Modal.confirm({
+        centered: true,
+        closable: false,
+        maskClosable: false,
+        title: 'Setup payments to offer memberships',
+        content: (
+          <Paragraph>
+            You need to setup your payments to create flexible memberships of any duration (days/months) and add
+            selected content for your buyers to enjoy with memberships credits.
+          </Paragraph>
+        ),
+        okText: 'Setup Payments',
+        cancelText: 'Go Back',
+        onOk: () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount),
+        onCancel: () => history.push(Routes.creatorDashboard.rootPath),
+      });
+    } else if (userDetails?.profile?.payment_provider === paymentProvider.PAYPAL) {
+      if (subscriptions.length > 0) {
+        hideAllSubscriptions(subscriptions);
+      }
+
+      Modal.info({
+        centered: true,
+        closable: true,
+        maskClosable: false,
+        title: 'Unable to create membership',
+        content: (
+          <>
+            <Paragraph>
+              Membership subscriptions for users using PayPal are unavailable at the moment. We are working on it.
+            </Paragraph>
+            <Paragraph>Please drop us a message and express your interest to make it faster for you.</Paragraph>
+          </>
+        ),
+        okText: 'I want to sell memberships',
+        onOk: openFreshChatWidget,
+      });
     }
-  }, [subscriptions, userDetails, hideAllSubscriptions]);
+  }, [subscriptions, userDetails, history, hideAllSubscriptions]);
 
   const publishSubscription = async (subscriptionId) => {
     setIsLoading(true);
@@ -269,7 +319,12 @@ const Subscriptions = () => {
   const renderSubscriptionList = (subscription) => (
     <List.Item>
       {subscription.isButton ? (
-        <Button block type="primary" onClick={() => setColumnState(subscription.idx, 'CREATE')} disabled={isEditing}>
+        <Button
+          block
+          type="primary"
+          onClick={() => setColumnState(subscription.idx, 'CREATE')}
+          disabled={isEditing || !userDetails?.profile?.currency}
+        >
           Add new Membership Tier
         </Button>
       ) : !subscription.external_id || subscription.editing ? (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Collapse, Card, Tag, Tooltip, Space, Divider } from 'antd';
+import { Row, Col, Typography, Button, Collapse, Card, Tag, Tooltip, Space, Divider, Grid } from 'antd';
 import {
   MailOutlined,
   CopyOutlined,
@@ -9,6 +9,7 @@ import {
   DownOutlined,
   UpOutlined,
   EyeInvisibleOutlined,
+  ProfileOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -21,22 +22,29 @@ import TagListPopup from 'components/TagListPopup';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { getCourseSessionContentCount, getCourseVideoContentCount, getCourseEmptyContentCount } from 'utils/course';
+import {
+  getCourseSessionContentCount,
+  getCourseVideoContentCount,
+  getCourseEmptyContentCount,
+  getCourseDocumentContentCount,
+} from 'utils/course';
 import { isAPISuccess, productType, copyToClipboard, generateUrlFromUsername, preventDefaults } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { generatePath } from 'react-router';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+const { useBreakpoint } = Grid;
 const {
-  formatDate: { toShortDateWithYear, toDateAndTime },
+  formatDate: { toShortDateMonth, toDateAndTime },
 } = dateUtil;
 
 const Courses = ({ history }) => {
+  const { md, xl } = useBreakpoint();
   const { showSendEmailPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState([]);
@@ -160,7 +168,21 @@ const Courses = ({ history }) => {
   };
 
   const redirectToEditCourse = (courseExternalId) => {
-    history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/edit`);
+    history.push(
+      Routes.creatorDashboard.rootPath +
+        generatePath(Routes.creatorDashboard.updateCourse, {
+          course_id: courseExternalId,
+        })
+    );
+  };
+
+  const redirectToEditModules = (courseExternalId) => {
+    history.push(
+      Routes.creatorDashboard.rootPath +
+        generatePath(Routes.creatorDashboard.createCourseModule, {
+          course_id: courseExternalId,
+        })
+    );
   };
 
   //#endregion End Of Business Logics
@@ -235,11 +257,11 @@ const Courses = ({ history }) => {
         title: 'Duration',
         dataIndex: 'start_time',
         key: 'start_time',
-        width: '190px',
+        width: !xl ? '80px' : '120px',
         render: (text, record) =>
           record?.type === 'VIDEO'
             ? `${record?.validity ?? 0} days`
-            : `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
+            : `${toShortDateMonth(record.start_date)} - ${toShortDateMonth(record.end_date)}`,
       },
       {
         title: 'Course Content',
@@ -249,20 +271,32 @@ const Courses = ({ history }) => {
         render: (text, record) => {
           const sessionCount = getCourseSessionContentCount(record?.modules ?? []);
           const videoCount = getCourseVideoContentCount(record?.modules ?? []);
+          const docCount = getCourseDocumentContentCount(record?.modules ?? []);
           const emptyCount = getCourseEmptyContentCount(record?.modules ?? []);
 
-          if (!sessionCount && !videoCount) {
-            return <Text type="secondary"> {`${emptyCount} outlines`} </Text>;
+          if (!sessionCount && !videoCount && !docCount) {
+            return <Tag>{`${emptyCount} outlines`}</Tag>;
           }
 
           return (
-            <Tag color="blue">
-              <Space split={<Divider type="vertical" />}>
-                {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
-                {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
-                {emptyCount > 0 ? <Text type="secondary"> {`${emptyCount} outlines`} </Text> : null}
-              </Space>
-            </Tag>
+            <Space size={1} wrap={true}>
+              {sessionCount > 0 ? (
+                <Tag className={styles.mb5} color="blue">
+                  {`${sessionCount} sessions`}
+                </Tag>
+              ) : null}
+              {videoCount > 0 ? (
+                <Tag className={styles.mb5} color="purple">
+                  {`${videoCount} videos`}
+                </Tag>
+              ) : null}
+              {docCount > 0 ? (
+                <Tag className={styles.mb5} color="magenta">
+                  {`${docCount} files`}
+                </Tag>
+              ) : null}
+              {emptyCount > 0 ? <Tag>{`${emptyCount} outlines`}</Tag> : null}
+            </Space>
           );
         },
       },
@@ -270,7 +304,7 @@ const Courses = ({ history }) => {
         title: 'Price',
         dataIndex: 'price',
         key: 'price',
-        width: '100px',
+        width: '90px',
         render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
       },
       {
@@ -283,17 +317,17 @@ const Courses = ({ history }) => {
             {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         ),
-        width: '250px',
+        width: !xl ? '200px' : '310px',
         align: 'right',
         render: (text, record) => (
           <Row gutter={4} justify="end">
-            <Col xs={3}>
+            <Col xs={6} xl={3}>
               <Tooltip title="Send Customer Email">
                 <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={3}>
-              <Tooltip title="Edit Course">
+            <Col xs={6} xl={3}>
+              <Tooltip title="Edit Course Details">
                 <Button
                   block
                   type="text"
@@ -302,12 +336,17 @@ const Courses = ({ history }) => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={3}>
+            <Col xs={6} xl={3}>
+              <Tooltip title="Edit Course Modules">
+                <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
+              </Tooltip>
+            </Col>
+            <Col xs={6} xl={3}>
               <Tooltip title="Copy Course Link">
                 <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={5}>
+            <Col xs={12} xl={4}>
               {record.is_published ? (
                 <Tooltip title="Hide Course">
                   <Button danger block type="link" onClick={() => unpublishCourse(record)}>
@@ -322,7 +361,7 @@ const Courses = ({ history }) => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={10}>
+            <Col xs={12} xl={8}>
               {record.is_published ? (
                 expandedPublishedRowKeys.includes(record.id) ? (
                   <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
@@ -354,7 +393,7 @@ const Courses = ({ history }) => {
         title: 'Purchasable By',
         key: 'tag',
         dataIndex: 'tag',
-        width: '130px',
+        width: '110px',
         render: (text, record) => <TagListPopup tags={record.tag} />,
       };
 
@@ -504,7 +543,7 @@ const Courses = ({ history }) => {
             <Text>
               {course?.type === 'VIDEO'
                 ? `${course?.validity ?? 0} days`
-                : `${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`}
+                : `${toShortDateMonth(course.start_date)} - ${toShortDateMonth(course.end_date)}`}
             </Text>
           )}
           {layout(
@@ -554,7 +593,7 @@ const Courses = ({ history }) => {
           <Loader loading={isLoading} size="large" text="Fetching Courses">
             <Collapse defaultActiveKey={['published', 'unpublished']}>
               <Panel header={<Title level={5}> Published </Title>} key="published">
-                {isMobileDevice ? (
+                {!md ? (
                   <Row gutter={[8, 16]}>
                     <Col xs={24}>
                       <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
@@ -580,7 +619,7 @@ const Courses = ({ history }) => {
                 )}
               </Panel>
               <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
-                {isMobileDevice ? (
+                {!md ? (
                   <Row gutter={[8, 16]}>
                     <Col xs={24}>
                       <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>

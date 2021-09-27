@@ -225,15 +225,19 @@ export default {
       http.get(
         `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
       ),
-    getCreatorAudiences: (pageNo, perPage) =>
-      http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorAudiences: (pageNo, perPage, userType = null, emailList = null) =>
+      http.get(
+        `/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}${userType ? `&user_type=${userType}` : ''}${
+          emailList ? `&mailing_list=${emailList}` : ''
+        }`
+      ),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
     updateMemberTag: (payload) => http.put('secure/creator/audience', payload),
     setCreatorMemberRequestApproval: (payload) => http.put('/secure/creator/audience', payload),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
-    sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),
+    sendNewsletterSignupDetails: (payload) => http.post('/audience/signup', payload),
   },
   newsletter: {
     getCreatorEmailTemplates: () => http.get('/secure/creator/newsletter/templates'),
@@ -243,8 +247,8 @@ export default {
       http.patch(`/secure/creator/newsletter/templates/${templateId}`, payload),
     deleteEmailTemplate: (templateId) => http.delete(`/secure/creator/newsletter/templates/${templateId}`),
     getCreatorEmailList: () => http.get('/secure/creator/mailing-lists'),
-    getEmailListDetails: (emailListId, pageNo, perPage) =>
-      http.get(`/secure/creator/mailing-lists/${emailListId}/audience?page_no=${pageNo}&per_page=${perPage}`),
+    // getEmailListDetails: (emailListId, pageNo, perPage) =>
+    // http.get(`/secure/creator/mailing-lists/${emailListId}/audience?page_no=${pageNo}&per_page=${perPage}`),
     deleteEmailList: (emailListId) => http.delete(`/secure/creator/mailing-lists/${emailListId}`),
     createEmailList: (payload) => http.post('/secure/creator/mailing-lists', payload),
     updateEmailList: (emailListId, payload) =>
@@ -258,6 +262,9 @@ export default {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),
     updateDocument: (documentId, payload) => http.patch(`/secure/creator/documents/${documentId}`, payload),
+    deleteDocument: (documentId) => http.delete(`/secure/creator/documents/${documentId}`),
+    getAttendeeDocumentDetailsForCourse: (courseOrderId, documentId) =>
+      http.get(`/secure/customer/courses/orders/${courseOrderId}/documents/${documentId}`),
   },
   legals: {
     createLegals: (payload) => http.post('/secure/creator/legal', payload),

@@ -80,6 +80,7 @@ const ImageUpload = ({
                 <Col className={styles.helpText}>{overlayHelpText}</Col>
               </Row>
               <img
+                loading="lazy"
                 src={value}
                 alt={label}
                 className={classNames(styles.w100, styles.image, shape === 'round' ? styles.roundImage : undefined)}
