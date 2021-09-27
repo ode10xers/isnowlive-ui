@@ -25,6 +25,10 @@
     }
   }
 
+  .videoDetailsSection {
+    padding: 12px 20px !important;
+  }
+
   .videoDetailsContainer {
     .videoDetailItem {
       .detailIcons {
@@ -60,122 +64,64 @@
       width: 100%;
     }
   }
+}
 
-  .paymentInstrumentHeader {
-    @extend .videoTitle;
-    color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
-    margin: 12px 0 !important;
-  }
+.videoBuyBtn {
+  padding: 8px 16px;
+  height: 100%;
+  background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
 
-  .paymentInstrumentOption {
-    padding: 12px;
-    border-right: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
-
-    &:last-child {
-      border-right: none;
+  &.darkText {
+    .buyBtnText {
+      color : map-get($map: $colors, $key: 'Zeus') !important;
     }
 
-    .roundBtn {
-      cursor: pointer;
-      margin-top: 5px;
-      width: 14px;
-      height: 14px;
-      border-radius: 7px;
-      border: solid 1px map-get($colors, 'NightRider');
+    .buyBtnDivider {
+      height: 1.5em;
+      border-left-color : map-get($map: $colors, $key: 'Zeus') !important;
     }
   }
 
-  .buyMembershipContainer {
-    padding: 12px;
-    margin: 0 4px 8px !important;
-    width: 100%;
-    background-color: map-get($map: $colors, $key: 'Ivory');
-    border-radius: 8px;
-
-    .buyMembershipBtn {
-      background-color: map-get($map: $colors, $key: 'PolarGreen') !important;
-      border-color: map-get($map: $colors, $key: 'PolarGreen') !important;
-      color: map-get($map: $colors, $key: 'White') !important;
-      font-size: 16px;
+  &.lightText {
+    .buyBtnText {
+      color : map-get($map: $colors, $key: 'White') !important;
     }
 
-    .buyMembershipDesc {
+    .buyBtnDivider {
+      height: 1.5em;
+      border-left-color : map-get($map: $colors, $key: 'White') !important;
+    }
+  }
+
+  .buyBtnTextContainer {
+    height: 100%;
+  }
+}
+
+.buyUsingPassContainer, .buyUsingMembershipContainer {
+  background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')});
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.paymentInstrumentsContainer {
+  padding: 20px;
+
+  .paymentInstrumentHeadingContainer {
+    .paymentInstrumentHeadingDivider {
+      height: 3em;
+      border-left-color: map-get($map: $colors, $key: 'Black');
+    }
+  }
+
+  .paymentInstrumentSelectContainer {
+    .paymentInstrumentSelectHeading {
       text-align: center;
-      font-size: 14px;
-      color: map-get($map: $colors, $key: 'PolarGreen') !important;
     }
-  }
-
-  .buyPassContainer {
-    @extend .buyMembershipContainer;
-    background-color: map-get($map: $colors, $key: 'BlanchedAlmond');
-
-    .buyPassBtn {
-      font-size: 16px;
-      background-color: map-get($map: $colors, $key: 'Pumpkin') !important;
-      border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
-      color: map-get($map: $colors, $key: 'White') !important;
-    }
-
-    .buyPassDesc {
+    
+    .paymentInstrumentSelectDescription {
       text-align: center;
-      font-size: 14px;
-      color: map-get($map: $colors, $key: 'Pumpkin') !important;
-    }
-  }
-
-  .buyableMembershipListContainer, .buyablePassListContainer {
-    padding: 8px;
-
-    &.error {
-      border: 1px solid map-get($map: $colors, $key: 'SunsetOrange');
-      border-radius: 8px;
-    }
-  }
-
-  .buyVideoContainer {
-    @extend .buyMembershipContainer;
-    background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')});
-
-    .buyVideoBtn {
-      background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
-      border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
-
-      &.darkText {
-        --video-button-text-color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')});
-      }
-
-      &.lightText {
-        --video-button-text-color : #{map-get($colors, 'White')};
-      }
-
-      color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
-      .buyVideoBtnContent {
-        height: 24px; 
-        margin-left: 10px;
-        color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
-
-        .buyBtnDivider {
-          border-left: 1px solid var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
-          height: 20px;
-          margin: 0 8px;
-        }
-
-        .buyVideoBtnText {
-          font-size: 16px;
-          color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
-
-          del {
-            text-decoration: solid line-through map-get($map: $colors, $key: 'Razzmatazz') 2px;
-          }
-        }
-      }
-    }
-
-    .buyVideoDesc {
-      color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
-      text-align: center;
-      font-size: 14px;
     }
   }
 }

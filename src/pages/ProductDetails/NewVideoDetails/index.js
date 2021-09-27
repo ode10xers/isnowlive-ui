@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
-import { Row, Col, Button, Image, Typography, Space, Spin, Divider, message } from 'antd';
+import { Row, Col, Button, Image, Typography, Space, Spin, Divider, Grid, message } from 'antd';
 import {
   TagsOutlined,
   FilePdfOutlined,
@@ -58,6 +58,7 @@ const {
 } = dateUtil;
 
 const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 
 const paymentInstruments = {
   ONE_OFF: 'one-off',
@@ -72,6 +73,8 @@ const NewVideoDetails = ({ match }) => {
     showPaymentPopup,
     state: { userDetails },
   } = useGlobalContext();
+
+  const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -725,38 +728,6 @@ const NewVideoDetails = ({ match }) => {
     handleBuy();
   };
 
-  const handlePassBuyClicked = (e) => {
-    preventDefaults(e);
-
-    if (!selectedPass) {
-      setPassSelectionError(true);
-    } else {
-      setSelectedPaymentInstrument(paymentInstruments.PASS);
-      handleBuy();
-    }
-  };
-
-  const handleMembershipBuyClicked = (e) => {
-    preventDefaults(e);
-
-    if (!selectedSubscription) {
-      setSubscriptionSelectionError(true);
-    } else {
-      setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
-      handleBuy();
-    }
-  };
-
-  const handleSelectBuyablePass = (pass) => {
-    setPassSelectionError(false);
-    setSelectedPass(pass);
-  };
-
-  const handleSelectBuyableSubscription = (subs) => {
-    setSubscriptionSelectionError(false);
-    setSelectedSubscription(subs);
-  };
-
   //#endregion End of Event handlers
 
   //#region Start of UI Components
@@ -792,196 +763,19 @@ const NewVideoDetails = ({ match }) => {
     );
   };
 
-  const renderBuyablePassListItem = (pass) => (
-    <Col xs={24} key={pass.external_id}>
-      <Row gutter={12} align="middle">
-        <Col flex="0 0 16px">
-          <div
-            onClick={() => handleSelectBuyablePass(pass)}
-            className={selectedPass?.external_id === pass.external_id ? undefined : styles.roundBtn}
-          >
-            {selectedPass?.external_id === pass.external_id && <CheckCircleTwoTone twoToneColor="#52c41a" />}
-          </div>
-        </Col>
-        <Col flex="1 1 auto">
-          <PassesListItem pass={pass} />
-        </Col>
-      </Row>
-    </Col>
-  );
-
-  const renderBuyableSubscriptionItem = (subs) => (
-    <Col xs={24} key={subs.external_id}>
-      <Row gutter={6} align="middle">
-        <Col flex="0 0 16px">
-          <div
-            onClick={() => handleSelectBuyableSubscription(subs)}
-            className={selectedSubscription?.external_id === subs.external_id ? undefined : styles.roundBtn}
-          >
-            {selectedSubscription?.external_id === subs.external_id && <CheckCircleTwoTone twoToneColor="#52c41a" />}
-          </div>
-        </Col>
-        <Col flex="1 1 auto">
-          <SubscriptionListItem subscription={subs} />
-        </Col>
-      </Row>
-    </Col>
-  );
-
-  const renderBuySection = () => {
-    const colCount = 1 + (relatedPasses?.length > 0 ? 1 : 0) + (relatedSubscriptions?.length > 0 ? 1 : 0);
-
-    const buyOneOffUI = (
-      <Col
-        className={styles.paymentInstrumentOption}
-        xs={{ span: 24, order: 3 }}
-        md={{ span: 24 / colCount, order: 1 }}
-      >
-        <Title level={5} className={styles.textAlignCenter}>
-          <CreditCardOutlined /> Make a one-time purchase
-        </Title>
-        <Row gutter={[12, 12]} justify="center" className={styles.buyVideoContainer}>
-          <Col xs={24}>
-            <Button
-              block
-              type="primary"
-              size="large"
-              onClick={handleVideoBuyClicked}
-              className={classNames(
-                styles.buyVideoBtn,
-                isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-                  ? styles.darkText
-                  : styles.lightText
-              )}
-            >
-              <Space split={<Divider className={styles.buyBtnDivider} />} className={styles.buyVideoBtnContent}>
-                <Text className={styles.buyVideoBtnText}> ONE TIME PURCHASE </Text>
-                <Text className={styles.buyVideoBtnText}>
-                  {videoData?.pay_what_you_want
-                    ? 'Flexible'
-                    : videoData?.total_price > 0
-                    ? `${videoData?.currency?.toUpperCase()} ${videoData?.total_price}`
-                    : 'Free'}
-                </Text>
-              </Space>
-            </Button>
-          </Col>
-          <Col xs={24}>
-            <Paragraph className={styles.buyVideoDesc}>Just buy this video</Paragraph>
-          </Col>
-        </Row>
-      </Col>
-    );
-
-    const buyWithPassUI = (
-      <Col
-        className={styles.paymentInstrumentOption}
-        xs={{ span: 24, order: 2 }}
-        md={{ span: 24 / colCount, order: 2 }}
-      >
-        <Title level={5} className={styles.textAlignCenter}>
-          <TagsOutlined /> Buy with Pass
-        </Title>
-        <Row gutter={[12, 12]} justify="center" className={styles.buyPassContainer}>
-          <Col xs={24}>
-            <Button block type="primary" size="large" className={styles.buyPassBtn} onClick={handlePassBuyClicked}>
-              GET PASS AND BOOK
-            </Button>
-          </Col>
-          <Col xs={24}>
-            <Paragraph className={styles.buyPassDesc}>Get a pass for a more worry-free payment experience.</Paragraph>
-          </Col>
-        </Row>
-        {passSelectionError && <Paragraph type="danger">Please select a pass below first</Paragraph>}
-        <Row
-          gutter={[12, 12]}
-          justify="center"
-          className={classNames(styles.buyablePassListContainer, passSelectionError ? styles.error : undefined)}
-        >
-          {relatedPasses?.map(renderBuyablePassListItem)}
-        </Row>
-      </Col>
-    );
-
-    const buyWithMembershipUI = (
-      <Col
-        className={styles.paymentInstrumentOption}
-        xs={{ span: 24, order: 1 }}
-        md={{ span: 24 / colCount, order: 3 }}
-      >
-        <Title level={5} className={styles.textAlignCenter}>
-          <ScheduleOutlined /> Buy with Membership
-        </Title>
-        <Row gutter={[12, 12]} justify="center" className={styles.buyMembershipContainer}>
-          <Col xs={24}>
-            <Button
-              block
-              type="primary"
-              size="large"
-              className={styles.buyMembershipBtn}
-              onClick={handleMembershipBuyClicked}
-            >
-              SUBSCRIBE AND BOOK
-            </Button>
-          </Col>
-          <Col xs={24}>
-            <Paragraph className={styles.buyMembershipDesc}>Subscribe to a membership for discounted price.</Paragraph>
-          </Col>
-        </Row>
-        {subscriptionSelectionError && <Paragraph type="danger">Please select a subscription below first</Paragraph>}
-        <Row
-          gutter={[12, 12]}
-          justify="center"
-          className={classNames(
-            styles.buyableMembershipListContainer,
-            subscriptionSelectionError ? styles.error : undefined
-          )}
-        >
-          {relatedSubscriptions?.map(renderBuyableSubscriptionItem)}
-        </Row>
-      </Col>
-    );
-
-    return (
-      <>
-        <Col xs={24}>
-          <Title level={3} className={styles.paymentInstrumentHeader}>
-            Ways to buy
-          </Title>
-        </Col>
-        <Col xs={24}>
-          <Row>
-            {buyOneOffUI}
-            {relatedPasses?.length > 0 && buyWithPassUI}
-            {relatedSubscriptions?.length > 0 && buyWithMembershipUI}
-          </Row>
-        </Col>
-      </>
-    );
-  };
-
-  const relatedCourseSection =
-    relatedCourses.length > 0 ? (
-      <Row gutter={[8, 8]}>
-        <Col xs={24}>
-          <Title level={5}>This video can only be accessed by purchasing the course(s) below</Title>
-        </Col>
-        {relatedCourses.map((course) => (
-          <Col xs={24} md={12} lg={8} key={course.external_id}>
-            <CourseListItem course={course} />
-          </Col>
-        ))}
-      </Row>
-    ) : null;
-
-  // TODO: Check and test this UI
   const renderDynamicBuyButton = () => {
     if (usableSubscription && videoData?.total_price > 0) {
       return (
         <div className={styles.buyUsingMembershipContainer}>
           <Space direction="vertical">
             <Button
-              className={styles.videoBuyBtn}
+              block
+              className={classNames(
+                styles.videoBuyBtn,
+                !isInIframeWidget() && isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                  ? styles.darkText
+                  : styles.lightText
+              )}
               size="large"
               type="primary"
               onClick={() => {
@@ -989,19 +783,20 @@ const NewVideoDetails = ({ match }) => {
                 handleBuy();
               }}
             >
-              <Space split={<Divider className={styles.buyBtnDivider} />} className={styles.buyBtnTextContainer}>
-                <Text> BUY USING MEMBERSHIP </Text>
-                <Text>
+              <Space
+                align="center"
+                split={<Divider type="vertical" className={styles.buyBtnDivider} />}
+                className={styles.buyBtnTextContainer}
+              >
+                <Text className={styles.buyBtnText}> BUY USING YOUR MEMBERSHIP </Text>
+                <Text className={styles.buyBtnText}>
                   {videoData?.pay_what_you_want ? (
                     <>
                       <del>Flexible</del> 0
                     </>
                   ) : videoData?.total_price > 0 ? (
                     <>
-                      <del>
-                        `${videoData?.currency?.toUpperCase() ?? ''} ${videoData?.total_price ?? 0}`
-                      </del>{' '}
-                      0
+                      {videoData?.currency?.toUpperCase() ?? ''} <del>{videoData?.total_price ?? 0}</del> 0
                     </>
                   ) : (
                     'Free'
@@ -1019,8 +814,8 @@ const NewVideoDetails = ({ match }) => {
                   </Text>
                 </Space>
               </Col>
-              <Col flex="0 0 100px">
-                <Space direction="vertical" size="small">
+              <Col flex="0 0 120px" className={styles.textAlignRight}>
+                <Space direction="vertical" size="small" className={styles.textAlignRight}>
                   <Text strong>Auto renews on</Text>
                   <Text>{toShortDate(usableSubscription?.expiry)}</Text>
                 </Space>
@@ -1034,7 +829,13 @@ const NewVideoDetails = ({ match }) => {
         <div className={styles.buyUsingPassContainer}>
           <Space direction="vertical">
             <Button
-              className={styles.videoBuyBtn}
+              block
+              className={classNames(
+                styles.videoBuyBtn,
+                !isInIframeWidget() && isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                  ? styles.darkText
+                  : styles.lightText
+              )}
               size="large"
               type="primary"
               onClick={() => {
@@ -1042,19 +843,20 @@ const NewVideoDetails = ({ match }) => {
                 handleBuy();
               }}
             >
-              <Space split={<Divider className={styles.buyBtnDivider} />} className={styles.buyBtnTextContainer}>
-                <Text> BUY USING PASS </Text>
-                <Text>
+              <Space
+                align="center"
+                split={<Divider type="vertical" className={styles.buyBtnDivider} />}
+                className={styles.buyBtnTextContainer}
+              >
+                <Text className={styles.buyBtnText}> BUY USING YOUR PASS </Text>
+                <Text className={styles.buyBtnText}>
                   {videoData?.pay_what_you_want ? (
                     <>
                       <del>Flexible</del> 0
                     </>
                   ) : videoData?.total_price > 0 ? (
                     <>
-                      <del>
-                        `${videoData?.currency?.toUpperCase() ?? ''} ${videoData?.total_price ?? 0}`
-                      </del>{' '}
-                      0
+                      {videoData?.currency?.toUpperCase() ?? ''} <del>{videoData?.total_price ?? 0}</del> 0
                     </>
                   ) : (
                     'Free'
@@ -1066,7 +868,7 @@ const NewVideoDetails = ({ match }) => {
               <Col flex="1 1 auto">
                 <Text strong>{usablePass?.pass_name ?? ''}</Text>
               </Col>
-              <Col flex="0 0 100px">
+              <Col flex="0 0 140px" className={styles.textAlignRight}>
                 <Text strong>
                   {usablePass?.classes_remaining}/{usablePass?.class_count} credits left.
                 </Text>
@@ -1078,10 +880,24 @@ const NewVideoDetails = ({ match }) => {
     }
 
     return (
-      <Button className={styles.videoBuyBtn} size="large" type="primary" onClick={handleVideoBuyClicked}>
-        <Space split={<Divider className={styles.buyBtnDivider} />} className={styles.buyBtnTextContainer}>
-          <Text>BUY NOW</Text>
-          <Text>
+      <Button
+        className={classNames(
+          styles.videoBuyBtn,
+          !isInIframeWidget() && isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+            ? styles.darkText
+            : styles.lightText
+        )}
+        size="large"
+        type="primary"
+        onClick={handleVideoBuyClicked}
+      >
+        <Space
+          align="center"
+          split={<Divider type="vertical" className={styles.buyBtnDivider} />}
+          className={styles.buyBtnTextContainer}
+        >
+          <Text className={styles.buyBtnText}>BUY DIRECTLY</Text>
+          <Text className={styles.buyBtnText}>
             {videoData?.pay_what_you_want
               ? 'Flexible'
               : videoData?.total_price > 0
@@ -1093,18 +909,102 @@ const NewVideoDetails = ({ match }) => {
     );
   };
 
+  const renderPaymentInstrumentsSection = () => {
+    const relatedPassesAvailable = relatedPasses.length > 0;
+    const relatedSubscriptionAvailable = relatedSubscriptions.length > 0;
+
+    if (!relatedPassesAvailable && !relatedSubscriptionAvailable) {
+      return null;
+    }
+
+    let paymentInstrumentTextArr = [];
+
+    if (relatedPassesAvailable) {
+      paymentInstrumentTextArr.push('Credit Pass');
+    }
+
+    if (relatedSubscriptionAvailable) {
+      paymentInstrumentTextArr.push('Membership');
+    }
+
+    return (
+      <div className={styles.paymentInstrumentsContainer}>
+        <Row gutter={[12, 16]} align="middle" justify="space-around">
+          <Col xs={24} className={styles.textAlignCenter}>
+            <Space
+              direction={lg ? 'horizontal' : 'vertical'}
+              align="middle"
+              split={<Divider type="vertical" className={styles.paymentInstrumentHeadingDivider} />}
+              className={styles.paymentInstrumentHeadingContainer}
+            >
+              <Title level={3} className={styles.paymentInstrumentHeadingText}>
+                Make Big Savings
+              </Title>
+              <Title level={3} className={styles.paymentInstrumentHeadingText}>
+                Buy this video with a {paymentInstrumentTextArr.join(' or ')}{' '}
+              </Title>
+            </Space>
+          </Col>
+          {relatedPassesAvailable && (
+            <Col xs={24} lg={12}>
+              <div className={styles.paymentInstrumentSelectContainer}>
+                <Row gutter={[8, 16]}>
+                  <Col xs={24}>
+                    <Title level={4} className={styles.paymentInstrumentSelectHeading}>
+                      Buy with a credit pass
+                    </Title>
+                  </Col>
+                  <Col xs={24} className={styles.textAlignCenter}>
+                    <Text className={styles.paymentInstrumentSelectDescription}>
+                      Select from one of the passes below
+                    </Text>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[12, 12]} className={styles.paymentInstrumentSelectList}>
+                      {/* Item List */}
+                    </Row>
+                  </Col>
+                  <Col xs={24}>
+                    <Divider />
+                  </Col>
+                  <Col xs={24}>{/* Summary */}</Col>
+                  <Col xs={24}>{/* CTA */}</Col>
+                </Row>
+              </div>
+            </Col>
+          )}
+          {relatedSubscriptionAvailable && <Col xs={24} lg={12}></Col>}
+        </Row>
+      </div>
+    );
+  };
+
+  const relatedCourseSection =
+    relatedCourses.length > 0 ? (
+      <Row gutter={[8, 8]}>
+        <Col xs={24}>
+          <Title level={5}>This video can only be accessed by purchasing the course(s) below</Title>
+        </Col>
+        {relatedCourses.map((course) => (
+          <Col xs={24} md={12} lg={8} key={course.external_id}>
+            <CourseListItem course={course} />
+          </Col>
+        ))}
+      </Row>
+    ) : null;
+
   //#endregion End of UI Components
 
   return (
     <div className={styles.videoDetailsPage}>
       <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Spin spinning={isLoading} tip="Fetching data...">
-        <Row gutter={[8, 8]}>
+        <Row gutter={[8, 12]}>
           {/* Details Section */}
           <Col xs={24}>
             <Row gutter={[10, 10]}>
               {/* Video Details */}
-              <Col xs={{ span: 24, order: 2 }} lg={{ span: 12, order: 2 }}>
+              <Col xs={{ span: 24, order: 2 }} lg={{ span: 12, order: 2 }} className={styles.videoDetailsSection}>
                 <Space direction="vertical">
                   <Title level={3} className={styles.videoTitle}>
                     {videoData?.title}
@@ -1127,7 +1027,6 @@ const NewVideoDetails = ({ match }) => {
                       {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
                     </div>
                   </div>
-                  {/* TODO: Add buy button here */}
                   {!videoData?.is_course && renderDynamicBuyButton()}
                 </Space>
               </Col>
@@ -1147,7 +1046,7 @@ const NewVideoDetails = ({ match }) => {
             </Row>
           </Col>
           {/* Buy Sections */}
-          <Col xs={24}>{videoData?.is_course ? relatedCourseSection : renderBuySection()}</Col>
+          <Col xs={24}>{videoData?.is_course ? relatedCourseSection : renderPaymentInstrumentsSection()}</Col>
           {/* Similar Videos */}
           <Col xs={24}></Col>
         </Row>
