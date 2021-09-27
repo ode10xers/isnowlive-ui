@@ -448,7 +448,7 @@ const CourseForm = ({ match, history }) => {
                                 onClick={() => removePreviewImageUrl(previewUrl)}
                               />
                             </div>
-                            <Image preview={false} src={previewUrl} className={styles.previewImage} />
+                            <Image loading="lazy" preview={false} src={previewUrl} className={styles.previewImage} />
                           </div>
                         </Col>
                       ))}
