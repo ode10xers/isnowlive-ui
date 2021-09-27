@@ -260,15 +260,15 @@ const VideoDetails = ({ match, history }) => {
               <Image
                 preview={false}
                 className={styles.videoThumbnail}
-                src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
-                alt={video?.title || videoOrderDetails?.title}
+                src={videoOrderDetails?.thumbnail_url || video?.thumbnail_url || 'error'}
+                alt={videoOrderDetails?.title || video?.title}
                 fallback={DefaultImage()}
               />
             </div>
           ) : (
             <VideoCard
               cover={
-                video?.source === videoSourceType.YOUTUBE && videoOrderDetails ? (
+                videoOrderDetails?.source === videoSourceType.YOUTUBE && videoOrderDetails ? (
                   <iframe
                     className={styles.youtubeVideoPlayer}
                     src={`https://www.youtube.com/embed/${getYoutubeVideoIDFromURL(videoOrderDetails?.video_url)}`}
@@ -286,8 +286,8 @@ const VideoDetails = ({ match, history }) => {
                       <Image
                         preview={false}
                         className={styles.videoThumbnail}
-                        src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
-                        alt={video?.title || videoOrderDetails?.title}
+                        src={videoOrderDetails?.thumbnail_url || video?.thumbnail_url || 'error'}
+                        alt={videoOrderDetails?.title || video?.title}
                         fallback={DefaultImage()}
                       />
                     </div>
