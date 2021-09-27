@@ -114,7 +114,7 @@ const FileContentPopup = ({ visible, closeModal, addContentMethod = null, exclud
                 </Paragraph>
                 <Paragraph strong>
                   The downloadable settings will apply to all the files you select here. If you want a different setting
-                  for different file, please add them separately with the said setting.
+                  for different file, you can edit them after you've added them
                 </Paragraph>
               </Col>
               <Col xs={24}>
@@ -152,7 +152,7 @@ const FileContentPopup = ({ visible, closeModal, addContentMethod = null, exclud
             </>
           ) : (
             <Col xs={24}>
-              <Paragraph>You don't have any other files you can embed. Click the button below to add more.</Paragraph>
+              <Paragraph>You don't have any files you can embed. Click the button below to add more.</Paragraph>
               {/* Redirect them to Document Drive Section */}
               <Row justify="center">
                 <Col>
