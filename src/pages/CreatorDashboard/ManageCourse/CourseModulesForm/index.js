@@ -10,7 +10,6 @@ import {
   Form,
   Typography,
   Modal,
-  Collapse,
   Tooltip,
   Input,
   InputNumber,
@@ -19,6 +18,7 @@ import {
   DatePicker,
   Space,
   Switch,
+  Popconfirm,
   message,
 } from 'antd';
 import {
@@ -29,6 +29,7 @@ import {
   MinusCircleTwoTone,
   DeleteOutlined,
   FilePdfOutlined,
+  DownOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -84,7 +85,6 @@ const formInitialValues = {
   courseEndDate: null,
 };
 
-const { Panel } = Collapse;
 const { Text, Paragraph } = Typography;
 
 const {
@@ -697,27 +697,52 @@ const CourseModulesForm = ({ match, history }) => {
     });
   };
 
+  const handleCourseModuleHeaderClicked = (moduleIndex) => {
+    if (expandedModulesKeys.includes(moduleIndex)) {
+      setExpandedModulesKeys((prevKeys) => prevKeys.filter((val) => val !== moduleIndex));
+    } else {
+      setExpandedModulesKeys((prevKeys) => [...new Set([...prevKeys, moduleIndex])]);
+    }
+  };
+
   const handleDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source, draggableId, type } = result;
 
     const formModules = deepCloneObject(form.getFieldsValue()).modules;
     const moduleIndex = draggableId.split('-')[1];
-    const contentIndex = draggableId.split('-')[3];
-
-    // NOTE: For modules, we use form names which are actually array indexes
     const targetModule = formModules[moduleIndex];
-    const targetContent = targetModule.module_content[contentIndex];
 
-    if (targetModule && targetContent && destination && destination.index !== source.index) {
-      targetModule.module_content.splice(source.index, 1);
-      targetModule.module_content.splice(destination.index, 0, targetContent);
+    if (type.includes('content')) {
+      // Reordering of a content under a module
+      const contentIndex = draggableId.split('-')[3];
 
-      formModules[moduleIndex] = targetModule;
+      // NOTE: For modules, we use form names which are actually array indexes
+      const targetContent = targetModule.module_content[contentIndex];
 
-      form.setFieldsValue({
-        ...form.getFieldsValue(),
-        modules: formModules,
-      });
+      if (targetModule && targetContent && destination && destination.index !== source.index) {
+        targetModule.module_content.splice(source.index, 1);
+        targetModule.module_content.splice(destination.index, 0, targetContent);
+
+        formModules[moduleIndex] = targetModule;
+
+        form.setFieldsValue({
+          ...form.getFieldsValue(),
+          modules: formModules,
+        });
+      }
+    } else {
+      // Reordering of modules
+      if (targetModule && destination && destination.index !== source.index) {
+        formModules.splice(source.index, 1);
+        formModules.splice(destination.index, 0, targetModule);
+
+        // TODO: Handle expanded module keys increment here
+
+        form.setFieldsValue({
+          ...form.getFieldsValue(),
+          modules: formModules,
+        });
+      }
     }
   };
 
@@ -936,298 +961,390 @@ const CourseModulesForm = ({ match, history }) => {
                       <Row gutter={[8, 12]}>
                         <Col xs={24}>
                           <DragDropContext onDragEnd={handleDragEnd}>
-                            <Collapse
-                              defaultActiveKey={moduleFields[0]?.name ?? 0}
-                              activeKey={expandedModulesKeys}
-                              onChange={setExpandedModulesKeys}
-                            >
-                              {moduleFields.map(
-                                ({
-                                  key: moduleKey,
-                                  name: moduleFieldName,
-                                  fieldKey: moduleFieldKey,
-                                  ...moduleFormItemRestFields
-                                }) => (
-                                  <Panel
-                                    key={moduleFieldName}
-                                    extra={
-                                      <Tooltip title="Remove this module" style={{ width: 'fit-content' }}>
-                                        <DeleteOutlined
-                                          className={styles.deleteModuleIconButton}
-                                          onClick={() => {
-                                            setExpandedModulesKeys((prevKeys) =>
-                                              prevKeys.filter((val) => val !== moduleFieldName)
-                                            );
-                                            removeModule(moduleFieldName);
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    }
-                                    header={
-                                      <Form.Item
-                                        {...moduleFormItemRestFields}
-                                        id="module_name"
-                                        name={[moduleFieldName, 'name']}
-                                        fieldKey={[moduleFieldKey, 'name']}
-                                        className={styles.panelHeaderFormItem}
-                                        rules={validationRules.requiredValidation}
+                            <Droppable droppableId="modules" type="modules">
+                              {(moduleDroppableProvided) => (
+                                <div
+                                  {...moduleDroppableProvided}
+                                  ref={moduleDroppableProvided.innerRef}
+                                  className={styles.courseModuleItemContainer}
+                                >
+                                  {moduleFields.map(
+                                    ({
+                                      key: moduleKey,
+                                      name: moduleFieldName,
+                                      fieldKey: moduleFieldKey,
+                                      ...moduleFormItemRestFields
+                                    }) => (
+                                      <Draggable
+                                        draggableId={`module-${moduleFieldName}`}
+                                        index={moduleFieldName}
+                                        key={`module-${moduleFieldName}`}
                                       >
-                                        <Input
-                                          placeholder="Module name"
-                                          maxLength={50}
-                                          className={styles.panelHeaderFormInput}
-                                          onClick={preventDefaults}
-                                        />
-                                      </Form.Item>
-                                    }
-                                  >
-                                    <Row>
-                                      <Col xs={24}>
-                                        <Form.List
-                                          {...moduleFormItemRestFields}
-                                          name={[moduleFieldName, 'module_content']}
-                                          rules={validationRules.courseModuleContentValidation}
-                                        >
-                                          {(contentFields, { add: addMoreContent, remove: removeContent }) => (
-                                            <Row gutter={[8, 8]}>
-                                              <Col xs={24}>
-                                                <Droppable
-                                                  droppableId={`module-${moduleFieldName}-content`}
-                                                  type={`module-${moduleFieldName}-content`}
-                                                >
-                                                  {(contentDroppableProvided) => (
-                                                    <div
-                                                      {...contentDroppableProvided}
-                                                      ref={contentDroppableProvided.innerRef}
+                                        {(moduleDraggableProvided) => (
+                                          <div
+                                            {...moduleDraggableProvided.draggableProps}
+                                            ref={moduleDraggableProvided.innerRef}
+                                            className={styles.courseModuleItem}
+                                          >
+                                            <div
+                                              className={styles.courseModuleHeader}
+                                              onClick={handleCourseModuleHeaderClicked}
+                                            >
+                                              <Row align="middle" gutter={[8, 8]} wrap={false}>
+                                                <Col flex="0 0 40px">
+                                                  <div
+                                                    className={styles.contentDragHandle}
+                                                    {...moduleDraggableProvided.dragHandleProps}
+                                                  />
+                                                </Col>
+                                                <Col flex="1 1 auto">
+                                                  <Form.Item
+                                                    {...moduleFormItemRestFields}
+                                                    id="module_name"
+                                                    name={[moduleFieldName, 'name']}
+                                                    fieldKey={[moduleFieldKey, 'name']}
+                                                    className={styles.panelHeaderFormItem}
+                                                    rules={validationRules.requiredValidation}
+                                                  >
+                                                    <Input
+                                                      placeholder="Module name"
+                                                      maxLength={50}
+                                                      className={styles.panelHeaderFormInput}
+                                                      onClick={preventDefaults}
+                                                    />
+                                                  </Form.Item>
+                                                </Col>
+                                                <Col flex="0 0 40px">
+                                                  <Popconfirm
+                                                    title="Remove this module?"
+                                                    okText="Yes, remove module"
+                                                    okButtonProps={{ danger: true, type: 'primary' }}
+                                                    cancelText="No"
+                                                    style={{ width: 'fit-content' }}
+                                                    onConfirm={(e) => {
+                                                      preventDefaults(e);
+                                                      setExpandedModulesKeys((prevKeys) =>
+                                                        prevKeys.filter((val) => val !== moduleFieldName)
+                                                      );
+                                                      removeModule(moduleFieldName);
+                                                    }}
+                                                  >
+                                                    <DeleteOutlined className={styles.deleteModuleIconButton} />
+                                                  </Popconfirm>
+                                                </Col>
+                                                <Col flex="0 0 40px">
+                                                  <DownOutlined
+                                                    rotate={expandedModulesKeys.includes(moduleFieldName) ? 180 : 0}
+                                                  />
+                                                </Col>
+                                              </Row>
+                                            </div>
+                                            {expandedModulesKeys.includes(moduleFieldName) && (
+                                              <div className={styles.expandedModuleItem}>
+                                                <Row>
+                                                  <Col xs={24}>
+                                                    <Form.List
+                                                      {...moduleFormItemRestFields}
+                                                      name={[moduleFieldName, 'module_content']}
+                                                      rules={validationRules.courseModuleContentValidation}
                                                     >
-                                                      {contentFields.map(
-                                                        ({
-                                                          key: contentKey,
-                                                          name: contentFieldName,
-                                                          fieldKey: contentFieldKey,
-                                                          ...contentFormItemRestFields
-                                                        }) => (
-                                                          <Draggable
-                                                            draggableId={`module-${moduleFieldName}-content-${contentFieldName}`}
-                                                            index={contentFieldName}
-                                                            key={`module-${moduleFieldName}-content-${contentFieldName}`}
-                                                          >
-                                                            {(contentDraggableProvided) => (
-                                                              <Row
-                                                                {...contentDraggableProvided.draggableProps}
-                                                                ref={contentDraggableProvided.innerRef}
-                                                                className={styles.contentListItem}
-                                                                align="middle"
-                                                                wrap={false}
-                                                                {...contentDraggableProvided.dragHandleProps}
-                                                              >
-                                                                <Col flex="30px">
-                                                                  <div className={styles.contentDragHandle} />
-                                                                </Col>
-                                                                <Col flex="auto">
-                                                                  <Row
-                                                                    key={contentKey}
-                                                                    gutter={[10, 10]}
-                                                                    align="middle"
-                                                                  >
-                                                                    <Col xs={10}>
-                                                                      <Form.Item
-                                                                        {...contentFormItemRestFields}
-                                                                        id="content_name"
-                                                                        name={[contentFieldName, 'name']}
-                                                                        fieldKey={[contentFieldKey, 'name']}
-                                                                        className={styles.inlineFormItem}
-                                                                        rules={validationRules.requiredValidation}
+                                                      {(
+                                                        contentFields,
+                                                        { add: addMoreContent, remove: removeContent }
+                                                      ) => (
+                                                        <Row gutter={[8, 8]}>
+                                                          <Col xs={24}>
+                                                            <Droppable
+                                                              droppableId={`module-${moduleFieldName}-content`}
+                                                              type={`module-${moduleFieldName}-content`}
+                                                            >
+                                                              {(contentDroppableProvided) => (
+                                                                <div
+                                                                  {...contentDroppableProvided}
+                                                                  ref={contentDroppableProvided.innerRef}
+                                                                >
+                                                                  {contentFields.map(
+                                                                    ({
+                                                                      key: contentKey,
+                                                                      name: contentFieldName,
+                                                                      fieldKey: contentFieldKey,
+                                                                      ...contentFormItemRestFields
+                                                                    }) => (
+                                                                      <Draggable
+                                                                        draggableId={`module-${moduleFieldName}-content-${contentFieldName}`}
+                                                                        index={contentFieldName}
+                                                                        key={`module-${moduleFieldName}-content-${contentFieldName}`}
                                                                       >
-                                                                        <Input
-                                                                          placeholder="Content name"
-                                                                          maxLength={50}
-                                                                        />
-                                                                      </Form.Item>
-                                                                      <Form.Item
-                                                                        hidden={true}
-                                                                        id="content_id"
-                                                                        name={[contentFieldName, 'product_id']}
-                                                                        fieldKey={[contentFieldKey, 'product_id']}
-                                                                      >
-                                                                        <Input
-                                                                          placeholder="Content ID"
-                                                                          maxLength={50}
-                                                                        />
-                                                                      </Form.Item>
-                                                                      <Form.Item
-                                                                        hidden={true}
-                                                                        id="content_type"
-                                                                        name={[contentFieldName, 'product_type']}
-                                                                        fieldKey={[contentFieldKey, 'product_type']}
-                                                                      >
-                                                                        <Input
-                                                                          placeholder="Content Type"
-                                                                          maxLength={50}
-                                                                        />
-                                                                      </Form.Item>
-                                                                    </Col>
-                                                                    <Col xs={14}>
-                                                                      <Row
-                                                                        gutter={[10, 10]}
-                                                                        justify="end"
-                                                                        align="middle"
-                                                                      >
-                                                                        {getContentProductType(
-                                                                          moduleFieldName,
-                                                                          contentFieldName
-                                                                        ) ? (
-                                                                          <Col
-                                                                            xs={12}
-                                                                            className={styles.textAlignRight}
+                                                                        {(contentDraggableProvided) => (
+                                                                          <Row
+                                                                            {...contentDraggableProvided.draggableProps}
+                                                                            ref={contentDraggableProvided.innerRef}
+                                                                            className={styles.contentListItem}
+                                                                            align="middle"
+                                                                            wrap={false}
+                                                                            {...contentDraggableProvided.dragHandleProps}
                                                                           >
-                                                                            {renderContentDetails(
-                                                                              moduleFieldName,
-                                                                              contentFieldName
-                                                                            )}
-                                                                          </Col>
-                                                                        ) : (
-                                                                          <>
-                                                                            <Col
-                                                                              xs={12}
-                                                                              className={styles.textAlignRight}
-                                                                            >
-                                                                              <Text
-                                                                                type="danger"
-                                                                                className={styles.textAlignCenter}
+                                                                            <Col flex="30px">
+                                                                              <div
+                                                                                className={styles.contentDragHandle}
+                                                                              />
+                                                                            </Col>
+                                                                            <Col flex="auto">
+                                                                              <Row
+                                                                                key={contentKey}
+                                                                                gutter={[10, 10]}
+                                                                                align="middle"
                                                                               >
-                                                                                Select content to add
-                                                                              </Text>
+                                                                                <Col xs={10}>
+                                                                                  <Form.Item
+                                                                                    {...contentFormItemRestFields}
+                                                                                    id="content_name"
+                                                                                    name={[contentFieldName, 'name']}
+                                                                                    fieldKey={[contentFieldKey, 'name']}
+                                                                                    className={styles.inlineFormItem}
+                                                                                    rules={
+                                                                                      validationRules.requiredValidation
+                                                                                    }
+                                                                                  >
+                                                                                    <Input
+                                                                                      placeholder="Content name"
+                                                                                      maxLength={50}
+                                                                                    />
+                                                                                  </Form.Item>
+                                                                                  <Form.Item
+                                                                                    hidden={true}
+                                                                                    id="content_id"
+                                                                                    name={[
+                                                                                      contentFieldName,
+                                                                                      'product_id',
+                                                                                    ]}
+                                                                                    fieldKey={[
+                                                                                      contentFieldKey,
+                                                                                      'product_id',
+                                                                                    ]}
+                                                                                  >
+                                                                                    <Input
+                                                                                      placeholder="Content ID"
+                                                                                      maxLength={50}
+                                                                                    />
+                                                                                  </Form.Item>
+                                                                                  <Form.Item
+                                                                                    hidden={true}
+                                                                                    id="content_type"
+                                                                                    name={[
+                                                                                      contentFieldName,
+                                                                                      'product_type',
+                                                                                    ]}
+                                                                                    fieldKey={[
+                                                                                      contentFieldKey,
+                                                                                      'product_type',
+                                                                                    ]}
+                                                                                  >
+                                                                                    <Input
+                                                                                      placeholder="Content Type"
+                                                                                      maxLength={50}
+                                                                                    />
+                                                                                  </Form.Item>
+                                                                                </Col>
+                                                                                <Col xs={14}>
+                                                                                  <Row
+                                                                                    gutter={[10, 10]}
+                                                                                    justify="end"
+                                                                                    align="middle"
+                                                                                  >
+                                                                                    {getContentProductType(
+                                                                                      moduleFieldName,
+                                                                                      contentFieldName
+                                                                                    ) ? (
+                                                                                      <Col
+                                                                                        xs={12}
+                                                                                        className={
+                                                                                          styles.textAlignRight
+                                                                                        }
+                                                                                      >
+                                                                                        {renderContentDetails(
+                                                                                          moduleFieldName,
+                                                                                          contentFieldName
+                                                                                        )}
+                                                                                      </Col>
+                                                                                    ) : (
+                                                                                      <>
+                                                                                        <Col
+                                                                                          xs={12}
+                                                                                          className={
+                                                                                            styles.textAlignRight
+                                                                                          }
+                                                                                        >
+                                                                                          <Text
+                                                                                            type="danger"
+                                                                                            className={
+                                                                                              styles.textAlignCenter
+                                                                                            }
+                                                                                          >
+                                                                                            Select content to add
+                                                                                          </Text>
+                                                                                        </Col>
+                                                                                        <Col
+                                                                                          xs={3}
+                                                                                          className={
+                                                                                            styles.textAlignCenter
+                                                                                          }
+                                                                                        >
+                                                                                          <Tooltip title="Add File Content">
+                                                                                            <Button
+                                                                                              block
+                                                                                              size="large"
+                                                                                              type="link"
+                                                                                              icon={<FilePdfOutlined />}
+                                                                                              onClick={() =>
+                                                                                                openFilePopup(
+                                                                                                  moduleFieldName
+                                                                                                )
+                                                                                              }
+                                                                                            />
+                                                                                          </Tooltip>
+                                                                                        </Col>
+                                                                                        <Col
+                                                                                          xs={3}
+                                                                                          className={
+                                                                                            styles.textAlignCenter
+                                                                                          }
+                                                                                        >
+                                                                                          <Tooltip
+                                                                                            title={
+                                                                                              courseCurriculumType ===
+                                                                                              courseCurriculumTypes.LIVE
+                                                                                                .name
+                                                                                                ? `You can't add a video to a live session course`
+                                                                                                : 'Add Video Content'
+                                                                                            }
+                                                                                          >
+                                                                                            <Button
+                                                                                              block
+                                                                                              disabled={
+                                                                                                courseCurriculumType ===
+                                                                                                courseCurriculumTypes
+                                                                                                  .LIVE.name
+                                                                                              }
+                                                                                              size="large"
+                                                                                              type="link"
+                                                                                              icon={
+                                                                                                <PlayCircleOutlined />
+                                                                                              }
+                                                                                              onClick={() =>
+                                                                                                openVideoPopup(
+                                                                                                  moduleFieldName
+                                                                                                )
+                                                                                              }
+                                                                                            />
+                                                                                          </Tooltip>
+                                                                                        </Col>
+                                                                                        <Col
+                                                                                          xs={3}
+                                                                                          className={
+                                                                                            styles.textAlignCenter
+                                                                                          }
+                                                                                        >
+                                                                                          <Tooltip
+                                                                                            title={
+                                                                                              courseCurriculumType ===
+                                                                                              courseCurriculumTypes
+                                                                                                .VIDEO.name
+                                                                                                ? `You can't add a session to a video course`
+                                                                                                : !courseStartDate ||
+                                                                                                  !courseEndDate
+                                                                                                ? 'Please pick the course dates first'
+                                                                                                : 'Add Session Content'
+                                                                                            }
+                                                                                          >
+                                                                                            <Button
+                                                                                              block
+                                                                                              disabled={
+                                                                                                courseCurriculumType ===
+                                                                                                  courseCurriculumTypes
+                                                                                                    .VIDEO.name ||
+                                                                                                !courseStartDate ||
+                                                                                                !courseEndDate
+                                                                                              }
+                                                                                              size="large"
+                                                                                              type="link"
+                                                                                              icon={
+                                                                                                <VideoCameraAddOutlined />
+                                                                                              }
+                                                                                              onClick={() =>
+                                                                                                openSessionPopup(
+                                                                                                  moduleFieldName
+                                                                                                )
+                                                                                              }
+                                                                                            />
+                                                                                          </Tooltip>
+                                                                                        </Col>
+                                                                                      </>
+                                                                                    )}
+                                                                                    <Col
+                                                                                      xs={3}
+                                                                                      className={styles.textAlignCenter}
+                                                                                    >
+                                                                                      <Tooltip title="Remove content">
+                                                                                        <Button
+                                                                                          size="large"
+                                                                                          type="link"
+                                                                                          icon={
+                                                                                            <MinusCircleTwoTone twoToneColor="#FF0000" />
+                                                                                          }
+                                                                                          onClick={() =>
+                                                                                            removeContent(
+                                                                                              contentFieldName
+                                                                                            )
+                                                                                          }
+                                                                                        />
+                                                                                      </Tooltip>
+                                                                                    </Col>
+                                                                                  </Row>
+                                                                                </Col>
+                                                                              </Row>
                                                                             </Col>
-                                                                            <Col
-                                                                              xs={3}
-                                                                              className={styles.textAlignCenter}
-                                                                            >
-                                                                              <Tooltip title="Add File Content">
-                                                                                <Button
-                                                                                  block
-                                                                                  size="large"
-                                                                                  type="link"
-                                                                                  icon={<FilePdfOutlined />}
-                                                                                  onClick={() =>
-                                                                                    openFilePopup(moduleFieldName)
-                                                                                  }
-                                                                                />
-                                                                              </Tooltip>
-                                                                            </Col>
-                                                                            <Col
-                                                                              xs={3}
-                                                                              className={styles.textAlignCenter}
-                                                                            >
-                                                                              <Tooltip
-                                                                                title={
-                                                                                  courseCurriculumType ===
-                                                                                  courseCurriculumTypes.LIVE.name
-                                                                                    ? `You can't add a video to a live session course`
-                                                                                    : 'Add Video Content'
-                                                                                }
-                                                                              >
-                                                                                <Button
-                                                                                  block
-                                                                                  disabled={
-                                                                                    courseCurriculumType ===
-                                                                                    courseCurriculumTypes.LIVE.name
-                                                                                  }
-                                                                                  size="large"
-                                                                                  type="link"
-                                                                                  icon={<PlayCircleOutlined />}
-                                                                                  onClick={() =>
-                                                                                    openVideoPopup(moduleFieldName)
-                                                                                  }
-                                                                                />
-                                                                              </Tooltip>
-                                                                            </Col>
-                                                                            <Col
-                                                                              xs={3}
-                                                                              className={styles.textAlignCenter}
-                                                                            >
-                                                                              <Tooltip
-                                                                                title={
-                                                                                  courseCurriculumType ===
-                                                                                  courseCurriculumTypes.VIDEO.name
-                                                                                    ? `You can't add a session to a video course`
-                                                                                    : !courseStartDate || !courseEndDate
-                                                                                    ? 'Please pick the course dates first'
-                                                                                    : 'Add Session Content'
-                                                                                }
-                                                                              >
-                                                                                <Button
-                                                                                  block
-                                                                                  disabled={
-                                                                                    courseCurriculumType ===
-                                                                                      courseCurriculumTypes.VIDEO
-                                                                                        .name ||
-                                                                                    !courseStartDate ||
-                                                                                    !courseEndDate
-                                                                                  }
-                                                                                  size="large"
-                                                                                  type="link"
-                                                                                  icon={<VideoCameraAddOutlined />}
-                                                                                  onClick={() =>
-                                                                                    openSessionPopup(moduleFieldName)
-                                                                                  }
-                                                                                />
-                                                                              </Tooltip>
-                                                                            </Col>
-                                                                          </>
+                                                                          </Row>
                                                                         )}
-                                                                        <Col xs={3} className={styles.textAlignCenter}>
-                                                                          <Tooltip title="Remove content">
-                                                                            <Button
-                                                                              size="large"
-                                                                              type="link"
-                                                                              icon={
-                                                                                <MinusCircleTwoTone twoToneColor="#FF0000" />
-                                                                              }
-                                                                              onClick={() =>
-                                                                                removeContent(contentFieldName)
-                                                                              }
-                                                                            />
-                                                                          </Tooltip>
-                                                                        </Col>
-                                                                      </Row>
-                                                                    </Col>
-                                                                  </Row>
-                                                                </Col>
-                                                              </Row>
-                                                            )}
-                                                          </Draggable>
-                                                        )
+                                                                      </Draggable>
+                                                                    )
+                                                                  )}
+                                                                  {contentDroppableProvided.placeholder}
+                                                                </div>
+                                                              )}
+                                                            </Droppable>
+                                                          </Col>
+                                                          <Col xs={24}>
+                                                            <Row justify="center">
+                                                              <Col>
+                                                                <Button
+                                                                  size="large"
+                                                                  type="primary"
+                                                                  onClick={() => addMoreContent()}
+                                                                  icon={<PlusOutlined />}
+                                                                  className={styles.greenBtn}
+                                                                >
+                                                                  Add More Content
+                                                                </Button>
+                                                              </Col>
+                                                            </Row>
+                                                          </Col>
+                                                        </Row>
                                                       )}
-                                                      {contentDroppableProvided.placeholder}
-                                                    </div>
-                                                  )}
-                                                </Droppable>
-                                              </Col>
-                                              <Col xs={24}>
-                                                <Row justify="center">
-                                                  <Col>
-                                                    <Button
-                                                      size="large"
-                                                      type="primary"
-                                                      onClick={() => addMoreContent()}
-                                                      icon={<PlusOutlined />}
-                                                      className={styles.greenBtn}
-                                                    >
-                                                      Add More Content
-                                                    </Button>
+                                                    </Form.List>
                                                   </Col>
                                                 </Row>
-                                              </Col>
-                                            </Row>
-                                          )}
-                                        </Form.List>
-                                      </Col>
-                                    </Row>
-                                  </Panel>
-                                )
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
+                                      </Draggable>
+                                    )
+                                  )}
+                                  {moduleDroppableProvided.placeholder}
+                                </div>
                               )}
-                            </Collapse>
+                            </Droppable>
                           </DragDropContext>
                         </Col>
                         <Col xs={24} md={8} lg={6}>
