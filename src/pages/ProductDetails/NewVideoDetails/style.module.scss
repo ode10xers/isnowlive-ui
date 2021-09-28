@@ -132,8 +132,10 @@
   }
 
   .paymentInstrumentSelectContainer {
+    padding: 12px;
     .paymentInstrumentSelectHeading {
       text-align: center;
+      margin-bottom: 0 !important;
     }
     
     .paymentInstrumentSelectDescription {

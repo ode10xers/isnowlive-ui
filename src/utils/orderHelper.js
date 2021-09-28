@@ -5,9 +5,11 @@ import {
   showPurchasePassAndBookSessionSuccessModal,
   showAlreadyBookedModal,
   showErrorModal,
+  showPurchaseSubscriptionAndGetVideoSuccessModal,
+  showPurchaseSubscriptionAndBookSessionSuccessModal,
 } from 'components/Modals/modals';
 
-import { isAPISuccess, isUnapprovedUserError, productType } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError, paymentSource, productType } from 'utils/helper';
 
 // These functions are for fetching the product details
 // that is required to be shown in the confirmation modals
@@ -67,7 +69,11 @@ export const followUpGetVideo = async (payload) => {
     const followUpPurchase = await apis.videos.createOrderForUser(payload);
 
     if (isAPISuccess(followUpPurchase.status)) {
-      showPurchasePassAndGetVideoSuccessModal(payload.source_id);
+      if (payload.payment_source === paymentSource.PASS) {
+        showPurchasePassAndGetVideoSuccessModal(payload.source_id);
+      } else if (payload.payment_source === paymentSource.SUBSCRIPTION) {
+        showPurchaseSubscriptionAndGetVideoSuccessModal();
+      }
     }
   } catch (error) {
     if (error.response?.data?.message === 'user already has a confirmed order for this video') {
@@ -84,7 +90,11 @@ export const followUpBookSession = async (payload) => {
     const followUpBooking = await apis.session.createOrderForUser(payload);
 
     if (isAPISuccess(followUpBooking.status)) {
-      showPurchasePassAndBookSessionSuccessModal(payload.source_id, payload.inventory_id);
+      if (payload.payment_source === paymentSource.PASS) {
+        showPurchasePassAndBookSessionSuccessModal(payload.source_id, payload.inventory_id);
+      } else if (payload.payment_source === paymentSource.SUBSCRIPTION) {
+        showPurchaseSubscriptionAndBookSessionSuccessModal(payload.inventory_id);
+      }
     }
   } catch (error) {
     if (

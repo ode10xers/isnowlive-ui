@@ -48,6 +48,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 import SelectablePassItem from './SelectablePassItem';
+import SelectableSubscriptionItem from './SelectableSubscriptionItem';
 
 const {
   formatDate: { getVideoMinutesDuration, toShortDate },
@@ -952,6 +953,18 @@ const NewVideoDetails = ({ match }) => {
     </Col>
   );
 
+  const renderRelatedSubscriptionItems = (subs) => (
+    <Col xs={24} md={12} key={subs.external_id}>
+      <SelectableSubscriptionItem
+        subscription={subs}
+        showExtra={true}
+        onSelect={setSelectedSubscription}
+        onDeselect={handleDeselectSubscription}
+        isSelected={selectedSubscription?.external_id === subs.external_id}
+      />
+    </Col>
+  );
+
   const renderPaymentInstrumentsSection = () => {
     const relatedPassesAvailable = relatedPasses.length > 0;
     const relatedSubscriptionAvailable = relatedSubscriptions.length > 0;
@@ -972,7 +985,7 @@ const NewVideoDetails = ({ match }) => {
 
     return (
       <div className={styles.paymentInstrumentsContainer}>
-        <Row gutter={[12, 16]} align="middle" justify="space-around">
+        <Row gutter={[12, 16]} justify="space-around">
           <Col xs={24} className={styles.textAlignCenter}>
             <Space
               direction={lg ? 'horizontal' : 'vertical'}
@@ -1114,7 +1127,131 @@ const NewVideoDetails = ({ match }) => {
               </div>
             </Col>
           )}
-          {relatedSubscriptionAvailable && <Col xs={24} lg={12}></Col>}
+          {relatedSubscriptionAvailable && (
+            <Col xs={24} lg={12}>
+              <div className={styles.paymentInstrumentSelectContainer}>
+                <Row gutter={[8, 16]}>
+                  <Col xs={24}>
+                    <Title level={4} className={styles.paymentInstrumentSelectHeading}>
+                      Buy with a membership
+                    </Title>
+                  </Col>
+                  <Col xs={24} className={styles.textAlignCenter}>
+                    <Text className={styles.paymentInstrumentSelectDescription}>
+                      Select from one of the memberships below
+                    </Text>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[12, 12]} className={styles.paymentInstrumentSelectList}>
+                      {relatedSubscriptions.map(renderRelatedSubscriptionItems)}
+                    </Row>
+                  </Col>
+                  <Col xs={24}>
+                    <Divider />
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[12, 12]} align="middle">
+                      <Col xs={24} md={11}>
+                        <div className={styles.smallProductPreview}>
+                          <div className={styles.smallProductPreviewOverlay}>This Video (FREE)</div>
+                          <Image
+                            loading="lazy"
+                            width="100%"
+                            src={videoData?.thumbnail_url}
+                            className={styles.smallProductPreviewImage}
+                            fallback={DefaultImage()}
+                            preview={false}
+                          />
+                        </div>
+                      </Col>
+                      <Col xs={24} md={2} className={styles.textAlignCenter}>
+                        <PlusCircleFilled className={styles.bundleSummaryIcon} />
+                      </Col>
+                      <Col xs={24} md={11}>
+                        {selectedSubscription ? (
+                          <div className={styles.paymentInstrumentBundleContainer}>
+                            <SelectableSubscriptionItem
+                              subscription={selectedSubscription}
+                              showExtra={true}
+                              onSelect={setSelectedSubscription}
+                              onDeselect={handleDeselectSubscription}
+                              isSelected={true}
+                            />
+                          </div>
+                        ) : (
+                          <div className={styles.paymentInstrumentOutlineContainer}>
+                            <div className={styles.paymentInstrumentOutline}>Select a Membership</div>
+                            <Paragraph className={styles.paymentInstrumentOutlineHelpText}>
+                              Select a membership above
+                            </Paragraph>
+                          </div>
+                        )}
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[8, 12]} align="middle" className={styles.bundleSummaryContainer}>
+                      <Col xs={24} md={12} className={styles.textAlignCenter}>
+                        <Space
+                          align="center"
+                          className={styles.bundleSummaryTextContainer}
+                          split={<PlusOutlined className={styles.bundleSummaryDivider} />}
+                        >
+                          <Text className={styles.bundleSummaryText} strong>
+                            {videoData?.title}
+                          </Text>
+                          {selectedSubscription ? (
+                            <Text className={styles.bundleSummaryText} strong>
+                              {selectedSubscription.name}
+                            </Text>
+                          ) : (
+                            <Text className={styles.bundleSummaryText}>Selected Membership</Text>
+                          )}
+                        </Space>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Button
+                          block
+                          disabled={!selectedSubscription}
+                          className={classNames(
+                            styles.videoBuyBtn,
+                            !selectedSubscription ? styles.disabled : undefined,
+                            !isInIframeWidget() &&
+                              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                              ? styles.darkText
+                              : styles.lightText
+                          )}
+                          type="primary"
+                          onClick={handleBuySubscriptionAndVideoClicked}
+                        >
+                          <Space
+                            align="center"
+                            size="small"
+                            split={<Divider type="vertical" className={styles.buyBtnDivider} />}
+                            className={styles.buyBtnTextContainer}
+                          >
+                            <Text className={styles.buyBtnText}> BUY VIDEO AND MEMBERSHIP </Text>
+                            {selectedSubscription ? (
+                              <Text className={styles.buyBtnText}>
+                                {selectedSubscription?.total_price > 0 ? (
+                                  <>
+                                    {selectedSubscription?.currency?.toUpperCase() ?? ''}{' '}
+                                    {selectedSubscription?.total_price ?? 0}
+                                  </>
+                                ) : (
+                                  'Free'
+                                )}
+                              </Text>
+                            ) : null}
+                          </Space>
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+          )}
         </Row>
       </div>
     );
@@ -1168,7 +1305,7 @@ const NewVideoDetails = ({ match }) => {
                       {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
                     </div>
                   </div>
-                  {!videoData?.is_course && !usablePass && !usableSubscription && renderDynamicBuyButton()}
+                  {!videoData?.is_course && renderDynamicBuyButton()}
                 </Space>
               </Col>
               {/* Video Image */}
@@ -1187,7 +1324,13 @@ const NewVideoDetails = ({ match }) => {
             </Row>
           </Col>
           {/* Buy Sections */}
-          <Col xs={24}>{videoData?.is_course ? relatedCourseSection : renderPaymentInstrumentsSection()}</Col>
+          <Col xs={24}>
+            {videoData?.is_course
+              ? relatedCourseSection
+              : !usablePass && !usableSubscription
+              ? renderPaymentInstrumentsSection()
+              : null}
+          </Col>
           {/* Similar Videos */}
           <Col xs={24}></Col>
         </Row>

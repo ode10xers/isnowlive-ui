@@ -221,6 +221,41 @@ export const showPurchasePassAndBookSessionSuccessModal = async (passOrderId, in
   });
 };
 
+export const showPurchaseSubscriptionAndBookSessionSuccessModal = async (inventoryId) => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  const inventoryDetails = await getSessionInventoryDetails(inventoryId);
+
+  Modal.success({
+    width: 480,
+    closable: true,
+    maskClosable: false,
+    okButtonProps: { style: { display: 'none' } },
+    title: 'Registration Successful',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
+      )),
+    content: (
+      <>
+        <Paragraph>You have successfully purchased this membership.</Paragraph>
+        <Paragraph>
+          We have <Text strong> used 1 credit </Text> to book this class for you.
+        </Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        {generateCustomButtonsForSessionModals(username, inventoryDetails)}
+      </>
+    ),
+    afterClose: resetBodyStyle,
+  });
+};
+
 export const showBookSessionWithPassSuccessModal = async (passOrderId, inventoryId) => {
   const username = getUsernameFromUrl();
   const userEmail = getLocalUserDetails().email;
