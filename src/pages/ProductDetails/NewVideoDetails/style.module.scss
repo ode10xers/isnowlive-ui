@@ -15,6 +15,7 @@
   .videoTitle {
     margin-bottom: 0 !important;
     font-size: 28px !important;
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
 
     @media screen and (max-width: 768px) {
       font-size: 20px !important;
@@ -31,8 +32,11 @@
 
   .videoDetailsContainer {
     .videoDetailItem {
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
+
       .detailIcons {
         margin-right: 6px;
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
       }
     }
   }
@@ -52,7 +56,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
         sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
       background: transparent !important;
-      color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}) !important;
     }
   }
 
@@ -78,11 +82,11 @@
 
   &.darkText {
     .buyBtnText {
-      color : map-get($map: $colors, $key: 'Zeus') !important;
+      color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')}) !important;
     }
 
     .buyBtnDivider {
-      border-left-color : map-get($map: $colors, $key: 'Zeus') !important;
+      border-left-color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')}) !important;
     }
   }
 
@@ -120,26 +124,47 @@
   padding: 20px;
 
   .paymentInstrumentHeadingContainer {
+    .paymentInstrumentHeadingText {
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
+
+      @media screen and (max-width: 769px) {
+        font-size: 20px !important;
+      }
+    }
+
     .paymentInstrumentHeadingDivider {
       height: 3em;
-      border-left-color: map-get($map: $colors, $key: 'Black');
-      border-top-color: map-get($map: $colors, $key: 'Black');
-      @media screen and (max-width: 769px) {
-        height: initial;
-        margin: 8px 0;
+      border-left-color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
+      border-top-color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
+      @media screen and (max-width: 993px) {
+        height: 4px !important;
+        margin: 8px 0 !important; 
       }
     }
   }
 
   .paymentInstrumentSelectContainer {
+    border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    border-radius: 8px;
     padding: 12px;
+
     .paymentInstrumentSelectHeading {
       text-align: center;
       margin-bottom: 0 !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
+
+      @media screen and (max-width: 769px) {
+        font-size: 18px !important;
+      }
+
+      @media screen and (max-width: 576px) {
+        font-size: 16px !important;
+      }
     }
     
     .paymentInstrumentSelectDescription {
       text-align: center;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
     }
 
     .smallProductPreview {
@@ -171,10 +196,6 @@
       color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
     }
 
-    .paymentInstrumentBundleContainer {
-
-    }
-
     .paymentInstrumentOutlineContainer {
       .paymentInstrumentOutline {
         border: 1px dashed map-get($map: $colors, $key: 'Silver');
@@ -187,18 +208,19 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
       }
 
       .paymentInstrumentOutlineHelpText {
         text-align: center;
         margin: 4px auto;
         font-size: 12px;
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
       }
     }
 
     .bundleSummaryContainer {
       padding: 8px !important;
-
       background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')});
       border-radius: 6px;
 
@@ -208,10 +230,13 @@
         .bundleSummaryDivider {
           font-size: 12px;
           margin: auto 4px;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
+
         }
   
         .bundleSummaryText {
           font-size: 14px;  
+          color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')});
         }
       }
     }

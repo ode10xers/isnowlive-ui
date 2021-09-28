@@ -770,6 +770,7 @@ const NewVideoDetails = ({ match }) => {
 
   //#region Start of UI Components
 
+  // TODO: Update this implementation
   const renderVideoDocumentUrl = () => {
     const documentUrl = videoData?.description.split('!~!~!~')[1] ?? '';
     const isPublicDownloadable = videoData?.description.split('!~!~!~')[2] ?? false;
@@ -797,6 +798,7 @@ const NewVideoDetails = ({ match }) => {
             <Text className={styles.filenameText}>{filename}</Text>
           )}
         </Space>
+        <Divider />
       </div>
     );
   };
@@ -1283,7 +1285,7 @@ const NewVideoDetails = ({ match }) => {
             <Row gutter={[10, 10]}>
               {/* Video Details */}
               <Col xs={{ span: 24, order: 2 }} lg={{ span: 12, order: 2 }} className={styles.videoDetailsSection}>
-                <Space direction="vertical">
+                <Space direction="vertical" className={styles.w100}>
                   <Title level={3} className={styles.videoTitle}>
                     {videoData?.title}
                   </Title>
@@ -1300,7 +1302,6 @@ const NewVideoDetails = ({ match }) => {
                   </Space>
                   <div className={styles.videoDescContainer}>
                     {renderVideoDocumentUrl()}
-                    <Divider />
                     <div className={styles.videoDesc}>
                       {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
                     </div>
