@@ -68,6 +68,7 @@ const MembershipDetailPreview = lazy(() => import('pages/PreviewPages/Membership
 const AvailabilityDetailPreview = lazy(() => import('pages/PreviewPages/AvailabilityDetails'));
 const SessionDetailsPreview = lazy(() => import('pages/PreviewPages/SessionDetails'));
 const InventoryDetailsPreview = lazy(() => import('pages/PreviewPages/InventoryDetails'));
+const PluginPages = lazy(() => import('pages/PluginPages'));
 
 // const CookieConsentPopup = lazy(() => import('components/CookieConsentPopup'));
 const PaymentPopup = lazy(() => import('components/PaymentPopup'));
@@ -232,6 +233,7 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
+            <RouteWithLayout layout={FullWidthLayout} path={Routes.plugins.root} component={PluginPages} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute
               layout={SideNavWithHeaderLayout}

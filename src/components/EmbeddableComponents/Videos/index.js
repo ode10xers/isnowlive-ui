@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-// import VideoDetailedListView from 'pages/DetailedListView/Videos';
 
 import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
 import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-design/icons';
@@ -7,9 +6,10 @@ import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-
 import apis from 'apis';
 import Routes from 'routes';
 
-import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import AuthModal from 'components/AuthModal';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
+import { redirectToPluginVideosPage } from 'utils/redirect';
 import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -103,6 +103,10 @@ const Videos = () => {
     } else {
       setShowAuthModal(true);
     }
+  };
+
+  const handlePluginVideoItemsClicked = (video) => {
+    redirectToPluginVideosPage(video);
   };
 
   const groupFilters = (
@@ -222,7 +226,7 @@ const Videos = () => {
         <Row gutter={[8, 8]}>
           {videosByGroup[groupView]?.map((video) => (
             <Col xs={24} sm={12} md={8} lg={6}>
-              <VideoListCard video={video} />
+              <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
             </Col>
           ))}
         </Row>

@@ -24,6 +24,8 @@ import {
 import AuthModal from 'components/AuthModal';
 import DefaultImage from 'components/Icons/DefaultImage';
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
+import SelectablePassItem from './SelectablePassItem';
+import SelectableSubscriptionItem from './SelectableSubscriptionItem';
 
 import {
   orderType,
@@ -47,8 +49,6 @@ import { generateColorPalletteForProfile } from 'utils/colors';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import SelectablePassItem from './SelectablePassItem';
-import SelectableSubscriptionItem from './SelectableSubscriptionItem';
 
 const {
   formatDate: { getVideoMinutesDuration, toShortDate },
