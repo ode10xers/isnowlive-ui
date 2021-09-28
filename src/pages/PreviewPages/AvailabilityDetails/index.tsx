@@ -104,6 +104,7 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
         setCreatorProfile(creatorDetailsResponse.data);
       }
     } catch (error) {
+      // @ts-ignore
       message.error(error?.response?.data?.message || 'Failed to fetch creator profile');
     }
     setIsLoading(false);

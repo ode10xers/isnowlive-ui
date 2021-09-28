@@ -3,13 +3,11 @@ import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 import { Row, Col, Button, Image, Typography, Space, Spin, Divider, Grid, message } from 'antd';
 import {
-  TagsOutlined,
   FilePdfOutlined,
   CalendarOutlined,
-  ScheduleOutlined,
-  CreditCardOutlined,
-  CheckCircleTwoTone,
   ClockCircleOutlined,
+  PlusCircleFilled,
+  PlusOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -26,8 +24,6 @@ import {
 import AuthModal from 'components/AuthModal';
 import DefaultImage from 'components/Icons/DefaultImage';
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
-import PassesListItem from 'components/DynamicProfileComponents/PassesProfileComponent/PassesListItem';
-import SubscriptionListItem from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListItem';
 
 import {
   orderType,
@@ -51,6 +47,7 @@ import { generateColorPalletteForProfile } from 'utils/colors';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import SelectablePassItem from './SelectablePassItem';
 
 const {
   formatDate: { getVideoMinutesDuration, toShortDate },
@@ -92,9 +89,7 @@ const NewVideoDetails = ({ match }) => {
   const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
   const [selectedPaymentInstrument, setSelectedPaymentInstrument] = useState(paymentInstruments.ONE_OFF);
   const [selectedPass, setSelectedPass] = useState(null);
-  const [passSelectionError, setPassSelectionError] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
-  const [subscriptionSelectionError, setSubscriptionSelectionError] = useState(false);
 
   //#region Start of API Calls
 
@@ -302,8 +297,6 @@ const NewVideoDetails = ({ match }) => {
     } else {
       setUsablePass(null);
       setUsableSubscription(null);
-      setPassSelectionError(false);
-      setSubscriptionSelectionError(false);
     }
   }, [videoId, userDetails, fetchUserPaymentInstruments]);
 
@@ -714,6 +707,14 @@ const NewVideoDetails = ({ match }) => {
     setShowAuthModal(false);
   };
 
+  const handleDeselectPass = () => {
+    setSelectedPass(null);
+  };
+
+  const handleDeselectSubscription = () => {
+    setSelectedSubscription(null);
+  };
+
   const handleBuy = () => {
     if (userDetails) {
       showConfirmPaymentPopup();
@@ -726,6 +727,42 @@ const NewVideoDetails = ({ match }) => {
     preventDefaults(e);
     setSelectedPaymentInstrument(paymentInstruments.ONE_OFF);
     handleBuy();
+  };
+
+  const handleBuyVideoUsingPassClicked = (e) => {
+    if (!usablePass) {
+      message.error('You need a valid credit pass first!');
+    } else {
+      setSelectedPaymentInstrument(paymentInstruments.PASS);
+      handleBuy();
+    }
+  };
+
+  const handleBuyVideoUsingSubscriptionClicked = (e) => {
+    if (!usableSubscription) {
+      message.error('You need a valid subscription first!');
+    } else {
+      setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
+      handleBuy();
+    }
+  };
+
+  const handleBuyPassAndVideoClicked = (e) => {
+    if (!selectedPass) {
+      message.error('Please select a pass!');
+    } else {
+      setSelectedPaymentInstrument(paymentInstruments.PASS);
+      handleBuy();
+    }
+  };
+
+  const handleBuySubscriptionAndVideoClicked = (e) => {
+    if (!selectedSubscription) {
+      message.error('Please select a membership!');
+    } else {
+      setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
+      handleBuy();
+    }
   };
 
   //#endregion End of Event handlers
@@ -778,10 +815,7 @@ const NewVideoDetails = ({ match }) => {
               )}
               size="large"
               type="primary"
-              onClick={() => {
-                setSelectedPaymentInstrument(paymentInstruments.SUBSCRIPTION);
-                handleBuy();
-              }}
+              onClick={handleBuyVideoUsingSubscriptionClicked}
             >
               <Space
                 align="center"
@@ -838,10 +872,7 @@ const NewVideoDetails = ({ match }) => {
               )}
               size="large"
               type="primary"
-              onClick={() => {
-                setSelectedPaymentInstrument(paymentInstruments.PASS);
-                handleBuy();
-              }}
+              onClick={handleBuyVideoUsingPassClicked}
             >
               <Space
                 align="center"
@@ -909,6 +940,18 @@ const NewVideoDetails = ({ match }) => {
     );
   };
 
+  const renderRelatedPassItems = (pass) => (
+    <Col xs={24} md={12} key={pass.external_id}>
+      <SelectablePassItem
+        pass={pass}
+        showExtra={true}
+        onSelect={setSelectedPass}
+        onDeselect={handleDeselectPass}
+        isSelected={selectedPass?.external_id === pass.external_id}
+      />
+    </Col>
+  );
+
   const renderPaymentInstrumentsSection = () => {
     const relatedPassesAvailable = relatedPasses.length > 0;
     const relatedSubscriptionAvailable = relatedSubscriptions.length > 0;
@@ -934,7 +977,9 @@ const NewVideoDetails = ({ match }) => {
             <Space
               direction={lg ? 'horizontal' : 'vertical'}
               align="middle"
-              split={<Divider type="vertical" className={styles.paymentInstrumentHeadingDivider} />}
+              split={
+                <Divider type={lg ? 'vertical' : 'horizontal'} className={styles.paymentInstrumentHeadingDivider} />
+              }
               className={styles.paymentInstrumentHeadingContainer}
             >
               <Title level={3} className={styles.paymentInstrumentHeadingText}>
@@ -961,14 +1006,110 @@ const NewVideoDetails = ({ match }) => {
                   </Col>
                   <Col xs={24}>
                     <Row gutter={[12, 12]} className={styles.paymentInstrumentSelectList}>
-                      {/* Item List */}
+                      {relatedPasses.map(renderRelatedPassItems)}
                     </Row>
                   </Col>
                   <Col xs={24}>
                     <Divider />
                   </Col>
-                  <Col xs={24}>{/* Summary */}</Col>
-                  <Col xs={24}>{/* CTA */}</Col>
+                  <Col xs={24}>
+                    <Row gutter={[12, 12]} align="middle">
+                      <Col xs={24} md={11}>
+                        <div className={styles.smallProductPreview}>
+                          <div className={styles.smallProductPreviewOverlay}>This Video (FREE)</div>
+                          <Image
+                            loading="lazy"
+                            width="100%"
+                            src={videoData?.thumbnail_url}
+                            className={styles.smallProductPreviewImage}
+                            fallback={DefaultImage()}
+                            preview={false}
+                          />
+                        </div>
+                      </Col>
+                      <Col xs={24} md={2} className={styles.textAlignCenter}>
+                        <PlusCircleFilled className={styles.bundleSummaryIcon} />
+                      </Col>
+                      <Col xs={24} md={11}>
+                        {selectedPass ? (
+                          <div className={styles.paymentInstrumentBundleContainer}>
+                            <SelectablePassItem
+                              pass={selectedPass}
+                              showExtra={true}
+                              onSelect={setSelectedPass}
+                              onDeselect={handleDeselectPass}
+                              isSelected={true}
+                            />
+                          </div>
+                        ) : (
+                          <div className={styles.paymentInstrumentOutlineContainer}>
+                            <div className={styles.paymentInstrumentOutline}>Select a Credit Pass</div>
+                            <Paragraph className={styles.paymentInstrumentOutlineHelpText}>
+                              Select a pass above
+                            </Paragraph>
+                          </div>
+                        )}
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[8, 12]} align="middle" className={styles.bundleSummaryContainer}>
+                      <Col xs={24} md={12} className={styles.textAlignCenter}>
+                        <Space
+                          align="center"
+                          className={styles.bundleSummaryTextContainer}
+                          split={<PlusOutlined className={styles.bundleSummaryDivider} />}
+                        >
+                          <Text className={styles.bundleSummaryText} strong>
+                            {videoData?.title}
+                          </Text>
+                          {selectedPass ? (
+                            <Text className={styles.bundleSummaryText} strong>
+                              {selectedPass.name}
+                            </Text>
+                          ) : (
+                            <Text className={styles.bundleSummaryText}>Selected Pass</Text>
+                          )}
+                        </Space>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Button
+                          block
+                          disabled={!selectedPass}
+                          className={classNames(
+                            styles.videoBuyBtn,
+                            !selectedPass ? styles.disabled : undefined,
+                            !isInIframeWidget() &&
+                              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                              ? styles.darkText
+                              : styles.lightText
+                          )}
+                          type="primary"
+                          onClick={handleBuyPassAndVideoClicked}
+                        >
+                          <Space
+                            align="center"
+                            size="small"
+                            split={<Divider type="vertical" className={styles.buyBtnDivider} />}
+                            className={styles.buyBtnTextContainer}
+                          >
+                            <Text className={styles.buyBtnText}> BUY VIDEO AND PASS </Text>
+                            {selectedPass ? (
+                              <Text className={styles.buyBtnText}>
+                                {selectedPass?.total_price > 0 ? (
+                                  <>
+                                    {selectedPass?.currency?.toUpperCase() ?? ''} {selectedPass?.total_price ?? 0}
+                                  </>
+                                ) : (
+                                  'Free'
+                                )}
+                              </Text>
+                            ) : null}
+                          </Space>
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
                 </Row>
               </div>
             </Col>
@@ -1027,7 +1168,7 @@ const NewVideoDetails = ({ match }) => {
                       {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
                     </div>
                   </div>
-                  {!videoData?.is_course && renderDynamicBuyButton()}
+                  {!videoData?.is_course && !usablePass && !usableSubscription && renderDynamicBuyButton()}
                 </Space>
               </Col>
               {/* Video Image */}

@@ -72,13 +72,16 @@
   background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
 
+  &.disabled {
+    opacity: 0.7;
+  }
+
   &.darkText {
     .buyBtnText {
       color : map-get($map: $colors, $key: 'Zeus') !important;
     }
 
     .buyBtnDivider {
-      height: 1.5em;
       border-left-color : map-get($map: $colors, $key: 'Zeus') !important;
     }
   }
@@ -89,13 +92,21 @@
     }
 
     .buyBtnDivider {
-      height: 1.5em;
       border-left-color : map-get($map: $colors, $key: 'White') !important;
     }
   }
 
   .buyBtnTextContainer {
     height: 100%;
+  }
+
+  .buyBtnText {
+    font-size: 14px;
+  }
+
+  .buyBtnDivider {
+    height: 1.5em;
+    margin: 0 2px !important;
   }
 }
 
@@ -112,6 +123,11 @@
     .paymentInstrumentHeadingDivider {
       height: 3em;
       border-left-color: map-get($map: $colors, $key: 'Black');
+      border-top-color: map-get($map: $colors, $key: 'Black');
+      @media screen and (max-width: 769px) {
+        height: initial;
+        margin: 8px 0;
+      }
     }
   }
 
@@ -122,6 +138,80 @@
     
     .paymentInstrumentSelectDescription {
       text-align: center;
+    }
+
+    .smallProductPreview {
+      position: relative;
+
+      .smallProductPreviewOverlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        margin-top: -20px;
+        margin-left: -90px;
+        padding: 6px 12px;
+        width: 180px;
+        background: rgba(0, 0, 0, 0.4);
+        color: map-get($map: $colors, $key: 'White');
+        font-size: 16px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .smallProductPreviewImage {
+        border-radius: 8px;
+      }
+    }
+
+    .bundleSummaryIcon {
+      font-size: 32px;
+      color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    }
+
+    .paymentInstrumentBundleContainer {
+
+    }
+
+    .paymentInstrumentOutlineContainer {
+      .paymentInstrumentOutline {
+        border: 1px dashed map-get($map: $colors, $key: 'Silver');
+        background-color: map-get($map: $colors, $key: 'WhiteSmoke2');
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+        min-height: 120px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .paymentInstrumentOutlineHelpText {
+        text-align: center;
+        margin: 4px auto;
+        font-size: 12px;
+      }
+    }
+
+    .bundleSummaryContainer {
+      padding: 8px !important;
+
+      background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')});
+      border-radius: 6px;
+
+      .bundleSummaryTextContainer {
+        text-align: center;
+  
+        .bundleSummaryDivider {
+          font-size: 12px;
+          margin: auto 4px;
+        }
+  
+        .bundleSummaryText {
+          font-size: 14px;  
+        }
+      }
     }
   }
 }
