@@ -180,7 +180,7 @@ const Videos = () => {
                 <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
                   {groupVideos?.slice(0, videoItemsLimit).map((video) => (
                     <Col xs={20} sm={18} md={9} lg={7} xl={5}>
-                      <VideoListCard video={video} />
+                      <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
                     </Col>
                   ))}
                   {groupVideos?.length > videoItemsLimit && (

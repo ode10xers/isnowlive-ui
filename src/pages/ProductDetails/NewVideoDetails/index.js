@@ -1108,8 +1108,8 @@ const NewVideoDetails = ({ match }) => {
                             split={<Divider type="vertical" className={styles.buyBtnDivider} />}
                             className={styles.buyBtnTextContainer}
                           >
-                            <Text className={styles.buyBtnText}> BUY VIDEO AND PASS </Text>
-                            {selectedPass ? (
+                            <Text className={styles.buyBtnText}> BUY VIDEO & PASS </Text>
+                            {/* {selectedPass ? (
                               <Text className={styles.buyBtnText}>
                                 {selectedPass?.total_price > 0 ? (
                                   <>
@@ -1119,7 +1119,7 @@ const NewVideoDetails = ({ match }) => {
                                   'Free'
                                 )}
                               </Text>
-                            ) : null}
+                            ) : null} */}
                           </Space>
                         </Button>
                       </Col>
@@ -1232,8 +1232,8 @@ const NewVideoDetails = ({ match }) => {
                             split={<Divider type="vertical" className={styles.buyBtnDivider} />}
                             className={styles.buyBtnTextContainer}
                           >
-                            <Text className={styles.buyBtnText}> BUY VIDEO AND MEMBERSHIP </Text>
-                            {selectedSubscription ? (
+                            <Text className={styles.buyBtnText}> BUY VIDEO & MEMBERSHIP </Text>
+                            {/* {selectedSubscription ? (
                               <Text className={styles.buyBtnText}>
                                 {selectedSubscription?.total_price > 0 ? (
                                   <>
@@ -1244,7 +1244,7 @@ const NewVideoDetails = ({ match }) => {
                                   'Free'
                                 )}
                               </Text>
-                            ) : null}
+                            ) : null} */}
                           </Space>
                         </Button>
                       </Col>
