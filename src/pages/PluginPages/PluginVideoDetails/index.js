@@ -29,7 +29,7 @@ const PluginVideoDetails = ({ match, history }) => {
 
   return (
     <div className={styles.pluginVideoDetailsPage}>
-      <Row gutter={[8, 8]}>
+      <Row gutter={[8, 8]} className={styles.pageContainer}>
         <Col xs={24}>
           <div className={styles.backButtonContainer}>
             <Button
