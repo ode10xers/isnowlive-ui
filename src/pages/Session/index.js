@@ -64,6 +64,7 @@ import {
 import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/integrations/googleTagManager';
 
 import styles from './style.module.scss';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 
 const maxInventoryLimitPerRequest = 1000;
 
@@ -161,6 +162,8 @@ const Session = ({ match, history }) => {
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [isOfflineSession, setIsOfflineSession] = useState(false);
   const [onlineMeetingType, setOnlineMeetingType] = useState(meetingTypes.ZOOM.value);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.1);
 
   const {
     state: {
@@ -176,6 +179,8 @@ const Session = ({ match, history }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -1229,7 +1234,17 @@ const Session = ({ match, history }) => {
                 )}
                 hidden={sessionPaymentType === priceTypes.FREE}
               >
-                <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
+                {creatorAbsorbsFees || sessionPaymentType === priceTypes.FLEXIBLE ? (
+                  <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
+                ) : (
+                  <PriceInputCalculator
+                    name="price"
+                    form={form}
+                    minimalPrice={1}
+                    initialValue={1}
+                    feePercentage={creatorFeePercentage}
+                  />
+                )}
               </Form.Item>
 
               {sessionPaymentType !== priceTypes.FREE && (
