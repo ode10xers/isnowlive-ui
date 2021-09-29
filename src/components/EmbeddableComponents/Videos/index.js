@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-
+import { useHistory, generatePath } from 'react-router-dom';
 import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
 import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-design/icons';
 
@@ -9,7 +9,7 @@ import Routes from 'routes';
 import AuthModal from 'components/AuthModal';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
-import { redirectToPluginVideosPage } from 'utils/redirect';
+// import { redirectToPluginVideosPage } from 'utils/redirect';
 import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -25,6 +25,8 @@ const Videos = () => {
   const {
     state: { userDetails },
   } = useGlobalContext();
+  const history = useHistory();
+  console.log(history);
 
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -106,7 +108,10 @@ const Videos = () => {
   };
 
   const handlePluginVideoItemsClicked = (video) => {
-    redirectToPluginVideosPage(video);
+    // redirectToPluginVideosPage(video);
+    history.push(Routes.plugins.root + generatePath(Routes.plugins.details.video, { video_id: video.external_id }));
+    console.log('pushed');
+    // window.location.reload();
   };
 
   const groupFilters = (
@@ -179,7 +184,7 @@ const Videos = () => {
               <Col xs={24}>
                 <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
                   {groupVideos?.slice(0, videoItemsLimit).map((video) => (
-                    <Col xs={20} sm={18} md={9} lg={7} xl={5}>
+                    <Col xs={20} sm={18} md={9} lg={7} xl={5} key={video.external_id}>
                       <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
                     </Col>
                   ))}
@@ -225,7 +230,7 @@ const Videos = () => {
       <Col xs={24}>
         <Row gutter={[8, 8]}>
           {videosByGroup[groupView]?.map((video) => (
-            <Col xs={24} sm={12} md={8} lg={6}>
+            <Col xs={24} sm={12} md={8} lg={6} key={`more_${video.external_id}`}>
               <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
             </Col>
           ))}
