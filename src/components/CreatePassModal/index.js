@@ -9,6 +9,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
@@ -65,7 +66,14 @@ const colorPickerChoices = [
   '#5030fd',
 ];
 
-const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMemberTags = [] }) => {
+const CreatePassModal = ({
+  visible,
+  closeModal,
+  editedPass = null,
+  creatorMemberTags = [],
+  creatorAbsorbsFees = true,
+  creatorFeePercentage = 0.2,
+}) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -188,7 +196,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         });
         setSelectedTagType(editedPass.tag?.external_id ? 'selected' : 'anyone');
         setSelectedTag(editedPass.tag?.external_id || null);
-        setCurrency(editedPass.currency.toUpperCase() || '');
+        setCurrency(editedPass.currency?.toUpperCase() || '');
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(
           editedPass.sessions.filter((session) => session.type === 'NORMAL').map((session) => session.session_id) ?? []
@@ -200,16 +208,16 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         );
         setSelectedVideos(editedPass.videos.map((video) => video.external_id));
         setColorCode(editedPass.color_code || whiteColor);
-      } else {
-        form.resetFields();
-        setPassType(passTypes.LIMITED.name);
-        setSelectedClasses([]);
-        setSelectedVideos([]);
-        setSelectedAvailabilities([]);
-        setColorCode(initialColor);
-        setSelectedTag(null);
-        setSelectedTagType('anyone');
       }
+    } else {
+      form.resetFields();
+      setPassType(passTypes.LIMITED.name);
+      setSelectedClasses([]);
+      setSelectedVideos([]);
+      setSelectedAvailabilities([]);
+      setColorCode(initialColor);
+      setSelectedTag(null);
+      setSelectedTagType('anyone');
     }
   }, [visible, editedPass, form]);
 
@@ -638,12 +646,23 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                 label="Pass Price"
                 rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
               >
-                <InputNumber
-                  min={0}
-                  disabled={currency === ''}
-                  placeholder="Pass Price"
-                  className={styles.numericInput}
-                />
+                {currency !== '' && !creatorAbsorbsFees ? (
+                  <PriceInputCalculator
+                    key={editedPass?.external_id ?? 'new'}
+                    name="price"
+                    form={form}
+                    minimalPrice={0}
+                    initialValue={0}
+                    feePercentage={creatorFeePercentage}
+                  />
+                ) : (
+                  <InputNumber
+                    min={0}
+                    disabled={currency === ''}
+                    placeholder="Pass Price"
+                    className={styles.numericInput}
+                  />
+                )}
               </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>

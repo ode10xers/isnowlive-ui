@@ -35,6 +35,7 @@ import ImageUpload from 'components/ImageUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showCourseOptionsHelperModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import {
@@ -64,7 +65,6 @@ import {
 import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/integrations/googleTagManager';
 
 import styles from './style.module.scss';
-import PriceInputCalculator from 'components/PriceInputCalculator';
 
 const maxInventoryLimitPerRequest = 1000;
 
@@ -1225,7 +1225,9 @@ const Session = ({ match, history }) => {
                     ? `Choose your minimum price. We default to 5 ${form
                         .getFieldsValue()
                         .currency.toUpperCase()} as default`
-                    : 'Set your price'
+                    : creatorAbsorbsFees
+                    ? 'Set your price'
+                    : ''
                 }
                 rules={validationRules.numberValidation(
                   `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,

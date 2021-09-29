@@ -1,1 +1,13 @@
 @import '../../styles/variables.scss';
+
+.separatorIcon {
+  font-size: 18px;
+  text-align: center;
+  line-height: 32px;
+  margin: 2px 8px;
+}
+
+.infoIcon {
+  @extend .separatorIcon;
+  color: map-get($map: $colors, $key: 'DodgerBlue');
+}

@@ -30,6 +30,8 @@ const PriceInputCalculator = ({
       fieldValue = form.getFieldValue(name);
     }
 
+    console.log(fieldValue);
+
     if (fieldValue && !isNaN(fieldValue)) {
       setCreatorPrice(fieldValue);
 
@@ -39,7 +41,12 @@ const PriceInputCalculator = ({
         setCalculatedPrice(null);
       }
     }
-  }, [form, name, feePercentage]);
+
+    return () => {
+      setCreatorPrice(defaultValue);
+      setCalculatedPrice(null);
+    };
+  }, [form, name, feePercentage, defaultValue]);
 
   const onCreatorPriceChange = (numValue) => {
     if (typeof numValue === 'number' && !isNaN(numValue) && numValue > 0) {
@@ -90,7 +97,7 @@ const PriceInputCalculator = ({
         </Space>
       </Col>
       <Col flex="40px">
-        <CalculatorOutlined />
+        <CalculatorOutlined className={styles.separatorIcon} />
       </Col>
       <Col flex="140px">
         <Space size={1} direction="vertical" className={styles.w100}>
@@ -106,8 +113,11 @@ const PriceInputCalculator = ({
         </Space>
       </Col>
       <Col flex="40px">
-        <Tooltip title="">
-          <InfoCircleOutlined />
+        <Tooltip
+          title="You can input on any one of the fields and we'll calculate the other one for you"
+          trigger="hover"
+        >
+          <InfoCircleOutlined className={styles.infoIcon} />
         </Tooltip>
       </Col>
     </Row>

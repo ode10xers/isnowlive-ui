@@ -45,6 +45,8 @@ const ClassPassList = () => {
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.2);
 
   const showSendEmailModal = (pass) => {
     let activeRecipients = [];
@@ -200,13 +202,15 @@ const ClassPassList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
+        setCreatorAbsorbsFees(data.creator_owns_fee);
+        setCreatorFeePercentage(data.platform_fee_percentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -216,8 +220,8 @@ const ClassPassList = () => {
 
   useEffect(() => {
     getPassesForCreator();
-    fetchCreatorMemberTags();
-  }, [getPassesForCreator, fetchCreatorMemberTags]);
+    fetchCreatorSettings();
+  }, [getPassesForCreator, fetchCreatorSettings]);
 
   const copyPassLink = (passId) => {
     const username = getLocalUserDetails().username;
@@ -542,10 +546,13 @@ const ClassPassList = () => {
   return (
     <div className={styles.box}>
       <CreatePassModal
+        key={targetPass?.external_id ?? 'new'}
         visible={createModalVisible}
         closeModal={hideCreatePassesModal}
         editedPass={targetPass}
         creatorMemberTags={creatorMemberTags}
+        creatorAbsorbsFees={creatorAbsorbsFees}
+        creatorFeePercentage={creatorFeePercentage}
       />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={8} lg={18}>
