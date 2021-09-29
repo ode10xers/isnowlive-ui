@@ -346,18 +346,20 @@ const CourseModulesForm = ({ match, history }) => {
 
   //#region Start of Validation Logics
 
+  // NOTE : Since now we support duplicates, we want the duplicates to show up
+  // so the propagate video popup shows up properly
   const getVideoContentIDsFromModules = (modules = []) => [
-    ...new Set(
-      modules.reduce(
-        (acc, module) =>
-          (acc = acc.concat(
-            module.module_content
-              .filter((content) => content?.product_type?.toUpperCase() === 'VIDEO')
-              .map((content) => content.product_id)
-          )),
-        []
-      )
+    // ...new Set(
+    ...modules.reduce(
+      (acc, module) =>
+        (acc = acc.concat(
+          module.module_content
+            .filter((content) => content?.product_type?.toUpperCase() === 'VIDEO')
+            .map((content) => content?.product_id)
+        )),
+      []
     ),
+    // ),
   ];
 
   // const getFileContentIDsFromModules = (modules = []) => [
@@ -701,24 +703,40 @@ const CourseModulesForm = ({ match, history }) => {
     const { destination, source, draggableId } = result;
 
     const formModules = deepCloneObject(form.getFieldsValue()).modules;
-    const moduleIndex = draggableId.split('-')[1];
-    const contentIndex = draggableId.split('-')[3];
 
-    // NOTE: For modules, we use form names which are actually array indexes
-    const targetModule = formModules[moduleIndex];
-    const targetContent = targetModule.module_content[contentIndex];
+    if (destination.droppableId === source.droppableId) {
+      // DnD in the same module
+      const moduleIndex = draggableId.split('-')[1];
+      const contentIndex = draggableId.split('-')[3];
 
-    if (targetModule && targetContent && destination && destination.index !== source.index) {
-      targetModule.module_content.splice(source.index, 1);
-      targetModule.module_content.splice(destination.index, 0, targetContent);
+      // NOTE: For modules, we use form names which are actually array indexes
+      const targetModule = formModules[moduleIndex];
+      const targetContent = targetModule.module_content[contentIndex];
 
-      formModules[moduleIndex] = targetModule;
+      if (targetModule && targetContent && destination && destination.index !== source.index) {
+        targetModule.module_content.splice(source.index, 1);
+        targetModule.module_content.splice(destination.index, 0, targetContent);
 
-      form.setFieldsValue({
-        ...form.getFieldsValue(),
-        modules: formModules,
-      });
+        formModules[moduleIndex] = targetModule;
+      }
+    } else {
+      const sourceModuleIndex = source.droppableId.split('-')[1];
+      const destinationModuleIndex = destination.droppableId.split('-')[1];
+
+      const sourceModule = deepCloneObject(formModules[sourceModuleIndex]);
+      const destModule = deepCloneObject(formModules[destinationModuleIndex]);
+
+      const [targetContent] = sourceModule.module_content.splice(source.index, 1);
+      destModule.module_content.splice(destination.index, 0, targetContent);
+
+      formModules[sourceModuleIndex] = sourceModule;
+      formModules[destinationModuleIndex] = destModule;
     }
+
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      modules: formModules,
+    });
   };
 
   const openSessionPopup = (moduleIndex) => {
@@ -993,7 +1011,7 @@ const CourseModulesForm = ({ match, history }) => {
                                               <Col xs={24}>
                                                 <Droppable
                                                   droppableId={`module-${moduleFieldName}-content`}
-                                                  type={`module-${moduleFieldName}-content`}
+                                                  type="module-content"
                                                 >
                                                   {(contentDroppableProvided) => (
                                                     <div
