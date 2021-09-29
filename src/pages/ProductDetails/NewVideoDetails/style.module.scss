@@ -15,7 +15,7 @@
   .videoTitle {
     margin-bottom: 0 !important;
     font-size: 28px !important;
-    color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}));
+    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')}));
 
     @media screen and (max-width: 768px) {
       font-size: 20px !important;
@@ -32,12 +32,12 @@
 
   .videoDetailsContainer {
     .videoDetailItem {
-      color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}));
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color,  #{map-get($colors, 'Smalt')}));
       
 
       .detailIcons {
         margin-right: 6px;
-        color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}));
+        color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')}));
       }
     }
   }
@@ -57,8 +57,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
         sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
       background: transparent !important;
-      // color: var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}) !important;
-      color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color,  #{map-get($colors, 'PrussianBlue')}));
 
     }
   }
@@ -76,8 +75,8 @@
 .videoBuyBtn {
   padding: 8px 16px;
   height: 100%;
-  background-color: var(--video-plugin-cta-background-color, var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
-  border-color: var(--video-plugin-cta-background-color, var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
+  background-color: var(--passion-profile-primary-color, var(--video-plugin-cta-background-color,  #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
+  border-color: var(--passion-profile-primary-color, var(--video-plugin-cta-background-color,  #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
 
   &.disabled {
     opacity: 0.7;
@@ -85,11 +84,11 @@
 
   &.darkText {
     .buyBtnText {
-      color : var(--video-plugin-cta-font-color, var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')})) !important;
+      color : var(--passion-profile-darker-color, var(--video-plugin-cta-font-color, #{map-get($colors, 'Zeus')})) !important;
     }
 
     .buyBtnDivider {
-      border-left-color : var(--video-plugin-cta-font-color, var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')})) !important;
+      border-left-color : var(--passion-profile-darker-color, var(--video-plugin-cta-font-color, #{map-get($colors, 'Zeus')})) !important;
     }
   }
 
@@ -118,7 +117,7 @@
 }
 
 .buyUsingPassContainer, .buyUsingMembershipContainer {
-  background-color: var(--video-plugin-light-color, var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')}));
+  background-color: var(--passion-profile-light-color, var(--video-plugin-light-color, #{map-get($map: $colors, $key: 'AliceBlue')}));
   padding: 16px;
   border-radius: 8px;
 }
@@ -128,7 +127,7 @@
 
   .paymentInstrumentHeadingContainer {
     .paymentInstrumentHeadingText {
-      color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
 
       @media screen and (max-width: 769px) {
         font-size: 20px !important;
@@ -137,8 +136,8 @@
 
     .paymentInstrumentHeadingDivider {
       height: 3em;
-      border-left-color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
-      border-top-color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+      border-left-color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+      border-top-color:  var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
       @media screen and (max-width: 993px) {
         height: 4px !important;
         margin: 8px 0 !important; 
@@ -147,14 +146,14 @@
   }
 
   .paymentInstrumentSelectContainer {
-    border: 1px solid var(--video-plugin-cta-background-color, var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}));
+    border: 1px solid var(--passion-profile-primary-color, var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}));
     border-radius: 8px;
     padding: 12px;
 
     .paymentInstrumentSelectHeading {
       text-align: center;
       margin-bottom: 0 !important;
-      color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
 
       @media screen and (max-width: 769px) {
         font-size: 18px !important;
@@ -167,7 +166,7 @@
     
     .paymentInstrumentSelectDescription {
       text-align: center;
-      color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
     }
 
     .smallProductPreview {
@@ -196,7 +195,7 @@
 
     .bundleSummaryIcon {
       font-size: 32px;
-      color: var(--video-plugin-text-color, var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}));    
+      color: var(--passion-profile-primary-color, var(--video-plugin-text-color, #{map-get($colors, 'DodgerBlue')}));    
     }
 
     .paymentInstrumentOutlineContainer {
@@ -211,20 +210,20 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+        color: var(--passion-profile-darker-color, var(--video-plugin-text-color,  #{map-get($colors, 'PrussianBlue')}));
       }
 
       .paymentInstrumentOutlineHelpText {
         text-align: center;
         margin: 4px auto;
         font-size: 12px;
-        color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+        color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
       }
     }
 
     .bundleSummaryContainer {
       padding: 8px !important;
-      background-color: var(--video-plugin-light-color, var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')}));
+      background-color: var(--passion-profile-light-color, var(--video-plugin-light-color, #{map-get($map: $colors, $key: 'AliceBlue')}));
       border-radius: 6px;
 
       .bundleSummaryTextContainer {
@@ -233,12 +232,12 @@
         .bundleSummaryDivider {
           font-size: 12px;
           margin: auto 4px;
-          color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+          color: var(--passion-profile-darker-color, var(--video-plugin-text-color,  #{map-get($colors, 'PrussianBlue')}));
         }
 
         .bundleSummaryText {
           font-size: 14px;  
-          color: var(--video-plugin-text-color, var(--passion-profile-darker-color, #{map-get($colors, 'PrussianBlue')}));
+          color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
         }
       }
     }
