@@ -19,7 +19,7 @@ import {
   getSessionInventoryDetails,
   getCreatorProfileByUsername,
 } from 'utils/orderHelper';
-import { isWidgetUrl } from 'utils/widgets';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import { getAuthCookie } from 'services/authCookie';
@@ -29,7 +29,7 @@ import styles from './style.modules.scss';
 const { Text, Paragraph } = Typography;
 
 const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPath) => {
-  if (!isWidgetUrl()) {
+  if (!isWidgetUrl() && !isInIframeWidget()) {
     return generateUrlFromUsername(userName) + targetPath;
   } else {
     let completeUrl = generateUrlFromUsername(userName) + targetPath;
