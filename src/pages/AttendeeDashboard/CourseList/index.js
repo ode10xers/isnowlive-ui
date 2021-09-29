@@ -111,7 +111,7 @@ const CourseList = () => {
               ? []
               : [
                   <Button type="link" onClick={() => redirectToCourseOrderDetails(item)}>
-                    Details
+                    View Content
                   </Button>,
                 ]
           }
@@ -173,12 +173,12 @@ const CourseList = () => {
     },
     {
       title: '',
-      width: '70px',
+      width: '100px',
       render: (text, record) => (
         <Row gutter={[8, 8]} justify="end">
           <Col>
             <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(record)}>
-              Details
+              View Content
             </Button>
           </Col>
         </Row>
@@ -200,7 +200,7 @@ const CourseList = () => {
                   {courseOrders?.active?.length > 0 ? (
                     <>
                       <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                        Click on the card to show course details
+                        Click on the card to view course contents
                       </Text>
                       <Row gutter={[8, 8]}>
                         {courseOrders?.active?.map((course) => renderCourseItem(course, false))}
@@ -225,9 +225,6 @@ const CourseList = () => {
                 <Loader loading={isLoading} size="large" text="Loading courses">
                   {courseOrders?.expired?.length > 0 ? (
                     <>
-                      <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                        Click on the card to show course details
-                      </Text>
                       <Row gutter={[8, 8]}>
                         {courseOrders?.expired?.map((course) => renderCourseItem(course, true))}
                       </Row>
