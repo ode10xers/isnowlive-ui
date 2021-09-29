@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useHistory, generatePath } from 'react-router-dom';
 import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
 import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-design/icons';
 
@@ -9,7 +8,7 @@ import Routes from 'routes';
 import AuthModal from 'components/AuthModal';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
-// import { redirectToPluginVideosPage } from 'utils/redirect';
+import { redirectToPluginVideoDetailsPage } from 'utils/redirect';
 import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -25,8 +24,6 @@ const Videos = () => {
   const {
     state: { userDetails },
   } = useGlobalContext();
-  const history = useHistory();
-  console.log(history);
 
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -108,10 +105,7 @@ const Videos = () => {
   };
 
   const handlePluginVideoItemsClicked = (video) => {
-    // redirectToPluginVideosPage(video);
-    history.push(Routes.plugins.root + generatePath(Routes.plugins.details.video, { video_id: video.external_id }));
-    console.log('pushed');
-    // window.location.reload();
+    redirectToPluginVideoDetailsPage(video);
   };
 
   const groupFilters = (

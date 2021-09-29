@@ -62,7 +62,7 @@ export const redirectToVideosPage = (video) => {
   // }
 };
 
-export const redirectToPluginVideosPage = (video) => {
+export const redirectToPluginVideoDetailsPage = (video) => {
   let urlUsername = getUsernameFromUrl();
 
   if (reservedDomainName.includes(urlUsername)) {
@@ -75,6 +75,7 @@ export const redirectToPluginVideosPage = (video) => {
     video_id: video.external_id,
   })}`;
   window.open(targetUrl, '_self');
+  // window.location.assign(targetUrl);
 };
 
 export const redirectToCoursesPage = (course) => {

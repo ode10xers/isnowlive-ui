@@ -2,6 +2,8 @@ import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import parseQueryString from 'utils/parseQueryString';
 
+export const localStoragePluginStylingKeyPrefix = 'passion_plugin_styling_';
+
 export const widgetComponentsName = {
   CALENDAR: {
     value: 'calendar',
@@ -264,6 +266,10 @@ export const widgetComponentsName = {
       {
         key: '--video-plugin-cta-font-color',
         label: 'Button Text Color',
+      },
+      {
+        key: '--video-plugin-light-color',
+        label: 'Light Background Color',
       },
     ],
   },

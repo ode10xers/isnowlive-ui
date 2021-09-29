@@ -56,7 +56,7 @@ const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPat
 // issue that sometimes happens after closing a modal
 export const resetBodyStyle = () => {
   document.body.classList.remove(['ant-scrolling-effect']);
-  document.body.removeAttribute('style');
+  document.body.style.overflow = '';
 };
 
 export const showErrorModal = (title, message = '') => {

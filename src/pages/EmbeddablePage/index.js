@@ -7,9 +7,9 @@ import SessionsList from 'components/EmbeddableComponents/SessionsCardsList';
 import Subscriptions from 'components/EmbeddableComponents/Subscriptions';
 import CalendarSessions from 'components/EmbeddableComponents/CalendarSessions';
 import AvailabilitiesPlugin from 'components/EmbeddableComponents/AvailabilitiesPlugin';
-
-import { widgetComponentsName } from 'utils/widgets';
 import InventoryList from 'components/EmbeddableComponents/InventoryList';
+
+import { localStoragePluginStylingKeyPrefix, widgetComponentsName } from 'utils/widgets';
 
 // TODO: Might want to implement lazy loading here as well
 export default function EmbeddablePage({ widget }) {
@@ -32,10 +32,14 @@ export default function EmbeddablePage({ widget }) {
     componentToLoad = <InventoryList />;
   }
 
+  localStorage.removeItem(`${localStoragePluginStylingKeyPrefix}${widget}`);
+
   window.addEventListener('message', (e) => {
     const { command, data: customStyles } = e.data;
 
     if (command && command === 'add-custom-styling') {
+      // NOTE : Hack, we save this to LS and do the same thing whenever we need it
+      localStorage.setItem(`${localStoragePluginStylingKeyPrefix}${widget}`, customStyles);
       document.head.insertAdjacentHTML('beforeend', `<style>${customStyles}</style>`);
     }
   });

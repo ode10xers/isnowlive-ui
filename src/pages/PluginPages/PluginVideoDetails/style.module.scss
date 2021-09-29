@@ -6,6 +6,6 @@
 
   .backButton {
     color : var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
-    border-color : var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')});
+    border-color : var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
   }
 }
