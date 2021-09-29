@@ -784,7 +784,7 @@ const NewVideoDetails = ({ match }) => {
     return (
       <div className={styles.videoDocumentUrl}>
         <Space direction="vertical">
-          <Text> This video includes a downloadable PDF file: </Text>
+          <Text className={styles.videoDocumentText}> This video includes a downloadable PDF file: </Text>
           {isPublicDownloadable ? (
             <Button
               className={styles.filenameDownload}
