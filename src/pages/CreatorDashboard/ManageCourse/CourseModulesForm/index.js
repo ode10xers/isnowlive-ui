@@ -346,6 +346,8 @@ const CourseModulesForm = ({ match, history }) => {
 
   //#region Start of Validation Logics
 
+  // NOTE : Since now we support duplicates, we want the duplicates to show up
+  // so the propagate video popup shows up properly
   const getVideoContentIDsFromModules = (modules = []) => [
     // ...new Set(
     ...modules.reduce(
@@ -702,18 +704,33 @@ const CourseModulesForm = ({ match, history }) => {
 
     const formModules = deepCloneObject(form.getFieldsValue()).modules;
 
-    const moduleIndex = draggableId.split('-')[1];
-    const contentIndex = draggableId.split('-')[3];
+    if (destination.droppableId === source.droppableId) {
+      // DnD in the same module
+      const moduleIndex = draggableId.split('-')[1];
+      const contentIndex = draggableId.split('-')[3];
 
-    // NOTE: For modules, we use form names which are actually array indexes
-    const targetModule = formModules[moduleIndex];
-    const targetContent = targetModule.module_content[contentIndex];
+      // NOTE: For modules, we use form names which are actually array indexes
+      const targetModule = formModules[moduleIndex];
+      const targetContent = targetModule.module_content[contentIndex];
 
-    if (targetModule && targetContent && destination && destination.index !== source.index) {
-      targetModule.module_content.splice(source.index, 1);
-      targetModule.module_content.splice(destination.index, 0, targetContent);
+      if (targetModule && targetContent && destination && destination.index !== source.index) {
+        targetModule.module_content.splice(source.index, 1);
+        targetModule.module_content.splice(destination.index, 0, targetContent);
 
-      formModules[moduleIndex] = targetModule;
+        formModules[moduleIndex] = targetModule;
+      }
+    } else {
+      const sourceModuleIndex = source.droppableId.split('-')[1];
+      const destinationModuleIndex = destination.droppableId.split('-')[1];
+
+      const sourceModule = deepCloneObject(formModules[sourceModuleIndex]);
+      const destModule = deepCloneObject(formModules[destinationModuleIndex]);
+
+      const [targetContent] = sourceModule.module_content.splice(source.index, 1);
+      destModule.module_content.splice(destination.index, 0, targetContent);
+
+      formModules[sourceModuleIndex] = sourceModule;
+      formModules[destinationModuleIndex] = destModule;
     }
 
     form.setFieldsValue({
@@ -994,7 +1011,7 @@ const CourseModulesForm = ({ match, history }) => {
                                               <Col xs={24}>
                                                 <Droppable
                                                   droppableId={`module-${moduleFieldName}-content`}
-                                                  type={`module-${moduleFieldName}-content`}
+                                                  type="module-content"
                                                 >
                                                   {(contentDroppableProvided) => (
                                                     <div
