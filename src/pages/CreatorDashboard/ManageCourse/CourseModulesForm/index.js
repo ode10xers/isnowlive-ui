@@ -347,17 +347,17 @@ const CourseModulesForm = ({ match, history }) => {
   //#region Start of Validation Logics
 
   const getVideoContentIDsFromModules = (modules = []) => [
-    ...new Set(
-      modules.reduce(
-        (acc, module) =>
-          (acc = acc.concat(
-            module.module_content
-              .filter((content) => content?.product_type?.toUpperCase() === 'VIDEO')
-              .map((content) => content.product_id)
-          )),
-        []
-      )
+    // ...new Set(
+    ...modules.reduce(
+      (acc, module) =>
+        (acc = acc.concat(
+          module.module_content
+            .filter((content) => content?.product_type?.toUpperCase() === 'VIDEO')
+            .map((content) => content?.product_id)
+        )),
+      []
     ),
+    // ),
   ];
 
   // const getFileContentIDsFromModules = (modules = []) => [
@@ -701,6 +701,7 @@ const CourseModulesForm = ({ match, history }) => {
     const { destination, source, draggableId } = result;
 
     const formModules = deepCloneObject(form.getFieldsValue()).modules;
+
     const moduleIndex = draggableId.split('-')[1];
     const contentIndex = draggableId.split('-')[3];
 
@@ -713,12 +714,12 @@ const CourseModulesForm = ({ match, history }) => {
       targetModule.module_content.splice(destination.index, 0, targetContent);
 
       formModules[moduleIndex] = targetModule;
-
-      form.setFieldsValue({
-        ...form.getFieldsValue(),
-        modules: formModules,
-      });
     }
+
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      modules: formModules,
+    });
   };
 
   const openSessionPopup = (moduleIndex) => {
