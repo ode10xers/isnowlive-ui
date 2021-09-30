@@ -54,16 +54,20 @@ const Videos = () => {
   const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [expandedCollapseKeys, setExpandedCollapseKeys] = useState(['Published']);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.2);
 
   const isOnboarding = location.state ? location.state.onboarding || false : false;
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
+        setCreatorAbsorbsFees(data.creator_owns_fee);
+        setCreatorFeePercentage(data.platform_fee_percentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -185,7 +189,7 @@ const Videos = () => {
       showUploadVideoModal();
     }
 
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     getVideosForCreator();
     //eslint-disable-next-line
   }, [isOnboarding]);
@@ -796,6 +800,7 @@ const Videos = () => {
   return (
     <div className={styles.box}>
       <UploadVideoModal
+        key={selectedVideo?.external_id ?? 'new'}
         formPart={formPart}
         setFormPart={setFormPart}
         visible={createModalVisible}
@@ -805,6 +810,8 @@ const Videos = () => {
         shouldClone={shouldCloneVideo}
         creatorMemberTags={creatorMemberTags}
         refetchVideos={getVideosForCreator}
+        creatorAbsorbsFees={creatorAbsorbsFees}
+        creatorFeePercentage={creatorFeePercentage}
       />
       <Row gutter={[8, 24]}>
         <Col xs={24} md={14} lg={18}>

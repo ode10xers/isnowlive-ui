@@ -36,6 +36,7 @@ import Routes from 'routes';
 import Loader from 'components/Loader';
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import {
   showErrorModal,
   showSuccessModal,
@@ -112,6 +113,8 @@ const UploadVideoModal = ({
   updateEditedVideo,
   shouldClone,
   creatorMemberTags = [],
+  creatorAbsorbsFees = true,
+  creatorFeePercentage = 0.2,
   refetchVideos,
 }) => {
   const [form] = Form.useForm();
@@ -998,7 +1001,11 @@ const UploadVideoModal = ({
                   id="price"
                   name="price"
                   label={`Price (${currency.toUpperCase()})`}
-                  extra={`Set your ${videoType === videoPriceTypes.FLEXIBLE.name ? 'minimum' : ''} price`}
+                  extra={
+                    currency !== '' && !creatorAbsorbsFees && videoType === videoPriceTypes.PAID.name
+                      ? ''
+                      : `Set your ${videoType === videoPriceTypes.FLEXIBLE.name ? 'minimum' : ''} price`
+                  }
                   hidden={videoType === videoPriceTypes.FREE.name}
                   rules={validationRules.numberValidation(
                     `Please input the price ${videoType === videoPriceTypes.FLEXIBLE.name ? '(min. 5)' : ''}`,
@@ -1006,12 +1013,23 @@ const UploadVideoModal = ({
                     false
                   )}
                 >
-                  <InputNumber
-                    min={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
-                    disabled={currency === ''}
-                    placeholder="Price"
-                    className={styles.numericInput}
-                  />
+                  {currency !== '' && !creatorAbsorbsFees && videoType === videoPriceTypes.PAID.name ? (
+                    <PriceInputCalculator
+                      // key={editedVideo?.external_id ?? 'new'}
+                      name="price"
+                      form={form}
+                      minimalPrice={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
+                      initialValue={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
+                      feePercentage={creatorFeePercentage}
+                    />
+                  ) : (
+                    <InputNumber
+                      min={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
+                      disabled={currency === ''}
+                      placeholder="Price"
+                      className={styles.numericInput}
+                    />
+                  )}
                 </Form.Item>
               </Col>
 

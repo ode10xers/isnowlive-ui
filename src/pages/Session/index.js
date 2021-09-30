@@ -173,7 +173,7 @@ const Session = ({ match, history }) => {
     },
   } = useGlobalContext();
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
@@ -319,7 +319,7 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     fetchCreatorDocuments();
 
     if (match.path.includes('manage')) {
@@ -374,7 +374,7 @@ const Session = ({ match, history }) => {
     match.path,
     getCreatorCurrencyDetails,
     fetchCreatorDocuments,
-    fetchCreatorMemberTags,
+    fetchCreatorSettings,
   ]);
 
   const onSessionImageUpload = (imageUrl) => {
