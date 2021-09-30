@@ -91,7 +91,7 @@ const PriceInputCalculator = ({
                 className={styles.w100}
                 onChange={onCreatorPriceChange}
                 min={minimalPrice}
-                precision={2}
+                precision={1}
                 placeholder={placeholderBefore}
                 value={creatorPrice}
               />
@@ -113,7 +113,7 @@ const PriceInputCalculator = ({
                 className={styles.w100}
                 onChange={onCalculatedPriceChange}
                 min={minimalPrice}
-                precision={2}
+                precision={1}
                 placeholder={placeholderAfter}
                 value={calculatedPrice}
               />
