@@ -17,7 +17,6 @@ import {
   Divider,
   Grid,
   message,
-  Modal,
 } from 'antd';
 import {
   MailOutlined,
@@ -28,7 +27,6 @@ import {
   ProfileOutlined,
   CopyTwoTone,
   ExportOutlined,
-  CheckCircleTwoTone,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -60,7 +58,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { Panel } = Collapse;
 const { useBreakpoint } = Grid;
 const {
