@@ -85,7 +85,7 @@ const Videos = () => {
 
   const redirectToAttendeeDashboard = () => {
     const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) || 'app';
-    window.open(`${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}`, '_self');
+    window.open(`${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}`, '_blank');
   };
 
   const handleFilterToggleClicked = () => {
