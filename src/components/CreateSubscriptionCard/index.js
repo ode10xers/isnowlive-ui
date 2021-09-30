@@ -30,10 +30,11 @@ import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, generateRandomColor } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 
 const initialColor = generateRandomColor();
 
@@ -69,7 +70,14 @@ const includedProductsList = [
   },
 ];
 
-const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription = null, creatorMemberTags = [] }) => {
+const CreateSubscriptionCard = ({
+  cancelChanges,
+  saveChanges,
+  editedSubscription = null,
+  creatorMemberTags = [],
+  creatorAbsorbsFees = true,
+  creatorFeePercentage = 0.2,
+}) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -412,26 +420,29 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
           <List itemLayout="vertical">
             <List.Item>
               <Form.Item className={styles.compactFormItem}>
-                <Row gutter={4}>
-                  <Col xs={16}>
-                    <Form.Item
-                      id="price"
+                <Form.Item
+                  id="price"
+                  name="price"
+                  rules={validationRules.numberValidation('Please Input Subscription Price', 0, false)}
+                  noStyle
+                >
+                  {currency !== '' && !creatorAbsorbsFees ? (
+                    <PriceInputCalculator
                       name="price"
-                      rules={validationRules.numberValidation('Please Input Subscription Price', 0, false)}
-                      noStyle
-                    >
-                      <InputNumber
-                        min={0}
-                        placeholder="Enter Price"
-                        className={styles.numericInput}
-                        disabled={currency === ''}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={8} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
-                    <Text strong>{currency?.toUpperCase()}</Text>
-                  </Col>
-                </Row>
+                      form={form}
+                      minimalPrice={1}
+                      initialValue={1}
+                      feePercentage={creatorFeePercentage}
+                    />
+                  ) : (
+                    <InputNumber
+                      min={1}
+                      placeholder="Enter Price"
+                      className={styles.numericInput}
+                      disabled={currency === ''}
+                    />
+                  )}
+                </Form.Item>
               </Form.Item>
             </List.Item>
             <List.Item>

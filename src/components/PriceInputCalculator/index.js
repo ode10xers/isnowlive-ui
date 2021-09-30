@@ -82,43 +82,54 @@ const PriceInputCalculator = ({
   }
 
   return (
-    <Row gutter={[8, 8]}>
-      <Col flex="140px">
+    <Row>
+      <Col xs={12}>
         <Space size={1} direction="vertical" className={styles.w100}>
-          <InputNumber
-            className={styles.w100}
-            onChange={onCreatorPriceChange}
-            min={minimalPrice}
-            precision={2}
-            placeholder={placeholderBefore}
-            value={creatorPrice}
-          />
+          <Row>
+            <Col flex="2 1 70px">
+              <InputNumber
+                className={styles.w100}
+                onChange={onCreatorPriceChange}
+                min={minimalPrice}
+                precision={2}
+                placeholder={placeholderBefore}
+                value={creatorPrice}
+              />
+            </Col>
+            <Col flex="0 0 16px">
+              <CalculatorOutlined className={styles.separatorIcon} />
+            </Col>
+          </Row>
+
           <Text type="secondary">Price you get</Text>
         </Space>
       </Col>
-      <Col flex="40px">
-        <CalculatorOutlined className={styles.separatorIcon} />
-      </Col>
-      <Col flex="140px">
+
+      <Col xs={12}>
         <Space size={1} direction="vertical" className={styles.w100}>
-          <InputNumber
-            className={styles.w100}
-            onChange={onCalculatedPriceChange}
-            min={minimalPrice}
-            precision={2}
-            placeholder={placeholderAfter}
-            value={calculatedPrice}
-          />
+          <Row>
+            <Col flex="2 1 70px">
+              <InputNumber
+                className={styles.w100}
+                onChange={onCalculatedPriceChange}
+                min={minimalPrice}
+                precision={2}
+                placeholder={placeholderAfter}
+                value={calculatedPrice}
+              />
+            </Col>
+            <Col flex="0 0 16px">
+              <Tooltip
+                title="You can input on any one of the fields and we'll calculate the other one for you"
+                trigger="hover"
+              >
+                <InfoCircleOutlined className={styles.infoIcon} />
+              </Tooltip>
+            </Col>
+          </Row>
+
           <Text type="secondary">Price customer sees</Text>
         </Space>
-      </Col>
-      <Col flex="40px">
-        <Tooltip
-          title="You can input on any one of the fields and we'll calculate the other one for you"
-          trigger="hover"
-        >
-          <InfoCircleOutlined className={styles.infoIcon} />
-        </Tooltip>
       </Col>
     </Row>
   );

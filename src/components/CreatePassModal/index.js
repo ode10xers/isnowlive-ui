@@ -648,7 +648,6 @@ const CreatePassModal = ({
               >
                 {currency !== '' && !creatorAbsorbsFees ? (
                   <PriceInputCalculator
-                    key={editedPass?.external_id ?? 'new'}
                     name="price"
                     form={form}
                     minimalPrice={0}

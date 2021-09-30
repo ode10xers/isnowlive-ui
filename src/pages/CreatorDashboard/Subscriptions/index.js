@@ -32,14 +32,18 @@ const Subscriptions = ({ history }) => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [targetSubscription, setTargetSubscription] = useState(null);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.2);
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
+        setCreatorAbsorbsFees(data.creator_owns_fee);
+        setCreatorFeePercentage(data.platform_fee_percentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -107,9 +111,9 @@ const Subscriptions = ({ history }) => {
       userDetails?.profile?.payment_account_status === StripeAccountStatus.CONNECTED
     ) {
       getCreatorSubscriptions();
-      fetchCreatorMemberTags();
+      fetchCreatorSettings();
     }
-  }, [userDetails, getCreatorSubscriptions, fetchCreatorMemberTags]);
+  }, [userDetails, getCreatorSubscriptions, fetchCreatorSettings]);
 
   useEffect(() => {
     if (
@@ -330,6 +334,8 @@ const Subscriptions = ({ history }) => {
       ) : !subscription.external_id || subscription.editing ? (
         <CreateSubscriptionCard
           creatorMemberTags={creatorMemberTags || []}
+          creatorAbsorbsFees={creatorAbsorbsFees}
+          creatorFeePercentage={creatorFeePercentage}
           cancelChanges={() => setColumnState(subscription.idx, 'EMPTY')}
           saveChanges={() => setColumnState(subscription.idx, 'SAVED')}
           editedSubscription={targetSubscription}
