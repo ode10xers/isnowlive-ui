@@ -26,3 +26,5 @@ export const sessionMeetingTypes = {
 export const attendeeProductOrderTypes = {
   COURSE: 'course',
 };
+
+export const defaultPlatformFeePercentage = 0.1;
