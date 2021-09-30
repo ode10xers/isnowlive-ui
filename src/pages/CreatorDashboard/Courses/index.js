@@ -1,15 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { generatePath } from 'react-router';
 import classNames from 'classnames';
+import moment from 'moment';
 
-import { Row, Col, Typography, Button, Collapse, Card, Tag, Tooltip, Space, Divider, Grid } from 'antd';
+import {
+  Row,
+  Col,
+  Popover,
+  Typography,
+  Button,
+  Collapse,
+  Card,
+  Tag,
+  Tooltip,
+  Space,
+  Divider,
+  Grid,
+  message,
+} from 'antd';
 import {
   MailOutlined,
-  CopyOutlined,
   EditTwoTone,
   DownOutlined,
   UpOutlined,
   EyeInvisibleOutlined,
   ProfileOutlined,
+  CopyTwoTone,
+  ExportOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -18,7 +35,6 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import TagListPopup from 'components/TagListPopup';
-
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -29,12 +45,18 @@ import {
   getCourseEmptyContentCount,
   getCourseDocumentContentCount,
 } from 'utils/course';
-import { isAPISuccess, productType, copyToClipboard, generateUrlFromUsername, preventDefaults } from 'utils/helper';
+import {
+  isAPISuccess,
+  productType,
+  copyToClipboard,
+  generateUrlFromUsername,
+  preventDefaults,
+  courseType,
+} from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import { generatePath } from 'react-router';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -65,6 +87,7 @@ const Courses = ({ history }) => {
         setCreatorMemberTags(data.tags);
       }
     } catch (error) {
+      console.error(error);
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
     }
     setIsLoading(false);
@@ -79,7 +102,8 @@ const Courses = ({ history }) => {
         setCourses(data);
       }
     } catch (error) {
-      showErrorModal('Failed fetching courses', error?.response?.data?.message || 'Something went wrong');
+      console.error(error);
+      showErrorModal('Failed fetching courses', error?.response?.data?.message || 'Something went wrong.');
     }
     setIsLoading(false);
   }, []);
@@ -104,7 +128,7 @@ const Courses = ({ history }) => {
         fetchAllCoursesForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to publish course');
+      showErrorModal('Failed to publish course', error.response?.data?.message || 'Something went wrong.');
     }
     setIsLoading(false);
   };
@@ -119,7 +143,67 @@ const Courses = ({ history }) => {
         fetchAllCoursesForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to unpublish course');
+      console.error(error);
+      showErrorModal('Failed to unpublish course', error.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  };
+
+  const cloneCourse = async (course) => {
+    setIsLoading(true);
+
+    if (!course) {
+      message.error('Invalid course selected!');
+      return;
+    }
+
+    try {
+      const clonedPayload = {
+        name: course.name + ' (Cloned)',
+        course_image_url: course.course_image_url ?? '',
+        summary: course.summary ?? '',
+        description: course.description ?? '',
+        topic: course.topic ?? [],
+        faqs: course.faqs ?? [],
+        price: course.price ?? 0,
+        currency: course.currency ?? '',
+        tag_ids: course.tag?.map((tagData) => tagData.external_id) ?? [],
+        preview_image_url: course.preview_image_url ?? [],
+        preview_video_urls: course.preview_video_urls ?? [],
+        type: course.type ?? courseType.MIXED,
+        max_participants: course.max_participants ?? 0,
+        validity: course.validity ?? 0,
+        start_date: course.start_date ?? moment().startOf('day').utc().format(),
+        end_date: course.end_date ?? moment().endOf('day').add(10, 'day').utc().format(),
+        modules: course.modules ?? [],
+      };
+
+      const { status, data } = await apis.courses.createCourse(clonedPayload);
+
+      if (isAPISuccess(status) && data) {
+        message.success('Course cloned successfully!');
+        if (data?.id) {
+          redirectToEditCourse(data?.id);
+        }
+        // Modal.confirm({
+        //   closable: true,
+        //   icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+        //   title: 'Course successfully cloned!',
+        //   content: (
+        //     <>
+        //       <Paragraph>
+        //         The cloned course will be unpublished by default. You can continue to edit it and publish it later.
+        //       </Paragraph>
+        //     </>
+        //   ),
+        //   okText: 'Continue to edit',
+        //   onOk: () => (data.id ? redirectToEditCourse(data?.id) : false),
+        //   cancelText: 'Close',
+        // });
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to clone course', error.response?.data?.message || 'Something went wrong.');
     }
     setIsLoading(false);
   };
@@ -320,12 +404,12 @@ const Courses = ({ history }) => {
         width: !xl ? '200px' : '310px',
         align: 'right',
         render: (text, record) => (
-          <Row gutter={4} justify="end">
-            <Col xs={6} xl={3}>
+          <Row gutter={4} justify="end" align="middle">
+            {/* <Col xs={6} xl={3}>
               <Tooltip title="Send Customer Email">
                 <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
               </Tooltip>
-            </Col>
+            </Col> */}
             <Col xs={6} xl={3}>
               <Tooltip title="Edit Course Details">
                 <Button
@@ -341,12 +425,33 @@ const Courses = ({ history }) => {
                 <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
               </Tooltip>
             </Col>
-            <Col xs={6} xl={3}>
-              <Tooltip title="Copy Course Link">
-                <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
-              </Tooltip>
+            <Col xs={12} xl={5}>
+              <Popover
+                placement="topRight"
+                content={
+                  <Space>
+                    <Tooltip title="Copy Course Link">
+                      <Button
+                        type="link"
+                        onClick={() => copyCourseLink(record.id)}
+                        icon={<CopyTwoTone twoToneColor="#08979c" />}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Send Customer Email">
+                      <Button type="link" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+                    </Tooltip>
+                    <Tooltip title="Clone This Course">
+                      <Button type="text" onClick={() => cloneCourse(record)} icon={<ExportOutlined />} />
+                    </Tooltip>
+                  </Space>
+                }
+              >
+                <Button block type="text">
+                  More
+                </Button>
+              </Popover>
             </Col>
-            <Col xs={12} xl={4}>
+            <Col xs={12} xl={5}>
               {record.is_published ? (
                 <Tooltip title="Hide Course">
                   <Button danger block type="link" onClick={() => unpublishCourse(record)}>
@@ -493,9 +598,9 @@ const Courses = ({ history }) => {
             </div>
           }
           actions={[
-            <Tooltip title="Send Customer Email">
-              <Button type="text" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
-            </Tooltip>,
+            // <Tooltip title="Send Customer Email">
+            //   <Button type="text" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
+            // </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -504,14 +609,37 @@ const Courses = ({ history }) => {
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
-            <Tooltip title="Copy Course Link">
-              <Button
-                type="text"
-                className={styles.detailsButton}
-                onClick={() => copyCourseLink(course.id)}
-                icon={<CopyOutlined />}
-              />
-            </Tooltip>,
+            // <Tooltip title="Copy Course Link">
+            //   <Button
+            //     type="text"
+            //     className={styles.detailsButton}
+            //     onClick={() => copyCourseLink(course.id)}
+            //     icon={<CopyOutlined />}
+            //   />
+            // </Tooltip>,
+            <Popover
+              trigger="click"
+              content={
+                <Space>
+                  <Tooltip title="Copy Course Link">
+                    <Button
+                      type="link"
+                      className={styles.detailsButton}
+                      onClick={() => copyCourseLink(course.id)}
+                      icon={<CopyTwoTone twoToneColor="#08979c" />}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Send Customer Email">
+                    <Button type="link" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
+                  </Tooltip>
+                  <Tooltip title="Clone This Course">
+                    <Button type="text" onClick={() => cloneCourse(course)} icon={<ExportOutlined />} />
+                  </Tooltip>
+                </Space>
+              }
+            >
+              <Button type="text">More</Button>
+            </Popover>,
             course.is_published ? (
               <Tooltip title="Hide Course">
                 <Button type="link" danger onClick={() => unpublishCourse(course)}>
