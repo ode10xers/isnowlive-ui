@@ -13,23 +13,21 @@ const TextEditor = ({ name, form, placeholder }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   useEffect(() => {
+    let fieldValue = null;
+
     if (typeof name === 'string') {
-      if (form.getFieldsValue()[name]) {
-        const contentBlock = htmlToDraft(form.getFieldsValue()[name]);
-        if (contentBlock) {
-          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-          const editorState = EditorState.createWithContent(contentState);
-          setEditorState(editorState);
-        }
-      }
+      fieldValue = form.getFieldValue([name]);
     } else if (Array.isArray(name)) {
-      if (form.getFieldValue(name)) {
-        const contentBlock = htmlToDraft(form.getFieldValue(name));
-        if (contentBlock) {
-          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-          const editorState = EditorState.createWithContent(contentState);
-          setEditorState(editorState);
-        }
+      fieldValue = form.getFieldValue(name);
+    }
+
+    if (fieldValue) {
+      const contentBlock = htmlToDraft(fieldValue);
+
+      if (contentBlock) {
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+        const editorState = EditorState.createWithContent(contentState);
+        setEditorState(editorState);
       }
     }
   }, [form, name]);
