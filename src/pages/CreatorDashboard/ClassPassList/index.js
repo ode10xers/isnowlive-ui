@@ -27,6 +27,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -46,7 +47,7 @@ const ClassPassList = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
-  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.2);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const showSendEmailModal = (pass) => {
     let activeRecipients = [];
@@ -208,9 +209,9 @@ const ClassPassList = () => {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
-        setCreatorAbsorbsFees(data.creator_owns_fee);
-        setCreatorFeePercentage(data.platform_fee_percentage);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');

@@ -13,7 +13,7 @@ import SubscriptionCards from 'components/SubscriptionCards';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
-import { paymentProvider } from 'utils/constants';
+import { defaultPlatformFeePercentage, paymentProvider } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
@@ -33,7 +33,7 @@ const Subscriptions = ({ history }) => {
   const [targetSubscription, setTargetSubscription] = useState(null);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
-  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.2);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
@@ -41,9 +41,9 @@ const Subscriptions = ({ history }) => {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
-        setCreatorAbsorbsFees(data.creator_owns_fee);
-        setCreatorFeePercentage(data.platform_fee_percentage);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');

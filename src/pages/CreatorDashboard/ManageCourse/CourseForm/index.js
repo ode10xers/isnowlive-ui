@@ -34,6 +34,8 @@ import { courseCreatePageLayout, coursePageTailLayout } from 'layouts/FormLayout
 
 import styles from './styles.module.scss';
 import { generatePath } from 'react-router';
+import { defaultPlatformFeePercentage } from 'utils/constants';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 
 const coursePriceTypes = {
   FREE: {
@@ -77,6 +79,8 @@ const CourseForm = ({ match, history }) => {
 
   const [courseDetails, setCourseDetails] = useState(null);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
@@ -108,13 +112,15 @@ const CourseForm = ({ match, history }) => {
     setIsLoading(false);
   }, [form, history]);
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -167,13 +173,13 @@ const CourseForm = ({ match, history }) => {
   );
 
   useEffect(() => {
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     getCreatorCurrencyDetails();
 
     if (courseId) {
       fetchCourseDetails(courseId);
     }
-  }, [fetchCreatorMemberTags, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
+  }, [fetchCreatorSettings, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
 
   const handleAddPreviewImageUrl = (newPreviewImageUrl) => {
     setPreviewImageUrls((imageUrls) => [...imageUrls, newPreviewImageUrl]);
@@ -728,14 +734,26 @@ const CourseForm = ({ match, history }) => {
                           rules={validationRules.numberValidation('Please input course price', 0)}
                           noStyle
                         >
-                          <InputNumber
-                            min={0}
-                            disabled={currency === ''}
-                            placeholder="Course Price"
-                            className={styles.numericInput}
-                          />
+                          {creatorAbsorbsFees || currency === '' ? (
+                            <InputNumber
+                              min={0}
+                              disabled={currency === ''}
+                              placeholder="Course Price"
+                              className={styles.numericInput}
+                            />
+                          ) : (
+                            <PriceInputCalculator
+                              name="price"
+                              form={form}
+                              minimalPrice={1}
+                              initialValue={1}
+                              feePercentage={creatorFeePercentage}
+                            />
+                          )}
                         </Form.Item>
-                        <span className="ant-form-text"> {currency?.toUpperCase() || ''} </span>
+                        {(creatorAbsorbsFees || currency === '') && (
+                          <span className="ant-form-text"> {currency?.toUpperCase() || ''} </span>
+                        )}
                       </Form.Item>
                     </Col>
                   )}

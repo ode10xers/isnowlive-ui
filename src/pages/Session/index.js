@@ -50,7 +50,7 @@ import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { sessionMeetingTypes } from 'utils/constants';
+import { defaultPlatformFeePercentage, sessionMeetingTypes } from 'utils/constants';
 
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
@@ -163,7 +163,7 @@ const Session = ({ match, history }) => {
   const [isOfflineSession, setIsOfflineSession] = useState(false);
   const [onlineMeetingType, setOnlineMeetingType] = useState(meetingTypes.ZOOM.value);
   const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
-  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.1);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const {
     state: {
@@ -178,9 +178,9 @@ const Session = ({ match, history }) => {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags ?? []);
         setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
-        setCreatorFeePercentage(data.platform_fee_percentage);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');

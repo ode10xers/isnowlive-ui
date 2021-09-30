@@ -33,6 +33,7 @@ import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType, vi
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -55,7 +56,7 @@ const Videos = () => {
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [expandedCollapseKeys, setExpandedCollapseKeys] = useState(['Published']);
   const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
-  const [creatorFeePercentage, setCreatorFeePercentage] = useState(0.2);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const isOnboarding = location.state ? location.state.onboarding || false : false;
 
@@ -65,9 +66,9 @@ const Videos = () => {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
-        setCreatorAbsorbsFees(data.creator_owns_fee);
-        setCreatorFeePercentage(data.platform_fee_percentage);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
