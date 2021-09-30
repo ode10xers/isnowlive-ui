@@ -105,8 +105,6 @@ const CourseForm = ({ match, history }) => {
         error?.response?.data?.message || 'Something went wrong'
       );
     }
-
-    setIsLoading(false);
   }, [form, history]);
 
   const fetchCreatorMemberTags = useCallback(async () => {
@@ -120,7 +118,6 @@ const CourseForm = ({ match, history }) => {
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
     }
-    setIsLoading(false);
   }, []);
 
   const fetchCourseDetails = useCallback(
@@ -173,6 +170,8 @@ const CourseForm = ({ match, history }) => {
 
     if (courseId) {
       fetchCourseDetails(courseId);
+    } else {
+      setIsLoading(false);
     }
   }, [fetchCreatorMemberTags, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
 
@@ -340,6 +339,7 @@ const CourseForm = ({ match, history }) => {
         onFinish={handleFinish}
         initialValues={formInitialValues}
         scrollToFirstError={true}
+        key={courseDetails?.id ? courseDetails?.id : 'newForm'}
       >
         <Row gutter={[8, 10]}>
           {/* Section Header */}
@@ -401,7 +401,12 @@ const CourseForm = ({ match, history }) => {
                   id="description"
                 >
                   <div>
-                    <TextEditor name="description" form={form} placeholder="  Describe this course briefly" />
+                    <TextEditor
+                      key={courseDetails?.id ? courseDetails?.id : 'new_description'}
+                      name={['description']}
+                      form={form}
+                      placeholder="  Describe this course briefly"
+                    />
                   </div>
                   {/* <TextArea
                     showCount={true}
@@ -418,9 +423,15 @@ const CourseForm = ({ match, history }) => {
                   id="summary"
                   name="summary"
                   label="Details of what students will learn"
+                  fieldKey={courseDetails?.id ? `${courseDetails.id}_summary` : 'new_summary'}
                 >
                   <div>
-                    <TextEditor name="summary" form={form} placeholder="  Describe what will the students learn" />
+                    <TextEditor
+                      fieldKey={courseDetails?.id ? `${courseDetails.id}_summary` : 'new_summary'}
+                      name="summary"
+                      form={form}
+                      placeholder="  Describe what will the students learn"
+                    />
                   </div>
                   {/* <TextArea
                     placeholder="Describe what will the students learn from this course (max 800 characters)"
@@ -520,17 +531,11 @@ const CourseForm = ({ match, history }) => {
                             >
                               <div>
                                 <TextEditor
-                                  name={[name, 'description']}
+                                  name={['topic', name, 'description']}
                                   form={form}
                                   placeholder="  Describe who is this course for"
                                 />
                               </div>
-                              {/* <TextArea
-                                className={styles.textAreaInput}
-                                showCount={true}
-                                maxLength={280}
-                                placeholder="Describe who is this course for (max 280 characters)"
-                              /> */}
                             </Form.Item>
                           </Col>
                         </Row>
@@ -688,17 +693,11 @@ const CourseForm = ({ match, history }) => {
                             >
                               <div>
                                 <TextEditor
-                                  name={[name, 'answer']}
+                                  name={['faqs', name, 'answer']}
                                   form={form}
                                   placeholder="  Describe the answer to the question above"
                                 />
                               </div>
-                              {/* <TextArea
-                                className={styles.textAreaInput}
-                                showCount={true}
-                                maxLength={280}
-                                placeholder="Describe the answer to the question above (max 280 characters)"
-                              /> */}
                             </Form.Item>
                           </Col>
                         </Row>
