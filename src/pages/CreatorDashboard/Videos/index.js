@@ -28,12 +28,12 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType, videoSourceType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import { defaultPlatformFeePercentage } from 'utils/constants';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;

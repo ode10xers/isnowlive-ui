@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import moment from 'moment';
+import { generatePath } from 'react-router';
 import classNames from 'classnames';
+import moment from 'moment';
+
 import {
   Row,
   Col,
@@ -24,18 +26,17 @@ import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
+import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { isAPISuccess } from 'utils/helper';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 import { courseCreatePageLayout, coursePageTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { generatePath } from 'react-router';
-import { defaultPlatformFeePercentage } from 'utils/constants';
-import PriceInputCalculator from 'components/PriceInputCalculator';
 
 const coursePriceTypes = {
   FREE: {
@@ -745,8 +746,8 @@ const CourseForm = ({ match, history }) => {
                             <PriceInputCalculator
                               name="price"
                               form={form}
-                              minimalPrice={1}
-                              initialValue={1}
+                              minimalPrice={0}
+                              initialValue={0}
                               feePercentage={creatorFeePercentage}
                             />
                           )}

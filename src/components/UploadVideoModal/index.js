@@ -45,19 +45,19 @@ import {
   resetBodyStyle,
 } from 'components/Modals/modals';
 
-import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
+import validationRules from 'utils/validation';
+import { getLocalUserDetails } from 'utils/storage';
 import { fetchCreatorCurrency } from 'utils/payment';
 import { generateYoutubeThumbnailURL } from 'utils/video';
-import { getLocalUserDetails } from 'utils/storage';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
-import { defaultPlatformFeePercentage } from 'utils/constants';
 
 const { Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -1016,11 +1016,10 @@ const UploadVideoModal = ({
                 >
                   {currency !== '' && !creatorAbsorbsFees && videoType === videoPriceTypes.PAID.name ? (
                     <PriceInputCalculator
-                      // key={editedVideo?.external_id ?? 'new'}
                       name="price"
                       form={form}
-                      minimalPrice={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
-                      initialValue={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
+                      minimalPrice={0}
+                      initialValue={0}
                       feePercentage={creatorFeePercentage}
                     />
                   ) : (

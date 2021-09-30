@@ -27,15 +27,15 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
-import PriceInputCalculator from 'components/PriceInputCalculator';
-import { defaultPlatformFeePercentage } from 'utils/constants';
 
 const initialColor = generateRandomColor();
 

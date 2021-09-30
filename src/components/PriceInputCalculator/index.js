@@ -16,9 +16,9 @@ const PriceInputCalculator = ({
   placeholderBefore = 'Price you get',
   placeholderAfter = 'Price customer sees',
   feePercentage = 0.1,
-  defaultValue = 1,
+  initialValue = 1,
 }) => {
-  const [creatorPrice, setCreatorPrice] = useState(defaultValue);
+  const [creatorPrice, setCreatorPrice] = useState(initialValue);
   const [calculatedPrice, setCalculatedPrice] = useState(null);
 
   useEffect(() => {
@@ -43,10 +43,10 @@ const PriceInputCalculator = ({
     }
 
     return () => {
-      setCreatorPrice(defaultValue);
+      setCreatorPrice(initialValue);
       setCalculatedPrice(null);
     };
-  }, [form, name, feePercentage, defaultValue]);
+  }, [form, name, feePercentage, initialValue]);
 
   const onCreatorPriceChange = (numValue) => {
     if (typeof numValue === 'number' && !isNaN(numValue) && numValue > 0) {
