@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import moment from 'moment';
+import { generatePath } from 'react-router';
 import classNames from 'classnames';
+import moment from 'moment';
+
 import {
   Row,
   Col,
@@ -25,16 +27,17 @@ import Routes from 'routes';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
 import TextEditor from 'components/TextEditor';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
+import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { isAPISuccess } from 'utils/helper';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 import { courseCreatePageLayout, coursePageTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { generatePath } from 'react-router';
 
 const coursePriceTypes = {
   FREE: {
@@ -78,6 +81,8 @@ const CourseForm = ({ match, history }) => {
 
   const [courseDetails, setCourseDetails] = useState(null);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
@@ -107,13 +112,15 @@ const CourseForm = ({ match, history }) => {
     }
   }, [form, history]);
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -165,7 +172,7 @@ const CourseForm = ({ match, history }) => {
   );
 
   useEffect(() => {
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     getCreatorCurrencyDetails();
 
     if (courseId) {
@@ -173,7 +180,7 @@ const CourseForm = ({ match, history }) => {
     } else {
       setIsLoading(false);
     }
-  }, [fetchCreatorMemberTags, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
+  }, [fetchCreatorSettings, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
 
   const handleAddPreviewImageUrl = (newPreviewImageUrl) => {
     setPreviewImageUrls((imageUrls) => [...imageUrls, newPreviewImageUrl]);
@@ -752,14 +759,26 @@ const CourseForm = ({ match, history }) => {
                           rules={validationRules.numberValidation('Please input course price', 0)}
                           noStyle
                         >
-                          <InputNumber
-                            min={0}
-                            disabled={currency === ''}
-                            placeholder="Course Price"
-                            className={styles.numericInput}
-                          />
+                          {creatorAbsorbsFees || currency === '' ? (
+                            <InputNumber
+                              min={0}
+                              disabled={currency === ''}
+                              placeholder="Course Price"
+                              className={styles.numericInput}
+                            />
+                          ) : (
+                            <PriceInputCalculator
+                              name="price"
+                              form={form}
+                              minimalPrice={0}
+                              initialValue={0}
+                              feePercentage={creatorFeePercentage}
+                            />
+                          )}
                         </Form.Item>
-                        <span className="ant-form-text"> {currency?.toUpperCase() || ''} </span>
+                        {(creatorAbsorbsFees || currency === '') && (
+                          <span className="ant-form-text"> {currency?.toUpperCase() || ''} </span>
+                        )}
                       </Form.Item>
                     </Col>
                   )}
