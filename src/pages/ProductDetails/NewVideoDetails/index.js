@@ -8,6 +8,7 @@ import {
   ClockCircleOutlined,
   PlusCircleFilled,
   PlusOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -26,6 +27,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 import SelectablePassItem from './SelectablePassItem';
 import SelectableSubscriptionItem from './SelectableSubscriptionItem';
+import DocumentEmbed from 'components/DocumentEmbed';
 
 import {
   orderType,
@@ -78,6 +80,7 @@ const NewVideoDetails = ({ match }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [videoData, setVideoData] = useState(null);
   const [creatorProfile, setCreatorProfile] = useState(null);
+  const [showDocumentPreview, setShowDocumentPreview] = useState(false);
 
   // Related Products State
   const [relatedSubscriptions, setRelatedSubscriptions] = useState([]);
@@ -708,6 +711,16 @@ const NewVideoDetails = ({ match }) => {
     setShowAuthModal(false);
   };
 
+  const handleShowDocumentPreview = (e) => {
+    preventDefaults(e);
+    setShowDocumentPreview((prevState) => !prevState);
+  };
+
+  const handleHideDocumentPreview = (e) => {
+    preventDefaults(e);
+    setShowDocumentPreview(false);
+  };
+
   const handleDeselectPass = () => {
     setSelectedPass(null);
   };
@@ -770,36 +783,82 @@ const NewVideoDetails = ({ match }) => {
 
   //#region Start of UI Components
 
-  // TODO: Update this implementation
-  const renderVideoDocumentUrl = () => {
-    const documentUrl = videoData?.description.split('!~!~!~')[1] ?? '';
-    const isPublicDownloadable = videoData?.description.split('!~!~!~')[2] ?? false;
+  const documentPreview =
+    showDocumentPreview && videoData && videoData?.is_public_document && videoData?.document?.url ? (
+      <div className={styles.filePreviewContainer}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} className={styles.textAlignCenter}>
+            <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
+              Close Preview
+            </Button>
+          </Col>
+          {videoData?.document?.url?.includes('/image/') ? (
+            <Col xs={24} className={styles.textAlignCenter}>
+              <Image width="100%" preview={false} className={styles.mt10} src={videoData?.document?.url} />
+            </Col>
+          ) : videoData?.document?.url?.includes('.pdf') ? (
+            <Col xs={24}>
+              <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
+            </Col>
+          ) : null}
+        </Row>
+      </div>
+    ) : null;
 
-    if (!documentUrl) {
+  const renderVideoDocumentUrl = () => {
+    const documentData = videoData?.document ?? null;
+
+    if (!documentData) {
       return null;
     }
 
-    const filename = documentUrl.split('_').slice(-1)[0] || 'Download';
+    const isAccessibleByPublic = videoData?.is_public_document ?? false;
+    const isDownloadable = videoData?.is_document_downloadable ?? false;
+    const documentUrl = documentData.url;
+
+    const filename =
+      documentData.name || documentData.url.split('_').splice(1).join('_') || (isAccessibleByPublic ? 'View' : '');
 
     return (
-      <div className={styles.videoDocumentUrl}>
-        <Space direction="vertical">
-          <Text className={styles.videoDocumentText}> This video includes a downloadable PDF file: </Text>
-          {isPublicDownloadable ? (
+      <Col xs={24}>
+        <Paragraph className={styles.sectionHeading}>
+          This video includes a file
+          {isAccessibleByPublic ? '' : ` that's only available after purchase`}
+        </Paragraph>
+        {isAccessibleByPublic ? (
+          <Space>
             <Button
-              className={styles.filenameDownload}
+              className={classNames(
+                styles.filePreviewButton,
+                isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                  ? styles.darkText
+                  : styles.lightText
+              )}
               type="primary"
               icon={<FilePdfOutlined />}
-              onClick={() => window.open(documentUrl)}
+              onClick={handleShowDocumentPreview}
             >
               {filename}
             </Button>
-          ) : (
-            <Text className={styles.filenameText}>{filename}</Text>
-          )}
-        </Space>
-        <Divider />
-      </div>
+            {isDownloadable ? (
+              <Button
+                ghost
+                className={styles.fileDownloadButton}
+                type="primary"
+                icon={<DownloadOutlined />}
+                onClick={() => window.open(documentUrl)}
+              />
+            ) : null}
+          </Space>
+        ) : (
+          <div className={styles.fileContainer}>
+            <Text className={styles.fileName}>
+              <FilePdfOutlined /> {filename}
+            </Text>
+          </div>
+        )}
+        {documentPreview}
+      </Col>
     );
   };
 
@@ -1301,7 +1360,6 @@ const NewVideoDetails = ({ match }) => {
                     </Text>
                   </Space>
                   <div className={styles.videoDescContainer}>
-                    {renderVideoDocumentUrl()}
                     <div className={styles.videoDesc}>
                       {ReactHtmlParser(videoData?.description.split('!~!~!~')[0] ?? '')}
                     </div>
@@ -1324,6 +1382,7 @@ const NewVideoDetails = ({ match }) => {
               </Col>
             </Row>
           </Col>
+          {renderVideoDocumentUrl()}
           {/* Buy Sections */}
           <Col xs={24}>
             {videoData?.is_course

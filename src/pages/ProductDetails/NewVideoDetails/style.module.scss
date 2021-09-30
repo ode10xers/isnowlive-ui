@@ -1,19 +1,5 @@
 @import '../../../styles/variables.scss';
 
-.videoDocumentUrl {
-  .videoDocumentText {
-    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')}));
-  }
-
-  .filenameText {
-    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')}));
-  }
-
-  .filenameDownload {
-    background-color: var(--passion-profile-primary-color, var(--video-plugin-cta-background-color,  #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
-    border-color: var(--passion-profile-primary-color, var(--video-plugin-cta-background-color,  #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;  
-  }
-}
 
 .videoDetailsPage {
   min-height: calc(100vh - 66px);
@@ -59,10 +45,6 @@
 
   .videoDescContainer {
     min-width: 100%;
-
-    .videoDocumentUrl {
-      margin-top: 12px;
-    }
 
     .videoDesc {
       margin-top: 12px;
