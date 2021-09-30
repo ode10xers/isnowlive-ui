@@ -183,21 +183,25 @@ const Courses = ({ history }) => {
       const { status, data } = await apis.courses.createCourse(clonedPayload);
 
       if (isAPISuccess(status) && data) {
-        Modal.confirm({
-          closable: true,
-          icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-          title: 'Course successfully cloned!',
-          content: (
-            <>
-              <Paragraph>
-                The cloned course will be unpublished by default. You can continue to edit it and publish it later.
-              </Paragraph>
-            </>
-          ),
-          okText: 'Continue to edit',
-          onOk: () => (data.id ? redirectToEditCourse(data?.id) : false),
-          cancelText: 'Close',
-        });
+        message.success('Course cloned successfully!');
+        if (data?.id) {
+          redirectToEditCourse(data?.id);
+        }
+        // Modal.confirm({
+        //   closable: true,
+        //   icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+        //   title: 'Course successfully cloned!',
+        //   content: (
+        //     <>
+        //       <Paragraph>
+        //         The cloned course will be unpublished by default. You can continue to edit it and publish it later.
+        //       </Paragraph>
+        //     </>
+        //   ),
+        //   okText: 'Continue to edit',
+        //   onOk: () => (data.id ? redirectToEditCourse(data?.id) : false),
+        //   cancelText: 'Close',
+        // });
       }
     } catch (error) {
       console.error(error);
