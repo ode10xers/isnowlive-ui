@@ -27,4 +27,4 @@ export const attendeeProductOrderTypes = {
   COURSE: 'course',
 };
 
-export const defaultPlatformFeePercentage = 0.2;
+export const defaultPlatformFeePercentage = 0.1;
