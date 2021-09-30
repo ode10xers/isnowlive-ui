@@ -120,7 +120,7 @@ const PriceInputCalculator = ({
             </Col>
             <Col flex="0 0 16px">
               <Tooltip
-                title="You can input on any one of the fields and we'll calculate the other one for you"
+                title="You can input on any one of the fields and we'll calculate the other one for you (rounded up to 1 decimal place)"
                 trigger="hover"
               >
                 <InfoCircleOutlined className={styles.infoIcon} />
