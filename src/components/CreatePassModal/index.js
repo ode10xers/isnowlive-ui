@@ -643,7 +643,7 @@ const CreatePassModal = ({
               <Form.Item
                 id="price"
                 name="price"
-                label="Pass Price"
+                label={`Pass Price${currency ? ` (${currency?.toUpperCase()})` : ''}`}
                 rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
               >
                 {currency !== '' && !creatorAbsorbsFees ? (
