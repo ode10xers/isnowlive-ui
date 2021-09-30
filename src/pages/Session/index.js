@@ -35,6 +35,7 @@ import ImageUpload from 'components/ImageUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showCourseOptionsHelperModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import {
@@ -49,7 +50,7 @@ import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { sessionMeetingTypes } from 'utils/constants';
+import { defaultPlatformFeePercentage, sessionMeetingTypes } from 'utils/constants';
 
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
@@ -161,6 +162,8 @@ const Session = ({ match, history }) => {
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [isOfflineSession, setIsOfflineSession] = useState(false);
   const [onlineMeetingType, setOnlineMeetingType] = useState(meetingTypes.ZOOM.value);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const {
     state: {
@@ -170,12 +173,14 @@ const Session = ({ match, history }) => {
     },
   } = useGlobalContext();
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -314,7 +319,7 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     fetchCreatorDocuments();
 
     if (match.path.includes('manage')) {
@@ -369,7 +374,7 @@ const Session = ({ match, history }) => {
     match.path,
     getCreatorCurrencyDetails,
     fetchCreatorDocuments,
-    fetchCreatorMemberTags,
+    fetchCreatorSettings,
   ]);
 
   const onSessionImageUpload = (imageUrl) => {
@@ -1220,7 +1225,9 @@ const Session = ({ match, history }) => {
                     ? `Choose your minimum price. We default to 5 ${form
                         .getFieldsValue()
                         .currency.toUpperCase()} as default`
-                    : 'Set your price'
+                    : creatorAbsorbsFees
+                    ? 'Set your price'
+                    : ''
                 }
                 rules={validationRules.numberValidation(
                   `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,
@@ -1229,7 +1236,17 @@ const Session = ({ match, history }) => {
                 )}
                 hidden={sessionPaymentType === priceTypes.FREE}
               >
-                <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
+                {creatorAbsorbsFees || sessionPaymentType === priceTypes.FLEXIBLE ? (
+                  <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
+                ) : (
+                  <PriceInputCalculator
+                    name="price"
+                    form={form}
+                    minimalPrice={1}
+                    initialValue={1}
+                    feePercentage={creatorFeePercentage}
+                  />
+                )}
               </Form.Item>
 
               {sessionPaymentType !== priceTypes.FREE && (

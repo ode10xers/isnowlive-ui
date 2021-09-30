@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import moment from 'moment';
+import { generatePath } from 'react-router';
 import classNames from 'classnames';
+import moment from 'moment';
+
 import {
   Row,
   Col,
@@ -24,16 +26,18 @@ import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
+import TextEditor from 'components/TextEditor';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
+import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { isAPISuccess } from 'utils/helper';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 import { courseCreatePageLayout, coursePageTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { generatePath } from 'react-router';
 
 const coursePriceTypes = {
   FREE: {
@@ -60,7 +64,7 @@ const formInitialValues = {
 };
 
 const { Title, Text } = Typography;
-const { TextArea } = Input;
+// const { TextArea } = Input;
 
 const CourseForm = ({ match, history }) => {
   const [form] = Form.useForm();
@@ -77,6 +81,8 @@ const CourseForm = ({ match, history }) => {
 
   const [courseDetails, setCourseDetails] = useState(null);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
@@ -104,22 +110,21 @@ const CourseForm = ({ match, history }) => {
         error?.response?.data?.message || 'Something went wrong'
       );
     }
-
-    setIsLoading(false);
   }, [form, history]);
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
     }
-    setIsLoading(false);
   }, []);
 
   const fetchCourseDetails = useCallback(
@@ -167,13 +172,15 @@ const CourseForm = ({ match, history }) => {
   );
 
   useEffect(() => {
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     getCreatorCurrencyDetails();
 
     if (courseId) {
       fetchCourseDetails(courseId);
+    } else {
+      setIsLoading(false);
     }
-  }, [fetchCreatorMemberTags, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
+  }, [fetchCreatorSettings, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
 
   const handleAddPreviewImageUrl = (newPreviewImageUrl) => {
     setPreviewImageUrls((imageUrls) => [...imageUrls, newPreviewImageUrl]);
@@ -339,6 +346,7 @@ const CourseForm = ({ match, history }) => {
         onFinish={handleFinish}
         initialValues={formInitialValues}
         scrollToFirstError={true}
+        key={courseDetails?.id ? courseDetails?.id : 'newForm'}
       >
         <Row gutter={[8, 10]}>
           {/* Section Header */}
@@ -394,31 +402,50 @@ const CourseForm = ({ match, history }) => {
               <Col xs={24}>
                 <Form.Item
                   {...courseCreatePageLayout}
+                  className={classNames(styles.bgWhite, styles.textEditorLayout)}
                   label="Short summary of the course"
                   name="description"
                   id="description"
                 >
-                  <TextArea
+                  <div>
+                    <TextEditor
+                      key={courseDetails?.id ? courseDetails?.id : 'new_description'}
+                      name={['description']}
+                      form={form}
+                      placeholder="  Describe this course briefly"
+                    />
+                  </div>
+                  {/* <TextArea
                     showCount={true}
                     placeholder="Describe this course briefly (max 280 characters)"
                     maxLength={280}
                     className={styles.textAreaInput}
-                  />
+                  /> */}
                 </Form.Item>
               </Col>
               <Col xs={24}>
                 <Form.Item
                   {...courseCreatePageLayout}
+                  className={classNames(styles.bgWhite, styles.textEditorLayout)}
                   id="summary"
                   name="summary"
                   label="Details of what students will learn"
+                  fieldKey={courseDetails?.id ? `${courseDetails.id}_summary` : 'new_summary'}
                 >
-                  <TextArea
+                  <div>
+                    <TextEditor
+                      fieldKey={courseDetails?.id ? `${courseDetails.id}_summary` : 'new_summary'}
+                      name="summary"
+                      form={form}
+                      placeholder="  Describe what will the students learn"
+                    />
+                  </div>
+                  {/* <TextArea
                     placeholder="Describe what will the students learn from this course (max 800 characters)"
                     maxLength={800}
                     showCount={true}
                     className={styles.textAreaInput}
-                  />
+                  /> */}
                 </Form.Item>
               </Col>
               <Col xs={24}>
@@ -507,13 +534,15 @@ const CourseForm = ({ match, history }) => {
                               name={[name, 'description']}
                               fieldKey={[fieldKey, 'description']}
                               rules={validationRules.requiredValidation}
+                              className={classNames(styles.bgWhite, styles.textEditorLayout)}
                             >
-                              <TextArea
-                                className={styles.textAreaInput}
-                                showCount={true}
-                                maxLength={280}
-                                placeholder="Describe who is this course for (max 280 characters)"
-                              />
+                              <div>
+                                <TextEditor
+                                  name={['topic', name, 'description']}
+                                  form={form}
+                                  placeholder="  Describe who is this course for"
+                                />
+                              </div>
                             </Form.Item>
                           </Col>
                         </Row>
@@ -667,13 +696,15 @@ const CourseForm = ({ match, history }) => {
                               name={[name, 'answer']}
                               fieldKey={[fieldKey, 'answer']}
                               rules={validationRules.requiredValidation}
+                              className={classNames(styles.bgWhite, styles.textEditorLayout)}
                             >
-                              <TextArea
-                                className={styles.textAreaInput}
-                                showCount={true}
-                                maxLength={280}
-                                placeholder="Describe the answer to the question above (max 280 characters)"
-                              />
+                              <div>
+                                <TextEditor
+                                  name={['faqs', name, 'answer']}
+                                  form={form}
+                                  placeholder="  Describe the answer to the question above"
+                                />
+                              </div>
                             </Form.Item>
                           </Col>
                         </Row>
@@ -728,14 +759,26 @@ const CourseForm = ({ match, history }) => {
                           rules={validationRules.numberValidation('Please input course price', 0)}
                           noStyle
                         >
-                          <InputNumber
-                            min={0}
-                            disabled={currency === ''}
-                            placeholder="Course Price"
-                            className={styles.numericInput}
-                          />
+                          {creatorAbsorbsFees || currency === '' ? (
+                            <InputNumber
+                              min={0}
+                              disabled={currency === ''}
+                              placeholder="Course Price"
+                              className={styles.numericInput}
+                            />
+                          ) : (
+                            <PriceInputCalculator
+                              name="price"
+                              form={form}
+                              minimalPrice={0}
+                              initialValue={0}
+                              feePercentage={creatorFeePercentage}
+                            />
+                          )}
                         </Form.Item>
-                        <span className="ant-form-text"> {currency?.toUpperCase() || ''} </span>
+                        {(creatorAbsorbsFees || currency === '') && (
+                          <span className="ant-form-text"> {currency?.toUpperCase() || ''} </span>
+                        )}
                       </Form.Item>
                     </Col>
                   )}
