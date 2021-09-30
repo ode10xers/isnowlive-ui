@@ -24,6 +24,7 @@ import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
+import TextEditor from 'components/TextEditor';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
@@ -60,7 +61,7 @@ const formInitialValues = {
 };
 
 const { Title, Text } = Typography;
-const { TextArea } = Input;
+// const { TextArea } = Input;
 
 const CourseForm = ({ match, history }) => {
   const [form] = Form.useForm();
@@ -394,31 +395,39 @@ const CourseForm = ({ match, history }) => {
               <Col xs={24}>
                 <Form.Item
                   {...courseCreatePageLayout}
+                  className={classNames(styles.bgWhite, styles.textEditorLayout)}
                   label="Short summary of the course"
                   name="description"
                   id="description"
                 >
-                  <TextArea
+                  <div>
+                    <TextEditor name="description" form={form} placeholder="  Describe this course briefly" />
+                  </div>
+                  {/* <TextArea
                     showCount={true}
                     placeholder="Describe this course briefly (max 280 characters)"
                     maxLength={280}
                     className={styles.textAreaInput}
-                  />
+                  /> */}
                 </Form.Item>
               </Col>
               <Col xs={24}>
                 <Form.Item
                   {...courseCreatePageLayout}
+                  className={classNames(styles.bgWhite, styles.textEditorLayout)}
                   id="summary"
                   name="summary"
                   label="Details of what students will learn"
                 >
-                  <TextArea
+                  <div>
+                    <TextEditor name="summary" form={form} placeholder="  Describe what will the students learn" />
+                  </div>
+                  {/* <TextArea
                     placeholder="Describe what will the students learn from this course (max 800 characters)"
                     maxLength={800}
                     showCount={true}
                     className={styles.textAreaInput}
-                  />
+                  /> */}
                 </Form.Item>
               </Col>
               <Col xs={24}>
@@ -507,13 +516,21 @@ const CourseForm = ({ match, history }) => {
                               name={[name, 'description']}
                               fieldKey={[fieldKey, 'description']}
                               rules={validationRules.requiredValidation}
+                              className={classNames(styles.bgWhite, styles.textEditorLayout)}
                             >
-                              <TextArea
+                              <div>
+                                <TextEditor
+                                  name={[name, 'description']}
+                                  form={form}
+                                  placeholder="  Describe who is this course for"
+                                />
+                              </div>
+                              {/* <TextArea
                                 className={styles.textAreaInput}
                                 showCount={true}
                                 maxLength={280}
                                 placeholder="Describe who is this course for (max 280 characters)"
-                              />
+                              /> */}
                             </Form.Item>
                           </Col>
                         </Row>
@@ -667,13 +684,21 @@ const CourseForm = ({ match, history }) => {
                               name={[name, 'answer']}
                               fieldKey={[fieldKey, 'answer']}
                               rules={validationRules.requiredValidation}
+                              className={classNames(styles.bgWhite, styles.textEditorLayout)}
                             >
-                              <TextArea
+                              <div>
+                                <TextEditor
+                                  name={[name, 'answer']}
+                                  form={form}
+                                  placeholder="  Describe the answer to the question above"
+                                />
+                              </div>
+                              {/* <TextArea
                                 className={styles.textAreaInput}
                                 showCount={true}
                                 maxLength={280}
                                 placeholder="Describe the answer to the question above (max 280 characters)"
-                              />
+                              /> */}
                             </Form.Item>
                           </Col>
                         </Row>
