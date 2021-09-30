@@ -787,11 +787,11 @@ const NewVideoDetails = ({ match }) => {
     showDocumentPreview && videoData && videoData?.is_public_document && videoData?.document?.url ? (
       <div className={styles.filePreviewContainer}>
         <Row gutter={[8, 8]}>
-          <Col xs={24} className={styles.textAlignCenter}>
+          {/* <Col xs={24} className={styles.textAlignCenter}>
             <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
               Close Preview
             </Button>
-          </Col>
+          </Col> */}
           {videoData?.document?.url?.includes('/image/') ? (
             <Col xs={24} className={styles.textAlignCenter}>
               <Image width="100%" preview={false} className={styles.mt10} src={videoData?.document?.url} />
@@ -849,6 +849,11 @@ const NewVideoDetails = ({ match }) => {
                 onClick={() => window.open(documentUrl)}
               />
             ) : null}
+            {showDocumentPreview && (
+              <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
+                Close Preview
+              </Button>
+            )}
           </Space>
         ) : (
           <div className={styles.fileContainer}>
