@@ -35,6 +35,7 @@ import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
 import PriceInputCalculator from 'components/PriceInputCalculator';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 const initialColor = generateRandomColor();
 
@@ -76,7 +77,7 @@ const CreateSubscriptionCard = ({
   editedSubscription = null,
   creatorMemberTags = [],
   creatorAbsorbsFees = true,
-  creatorFeePercentage = 0.2,
+  creatorFeePercentage = defaultPlatformFeePercentage,
 }) => {
   const [form] = Form.useForm();
   const history = useHistory();

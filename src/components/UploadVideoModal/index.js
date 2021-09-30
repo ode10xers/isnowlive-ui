@@ -57,6 +57,7 @@ import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 const { Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -114,7 +115,7 @@ const UploadVideoModal = ({
   shouldClone,
   creatorMemberTags = [],
   creatorAbsorbsFees = true,
-  creatorFeePercentage = 0.2,
+  creatorFeePercentage = defaultPlatformFeePercentage,
   refetchVideos,
 }) => {
   const [form] = Form.useForm();

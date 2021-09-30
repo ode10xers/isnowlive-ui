@@ -13,8 +13,9 @@ import PriceInputCalculator from 'components/PriceInputCalculator';
 import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, generateRandomColor } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { defaultPlatformFeePercentage } from 'utils/constants';
+import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -72,7 +73,7 @@ const CreatePassModal = ({
   editedPass = null,
   creatorMemberTags = [],
   creatorAbsorbsFees = true,
-  creatorFeePercentage = 0.2,
+  creatorFeePercentage = defaultPlatformFeePercentage,
 }) => {
   const [form] = Form.useForm();
   const history = useHistory();
