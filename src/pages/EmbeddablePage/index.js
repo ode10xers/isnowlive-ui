@@ -1,17 +1,16 @@
-import React from 'react';
-
-import Passes from 'components/EmbeddableComponents/Passes';
-import Videos from 'components/EmbeddableComponents/Videos';
-import Courses from 'components/EmbeddableComponents/Courses';
-import SessionsList from 'components/EmbeddableComponents/SessionsCardsList';
-import Subscriptions from 'components/EmbeddableComponents/Subscriptions';
-import CalendarSessions from 'components/EmbeddableComponents/CalendarSessions';
-import AvailabilitiesPlugin from 'components/EmbeddableComponents/AvailabilitiesPlugin';
-import InventoryList from 'components/EmbeddableComponents/InventoryList';
+import React, { lazy, Suspense } from 'react';
 
 import { localStoragePluginStylingKeyPrefix, widgetComponentsName } from 'utils/widgets';
 
-// TODO: Might want to implement lazy loading here as well
+const Passes = lazy(() => import('components/EmbeddableComponents/Passes'));
+const Videos = lazy(() => import('components/EmbeddableComponents/Videos'));
+const Courses = lazy(() => import('components/EmbeddableComponents/Courses'));
+const SessionsList = lazy(() => import('components/EmbeddableComponents/SessionsCardsList'));
+const Subscriptions = lazy(() => import('components/EmbeddableComponents/Subscriptions'));
+const CalendarSessions = lazy(() => import('components/EmbeddableComponents/CalendarSessions'));
+const AvailabilitiesPlugin = lazy(() => import('components/EmbeddableComponents/AvailabilitiesPlugin'));
+const InventoryList = lazy(() => import('components/EmbeddableComponents/InventoryList'));
+
 export default function EmbeddablePage({ widget }) {
   let componentToLoad = null;
   if (widget === widgetComponentsName.CALENDAR.value) {
@@ -45,5 +44,9 @@ export default function EmbeddablePage({ widget }) {
     }
   });
 
-  return <div>{componentToLoad}</div>;
+  return (
+    <div>
+      <Suspense fallback={<div>Loading plugins...</div>}>{componentToLoad}</Suspense>
+    </div>
+  );
 }

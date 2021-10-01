@@ -21,8 +21,6 @@ import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'ser
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
 
-import EmbeddablePage from 'pages/EmbeddablePage';
-
 const DefaultLayout = lazy(() => import('layouts/DefaultLayout'));
 const SideNavLayout = lazy(() => import('layouts/SideNavLayout'));
 const SideNavWithHeaderLayout = lazy(() => import('layouts/SideNavWithHeaderLayout'));
@@ -59,7 +57,7 @@ const NewHome = lazy(() => import('pages/NewHome'));
 const VideoDetailedListView = lazy(() => import('pages/DetailedListView/Videos'));
 const SessionDetailedListView = lazy(() => import('pages/DetailedListView/Sessions'));
 const CourseDetailedListView = lazy(() => import('pages/DetailedListView/Courses'));
-// const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
+const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
 const Legals = lazy(() => import('pages/Legals'));
 const Onboarding = lazy(() => import('pages/EditProfile'));
 

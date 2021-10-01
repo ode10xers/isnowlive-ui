@@ -25,8 +25,6 @@ const Videos = () => {
     state: { userDetails },
   } = useGlobalContext();
 
-  console.log(userDetails);
-
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [groupView, setGroupView] = useState(null);
