@@ -5,8 +5,10 @@ import { LeftOutlined } from '@ant-design/icons';
 
 import NewVideoDetails from 'pages/ProductDetails/NewVideoDetails';
 
-import styles from './style.module.scss';
+import { getUsernameFromUrl } from 'utils/helper';
 import { generateWidgetLink, localStoragePluginStylingKeyPrefix, widgetComponentsName } from 'utils/widgets';
+
+import styles from './style.module.scss';
 
 const PluginVideoDetails = ({ match, history }) => {
   const initializePluginStyling = useCallback(() => {
@@ -33,7 +35,7 @@ const PluginVideoDetails = ({ match, history }) => {
       widgetType: widgetComponentsName.VIDEOS.value,
     };
 
-    window.open(generateWidgetLink(queryParamsData), '_self');
+    window.open(generateWidgetLink(queryParamsData, getUsernameFromUrl()), '_self');
   };
 
   return (
