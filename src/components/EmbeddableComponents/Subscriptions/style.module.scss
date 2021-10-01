@@ -1,10 +1,8 @@
 @import '../../../styles/variables.scss';
 
-.subscriptionPluginContainer {
-  padding: 20px;
-}
-
-.passionLogo {
-  height: 30px;
-  float: right;
+// TODO: Match this with CSS Vars for subscription plugin
+.signupButton {
+  background-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--video-plugin-cta-font-color, #{map-get($colors, 'White')}) !important;
 }
