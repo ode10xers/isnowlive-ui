@@ -107,6 +107,7 @@ function App() {
   const windowLocation = window.location;
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
+  // Logic to sign in from Webflow redirection
   let signupAuthToken =
     window.location.search &&
     window.location.search.includes('signupAuthToken=') &&
@@ -209,6 +210,9 @@ function App() {
           const tokenFromLS = getAuthTokenFromLS();
           if (tokenFromLS) {
             http.setAuthToken(tokenFromLS);
+            // NOTE : The API call here causes a delay
+            // which might cause the styling not getting applied
+            setIsReadyToLoad(true);
             getUserDetails();
           } else {
             removeUserState();
