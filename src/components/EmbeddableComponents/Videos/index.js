@@ -14,6 +14,8 @@ import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { getAuthCookie } from 'services/authCookie';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 
 const { Title } = Typography;
 
@@ -85,7 +87,13 @@ const Videos = () => {
 
   const redirectToAttendeeDashboard = () => {
     const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) || 'app';
-    window.open(`${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}`, '_blank');
+    const authToken = getAuthTokenFromLS() || getAuthCookie() || userDetails?.auth_token || '';
+    window.open(
+      `${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}${
+        authToken ? `?authCode=${authToken}` : ''
+      }`,
+      '_blank'
+    );
   };
 
   const handleFilterToggleClicked = () => {
