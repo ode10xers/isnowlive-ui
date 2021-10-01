@@ -37,6 +37,7 @@ export default function EmbeddablePage({ widget }) {
   window.addEventListener('message', (e) => {
     const { command, data: customStyles } = e.data;
 
+    console.log(command);
     if (command && command === 'add-custom-styling') {
       // NOTE : Hack, we save this to LS and do the same thing whenever we need it
       localStorage.setItem(`${localStoragePluginStylingKeyPrefix}${widget}`, customStyles);
