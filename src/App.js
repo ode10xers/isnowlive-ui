@@ -106,6 +106,8 @@ function App() {
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
   // Logic to sign in from Webflow redirection
+  // As well as handle auth token passing from widget to site
+  // (widgets store tokens in LS while site uses cookies)
   let signupAuthToken =
     window.location.search &&
     window.location.search.includes('signupAuthToken=') &&

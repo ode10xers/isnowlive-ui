@@ -90,7 +90,7 @@ const Videos = () => {
     const authToken = getAuthTokenFromLS() || getAuthCookie() || userDetails?.auth_token || '';
     window.open(
       `${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}${
-        authToken ? `?authCode=${authToken}` : ''
+        authToken ? `?signupAuthToken=${authToken}` : ''
       }`,
       '_blank'
     );

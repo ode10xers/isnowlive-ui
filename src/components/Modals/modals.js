@@ -46,7 +46,7 @@ const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPat
     completeUrl =
       completeUrl +
       // '?isWidget=true&widgetType=dashboard' +
-      `${authCode && authCode !== '' ? `&authCode=${authCode}` : ''}`;
+      `${authCode && authCode !== '' ? `&signupAuthToken=${authCode}` : ''}`;
 
     return completeUrl;
   }
