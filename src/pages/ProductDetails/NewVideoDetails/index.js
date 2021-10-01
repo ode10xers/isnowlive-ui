@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
-import { Row, Col, Button, Image, Typography, Space, Spin, Divider, Grid, message } from 'antd';
+import { Row, Col, Button, Image, Typography, Space, Spin, Divider, message } from 'antd';
 import {
   FilePdfOutlined,
   CalendarOutlined,
@@ -60,7 +60,6 @@ const {
 } = dateUtil;
 
 const { Title, Text, Paragraph } = Typography;
-const { useBreakpoint } = Grid;
 
 const paymentInstruments = {
   ONE_OFF: 'one-off',
@@ -75,8 +74,6 @@ const NewVideoDetails = ({ match }) => {
     showPaymentPopup,
     state: { userDetails },
   } = useGlobalContext();
-
-  const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -908,7 +905,7 @@ const NewVideoDetails = ({ match }) => {
     if (usableSubscription && videoData?.total_price > 0) {
       return (
         <div className={styles.buyUsingMembershipContainer}>
-          <Space direction="vertical">
+          <Space direction="vertical" className={styles.w100}>
             <Button
               block
               className={classNames(
@@ -965,7 +962,7 @@ const NewVideoDetails = ({ match }) => {
     } else if (usablePass && videoData?.total_price > 0) {
       return (
         <div className={styles.buyUsingPassContainer}>
-          <Space direction="vertical">
+          <Space direction="vertical" className={styles.w100}>
             <Button
               block
               className={classNames(
@@ -1079,7 +1076,7 @@ const NewVideoDetails = ({ match }) => {
     let paymentInstrumentTextArr = [];
 
     if (relatedPassesAvailable) {
-      paymentInstrumentTextArr.push('Credit Pass');
+      paymentInstrumentTextArr.push('Pass');
     }
 
     if (relatedSubscriptionAvailable) {
@@ -1090,7 +1087,10 @@ const NewVideoDetails = ({ match }) => {
       <div className={styles.paymentInstrumentsContainer}>
         <Row gutter={[12, 16]} justify="space-around">
           <Col xs={24} className={styles.textAlignCenter}>
-            <Space
+            <Title level={3} className={styles.paymentInstrumentHeadingText}>
+              Get discounted price with {paymentInstrumentTextArr.join(' or ')}{' '}
+            </Title>
+            {/* <Space
               direction={lg ? 'horizontal' : 'vertical'}
               align="middle"
               split={
@@ -1104,7 +1104,7 @@ const NewVideoDetails = ({ match }) => {
               <Title level={3} className={styles.paymentInstrumentHeadingText}>
                 Buy this video with a {paymentInstrumentTextArr.join(' or ')}{' '}
               </Title>
-            </Space>
+            </Space> */}
           </Col>
           {relatedPassesAvailable && (
             <Col xs={24} lg={12}>

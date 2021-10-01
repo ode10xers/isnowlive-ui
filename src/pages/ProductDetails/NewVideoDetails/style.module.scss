@@ -180,25 +180,33 @@
 .paymentInstrumentsContainer {
   padding: 20px;
 
-  .paymentInstrumentHeadingContainer {
-    .paymentInstrumentHeadingText {
-      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+  .paymentInstrumentHeadingText {
+    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
 
-      @media screen and (max-width: 769px) {
-        font-size: 20px !important;
-      }
-    }
-
-    .paymentInstrumentHeadingDivider {
-      height: 3em;
-      border-left-color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
-      border-top-color:  var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
-      @media screen and (max-width: 993px) {
-        height: 4px !important;
-        margin: 8px 0 !important; 
-      }
+    @media screen and (max-width: 769px) {
+      font-size: 20px !important;
     }
   }
+
+  // .paymentInstrumentHeadingContainer {
+  //   .paymentInstrumentHeadingText {
+  //     color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+
+  //     @media screen and (max-width: 769px) {
+  //       font-size: 20px !important;
+  //     }
+  //   }
+
+  //   .paymentInstrumentHeadingDivider {
+  //     height: 3em;
+  //     border-left-color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+  //     border-top-color:  var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+  //     @media screen and (max-width: 993px) {
+  //       height: 4px !important;
+  //       margin: 8px 0 !important; 
+  //     }
+  //   }
+  // }
 
   .paymentInstrumentSelectContainer {
     border: 1px solid var(--passion-profile-primary-color, var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}));
