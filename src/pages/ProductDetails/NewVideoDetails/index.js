@@ -136,8 +136,8 @@ const NewVideoDetails = ({ match }) => {
           const usableSubscription =
             data.active.find(
               (subscription) =>
+                subscription.product_credits > subscription.product_credits_used &&
                 subscription.products['VIDEO'] &&
-                subscription.products['VIDEO']?.credits - subscription.products['VIDEO']?.credits_used > 0 &&
                 subscription.products['VIDEO']?.product_ids?.includes(videoExternalId)
             ) || null;
 
