@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 import { Row, Col, Button, Image, Typography, Space, Spin, Divider, Grid, message } from 'antd';
@@ -43,7 +43,7 @@ import {
   isUnapprovedUserError,
 } from 'utils/helper';
 import dateUtil from 'utils/date';
-import { isInIframeWidget } from 'utils/widgets';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import { getLocalUserDetails } from 'utils/storage';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { generateColorPalletteForProfile } from 'utils/colors';
@@ -51,6 +51,8 @@ import { generateColorPalletteForProfile } from 'utils/colors';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
 
 const {
   formatDate: { getVideoMinutesDuration, toShortDate },
@@ -86,6 +88,7 @@ const NewVideoDetails = ({ match }) => {
   const [relatedSubscriptions, setRelatedSubscriptions] = useState([]);
   const [relatedPasses, setRelatedPasses] = useState([]);
   const [relatedCourses, setRelatedCourses] = useState([]);
+  const [otherVideos, setOtherVideos] = useState([]);
 
   // User's usable Payment Instruments State
   const [usablePass, setUsablePass] = useState(null);
@@ -232,6 +235,18 @@ const NewVideoDetails = ({ match }) => {
     [getCourseDetailsForVideo]
   );
 
+  const fetchOtherVideos = useCallback(async () => {
+    try {
+      const { status, data } = await apis.videos.getVideosByUsername();
+
+      if (isAPISuccess(status) && data) {
+        setOtherVideos(data.sort((a, b) => (a.total_price ?? a.price) - (b.total_price ?? b.price)));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
     try {
       const { status, data } = creatorUsername
@@ -292,7 +307,8 @@ const NewVideoDetails = ({ match }) => {
     fetchVideoDetails(videoId);
     fetchRelatedPassesForVideo(videoId);
     fetchRelatedSubscriptionsForVideo(videoId);
-  }, [videoId, fetchVideoDetails, fetchRelatedPassesForVideo, fetchRelatedSubscriptionsForVideo]);
+    fetchOtherVideos();
+  }, [videoId, fetchVideoDetails, fetchRelatedPassesForVideo, fetchRelatedSubscriptionsForVideo, fetchOtherVideos]);
 
   // Use Effect logic to handle when user lands in the page already logged in
   useEffect(() => {
@@ -779,6 +795,14 @@ const NewVideoDetails = ({ match }) => {
     }
   };
 
+  const handleOtherVideoClicked = useCallback((video) => {
+    if (isInIframeWidget() || isWidgetUrl()) {
+      redirectToPluginVideoDetailsPage(video);
+    } else {
+      redirectToVideosPage(video);
+    }
+  }, []);
+
   //#endregion End of Event handlers
 
   //#region Start of UI Components
@@ -787,11 +811,6 @@ const NewVideoDetails = ({ match }) => {
     showDocumentPreview && videoData && videoData?.is_public_document && videoData?.document?.url ? (
       <div className={styles.filePreviewContainer}>
         <Row gutter={[8, 8]}>
-          {/* <Col xs={24} className={styles.textAlignCenter}>
-            <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
-              Close Preview
-            </Button>
-          </Col> */}
           {videoData?.document?.url?.includes('/image/') ? (
             <Col xs={24} className={styles.textAlignCenter}>
               <Image width="100%" preview={false} className={styles.mt10} src={videoData?.document?.url} />
@@ -805,6 +824,7 @@ const NewVideoDetails = ({ match }) => {
       </div>
     ) : null;
 
+  // TODO: Revisit this once design is done
   const renderVideoDocumentUrl = () => {
     const documentData = videoData?.document ?? null;
 
@@ -1337,6 +1357,35 @@ const NewVideoDetails = ({ match }) => {
       </Row>
     ) : null;
 
+  const otherVideosLimit = 5;
+
+  const similarVideosSection = useMemo(
+    () => (
+      <div>
+        <Row gutter={[8, 8]}>
+          <Col xs={24}>
+            <Title level={4} className={styles.similarVideosHeading}>
+              Similar Videos
+            </Title>
+          </Col>
+          <Col xs={24}>
+            <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
+              {otherVideos
+                .filter((video) => video.external_id !== videoData?.external_id)
+                .slice(0, otherVideosLimit)
+                .map((video) => (
+                  <Col xs={20} sm={18} md={9} lg={7} xl={5} key={video.external_id}>
+                    <VideoListCard video={video} handleClick={() => handleOtherVideoClicked(video)} />
+                  </Col>
+                ))}
+            </Row>
+          </Col>
+        </Row>
+      </div>
+    ),
+    [otherVideos, videoData, handleOtherVideoClicked]
+  );
+
   //#endregion End of UI Components
 
   return (
@@ -1397,7 +1446,7 @@ const NewVideoDetails = ({ match }) => {
               : null}
           </Col>
           {/* Similar Videos */}
-          <Col xs={24}></Col>
+          {otherVideos.length > 0 && <Col xs={24}>{similarVideosSection}</Col>}
         </Row>
       </Spin>
     </div>

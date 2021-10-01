@@ -121,9 +121,15 @@ const Videos = () => {
         </Button>
       </Col>
       <Col xs={12} className={styles.textAlignRight}>
-        <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
-          Sign In/Up
-        </Button>
+        {userDetails ? (
+          <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
+            My Dashboard
+          </Button>
+        ) : (
+          <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
+            Sign In/Up
+          </Button>
+        )}
       </Col>
       {showFilter && (
         <Col xs={24} className={styles.filterContainer}>
@@ -133,16 +139,16 @@ const Videos = () => {
                 Categories
               </Title>
               <Select
-                allowClear
                 showArrow
+                allowClear
                 mode="multiple"
                 placeholder="Select category that you want to see"
                 maxTagCount={3}
                 loading={isLoading}
-                className={styles.filterDropdown}
-                options={Object.keys(videosByGroup).map((group) => ({ label: group, value: group }))}
                 value={selectedVideoGroupFilter}
+                className={styles.filterDropdown}
                 onChange={setSelectedVideoGroupFilter}
+                options={Object.keys(videosByGroup).map((group) => ({ label: group, value: group }))}
               />
             </Col>
           </Row>
