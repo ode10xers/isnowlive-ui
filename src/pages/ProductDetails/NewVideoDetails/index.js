@@ -817,7 +817,15 @@ const NewVideoDetails = ({ match }) => {
             </Col>
           ) : videoData?.document?.url?.includes('.pdf') ? (
             <Col xs={24}>
-              <DocumentEmbed documentLink={videoData?.document?.url ?? null} />
+              <DocumentEmbed
+                activeButtonClass={classNames(
+                  styles.filePreviewButton,
+                  isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                    ? styles.darkText
+                    : styles.lightText
+                )}
+                documentLink={videoData?.document?.url ?? null}
+              />
             </Col>
           ) : null}
         </Row>
@@ -870,7 +878,16 @@ const NewVideoDetails = ({ match }) => {
               />
             ) : null}
             {showDocumentPreview && (
-              <Button danger ghost type="primary" onClick={handleHideDocumentPreview}>
+              <Button
+                className={classNames(
+                  styles.filePreviewButton,
+                  isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                    ? styles.darkText
+                    : styles.lightText
+                )}
+                type="primary"
+                onClick={handleHideDocumentPreview}
+              >
                 Close Preview
               </Button>
             )}
