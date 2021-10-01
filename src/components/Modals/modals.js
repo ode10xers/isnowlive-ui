@@ -25,6 +25,7 @@ import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import { getAuthCookie } from 'services/authCookie';
 
 import styles from './style.modules.scss';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 
 const { Text, Paragraph } = Typography;
 
@@ -35,7 +36,7 @@ const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPat
     let completeUrl = generateUrlFromUsername(userName) + targetPath;
 
     let authCode = null;
-    const authCodeFromCookie = getAuthCookie();
+    const authCodeFromCookie = getAuthCookie() || getAuthTokenFromLS();
     if (authCodeFromCookie && authCodeFromCookie !== '') {
       authCode = authCodeFromCookie;
     } else {
@@ -46,7 +47,7 @@ const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPat
     completeUrl =
       completeUrl +
       // '?isWidget=true&widgetType=dashboard' +
-      `${authCode && authCode !== '' ? `&signupAuthToken=${authCode}` : ''}`;
+      `${authCode && authCode !== '' ? `?signupAuthToken=${authCode}` : ''}`;
 
     return completeUrl;
   }
