@@ -12,7 +12,11 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
-import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import {
+  getCourseDocumentContentCount,
+  getCourseOrderSessionContentCount,
+  getCourseOrderVideoContentCount,
+} from 'utils/course';
 
 import styles from './styles.module.scss';
 
@@ -58,8 +62,8 @@ const CourseList = () => {
   };
 
   const renderCourseContents = (courseOrder) => {
-    const sessionCount = getCourseSessionContentCount(courseOrder.course?.modules ?? []);
-    const videoCount = getCourseVideoContentCount(courseOrder.course?.modules ?? []);
+    const sessionCount = getCourseOrderSessionContentCount(courseOrder.course?.modules ?? []);
+    const videoCount = getCourseOrderVideoContentCount(courseOrder.course?.modules ?? []);
     const docCount = getCourseDocumentContentCount(courseOrder.course?.modules ?? []);
 
     return (
