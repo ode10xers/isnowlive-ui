@@ -120,6 +120,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       }
     } catch (error) {
       console.error(error);
+      // @ts-ignore
       showErrorModal('Failed to fetch availability details', error?.response?.data?.message || 'Something went wrong');
     }
 
@@ -137,6 +138,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       }
     } catch (error) {
       console.error(error);
+      // @ts-ignore
       message.error(error?.response?.data?.message || 'Failed to fetch passes for availability');
     }
 

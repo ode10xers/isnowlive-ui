@@ -1,3 +1,4 @@
+import { generatePath } from 'react-router';
 import Routes from 'routes';
 import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 'utils/helper';
 // import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
@@ -59,6 +60,22 @@ export const redirectToVideosPage = (video) => {
   // } else {
   //   window.open(targetUrl);
   // }
+};
+
+export const redirectToPluginVideoDetailsPage = (video) => {
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
+
+  const baseUrl = generateUrlFromUsername(video.creator_username || urlUsername);
+
+  const targetUrl = `${baseUrl}${Routes.plugins.root}${generatePath(Routes.plugins.details.video, {
+    video_id: video.external_id,
+  })}`;
+  window.open(targetUrl, '_self');
+  // window.location.assign(targetUrl);
 };
 
 export const redirectToCoursesPage = (course) => {
