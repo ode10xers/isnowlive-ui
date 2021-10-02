@@ -1,6 +1,13 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
-import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  BarsOutlined,
+  LeftOutlined,
+  ControlOutlined,
+  UserOutlined,
+  ArrowRightOutlined,
+  ArrowLeftOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -116,6 +123,51 @@ const Videos = () => {
     redirectToPluginVideoDetailsPage(video);
   };
 
+  //#Source https://bit.ly/2neWfJ2
+  const generateElementId = (groupName) =>
+    groupName &&
+    groupName
+      .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+      .map((x) => x.toLowerCase())
+      .join('_');
+
+  const handleScrollPrevious = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+    if (targetScrollable) {
+      // targetScrollable.scrollLeft += (targetScrollable.offsetWidth * 0.8);
+      targetScrollable.scrollTo({
+        left: targetScrollable.scrollLeft - Math.round(targetScrollable.offsetWidth * 0.8),
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleScrollNext = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+    if (targetScrollable) {
+      // targetScrollable.scrollLeft += (targetScrollable.offsetWidth * 0.8);
+      targetScrollable.scrollTo({
+        left: targetScrollable.scrollLeft + Math.round(targetScrollable.offsetWidth * 0.8),
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleListScrolled = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+
+    if (targetScrollable.scrollLeft === 0) {
+      document.getElementById(`${generateElementId(groupName)}_prev`).style.display = 'none';
+      document.getElementById(`${generateElementId(groupName)}_next`).style.display = 'block';
+    } else if (targetScrollable.scrollLeft + 20 >= targetScrollable.scrollWidth - targetScrollable.clientWidth) {
+      document.getElementById(`${generateElementId(groupName)}_prev`).style.display = 'block';
+      document.getElementById(`${generateElementId(groupName)}_next`).style.display = 'none';
+    } else {
+      document.getElementById(`${generateElementId(groupName)}_prev`).style.display = 'block';
+      document.getElementById(`${generateElementId(groupName)}_next`).style.display = 'block';
+    }
+  };
+
   const groupFilters = (
     <Row gutter={[8, 12]} className={styles.filterSection}>
       <Col xs={12}>
@@ -190,14 +242,21 @@ const Videos = () => {
                 </Row>
               </Col>
               <Col xs={24}>
-                <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
+                <Row
+                  gutter={[8, 8]}
+                  className={styles.horizontalVideoList}
+                  id={generateElementId(groupName)}
+                  onScroll={() => handleListScrolled(groupName)}
+                >
                   {groupVideos?.slice(0, videoItemsLimit).map((video) => (
-                    <Col xs={20} sm={18} md={9} lg={7} xl={5} key={video.external_id}>
+                    // <Col xs={20} sm={18} md={9} lg={7} key={video.external_id}>
+                    <Col flex="24%" key={video.external_id}>
                       <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
                     </Col>
                   ))}
                   {groupVideos?.length > videoItemsLimit && (
-                    <Col xs={20} sm={18} md={9} lg={7} xl={5} className={styles.fadedItemContainer}>
+                    // <Col xs={20} sm={18} md={9} lg={7} className={styles.fadedItemContainer}>
+                    <Col flex="24%" className={styles.fadedItemContainer}>
                       <div className={styles.fadedOverlay}>
                         <div className={styles.seeMoreButton} onClick={() => handleMoreClicked(groupName)}>
                           <BarsOutlined className={styles.seeMoreIcon} />
@@ -209,6 +268,34 @@ const Videos = () => {
                       </div>
                     </Col>
                   )}
+                </Row>
+              </Col>
+              <Col xs={24}>
+                <Row gutter={[4, 4]} align="middle">
+                  <Col flex="1 1 auto">
+                    <Button
+                      id={`${generateElementId(groupName)}_prev`}
+                      size="small"
+                      style={{ display: 'none' }}
+                      className={styles.linkButton}
+                      type="link"
+                      onClick={() => handleScrollPrevious(groupName)}
+                      icon={<ArrowLeftOutlined />}
+                    >
+                      Scroll to previous
+                    </Button>
+                  </Col>
+                  <Col flex="0 0 120px">
+                    <Button
+                      id={`${generateElementId(groupName)}_next`}
+                      size="small"
+                      className={styles.linkButton}
+                      type="link"
+                      onClick={() => handleScrollNext(groupName)}
+                    >
+                      Scroll to next <ArrowRightOutlined />
+                    </Button>
+                  </Col>
                 </Row>
               </Col>
             </Row>

@@ -52,7 +52,8 @@
     .horizontalVideoList {
       flex-flow: row nowrap !important;
       overflow-x: scroll;
-      padding-bottom: 6px !important;
+      padding-bottom: 2px !important;
+      scroll-behavior: smooth;
     
       &::-webkit-scrollbar {
         height: 10px;

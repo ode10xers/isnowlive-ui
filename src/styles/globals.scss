@@ -63,3 +63,7 @@
   --inventory-list-plugin-cta-background-color: #{map-get($colors, 'DodgerBlue')};
   --inventory-list-plugin-cta-font-color: #{map-get($colors, 'White')};
 }
+
+html {
+  scroll-behavior: smooth;
+}
