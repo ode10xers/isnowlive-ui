@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
+import { Spin, Grid, Row, Col, Button, Typography, Select, message } from 'antd';
 import {
   BarsOutlined,
   LeftOutlined,
@@ -25,6 +25,7 @@ import { getAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS } from 'services/localAuthToken';
 
 const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const otherVideosKey = 'All Videos';
 const videoItemsLimit = 6;
@@ -33,6 +34,8 @@ const Videos = () => {
   const {
     state: { userDetails },
   } = useGlobalContext();
+
+  const { xs, sm, md, lg } = useBreakpoint();
 
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -168,6 +171,25 @@ const Videos = () => {
     }
   };
 
+  const isElementScrollable = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+    return targetScrollable && targetScrollable.scrollWidth >= targetScrollable.clientWidth + 100;
+  };
+
+  const getVideoItemFlexLayout = () => {
+    if (xs) {
+      return '85%';
+    } else if (lg) {
+      return '24%';
+    } else if (md) {
+      return '30%';
+    } else if (sm) {
+      return '45%';
+    } else {
+      return 'auto';
+    }
+  };
+
   const groupFilters = (
     <Row gutter={[8, 12]} className={styles.filterSection}>
       <Col xs={12}>
@@ -250,13 +272,13 @@ const Videos = () => {
                 >
                   {groupVideos?.slice(0, videoItemsLimit).map((video) => (
                     // <Col xs={20} sm={18} md={9} lg={7} key={video.external_id}>
-                    <Col flex="24%" key={video.external_id}>
+                    <Col flex={getVideoItemFlexLayout()} key={video.external_id}>
                       <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
                     </Col>
                   ))}
                   {groupVideos?.length > videoItemsLimit && (
                     // <Col xs={20} sm={18} md={9} lg={7} className={styles.fadedItemContainer}>
-                    <Col flex="24%" className={styles.fadedItemContainer}>
+                    <Col flex={getVideoItemFlexLayout()} className={styles.fadedItemContainer}>
                       <div className={styles.fadedOverlay}>
                         <div className={styles.seeMoreButton} onClick={() => handleMoreClicked(groupName)}>
                           <BarsOutlined className={styles.seeMoreIcon} />
@@ -288,6 +310,7 @@ const Videos = () => {
                   <Col flex="0 0 120px">
                     <Button
                       id={`${generateElementId(groupName)}_next`}
+                      style={isElementScrollable(groupName) ? {} : { display: 'none' }}
                       size="small"
                       className={styles.linkButton}
                       type="link"
