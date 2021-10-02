@@ -31,6 +31,7 @@ const VideoListCard = ({ video, handleClick = null }) => {
     <div className={styles.videoCoverContainer}>
       <div className={styles.videoImageContainer}>
         <Image
+          loading="lazy"
           preview={false}
           className={
             video?.thumbnail_url?.endsWith('.gif')

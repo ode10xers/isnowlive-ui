@@ -1,0 +1,58 @@
+@import '../../../../styles/variables.scss';
+
+.selectableSubscriptionItem {
+  border-radius: 12px;
+  border: 1px solid var(--primary-light-color);
+  background-color: var(--primary-lightest-color);
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  padding: 0 3px;
+
+  .subscriptionItemHeadingContainer {
+    background-color: var(--primary-light-color);
+    border-radius: 12px 12px 0 0;
+    padding: 0 !important;
+
+    .subscriptionItemHeading {
+      margin: 0 !important;
+      padding: 8px !important;
+
+      .subscriptionName, .subscriptionPrice {
+        color: var(--primary-dark-color);
+        font-weight: 500;
+        font-size: 16px;
+      }
+    
+      .subscriptionCurrency {
+        @extend .subscriptionName;
+        font-size: 9px;
+      }
+    }
+  }
+
+  .subscriptionDetailsContainer {
+    padding: 4px 12px !important;
+    
+    .subscriptionDetails {
+      font-size: 14px;
+      margin-bottom: 2px;
+      font-weight: 500;
+      color: var(--primary-dark-color) !important;
+    }
+  }
+
+  .extraButtonsContainer {
+    padding: 4px 12px 6px !important;
+
+    .extraBtn {
+      cursor: pointer;
+      color: var(--primary-dark-color);
+      font-size: 14px;
+    }
+  
+    .selectedBtn {
+      @extend .extraBtn;
+      background-color: var(--primary-light-color);
+    }
+  }
+}
+

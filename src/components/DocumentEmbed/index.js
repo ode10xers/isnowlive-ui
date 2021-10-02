@@ -10,7 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 const { Text } = Typography;
 
-const DocumentEmbed = ({ documentLink = null }) => {
+const DocumentEmbed = ({ documentLink = null, activeButtonClass = undefined }) => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   // const [hasOutline, setHasOutline] = useState(false);
@@ -86,15 +86,27 @@ const DocumentEmbed = ({ documentLink = null }) => {
       </Document>
       <div className={styles.navigatorContainer}>
         <Space align="center">
-          <Button type="primary" disabled={pageNumber <= 1} onClick={previousPage}>
-            Previous
-          </Button>
+          {pageNumber <= 1 ? (
+            <Button disabled={true} type="primary">
+              Previous
+            </Button>
+          ) : (
+            <Button className={activeButtonClass} type="primary" onClick={previousPage}>
+              Previous
+            </Button>
+          )}
           <Text>
             Page {pageNumber || (numPages ? 1 : '--')} of {numPages || '--'}
           </Text>
-          <Button type="primary" disabled={pageNumber >= numPages} onClick={nextPage}>
-            Next
-          </Button>
+          {pageNumber >= numPages ? (
+            <Button disabled={true} type="primary">
+              Next
+            </Button>
+          ) : (
+            <Button className={activeButtonClass} type="primary" onClick={nextPage}>
+              Next
+            </Button>
+          )}
         </Space>
       </div>
     </div>

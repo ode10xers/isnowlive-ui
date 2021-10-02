@@ -1,0 +1,71 @@
+@import '../../../../styles/variables.scss';
+
+.selectablePassItem {
+  background-color: var(--primary-light-color);
+  border: 1px solid var(--primary-light-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+
+  .passName, .passPrice {
+    color: var(--primary-dark-color);
+    font-weight: 500;
+    font-size: 16px;
+  }
+
+  .passCurrency {
+    @extend .passName;
+    font-size: 9px;
+  }
+
+  .passDetailsContainer {
+    .passDetailsItem {
+      font-size: 12px;
+      color: var(--primary-dark-color);
+    }
+
+    .passDetailsDivider {
+      border-left-color: var(--primary-dark-color);
+      height: 1.3em;
+    }
+  }
+
+  .extraDividerContainer {
+  //   &::before,
+  //   &::after {
+  //     width: 8px;
+  //     content: '';
+  //     height: 12px;
+  //     position: absolute;
+  //     top: calc(50% - 6px);
+  //     border: 1px solid var(--primary-light-color);
+  //     background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  //   }
+  //   &::before {
+  //     left: -9px;
+  //     border-radius: 0 8px 8px 0;
+  //     border-left: none;
+  //   }
+  //   &::after {
+  //     right: -9px;
+  //     border-radius: 8px 0 0 8px;
+  //     border-right: none
+  //   }
+
+    .extraDivider {
+      margin: 2px auto;
+    }
+  }
+
+  .extraButtonsContainer {
+    .extraBtn {
+      cursor: pointer;
+      color: var(--primary-dark-color);
+      font-size: 14px;
+    }
+
+    .selectedBtn {
+      @extend .extraBtn;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}

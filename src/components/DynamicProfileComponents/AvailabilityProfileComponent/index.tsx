@@ -166,6 +166,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
           {isEditing && <Col xs={1}>{dragAndDropHandleComponent}</Col>}
 
           <Col xs={isEditing ? 22 : 24}>
+            {/* @ts-ignore */}
             <ContainerCard {...commonContainerProps}>{componentChildren}</ContainerCard>
           </Col>
 
