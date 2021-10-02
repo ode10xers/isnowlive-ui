@@ -362,7 +362,7 @@ const CourseModulesForm = ({ match, history }) => {
     // ),
   ];
 
-  const getSessionContentIDsFormModules = (modules = []) => [
+  const getSessionContentIDsFromModules = (modules = []) => [
     // ...new Set(
     ...modules.reduce(
       (acc, module) =>
@@ -416,8 +416,8 @@ const CourseModulesForm = ({ match, history }) => {
       return false;
     }
 
-    const prevSessionContents = getSessionContentIDsFormModules(courseDetails?.modules ?? []).sort();
-    const newSessionContents = getSessionContentIDsFormModules(newModules).sort();
+    const prevSessionContents = getSessionContentIDsFromModules(courseDetails?.modules ?? []).sort();
+    const newSessionContents = getSessionContentIDsFromModules(newModules).sort();
 
     return JSON.stringify(prevSessionContents) !== JSON.stringify(newSessionContents);
   };
