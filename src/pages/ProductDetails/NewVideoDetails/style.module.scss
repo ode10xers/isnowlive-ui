@@ -55,7 +55,7 @@
   }
 }
 
-.similarVideosHeading, .sectionHeading {
+.similarVideosHeading, .sectionHeading, .usablePaymentInstrumentText {
   color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')})) !important;
 }
 

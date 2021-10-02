@@ -23,11 +23,12 @@ import {
   showPurchaseSubscriptionAndGetVideoSuccessModal,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
+import DocumentEmbed from 'components/DocumentEmbed';
 import DefaultImage from 'components/Icons/DefaultImage';
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 import SelectablePassItem from './SelectablePassItem';
 import SelectableSubscriptionItem from './SelectableSubscriptionItem';
-import DocumentEmbed from 'components/DocumentEmbed';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
 import {
   orderType,
@@ -47,12 +48,11 @@ import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import { getLocalUserDetails } from 'utils/storage';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { generateColorPalletteForProfile } from 'utils/colors';
+import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
-import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
 
 const {
   formatDate: { getVideoMinutesDuration, toShortDate },
@@ -923,7 +923,7 @@ const NewVideoDetails = ({ match }) => {
                 split={<Divider type="vertical" className={styles.buyBtnDivider} />}
                 className={styles.buyBtnTextContainer}
               >
-                <Text className={styles.buyBtnText}> BUY USING YOUR MEMBERSHIP </Text>
+                <Text className={styles.buyBtnText}> BUY USING MEMBERSHIP </Text>
                 <Text className={styles.buyBtnText}>
                   {videoData?.pay_what_you_want ? (
                     <>
@@ -942,8 +942,10 @@ const NewVideoDetails = ({ match }) => {
             <Row gutter={[8, 8]} wrap={false} justify="end">
               <Col flex="1 1 auto">
                 <Space direction="vertical" size="small">
-                  <Text strong>{usableSubscription?.subscription_name ?? ''}</Text>
-                  <Text>
+                  <Text strong className={styles.usablePaymentInstrumentText}>
+                    {usableSubscription?.subscription_name ?? ''}
+                  </Text>
+                  <Text className={styles.usablePaymentInstrumentText}>
                     {usableSubscription.product_credits - usableSubscription.product_credits_used}/
                     {usableSubscription.product_credits} credits left.
                   </Text>
@@ -951,8 +953,10 @@ const NewVideoDetails = ({ match }) => {
               </Col>
               <Col flex="0 0 120px" className={styles.textAlignRight}>
                 <Space direction="vertical" size="small" className={styles.textAlignRight}>
-                  <Text strong>Auto renews on</Text>
-                  <Text>{toShortDate(usableSubscription?.expiry)}</Text>
+                  <Text strong className={styles.usablePaymentInstrumentText}>
+                    Auto renews on
+                  </Text>
+                  <Text className={styles.usablePaymentInstrumentText}>{toShortDate(usableSubscription?.expiry)}</Text>
                 </Space>
               </Col>
             </Row>
@@ -980,7 +984,7 @@ const NewVideoDetails = ({ match }) => {
                 split={<Divider type="vertical" className={styles.buyBtnDivider} />}
                 className={styles.buyBtnTextContainer}
               >
-                <Text className={styles.buyBtnText}> BUY USING YOUR PASS </Text>
+                <Text className={styles.buyBtnText}> BUY USING PASS </Text>
                 <Text className={styles.buyBtnText}>
                   {videoData?.pay_what_you_want ? (
                     <>
@@ -998,10 +1002,12 @@ const NewVideoDetails = ({ match }) => {
             </Button>
             <Row gutter={[8, 8]} wrap={false} justify="end">
               <Col flex="1 1 auto">
-                <Text strong>{usablePass?.pass_name ?? ''}</Text>
+                <Text strong className={styles.usablePaymentInstrumentText}>
+                  {usablePass?.pass_name ?? ''}
+                </Text>
               </Col>
               <Col flex="0 0 140px" className={styles.textAlignRight}>
-                <Text strong>
+                <Text strong className={styles.usablePaymentInstrumentText}>
                   {usablePass?.classes_remaining}/{usablePass?.class_count} credits left.
                 </Text>
               </Col>
