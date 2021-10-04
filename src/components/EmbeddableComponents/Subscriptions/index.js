@@ -34,12 +34,12 @@ const {
 const NewSubscriptionItem = ({ subscription = null, onBuy, onDetails }) => {
   const subscriptionColor = subscription?.color_code ?? '#1890ff';
   const [h, s, l] = convertHexToHSL(subscriptionColor);
-  const lightnessMultiplier = l > 60 ? 0.6 : 1;
+  const lightnessMultiplier = l >= 50 ? 0.55 : 1;
 
   const colorObj = {
     '--primary-color': formatHSLStyleString(h, s, l),
-    '--primary-color-light': formatHSLStyleString(h, s, l + 30 * lightnessMultiplier),
-    '--primary-color-lightest': formatHSLStyleString(h, s, l + 40 * lightnessMultiplier),
+    '--primary-color-light': formatHSLStyleString(h, s, l + 40 * lightnessMultiplier),
+    '--primary-color-lightest': formatHSLStyleString(h, s, l + 50 * lightnessMultiplier),
     '--primary-color-dark': formatHSLStyleString(h, s, l - 25),
   };
 
