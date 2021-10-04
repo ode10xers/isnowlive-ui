@@ -13,6 +13,7 @@ import validationRules from 'utils/validation';
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import { couponTypes } from 'utils/constants';
 
 const { Text } = Typography;
 
@@ -40,20 +41,20 @@ const creatorProductInfo = [
   },
 ];
 
-const couponTypes = {
+const formCouponTypes = {
   ABSOLUTE: {
-    value: 'ABSOLUTE',
+    value: couponTypes.ABSOLUTE,
     label: 'Flat value coupons',
   },
   PERCENTAGE: {
-    value: 'PERCENTAGE',
+    value: couponTypes.PERCENTAGE,
     label: 'Percent based coupons',
   },
 };
 
 const formInitialValues = {
   discountAmount: 1,
-  couponType: couponTypes.PERCENTAGE.value,
+  couponType: formCouponTypes.ABSOLUTE.value,
 };
 
 // ! Coupons API will use external IDs, so for SESSION and PASS need to use external_id
@@ -65,7 +66,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   const [products, setProducts] = useState({});
   const [selectedProductTypes, setSelectedProductTypes] = useState([]);
 
-  const [selectedCouponType, setSelectedCouponType] = useState(couponTypes.ABSOLUTE.value);
+  const [selectedCouponType, setSelectedCouponType] = useState(formCouponTypes.ABSOLUTE.value);
 
   // For products that have different keys for names/id
   const getProductId = (productType, productData) => {
@@ -128,13 +129,13 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
       if (editedCoupon) {
         form.setFieldsValue({
           discountCode: editedCoupon.code,
-          couponType: editedCoupon.coupon_type ?? couponTypes.ABSOLUTE.value,
+          couponType: editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value,
           couponValue: editedCoupon.value,
           selectedProductTypes: editedCoupon.product_type.toLowerCase(),
           selectedProducts: editedCoupon.product_ids,
         });
 
-        setSelectedCouponType(editedCoupon.coupon_type ?? couponTypes.ABSOLUTE.value);
+        setSelectedCouponType(editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value);
         setSelectedProductTypes(editedCoupon.product_type.toLowerCase());
       } else {
         form.resetFields();
@@ -164,7 +165,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
     try {
       const payload = {
         code: values.discountCode,
-        coupon_type: selectedCouponType ?? couponTypes.ABSOLUTE.value,
+        coupon_type: selectedCouponType ?? formCouponTypes.ABSOLUTE.value,
         value: values.couponValue,
         product_type: selectedProductTypes.toUpperCase() || values.selectedProductTypes.toUpperCase(),
         product_ids: values.selectedProducts,
@@ -232,7 +233,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                 rules={validationRules.requiredValidation}
               >
                 <Radio.Group onChange={handleCouponTypeChanged}>
-                  {Object.values(couponTypes).map((cType) => (
+                  {Object.values(formCouponTypes).map((cType) => (
                     <Radio key={cType.value} value={cType.value}>
                       {cType.label}
                     </Radio>
@@ -241,7 +242,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
               </Form.Item>
             </Col>
             <Col xs={24}>
-              {selectedCouponType === couponTypes.PERCENTAGE.value ? (
+              {selectedCouponType === formCouponTypes.PERCENTAGE.value ? (
                 <Form.Item {...couponModalFormLayout} label="Discount Amount (%)" required={true}>
                   <Row gutter={4}>
                     <Col xs={20}>
@@ -324,7 +325,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                     .map(([key, value]) => (
                       <Select.OptGroup label={`${key.charAt(0).toUpperCase()}${key.slice(1)}`} key={key}>
                         {value?.map((product) => (
-                          <Select.Option key={product.id} value={getProductId(key, product)}>
+                          <Select.Option key={getProductId(key, product)} value={getProductId(key, product)}>
                             {getProductName(key, product)}
                           </Select.Option>
                         ))}
