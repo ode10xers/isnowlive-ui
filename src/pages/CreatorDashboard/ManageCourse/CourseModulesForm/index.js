@@ -1017,7 +1017,7 @@ const CourseModulesForm = ({ match, history }) => {
                                       >
                                         <Input
                                           placeholder="Module name"
-                                          maxLength={50}
+                                          maxLength={100}
                                           className={styles.panelHeaderFormInput}
                                           onClick={preventDefaults}
                                         />
@@ -1084,7 +1084,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                       >
                                                                         <Input
                                                                           placeholder="Content name"
-                                                                          maxLength={50}
+                                                                          maxLength={100}
                                                                         />
                                                                       </Form.Item>
                                                                       <Form.Item
@@ -1095,7 +1095,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                       >
                                                                         <Input
                                                                           placeholder="Content ID"
-                                                                          maxLength={50}
+                                                                          maxLength={100}
                                                                         />
                                                                       </Form.Item>
                                                                       <Form.Item

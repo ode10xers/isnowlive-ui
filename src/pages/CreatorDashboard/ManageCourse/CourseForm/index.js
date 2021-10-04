@@ -396,7 +396,7 @@ const CourseForm = ({ match, history }) => {
                   label="Course Name"
                   rules={validationRules.requiredValidation}
                 >
-                  <Input placeholder="Enter Course Name" maxLength={50} />
+                  <Input placeholder="Enter Course Name" maxLength={100} />
                 </Form.Item>
               </Col>
               <Col xs={24}>
@@ -507,11 +507,7 @@ const CourseForm = ({ match, history }) => {
                                 rules={validationRules.requiredValidation}
                                 noStyle
                               >
-                                <Input
-                                  placeholder="Enter heading (max. 50 characters)"
-                                  maxLength={50}
-                                  className={styles.inputWithButton}
-                                />
+                                <Input placeholder="Enter heading" maxLength={100} className={styles.inputWithButton} />
                               </Form.Item>
                               {fields.length > 0 ? (
                                 <span className="ant-form-text">
@@ -586,8 +582,8 @@ const CourseForm = ({ match, history }) => {
                                 noStyle
                               >
                                 <Input
-                                  placeholder="Enter preview title (max. 50 characters)"
-                                  maxLength={50}
+                                  placeholder="Enter preview title"
+                                  maxLength={100}
                                   className={styles.inputWithButton}
                                 />
                               </Form.Item>
@@ -670,8 +666,8 @@ const CourseForm = ({ match, history }) => {
                                 noStyle
                               >
                                 <Input
-                                  placeholder="Enter the question (max. 50 characters)"
-                                  maxLength={50}
+                                  placeholder="Enter the question"
+                                  maxLength={100}
                                   className={styles.inputWithButton}
                                 />
                               </Form.Item>
