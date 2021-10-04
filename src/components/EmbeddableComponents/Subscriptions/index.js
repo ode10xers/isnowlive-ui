@@ -10,21 +10,20 @@ import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components
 
 import dateUtil from 'utils/date';
 import {
-  isAPISuccess,
-  getUsernameFromUrl,
-  generateUrlFromUsername,
-  isUnapprovedUserError,
   orderType,
   productType,
-  isBrightColorShade,
+  isAPISuccess,
+  getUsernameFromUrl,
+  isUnapprovedUserError,
+  generateUrlFromUsername,
 } from 'utils/helper';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import { redirectToMembershipPage } from 'utils/redirect';
+import { convertHexToHSL, formatHSLStyleString } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { convertHexToHSL, formatHSLStyleString } from 'utils/colors';
 
 const { Title } = Typography;
 
