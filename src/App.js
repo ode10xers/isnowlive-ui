@@ -49,7 +49,8 @@ const PaymentVerification = lazy(() => import('pages/PaymentVerification'));
 const PaymentRetry = lazy(() => import('pages/PaymentRetry'));
 const SessionReschedule = lazy(() => import('pages/SessionReschedule'));
 const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
-const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
+// const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
+const NewVideoDetails = lazy(() => import('pages/ProductDetails/NewVideoDetails'));
 const CourseDetails = lazy(() => import('pages/ProductDetails/CourseDetails'));
 const PassDetails = lazy(() => import('pages/ProductDetails/PassDetails'));
 const NewHome = lazy(() => import('pages/NewHome'));
@@ -67,6 +68,7 @@ const MembershipDetailPreview = lazy(() => import('pages/PreviewPages/Membership
 const AvailabilityDetailPreview = lazy(() => import('pages/PreviewPages/AvailabilityDetails'));
 const SessionDetailsPreview = lazy(() => import('pages/PreviewPages/SessionDetails'));
 const InventoryDetailsPreview = lazy(() => import('pages/PreviewPages/InventoryDetails'));
+const PluginPages = lazy(() => import('pages/PluginPages'));
 
 // const CookieConsentPopup = lazy(() => import('components/CookieConsentPopup'));
 const PaymentPopup = lazy(() => import('components/PaymentPopup'));
@@ -103,6 +105,9 @@ function App() {
   const windowLocation = window.location;
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
+  // Logic to sign in from Webflow redirection
+  // As well as handle auth token passing from widget to site
+  // (widgets store tokens in LS while site uses cookies)
   let signupAuthToken =
     window.location.search &&
     window.location.search.includes('signupAuthToken=') &&
@@ -205,6 +210,9 @@ function App() {
           const tokenFromLS = getAuthTokenFromLS();
           if (tokenFromLS) {
             http.setAuthToken(tokenFromLS);
+            // NOTE : The API call here causes a delay
+            // which might cause the styling not getting applied
+            setIsReadyToLoad(true);
             getUserDetails();
           } else {
             removeUserState();
@@ -231,6 +239,7 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
+            <RouteWithLayout layout={FullWidthLayout} path={Routes.plugins.root} component={PluginPages} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute
               layout={SideNavWithHeaderLayout}
@@ -301,7 +310,13 @@ function App() {
               path={Routes.previewPages.videos}
               component={VideoDetailPreview}
             />
-            <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+            {/* <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              exact
+              path={Routes.videoDetails}
+              component={NewVideoDetails}
+            />
             <RouteWithLayout
               layout={NavbarLayout}
               exact

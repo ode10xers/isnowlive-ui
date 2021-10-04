@@ -25,6 +25,12 @@ const Routes = {
   inventoryDetails: '/e/:inventory_id',
   sessionDetails: '/s/:session_id',
   membershipDetails: '/m/:membership_id',
+  plugins: {
+    root: '/plugins',
+    details: {
+      video: '/details/video/:video_id',
+    },
+  },
   previewPages: {
     root: '/demo-preview',
     passes: '/demo-preview/p/:pass_id',

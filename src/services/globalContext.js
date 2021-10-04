@@ -6,7 +6,7 @@ import { getLocalUserDetails } from 'utils/storage';
 
 import http from 'services/http';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
-import { setAuthTokenInLS } from 'services/localAuthToken';
+import { deleteAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { trackUserLoginInGTM, clearGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
@@ -165,6 +165,7 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'LOG_OUT' });
     localStorage.removeItem('user-details');
     deleteAuthCookie();
+    deleteAuthTokenFromLS();
     resetMixPanel();
     clearGTMUserAttributes();
   }

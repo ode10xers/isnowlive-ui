@@ -16,7 +16,7 @@ import {
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 import { isAPISuccess } from 'utils/helper';
-import { isWidgetUrl } from 'utils/widgets';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import dateUtil from 'utils/date';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -106,7 +106,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         timezone_info: getTimezoneLocation(),
       });
       if (data) {
-        logIn(data, true, isWidgetUrl());
+        logIn(data, true, isWidgetUrl() || isInIframeWidget());
         closeModal();
         onLoggedInCallback();
         localStorage.removeItem('invite');
@@ -148,7 +148,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
             password: values.password,
           });
           if (data) {
-            logIn(data, true, isWidgetUrl());
+            logIn(data, true, isWidgetUrl() || isInIframeWidget());
             closeModal();
             onLoggedInCallback();
           }

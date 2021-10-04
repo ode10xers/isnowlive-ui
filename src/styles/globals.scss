@@ -23,6 +23,7 @@
   --video-plugin-text-color: #{map-get($map: $colors, $key: 'ResolutionBlue')};
   --video-plugin-cta-background-color : #{map-get($colors, 'DodgerBlue')};
   --video-plugin-cta-font-color : #{map-get($colors, 'White')};
+  --video-plugin-light-color: #{map-get($colors, 'AliceBlue')};
 
   // Session List Variables
   --session-list-widget-background-color: #{map-get($map: $colors, $key: 'WhiteSmoke1')};
@@ -61,4 +62,8 @@
   --inventory-list-plugin-date-heading-font-color: #{map-get($colors, 'White')};
   --inventory-list-plugin-cta-background-color: #{map-get($colors, 'DodgerBlue')};
   --inventory-list-plugin-cta-font-color: #{map-get($colors, 'White')};
+}
+
+html {
+  scroll-behavior: smooth;
 }

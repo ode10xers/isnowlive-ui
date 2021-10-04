@@ -362,6 +362,20 @@ const CourseModulesForm = ({ match, history }) => {
     // ),
   ];
 
+  const getSessionContentIDsFromModules = (modules = []) => [
+    // ...new Set(
+    ...modules.reduce(
+      (acc, module) =>
+        (acc = acc.concat(
+          module.module_content
+            .filter((content) => content?.product_type?.toUpperCase() === 'SESSION')
+            .map((content) => content?.product_id)
+        )),
+      []
+    ),
+    // ),
+  ];
+
   // const getFileContentIDsFromModules = (modules = []) => [
   //   ...new Set(
   //     modules.reduce(
@@ -395,6 +409,17 @@ const CourseModulesForm = ({ match, history }) => {
     const newVideoContents = getVideoContentIDsFromModules(newModules).sort();
 
     return JSON.stringify(prevVideoContents) !== JSON.stringify(newVideoContents);
+  };
+
+  const isSessionContentModified = (newModules) => {
+    if (!courseDetails?.modules) {
+      return false;
+    }
+
+    const prevSessionContents = getSessionContentIDsFromModules(courseDetails?.modules ?? []).sort();
+    const newSessionContents = getSessionContentIDsFromModules(newModules).sort();
+
+    return JSON.stringify(prevSessionContents) !== JSON.stringify(newSessionContents);
   };
 
   const showIssueDetectedModal = () =>
@@ -576,7 +601,7 @@ const CourseModulesForm = ({ match, history }) => {
       ...modifiedFields,
     };
 
-    if (isVideoContentModified(values.modules)) {
+    if (isVideoContentModified(values.modules) || isSessionContentModified(values.modules)) {
       const modalRef = Modal.confirm({
         centered: true,
         closable: true,
@@ -599,7 +624,7 @@ const CourseModulesForm = ({ match, history }) => {
                   <Button
                     block
                     type="default"
-                    onClick={() => saveCourseCurriculum({ ...payload, new_videos_to_orders: false }, modalRef)}
+                    onClick={() => saveCourseCurriculum({ ...payload, propagate_to_orders: false }, modalRef)}
                   >
                     Don't change existing orders
                   </Button>
@@ -608,7 +633,7 @@ const CourseModulesForm = ({ match, history }) => {
                   <Button
                     block
                     type="primary"
-                    onClick={() => saveCourseCurriculum({ ...payload, new_videos_to_orders: true }, modalRef)}
+                    onClick={() => saveCourseCurriculum({ ...payload, propagate_to_orders: true }, modalRef)}
                   >
                     Change existing orders
                   </Button>
@@ -621,7 +646,7 @@ const CourseModulesForm = ({ match, history }) => {
         cancelButtonProps: { style: { display: 'none' } },
       });
     } else {
-      saveCourseCurriculum({ ...payload, new_videos_to_orders: false });
+      saveCourseCurriculum({ ...payload, propagate_to_orders: false });
     }
   };
 

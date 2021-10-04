@@ -1,22 +1,31 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-// import VideoDetailedListView from 'pages/DetailedListView/Videos';
-
-import { Spin, Row, Col, Button, Typography, Select, message } from 'antd';
-import { BarsOutlined, LeftOutlined, ControlOutlined, UserOutlined } from '@ant-design/icons';
+import { Spin, Grid, Row, Col, Button, Typography, Select, message } from 'antd';
+import {
+  BarsOutlined,
+  LeftOutlined,
+  ControlOutlined,
+  UserOutlined,
+  ArrowRightOutlined,
+  ArrowLeftOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
-import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import AuthModal from 'components/AuthModal';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
+import { redirectToPluginVideoDetailsPage } from 'utils/redirect';
 import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { getAuthCookie } from 'services/authCookie';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 
 const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const otherVideosKey = 'All Videos';
 const videoItemsLimit = 6;
@@ -25,6 +34,8 @@ const Videos = () => {
   const {
     state: { userDetails },
   } = useGlobalContext();
+
+  const { xs, sm, md, lg } = useBreakpoint();
 
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -86,7 +97,13 @@ const Videos = () => {
 
   const redirectToAttendeeDashboard = () => {
     const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) || 'app';
-    window.open(`${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}`, '_self');
+    const authToken = getAuthTokenFromLS() || getAuthCookie() || userDetails?.auth_token || '';
+    window.open(
+      `${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}${
+        authToken ? `?signupAuthToken=${authToken}` : ''
+      }`,
+      '_blank'
+    );
   };
 
   const handleFilterToggleClicked = () => {
@@ -105,6 +122,74 @@ const Videos = () => {
     }
   };
 
+  const handlePluginVideoItemsClicked = (video) => {
+    redirectToPluginVideoDetailsPage(video);
+  };
+
+  //#Source https://bit.ly/2neWfJ2
+  const generateElementId = (groupName) =>
+    groupName &&
+    groupName
+      .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+      .map((x) => x.toLowerCase())
+      .join('_');
+
+  const handleScrollPrevious = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+    if (targetScrollable) {
+      // targetScrollable.scrollLeft += (targetScrollable.offsetWidth * 0.8);
+      targetScrollable.scrollTo({
+        left: targetScrollable.scrollLeft - Math.round(targetScrollable.offsetWidth * 0.8),
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleScrollNext = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+    if (targetScrollable) {
+      // targetScrollable.scrollLeft += (targetScrollable.offsetWidth * 0.8);
+      targetScrollable.scrollTo({
+        left: targetScrollable.scrollLeft + Math.round(targetScrollable.offsetWidth * 0.8),
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleListScrolled = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+
+    if (targetScrollable.scrollLeft === 0) {
+      document.getElementById(`${generateElementId(groupName)}_prev`).style.display = 'none';
+      document.getElementById(`${generateElementId(groupName)}_next`).style.display = 'block';
+    } else if (targetScrollable.scrollLeft + 20 >= targetScrollable.scrollWidth - targetScrollable.clientWidth) {
+      document.getElementById(`${generateElementId(groupName)}_prev`).style.display = 'block';
+      document.getElementById(`${generateElementId(groupName)}_next`).style.display = 'none';
+    } else {
+      document.getElementById(`${generateElementId(groupName)}_prev`).style.display = 'block';
+      document.getElementById(`${generateElementId(groupName)}_next`).style.display = 'block';
+    }
+  };
+
+  const isElementScrollable = (groupName) => {
+    const targetScrollable = document.getElementById(generateElementId(groupName));
+    return targetScrollable && targetScrollable.scrollWidth >= targetScrollable.clientWidth + 100;
+  };
+
+  const getVideoItemFlexLayout = () => {
+    if (xs) {
+      return '85%';
+    } else if (lg) {
+      return '24%';
+    } else if (md) {
+      return '30%';
+    } else if (sm) {
+      return '45%';
+    } else {
+      return 'auto';
+    }
+  };
+
   const groupFilters = (
     <Row gutter={[8, 12]} className={styles.filterSection}>
       <Col xs={12}>
@@ -118,9 +203,15 @@ const Videos = () => {
         </Button>
       </Col>
       <Col xs={12} className={styles.textAlignRight}>
-        <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
-          Sign In/Up
-        </Button>
+        {userDetails ? (
+          <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
+            My Dashboard
+          </Button>
+        ) : (
+          <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
+            Sign In/Up
+          </Button>
+        )}
       </Col>
       {showFilter && (
         <Col xs={24} className={styles.filterContainer}>
@@ -130,16 +221,16 @@ const Videos = () => {
                 Categories
               </Title>
               <Select
-                allowClear
                 showArrow
+                allowClear
                 mode="multiple"
                 placeholder="Select category that you want to see"
                 maxTagCount={3}
                 loading={isLoading}
-                className={styles.filterDropdown}
-                options={Object.keys(videosByGroup).map((group) => ({ label: group, value: group }))}
                 value={selectedVideoGroupFilter}
+                className={styles.filterDropdown}
                 onChange={setSelectedVideoGroupFilter}
+                options={Object.keys(videosByGroup).map((group) => ({ label: group, value: group }))}
               />
             </Col>
           </Row>
@@ -173,14 +264,21 @@ const Videos = () => {
                 </Row>
               </Col>
               <Col xs={24}>
-                <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
+                <Row
+                  gutter={[8, 8]}
+                  className={styles.horizontalVideoList}
+                  id={generateElementId(groupName)}
+                  onScroll={() => handleListScrolled(groupName)}
+                >
                   {groupVideos?.slice(0, videoItemsLimit).map((video) => (
-                    <Col xs={20} sm={18} md={9} lg={7} xl={5}>
-                      <VideoListCard video={video} />
+                    // <Col xs={20} sm={18} md={9} lg={7} key={video.external_id}>
+                    <Col flex={getVideoItemFlexLayout()} key={video.external_id}>
+                      <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
                     </Col>
                   ))}
                   {groupVideos?.length > videoItemsLimit && (
-                    <Col xs={20} sm={18} md={9} lg={7} xl={5} className={styles.fadedItemContainer}>
+                    // <Col xs={20} sm={18} md={9} lg={7} className={styles.fadedItemContainer}>
+                    <Col flex={getVideoItemFlexLayout()} className={styles.fadedItemContainer}>
                       <div className={styles.fadedOverlay}>
                         <div className={styles.seeMoreButton} onClick={() => handleMoreClicked(groupName)}>
                           <BarsOutlined className={styles.seeMoreIcon} />
@@ -192,6 +290,35 @@ const Videos = () => {
                       </div>
                     </Col>
                   )}
+                </Row>
+              </Col>
+              <Col xs={24}>
+                <Row gutter={[4, 4]} align="middle">
+                  <Col flex="1 1 auto">
+                    <Button
+                      id={`${generateElementId(groupName)}_prev`}
+                      size="small"
+                      style={{ display: 'none' }}
+                      className={styles.linkButton}
+                      type="link"
+                      onClick={() => handleScrollPrevious(groupName)}
+                      icon={<ArrowLeftOutlined />}
+                    >
+                      Scroll to previous
+                    </Button>
+                  </Col>
+                  <Col flex="0 0 120px">
+                    <Button
+                      id={`${generateElementId(groupName)}_next`}
+                      style={isElementScrollable(groupName) ? {} : { display: 'none' }}
+                      size="small"
+                      className={styles.linkButton}
+                      type="link"
+                      onClick={() => handleScrollNext(groupName)}
+                    >
+                      Scroll to next <ArrowRightOutlined />
+                    </Button>
+                  </Col>
                 </Row>
               </Col>
             </Row>
@@ -221,8 +348,8 @@ const Videos = () => {
       <Col xs={24}>
         <Row gutter={[8, 8]}>
           {videosByGroup[groupView]?.map((video) => (
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <VideoListCard video={video} />
+            <Col xs={24} sm={12} md={8} lg={6} key={`more_${video.external_id}`}>
+              <VideoListCard video={video} handleClick={() => handlePluginVideoItemsClicked(video)} />
             </Col>
           ))}
         </Row>

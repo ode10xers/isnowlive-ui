@@ -347,6 +347,40 @@ const PaymentPopup = () => {
           // If no followup booking info is attached, then it's only a simple pass purchase
           showPurchasePassSuccessModal(orderResponse.payment_order_id);
         }
+      } else if (verifyOrderRes === orderType.SUBSCRIPTION) {
+        /*
+          In pass order, there can be follow up bookings
+          If a follow up booking is required, orderResponse 
+          will contain the required info in follow_up_booking_info
+        */
+        const followUpBookingInfo = orderResponse.follow_up_booking_info;
+
+        if (followUpBookingInfo) {
+          if (followUpBookingInfo.productType === productTypeConstants.VIDEO) {
+            const payload = {
+              video_id: followUpBookingInfo.productId,
+              payment_source: paymentSource.SUBSCRIPTION,
+              source_id: orderResponse.payment_order_id,
+              user_timezone_location: getTimezoneLocation(),
+            };
+
+            await followUpGetVideo(payload);
+          } else if (followUpBookingInfo.productType === productTypeConstants.CLASS) {
+            const payload = {
+              inventory_id: followUpBookingInfo.productId,
+              user_timezone_offset: new Date().getTimezoneOffset(),
+              user_timezone_location: getTimezoneLocation(),
+              user_timezone: getCurrentLongTimezone(),
+              payment_source: paymentSource.SUBSCRIPTION,
+              source_id: orderResponse.payment_order_id,
+            };
+
+            await followUpBookSession(payload);
+          }
+        } else {
+          // If no followup booking info is attached, then it's only a simple subscription purchase
+          showPurchaseSubscriptionSuccessModal();
+        }
       } else if (verifyOrderRes === orderType.COURSE) {
         showPurchaseSingleCourseSuccessModal();
       } else if (verifyOrderRes === orderType.CLASS) {
@@ -356,8 +390,6 @@ const PaymentPopup = () => {
       } else if (verifyOrderRes === orderType.VIDEO) {
         // Showing confirmation for Single Session Booking
         showPurchaseSingleVideoSuccessModal(orderResponse.payment_order_id);
-      } else if (verifyOrderRes === orderType.SUBSCRIPTION) {
-        showPurchaseSubscriptionSuccessModal();
       }
     }
 
