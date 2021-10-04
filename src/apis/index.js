@@ -219,11 +219,11 @@ export default {
     reactivateCreatorMembers: (payload) => http.post('/secure/creator/audience/archive/reset', payload),
     searchCreatorMembers: (pageNo, perPage, fetchArchived = false, searchString) =>
       http.get(
-        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}&text=${searchString}`
+        `/secure/creator/audience?user_type=MEMBER&show_details=true&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}&text=${searchString}`
       ),
     getCreatorMembers: (pageNo, perPage, fetchArchived = false) =>
       http.get(
-        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
+        `/secure/creator/audience?user_type=MEMBER&show_details=true&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
       ),
     getCreatorAudiences: (pageNo, perPage, userType = null, emailList = null) =>
       http.get(

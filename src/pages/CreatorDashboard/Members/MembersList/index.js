@@ -1,5 +1,22 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Row, Col, Button, Form, Select, Input, Radio, Typography, Card, Empty, Tooltip, Modal } from 'antd';
+import moment from 'moment';
+
+import {
+  Row,
+  Col,
+  Button,
+  Form,
+  Select,
+  Space,
+  Input,
+  Radio,
+  Typography,
+  Card,
+  Empty,
+  Tooltip,
+  Tag,
+  Modal,
+} from 'antd';
 import { FilterFilled, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -265,6 +282,50 @@ const MembersList = () => {
     setArchiveView(e.target.value);
   };
 
+  const renderMemberInteractionDetails = useCallback((memberDetails) => {
+    const noActivityTag = <Tag> No Activity </Tag>;
+
+    const interactionDetails = memberDetails?.interaction_details ?? null;
+
+    if (!interactionDetails) {
+      return noActivityTag;
+    }
+
+    const isInactive = !interactionDetails['session'].external_id && !interactionDetails['video'].external_id;
+
+    if (isInactive) {
+      return noActivityTag;
+    }
+
+    const tagColors = {
+      session: 'blue',
+      video: 'purple',
+    };
+
+    const activityTags = Object.entries(interactionDetails)
+      .map(([productName, activityDetails]) => {
+        const activityMoment = moment(activityDetails.last_interaction);
+
+        // Check if it's before 1970-01-01, if it is we consider it invalid
+        if (activityMoment.isBefore(moment(0))) {
+          return null;
+        }
+
+        return (
+          <Tag color={tagColors[productName] ?? 'green'}>
+            Last bought a {productName} {activityMoment.fromNow()}
+          </Tag>
+        );
+      })
+      .filter((tag) => tag);
+
+    return activityTags.length > 0 ? (
+      <Space direction="vertical">{activityTags.map((tag) => tag)}</Space>
+    ) : (
+      noActivityTag
+    );
+  }, []);
+
   const generateMembersListColumns = useCallback(
     () => {
       const initialColumns = [
@@ -279,10 +340,17 @@ const MembersList = () => {
           key: 'last_name',
           render: (text, record) => record.last_name || '-',
         },
+        {
+          title: 'Activity',
+          dataIndex: 'interaction_details',
+          key: 'interaction_details',
+          width: '200px',
+          render: (text, record) => renderMemberInteractionDetails(record),
+        },
       ];
 
       if (creatorMemberTags.length > 0) {
-        const tagColumnPosition = 2;
+        const tagColumnPosition = 3;
 
         const tagColumnObject = {
           title: 'Tag',
@@ -326,7 +394,7 @@ const MembersList = () => {
         // it based on whether or not creator has tags
         const actionsColumnObject = {
           title: '',
-          width: '180px',
+          width: '100px',
           render: (record) => (
             <Row gutter={[8, 8]}>
               {record.id === selectedMember?.id ? (
