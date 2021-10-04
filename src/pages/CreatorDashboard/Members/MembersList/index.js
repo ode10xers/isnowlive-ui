@@ -17,7 +17,7 @@ import {
   Tag,
   Modal,
 } from 'antd';
-import { FilterFilled, CheckCircleTwoTone } from '@ant-design/icons';
+import { FilterFilled, CheckCircleTwoTone, DownOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -44,6 +44,40 @@ const memberViews = {
   },
 };
 
+const memberActivityFilterOptions = {
+  ALL: {
+    label: 'Show All',
+    value: 'all',
+  },
+  ALL_INACTIVE: {
+    label: 'Not active for a certain time',
+    value: 'all_inactive',
+  },
+  VIDEO_INACTIVE: {
+    label: 'Not bought a video for a certain time',
+    value: 'video_inactive',
+  },
+  SESSION_INACTIVE: {
+    label: 'Not bought a session for a certain time',
+    value: 'session_inactive',
+  },
+};
+
+const filterDurationOptions = {
+  WEEK: {
+    label: 'Last Week',
+    value: 7,
+  },
+  BIWEEK: {
+    label: 'Last 2 Weeks',
+    value: 14,
+  },
+  MONTH: {
+    label: 'Last Month',
+    value: 30,
+  },
+};
+
 const MembersList = () => {
   const [form] = Form.useForm();
 
@@ -61,6 +95,13 @@ const MembersList = () => {
   // isPrivateCommunity will be true when the user settings 'member_requires_invite' is true
   const [isPrivateCommunity, setIsPrivateCommunity] = useState(false);
 
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedMemberActivityFilter, setSelectedMemberActivityFilter] = useState(
+    memberActivityFilterOptions.ALL.value
+  );
+  const [selectedFilterDurationOption, setSelectedFilterDurationOption] = useState(filterDurationOptions.WEEK.value);
+  const [selectedTagFilters, setSelectedTagFilters] = useState([]);
+
   const fetchCreatorMemberTags = useCallback(async () => {
     setIsLoading(true);
 
@@ -77,33 +118,37 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorMembersList = useCallback(
-    async (pageNumber, itemsPerPage, searchString = null, fetchArchived = false) => {
-      setIsLoading(true);
+  const fetchCreatorMembersList = useCallback(async (pageNo, perPage, filters = {}) => {
+    setIsLoading(true);
+    try {
+      const { searchText = null } = filters;
 
-      try {
-        const { status, data } =
-          searchString && searchString.length > 0
-            ? await apis.audiences.searchCreatorMembers(pageNumber, itemsPerPage, fetchArchived, searchString)
-            : await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage, fetchArchived);
+      const queryData = {
+        pageNo,
+        perPage,
+        ...filters,
+      };
 
-        if (isAPISuccess(status) && data) {
-          setMembersList((memberList) => [...memberList, ...data.data]);
-          setCanShowMore(data.next_page);
-        }
-      } catch (error) {
-        if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
-          showErrorModal(
-            'Failed fetching creator members list',
-            error?.response?.data?.message || 'Something went wrong.'
-          );
-        }
+      const { status, data } =
+        searchText && searchText.length > 0
+          ? await apis.audiences.searchCreatorMembers(queryData)
+          : await apis.audiences.getCreatorMembers(queryData);
+
+      if (isAPISuccess(status) && data) {
+        setMembersList((memberList) => [...memberList, ...data.data]);
+        setCanShowMore(data.next_page);
       }
+    } catch (error) {
+      if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
+        showErrorModal(
+          'Failed fetching creator members list',
+          error?.response?.data?.message || 'Something went wrong.'
+        );
+      }
+    }
 
-      setIsLoading(false);
-    },
-    []
-  );
+    setIsLoading(false);
+  }, []);
 
   const fetchCreatorPrivateCommunityFlag = useCallback(async () => {
     setIsLoading(false);
@@ -158,8 +203,36 @@ const MembersList = () => {
   }, [fetchCreatorMemberTags, fetchCreatorPrivateCommunityFlag]);
 
   useEffect(() => {
-    fetchCreatorMembersList(pageNumber, totalItemsPerPage, searchString, archiveView === memberViews.ARCHIVED.value);
-  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage, searchString, archiveView]);
+    const activityFilter =
+      selectedMemberActivityFilter === memberActivityFilterOptions.ALL.value
+        ? {}
+        : {
+            productType:
+              selectedMemberActivityFilter === memberActivityFilterOptions.VIDEO_INACTIVE.value
+                ? 'VIDEO'
+                : selectedMemberActivityFilter === memberActivityFilterOptions.SESSION_INACTIVE.value
+                ? 'SESSION'
+                : '',
+            startDate: moment().endOf('day').subtract(selectedFilterDurationOption, 'days').utc().format('YYYY-MM-DD'),
+            endDate: moment().endOf('day').utc().format('YYYY-MM-DD'),
+          };
+
+    const filters = {
+      searchText: searchString,
+      fetchArchived: archiveView === memberViews.ARCHIVED.value,
+      ...activityFilter,
+    };
+
+    fetchCreatorMembersList(pageNumber, totalItemsPerPage, filters);
+  }, [
+    fetchCreatorMembersList,
+    pageNumber,
+    totalItemsPerPage,
+    searchString,
+    archiveView,
+    selectedMemberActivityFilter,
+    selectedFilterDurationOption,
+  ]);
 
   const updateSelectedMemberTag = async () => {
     if (!selectedMember) {
@@ -312,7 +385,7 @@ const MembersList = () => {
         }
 
         return (
-          <Tag color={tagColors[productName] ?? 'green'}>
+          <Tag key={productName} color={tagColors[productName] ?? 'green'}>
             Last bought a {productName} {activityMoment.fromNow()}
           </Tag>
         );
@@ -371,23 +444,23 @@ const MembersList = () => {
             ) : (
               <Text> {record.tag.name} </Text>
             ),
-          filterIcon: (filtered) => (
-            <Tooltip defaultVisible={true} title="Click here to filter">
-              <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />
-            </Tooltip>
-          ),
-          filters: [
-            {
-              text: 'Empty',
-              value: 'empty',
-            },
-            ...creatorMemberTags.map((tag) => ({
-              text: tag.name,
-              value: tag.external_id,
-            })),
-          ],
-          onFilter: (value, record) =>
-            value === 'empty' ? record.tag.external_id === '' : record.tag.external_id === value,
+          // filterIcon: (filtered) => (
+          //   <Tooltip defaultVisible={true} title="Click here to filter">
+          //     <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />
+          //   </Tooltip>
+          // ),
+          // filters: [
+          //   {
+          //     text: 'Empty',
+          //     value: 'empty',
+          //   },
+          //   ...creatorMemberTags.map((tag) => ({
+          //     text: tag.name,
+          //     value: tag.external_id,
+          //   })),
+          // ],
+          // onFilter: (value, record) =>
+          //   value === 'empty' ? record.tag.external_id === '' : record.tag.external_id === value,
         };
 
         // Since currently actions are only related to tags, we will also show/hide
@@ -547,6 +620,20 @@ const MembersList = () => {
     );
   };
 
+  const handleShowFilterClicked = () => {
+    setShowFilter((prevState) => !prevState);
+  };
+
+  const handleMemberActivityFilterChanged = (value) => {
+    resetUIState();
+    setSelectedMemberActivityFilter(value);
+  };
+
+  const handleFilterDurationChanged = (value) => {
+    resetUIState();
+    setSelectedFilterDurationOption(value);
+  };
+
   return (
     <div className={styles.box}>
       <Row gutter={[16, 16]}>
@@ -581,6 +668,65 @@ const MembersList = () => {
           </Radio.Group>
         </Col>
         <Col xs={24}>
+          <Button type="link" onClick={handleShowFilterClicked} icon={<DownOutlined rotate={showFilter ? 180 : 0} />}>
+            {showFilter ? 'Hide' : 'Show'} Filters
+          </Button>
+          {showFilter && (
+            <Row gutter={[8, 8]} className={styles.p10}>
+              <Col xs={24}>
+                <Space align="middle">
+                  {creatorMemberTags.length > 0 && (
+                    <div className={styles.filterContainer}>
+                      <Title level={5} className={styles.filterTitle}>
+                        Tags
+                      </Title>
+                      <Select
+                        showArrow
+                        allowClear
+                        mode="multiple"
+                        placeholder="Tags to show (empty = all)"
+                        maxTagCount={3}
+                        value={selectedTagFilters}
+                        onChange={setSelectedTagFilters}
+                        options={Object.entries(creatorMemberTags).map(([key, val]) => ({
+                          label: val.name,
+                          value: val.external_id,
+                        }))}
+                        className={styles.filterDropdown}
+                      />
+                    </div>
+                  )}
+                  <div className={styles.filterContainer}>
+                    <Title level={5} className={styles.filterTitle}>
+                      Activity
+                    </Title>
+                    <Select
+                      value={selectedMemberActivityFilter}
+                      onChange={handleMemberActivityFilterChanged}
+                      options={Object.values(memberActivityFilterOptions)}
+                      className={styles.filterDropdown}
+                    />
+                  </div>
+                  {selectedMemberActivityFilter !== memberActivityFilterOptions.ALL.value ? (
+                    <div className={styles.filterContainer}>
+                      <Title level={5} className={styles.filterTitle}>
+                        Time Period
+                      </Title>
+                      <Select
+                        value={selectedFilterDurationOption}
+                        onChange={handleFilterDurationChanged}
+                        options={Object.values(filterDurationOptions)}
+                        className={styles.filterDropdown}
+                      />
+                    </div>
+                  ) : null}
+                </Space>
+              </Col>
+            </Row>
+          )}
+        </Col>
+
+        <Col xs={24}>
           <Form form={form} scrollToFirstError={true}>
             {isMobileDevice ? (
               <Loader loading={isLoading} size="large" text="Fetching members list...">
@@ -609,7 +755,9 @@ const MembersList = () => {
                   <Table
                     size="small"
                     loading={isLoading}
-                    data={membersList}
+                    data={membersList.filter(
+                      (member) => !selectedTagFilters.length || selectedTagFilters.includes(member.tag?.external_id)
+                    )}
                     columns={generateMembersListColumns()}
                     rowKey={(record) => record.id}
                   />

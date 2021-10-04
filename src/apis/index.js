@@ -1,4 +1,5 @@
 import http from 'services/http';
+import { generateQueryString } from 'utils/helper';
 
 export default {
   admin: {
@@ -217,14 +218,54 @@ export default {
   },
   audiences: {
     reactivateCreatorMembers: (payload) => http.post('/secure/creator/audience/archive/reset', payload),
-    searchCreatorMembers: (pageNo, perPage, fetchArchived = false, searchString) =>
-      http.get(
-        `/secure/creator/audience?user_type=MEMBER&show_details=true&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}&text=${searchString}`
-      ),
-    getCreatorMembers: (pageNo, perPage, fetchArchived = false) =>
-      http.get(
-        `/secure/creator/audience?user_type=MEMBER&show_details=true&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
-      ),
+    searchCreatorMembers: ({
+      pageNo,
+      perPage,
+      fetchArchived = false,
+      searchText,
+      productType = null,
+      startDate = null,
+      endDate = null,
+    }) => {
+      const queryData = Object.fromEntries(
+        Object.entries({
+          user_type: 'MEMBER',
+          show_details: true,
+          page_no: pageNo,
+          per_page: perPage,
+          archived: fetchArchived,
+          text: searchText,
+          product_type: productType,
+          inactivity_start: startDate,
+          inactivity_end: endDate,
+        }).filter(([_, v]) => v != null)
+      );
+
+      return http.get(`/secure/creator/audience?${generateQueryString(queryData)}`);
+    },
+    getCreatorMembers: ({
+      pageNo,
+      perPage,
+      fetchArchived = false,
+      productType = null,
+      startDate = null,
+      endDate = null,
+    }) => {
+      const queryData = Object.fromEntries(
+        Object.entries({
+          user_type: 'MEMBER',
+          show_details: true,
+          page_no: pageNo,
+          per_page: perPage,
+          archived: fetchArchived,
+          product_type: productType,
+          inactivity_start: startDate,
+          inactivity_end: endDate,
+        }).filter(([_, v]) => v != null)
+      );
+
+      return http.get(`/secure/creator/audience?${generateQueryString(queryData)}`);
+    },
     getCreatorAudiences: (pageNo, perPage, userType = null, emailList = null) =>
       http.get(
         `/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}${userType ? `&user_type=${userType}` : ''}${
