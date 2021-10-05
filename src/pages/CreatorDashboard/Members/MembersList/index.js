@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Select, Space, Input, Radio, Typography, Card, Empty, Tag, Modal } from 'antd';
+import { Row, Col, Button, Form, Select, Space, Input, Grid, Radio, Typography, Card, Empty, Tag, Modal } from 'antd';
 import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -11,12 +11,12 @@ import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess, tagColors } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
 const { Text, Title, Paragraph } = Typography;
 const { Search } = Input;
+const { useBreakpoint } = Grid;
 
 const memberViews = {
   ACTIVE: {
@@ -64,6 +64,7 @@ const filterDurationOptions = {
 };
 
 const MembersList = () => {
+  const { lg } = useBreakpoint();
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -385,6 +386,16 @@ const MembersList = () => {
     );
   }, []);
 
+  const handleMemberActivityFilterChanged = (value) => {
+    resetUIState();
+    setSelectedMemberActivityFilter(value);
+  };
+
+  const handleFilterDurationChanged = (value) => {
+    resetUIState();
+    setSelectedFilterDurationOption(value);
+  };
+
   const generateMembersListColumns = useCallback(
     () => {
       const initialColumns = [
@@ -394,12 +405,6 @@ const MembersList = () => {
           key: 'first_name',
           render: (text, record) => `${record.first_name ?? ''} ${record.last_name ?? '-'}`,
         },
-        // {
-        //   title: 'Last Name',
-        //   dataIndex: 'last_name',
-        //   key: 'last_name',
-        //   render: (text, record) => record.last_name || '-',
-        // },
         {
           title: 'Activity',
           dataIndex: 'interaction_details',
@@ -429,33 +434,14 @@ const MembersList = () => {
                 />
               </Form.Item>
             ) : record.tag.external_id ? (
-              // <Text> {record.tag.name} </Text>
               <Tag
-                color={creatorMemberTags?.find((tag) => tag.external_id === record.tag.external_id)?.color ?? 'blue'}
+                color={creatorMemberTags?.find((tag) => tag.external_id === record.tag?.external_id)?.color ?? 'blue'}
               >
-                {' '}
-                {record.tag.name}{' '}
+                {record.tag?.name ?? ''}
               </Tag>
             ) : (
               '-'
             ),
-          // filterIcon: (filtered) => (
-          //   <Tooltip defaultVisible={true} title="Click here to filter">
-          //     <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />
-          //   </Tooltip>
-          // ),
-          // filters: [
-          //   {
-          //     text: 'Empty',
-          //     value: 'empty',
-          //   },
-          //   ...creatorMemberTags.map((tag) => ({
-          //     text: tag.name,
-          //     value: tag.external_id,
-          //   })),
-          // ],
-          // onFilter: (value, record) =>
-          //   value === 'empty' ? record.tag.external_id === '' : record.tag.external_id === value,
         };
 
         // Since currently actions are only related to tags, we will also show/hide
@@ -534,7 +520,7 @@ const MembersList = () => {
 
       return initialColumns;
     }, //eslint-disable-next-line
-    [creatorMemberTags, isPrivateCommunity, selectedMember, archiveView]
+    [creatorMemberTags, isPrivateCommunity, selectedMember, archiveView, renderMemberInteractionDetails]
   );
 
   const renderMobileMembersCard = (member) => {
@@ -566,71 +552,84 @@ const MembersList = () => {
                   <Button block type="link" onClick={() => setSelectedMember(member)}>
                     Edit Tag
                   </Button>,
-                  <Button className={styles.orangeBtn} type="primary" onClick={() => handleBanMemberClicked(member.id)}>
+                  <Button
+                    block
+                    className={styles.orangeBtn}
+                    type="primary"
+                    onClick={() => handleBanMemberClicked(member.id)}
+                  >
                     Remove
                   </Button>,
                 ]
           }
         >
-          {isPrivateCommunity && (
-            <Row gutter={[8, 8]}>
-              <Col xs={12}>Member Request:</Col>
-              <Col xs={12}>
-                {member.is_approved ? (
-                  <>
-                    <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
-                  </>
-                ) : (
-                  <Button block type="primary" onClick={() => approveMemberRequest(member.id)}>
-                    Allow
-                  </Button>
-                )}
+          <Row gutter={[8, 8]} align="middle">
+            {isPrivateCommunity && (
+              <Col xs={24}>
+                <Space align="middle">
+                  <Text>Member Request:</Text>
+                  {member.is_approved ? (
+                    <>
+                      <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
+                    </>
+                  ) : (
+                    <Button type="primary" onClick={() => approveMemberRequest(member.id)}>
+                      Allow
+                    </Button>
+                  )}
+                </Space>
               </Col>
-            </Row>
-          )}
-          {creatorMemberTags.length > 0 && (
-            <Row gutter={[8, 8]}>
-              <Col xs={4}>Tag :</Col>
-              <Col xs={20}>
-                {member.id === selectedMember?.id ? (
-                  <Form.Item noStyle name={member.id}>
-                    <Select
-                      className={styles.tagDropdownContainer}
-                      placeholder="Select the member tag"
-                      defaultValue={member.tag.external_id || null}
-                      options={creatorMemberTags.map((tag) => ({
-                        label: tag.name,
-                        value: tag.external_id,
-                      }))}
-                    />
-                  </Form.Item>
-                ) : (
-                  <Text> {member.tag.name} </Text>
-                )}
+            )}
+            {creatorMemberTags.length > 0 && (
+              <Col xs={24}>
+                <Space align="middle">
+                  <Text>Tag :</Text>
+                  <div>
+                    {member.id === selectedMember?.id ? (
+                      <Form.Item noStyle name={member.id}>
+                        <Select
+                          className={styles.tagDropdownContainer}
+                          placeholder="Select the member tag"
+                          defaultValue={member.tag?.external_id || null}
+                          options={creatorMemberTags.map((tag) => ({
+                            label: tag.name,
+                            value: tag.external_id,
+                          }))}
+                        />
+                      </Form.Item>
+                    ) : member.tag?.external_id ? (
+                      <Tag
+                        color={
+                          creatorMemberTags?.find((tag) => tag.external_id === member.tag?.external_id)?.color ?? 'blue'
+                        }
+                      >
+                        {member.tag?.name ?? ''}
+                      </Tag>
+                    ) : (
+                      '-'
+                    )}
+                  </div>
+                </Space>
               </Col>
-            </Row>
-          )}
+            )}
+            <Col xs={24}>
+              <Space direction="vertical">
+                <Text> Activities: </Text>
+                {renderMemberInteractionDetails(member)}
+              </Space>
+            </Col>
+          </Row>
         </Card>
       </Col>
     );
-  };
-
-  const handleMemberActivityFilterChanged = (value) => {
-    resetUIState();
-    setSelectedMemberActivityFilter(value);
-  };
-
-  const handleFilterDurationChanged = (value) => {
-    resetUIState();
-    setSelectedFilterDurationOption(value);
   };
 
   return (
     <div className={styles.box}>
       <Row gutter={[16, 16]}>
         <Col xs={24}>
-          <Row gutter={[8, 8]}>
-            <Col xs={24} md={12}>
+          <Row gutter={[8, 12]}>
+            <Col xs={24} lg={12}>
               <Row gutter={[8, 8]}>
                 <Col xs={24}>
                   <Title level={4}> Members List </Title>
@@ -664,7 +663,7 @@ const MembersList = () => {
                 </Col>
               </Row>
             </Col>
-            <Col xs={24} md={12}>
+            <Col xs={24} lg={12}>
               <Row gutter={[8, 12]}>
                 {creatorMemberTags.length > 0 && (
                   <Col xs={24} md={12}>
@@ -718,7 +717,7 @@ const MembersList = () => {
 
         <Col xs={24}>
           <Form form={form} scrollToFirstError={true}>
-            {isMobileDevice ? (
+            {!lg ? (
               <Loader loading={isLoading} size="large" text="Fetching members list...">
                 {membersList.length > 0 ? (
                   <Row gutter={[8, 8]} justify="center">
