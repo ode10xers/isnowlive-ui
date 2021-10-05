@@ -120,6 +120,14 @@ const Subscriptions = () => {
     document.body.style.background = 'var(--membership-widget-background-color, transparent)';
   }, [fetchCreatorSubscriptions]);
 
+  useEffect(() => {
+    if (selectedSubscription && isBuying) {
+      showConfirmPaymentPopup();
+    }
+
+    // eslint-disable-next-line
+  }, [selectedSubscription, isBuying]);
+
   //#region Start of UI Handlers
 
   const closeAuthModal = () => {
@@ -143,18 +151,17 @@ const Subscriptions = () => {
 
   const handleBuyClicked = (subs) => {
     setSelectedSubscription(subs);
-    setIsBuying(true);
 
     if (!userDetails) {
       setShowAuthModal(true);
     } else {
-      showConfirmPaymentPopup();
+      setIsBuying(true);
     }
   };
 
   const authModalCallback = () => {
-    if (isBuying) {
-      showConfirmPaymentPopup();
+    if (selectedSubscription) {
+      setIsBuying(true);
     } else {
       redirectToAttendeeDashboard();
     }
@@ -193,6 +200,7 @@ const Subscriptions = () => {
     };
 
     showPaymentPopup(paymentPopupData, createOrder);
+    setSelectedSubscription(null);
   };
 
   const createOrder = async (couponCode = '') => {
@@ -288,21 +296,3 @@ const Subscriptions = () => {
 };
 
 export default Subscriptions;
-
-/*
-    <div className={styles.subscriptionPluginContainer}>
-      <Row className={styles.mt20} gutter={[8, 16]}>
-        <Col span={14}>
-          <Title level={5}> Memberships </Title>
-        </Col>
-        <Col span={10}>
-          <img src={logo} alt="Passion.do" className={styles.passionLogo} />
-        </Col>
-        <Col span={24}>
-          <Loader loading={isLoading} size="large" text="Loading memberships...">
-            <CreatorSubscriptions subscriptions={subscriptions} />
-          </Loader>
-        </Col>
-      </Row>
-    </div>
-*/
