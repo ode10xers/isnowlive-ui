@@ -116,6 +116,8 @@ const Subscriptions = () => {
 
   useEffect(() => {
     fetchCreatorSubscriptions();
+
+    document.body.style.background = 'var(--membership-widget-background-color, transparent)';
   }, [fetchCreatorSubscriptions]);
 
   //#region Start of UI Handlers
