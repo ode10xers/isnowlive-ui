@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 
 import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popover, List, Card } from 'antd';
 import { EditTwoTone, UpOutlined, DownOutlined } from '@ant-design/icons';
@@ -12,9 +13,10 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
+import { fetchCreatorCurrency } from 'utils/payment';
+import { couponTypes } from 'utils/constants';
 
 import styles from './styles.module.scss';
-import classNames from 'classnames';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -24,9 +26,12 @@ const Coupons = () => {
   const [coupons, setCoupons] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [currency, setCurrency] = useState('');
 
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
+
+  // #region Start of Collapse/Expand Methods
 
   const toggleExpandAllPublished = () => {
     if (expandedPublishedRowKeys.length > 0) {
@@ -64,6 +69,10 @@ const Coupons = () => {
   const collapseRowUnpublished = (rowKey) =>
     setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
+  // #endregion End of Collapse/Expand Methods
+
+  //#region Start of API Calls
+
   const getCreatorCoupons = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -79,9 +88,30 @@ const Coupons = () => {
     setIsLoading(false);
   }, []);
 
+  const getCreatorCurrencyDetails = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const creatorCurrency = await fetchCreatorCurrency();
+
+      if (creatorCurrency) {
+        setCurrency(creatorCurrency);
+      } else {
+        setCurrency('');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setIsLoading(false);
+  }, []);
+
+  //#endregion End of API Calls
+
   useEffect(() => {
+    getCreatorCurrencyDetails();
     getCreatorCoupons();
-  }, [getCreatorCoupons]);
+  }, [getCreatorCurrencyDetails, getCreatorCoupons]);
+
+  //#region Start of UI Handlers
 
   const showCreateCouponModal = () => {
     setCreateModalVisible(true);
@@ -95,6 +125,10 @@ const Coupons = () => {
       getCreatorCoupons();
     }
   };
+
+  //#endregion End of UI Handlers
+
+  //#region Start of Business Logics
 
   const editCoupon = (coupon) => {
     setSelectedCoupon(coupon);
@@ -135,6 +169,10 @@ const Coupons = () => {
     setIsLoading(false);
   };
 
+  //#endregion End of Business Logics
+
+  //#region Start of UI Methods
+
   const generateCouponColumns = (published) => [
     {
       title: 'Discount Code',
@@ -147,7 +185,8 @@ const Coupons = () => {
       key: 'value',
       align: 'right',
       width: '140px',
-      render: (text, record) => `${record.value} %`,
+      render: (text, record) =>
+        `${record.value} ${record.coupon_type === couponTypes.ABSOLUTE ? currency?.toUpperCase() : '%'}`,
     },
     {
       title: 'Applicable Products',
@@ -240,25 +279,6 @@ const Coupons = () => {
         );
       },
     },
-  ];
-
-  const redemptionColumns = [
-    {
-      title: 'User Name',
-      dataIndex: 'customer_name',
-      key: 'customer_name',
-    },
-    {
-      title: 'Discount Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.amount}`,
-    },
-    // {
-    //   title: '',
-    //   dataIndex: '',
-    //   key: '',
-    // },
   ];
 
   const renderRedemptionList = (record) => {
@@ -372,6 +392,27 @@ const Coupons = () => {
       </Col>
     );
   };
+
+  //#endregion End of UI Methods
+
+  const redemptionColumns = [
+    {
+      title: 'User Name',
+      dataIndex: 'customer_name',
+      key: 'customer_name',
+    },
+    {
+      title: 'Discount Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (text, record) => `${record.currency?.toUpperCase()} ${record.amount}`,
+    },
+    // {
+    //   title: '',
+    //   dataIndex: '',
+    //   key: '',
+    // },
+  ];
 
   return (
     <div className={styles.box}>
