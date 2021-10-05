@@ -96,6 +96,7 @@ const Subscriptions = () => {
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
 
   const fetchCreatorSubscriptions = useCallback(async () => {
     setIsLoading(true);
@@ -129,6 +130,8 @@ const Subscriptions = () => {
   };
 
   const handleSignInClicked = () => {
+    setIsBuying(false);
+
     if (userDetails) {
       redirectToAttendeeDashboard();
     } else {
@@ -138,10 +141,20 @@ const Subscriptions = () => {
 
   const handleBuyClicked = (subs) => {
     setSelectedSubscription(subs);
+    setIsBuying(true);
+
     if (!userDetails) {
       setShowAuthModal(true);
     } else {
       showConfirmPaymentPopup();
+    }
+  };
+
+  const authModalCallback = () => {
+    if (isBuying) {
+      showConfirmPaymentPopup();
+    } else {
+      redirectToAttendeeDashboard();
     }
   };
 
@@ -150,6 +163,7 @@ const Subscriptions = () => {
   //#region Start of Purchase Business Logic
 
   const showConfirmPaymentPopup = () => {
+    setIsBuying(false);
     if (!selectedSubscription) {
       showErrorModal('Something went wrong', 'Invalid Subscription Selected');
       return;
@@ -245,11 +259,7 @@ const Subscriptions = () => {
     <div className={styles.subscriptionPluginContainer}>
       <div className={styles.subscriptionListContainer}>
         <Spin spinning={isLoading} tip="Fetching memberships...">
-          <AuthModal
-            visible={showAuthModal}
-            closeModal={closeAuthModal}
-            onLoggedInCallback={redirectToAttendeeDashboard}
-          />
+          <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={authModalCallback} />
           <Row gutter={[8, 12]} align="middle">
             <Col xs={24} className={styles.textAlignRight}>
               <Button
