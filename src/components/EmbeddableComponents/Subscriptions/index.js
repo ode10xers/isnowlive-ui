@@ -87,7 +87,7 @@ const NewSubscriptionItem = ({ subscription = null, onBuy, onDetails }) => {
 
 const Subscriptions = () => {
   const {
-    state: { userDetails },
+    state: { userDetails, paymentPopupVisible },
     showPaymentPopup,
   } = useGlobalContext();
 
@@ -119,6 +119,12 @@ const Subscriptions = () => {
 
     document.body.style.background = 'var(--membership-widget-background-color, transparent)';
   }, [fetchCreatorSubscriptions]);
+
+  useEffect(() => {
+    if (!paymentPopupVisible) {
+      setSelectedSubscription(null);
+    }
+  }, [paymentPopupVisible]);
 
   useEffect(() => {
     if (selectedSubscription && isBuying) {
@@ -200,7 +206,6 @@ const Subscriptions = () => {
     };
 
     showPaymentPopup(paymentPopupData, createOrder);
-    setSelectedSubscription(null);
   };
 
   const createOrder = async (couponCode = '') => {
