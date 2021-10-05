@@ -23,11 +23,11 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { couponTypes } from 'utils/constants';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { couponTypes } from 'utils/constants';
 
 const { Text } = Typography;
 

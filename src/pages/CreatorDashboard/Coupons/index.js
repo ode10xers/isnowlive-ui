@@ -14,9 +14,9 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { couponTypes } from 'utils/constants';
 
 import styles from './styles.module.scss';
-import { couponTypes } from 'utils/constants';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;

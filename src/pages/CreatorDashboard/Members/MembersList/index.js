@@ -351,8 +351,7 @@ const MembersList = () => {
   const renderMemberInteractionDetails = useCallback((memberDetails) => {
     const noActivityTag = (
       <Text type="secondary" className={styles.activityText}>
-        {' '}
-        No Activity{' '}
+        No Activity
       </Text>
     );
 
@@ -378,11 +377,9 @@ const MembersList = () => {
         }
 
         return (
-          // <Tag key={productName} color={tagColors[productName] ?? 'green'}>
-          <Text className={styles.activityText}>
+          <Text key={productName} className={styles.activityText}>
             Last bought a {productName} {activityMoment.fromNow()}
           </Text>
-          // </Tag>
         );
       })
       .filter((tag) => tag);
@@ -710,12 +707,6 @@ const MembersList = () => {
                     <Title level={5} className={styles.filterTitle}>
                       Time Period
                     </Title>
-                    {/* <Select
-                      value={selectedFilterDurationOption}
-                      onChange={handleFilterDurationChanged}
-                      options={Object.values(filterDurationOptions)}
-                      className={styles.filterDropdown}
-                    /> */}
                     <RangePicker
                       className={styles.w100}
                       value={selectedFilterDuration}
