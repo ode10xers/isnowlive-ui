@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Modal, Button, Form, Input, InputNumber, Select, Typography, message, Radio } from 'antd';
+import {
+  Row,
+  Col,
+  Modal,
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Checkbox,
+  Typography,
+  Divider,
+  message,
+  Radio,
+} from 'antd';
 
 import apis from 'apis';
 
@@ -9,11 +23,11 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { couponTypes } from 'utils/constants';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { couponTypes } from 'utils/constants';
 
 const { Text } = Typography;
 
@@ -64,7 +78,8 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [products, setProducts] = useState({});
-  const [selectedProductTypes, setSelectedProductTypes] = useState([]);
+  const [selectedProductType, setSelectedProductType] = useState(null);
+  const [selectedProductIds, setSelectedProductIds] = useState([]);
 
   const [selectedCouponType, setSelectedCouponType] = useState(formCouponTypes.ABSOLUTE.value);
 
@@ -130,24 +145,45 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         form.setFieldsValue({
           discountCode: editedCoupon.code,
           couponType: editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value,
-          couponValue: editedCoupon.value,
-          selectedProductTypes: editedCoupon.product_type.toLowerCase(),
-          selectedProducts: editedCoupon.product_ids,
+          couponValue: editedCoupon.value ?? 1,
+          selectedProductType: editedCoupon.product_type?.toLowerCase() ?? null,
+          selectedProducts: editedCoupon.product_ids ?? [],
         });
 
         setSelectedCouponType(editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value);
-        setSelectedProductTypes(editedCoupon.product_type.toLowerCase());
+        setSelectedProductType(editedCoupon.product_type?.toLowerCase() ?? null);
+        setSelectedProductIds(editedCoupon.product_ids);
       } else {
         form.resetFields();
       }
 
       fetchCreatorProducts();
+    } else {
+      setSelectedCouponType(formCouponTypes.ABSOLUTE.value);
+      setSelectedProductType([]);
+      setSelectedProductIds([]);
+      form.resetFields();
     }
   }, [form, editedCoupon, visible, fetchCreatorProducts]);
 
   const handleSelectedProductTypesChanged = (values) => {
-    setSelectedProductTypes(values);
+    setSelectedProductType(values);
+    setSelectedProductIds([]);
     form.setFieldsValue({ ...form.getFieldsValue(), selectedProducts: [] });
+  };
+
+  const handleSelectedProductIdsChanged = (values) => {
+    setSelectedProductIds(values);
+    form.setFieldsValue({ ...form.getFieldsValue(), selectedProducts: values });
+  };
+
+  const handleSelectAllProduct = (e) => {
+    if (e.target.checked) {
+      const selectedProducts = products[selectedProductType];
+      handleSelectedProductIdsChanged(selectedProducts.map((product) => getProductId(selectedProductType, product)));
+    } else {
+      handleSelectedProductIdsChanged([]);
+    }
   };
 
   const handleCouponTypeChanged = (e) => {
@@ -166,9 +202,9 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
       const payload = {
         code: values.discountCode,
         coupon_type: selectedCouponType ?? formCouponTypes.ABSOLUTE.value,
-        value: values.couponValue,
-        product_type: selectedProductTypes.toUpperCase() || values.selectedProductTypes.toUpperCase(),
-        product_ids: values.selectedProducts,
+        value: values.couponValue ?? 1,
+        product_type: selectedProductType?.toUpperCase() ?? values.selectedProductType?.toUpperCase() ?? '',
+        product_ids: selectedProductIds ?? values.selectedProducts ?? [],
       };
 
       const { status } = editedCoupon
@@ -276,7 +312,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                 >
                   <InputNumber
                     min={1}
-                    precision={0}
+                    precision={2}
                     placeholder="Discount amount (flat amount)"
                     className={styles.numericInput}
                   />
@@ -286,8 +322,8 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
             <Col xs={24}>
               <Form.Item
                 {...couponModalFormLayout}
-                id="selectedProductTypes"
-                name="selectedProductTypes"
+                id="selectedProductType"
+                name="selectedProductType"
                 label="Applicable Product Types"
                 rules={validationRules.requiredValidation}
               >
@@ -300,7 +336,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                     value: key,
                     label: key.charAt(0).toUpperCase() + key.slice(1),
                   }))}
-                  value={selectedProductTypes}
+                  value={selectedProductType}
                   onChange={handleSelectedProductTypesChanged}
                 />
               </Form.Item>
@@ -319,9 +355,30 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                   placeholder="Select the products applicable with this code"
                   mode="multiple"
                   maxTagCount={2}
+                  onChange={handleSelectedProductIdsChanged}
+                  value={selectedProductIds}
+                  dropdownRender={(menu) => (
+                    <div>
+                      {menu}
+                      <Divider style={{ margin: '4px 0' }} />
+                      {selectedProductType && products[selectedProductType]?.length > 0 && (
+                        <Checkbox
+                          className={styles.ml10}
+                          onChange={handleSelectAllProduct}
+                          indeterminate={
+                            0 < selectedProductIds.length &&
+                            selectedProductIds.length < products[selectedProductType]?.length
+                          }
+                          checked={products[selectedProductType]?.length === selectedProductIds.length}
+                        >
+                          Select All
+                        </Checkbox>
+                      )}
+                    </div>
+                  )}
                 >
                   {Object.entries(products)
-                    .filter(([key, value]) => selectedProductTypes.includes(key.toLowerCase()))
+                    .filter(([key, value]) => selectedProductType === key.toLowerCase())
                     .map(([key, value]) => (
                       <Select.OptGroup label={`${key.charAt(0).toUpperCase()}${key.slice(1)}`} key={key}>
                         {value?.map((product) => (
