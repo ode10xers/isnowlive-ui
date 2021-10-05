@@ -142,6 +142,10 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
       }
 
       fetchCreatorProducts();
+    } else {
+      setSelectedCouponType(formCouponTypes.ABSOLUTE.value);
+      setSelectedProductTypes([]);
+      form.resetFields();
     }
   }, [form, editedCoupon, visible, fetchCreatorProducts]);
 
