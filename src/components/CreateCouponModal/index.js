@@ -280,7 +280,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                 >
                   <InputNumber
                     min={1}
-                    precision={0}
+                    precision={2}
                     placeholder="Discount amount (flat amount)"
                     className={styles.numericInput}
                   />
