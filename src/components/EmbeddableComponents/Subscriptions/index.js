@@ -264,14 +264,20 @@ const Subscriptions = () => {
           <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={authModalCallback} />
           <Row gutter={[8, 12]} align="middle">
             <Col xs={24} className={styles.textAlignRight}>
-              <Button
-                type="primary"
-                icon={<UserOutlined />}
-                onClick={handleSignInClicked}
-                className={styles.signupButton}
-              >
-                Sign In/Up
-              </Button>
+              {userDetails ? (
+                <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
+                  My Dashboard
+                </Button>
+              ) : (
+                <Button
+                  type="primary"
+                  icon={<UserOutlined />}
+                  onClick={handleSignInClicked}
+                  className={styles.signupButton}
+                >
+                  Sign In/Up
+                </Button>
+              )}
             </Col>
             <Col xs={24}>{subscriptionList}</Col>
           </Row>
