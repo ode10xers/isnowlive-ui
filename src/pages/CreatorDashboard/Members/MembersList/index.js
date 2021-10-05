@@ -1,7 +1,23 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Select, Space, Input, Grid, Radio, Typography, Card, Empty, Tag, Modal } from 'antd';
+import {
+  Row,
+  Col,
+  Button,
+  Form,
+  Select,
+  Space,
+  Input,
+  Grid,
+  Radio,
+  Typography,
+  DatePicker,
+  Card,
+  Empty,
+  Tag,
+  Modal,
+} from 'antd';
 import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -16,6 +32,7 @@ import styles from './styles.module.scss';
 
 const { Text, Title, Paragraph } = Typography;
 const { Search } = Input;
+const { RangePicker } = DatePicker;
 const { useBreakpoint } = Grid;
 
 const memberViews = {
@@ -48,21 +65,6 @@ const memberActivityFilterOptions = {
   },
 };
 
-const filterDurationOptions = {
-  WEEK: {
-    label: 'Last Week',
-    value: 7,
-  },
-  BIWEEK: {
-    label: 'Last 2 Weeks',
-    value: 14,
-  },
-  MONTH: {
-    label: 'Last Month',
-    value: 30,
-  },
-};
-
 const MembersList = () => {
   const { lg } = useBreakpoint();
   const [form] = Form.useForm();
@@ -84,8 +86,11 @@ const MembersList = () => {
   const [selectedMemberActivityFilter, setSelectedMemberActivityFilter] = useState(
     memberActivityFilterOptions.ALL.value
   );
-  const [selectedFilterDurationOption, setSelectedFilterDurationOption] = useState(filterDurationOptions.WEEK.value);
   const [selectedTagFilters, setSelectedTagFilters] = useState([]);
+  const [selectedFilterDuration, setSelectedFilterDuration] = useState([
+    moment().startOf('day').subtract(7, 'days'),
+    moment().endOf('day'),
+  ]);
 
   const fetchCreatorMemberTags = useCallback(async () => {
     setIsLoading(true);
@@ -188,6 +193,7 @@ const MembersList = () => {
   }, [fetchCreatorMemberTags, fetchCreatorPrivateCommunityFlag]);
 
   useEffect(() => {
+    const dateFormat = 'YYYY-MM-DD';
     const activityFilter =
       selectedMemberActivityFilter === memberActivityFilterOptions.ALL.value
         ? {}
@@ -198,8 +204,10 @@ const MembersList = () => {
                 : selectedMemberActivityFilter === memberActivityFilterOptions.SESSION_INACTIVE.value
                 ? 'SESSION'
                 : '',
-            startDate: moment().endOf('day').subtract(selectedFilterDurationOption, 'days').utc().format('YYYY-MM-DD'),
-            endDate: moment().endOf('day').utc().format('YYYY-MM-DD'),
+            startDate: (selectedFilterDuration[0] ?? moment().startOf('day').subtract(7, 'days'))
+              ?.utc()
+              .format(dateFormat),
+            endDate: (selectedFilterDuration[1] ?? moment().endOf()).utc().format(dateFormat),
           };
 
     const filters = {
@@ -216,7 +224,7 @@ const MembersList = () => {
     searchString,
     archiveView,
     selectedMemberActivityFilter,
-    selectedFilterDurationOption,
+    selectedFilterDuration,
   ]);
 
   const updateSelectedMemberTag = async () => {
@@ -393,7 +401,7 @@ const MembersList = () => {
 
   const handleFilterDurationChanged = (value) => {
     resetUIState();
-    setSelectedFilterDurationOption(value);
+    setSelectedFilterDuration(value);
   };
 
   const generateMembersListColumns = useCallback(
@@ -702,11 +710,27 @@ const MembersList = () => {
                     <Title level={5} className={styles.filterTitle}>
                       Time Period
                     </Title>
-                    <Select
+                    {/* <Select
                       value={selectedFilterDurationOption}
                       onChange={handleFilterDurationChanged}
                       options={Object.values(filterDurationOptions)}
                       className={styles.filterDropdown}
+                    /> */}
+                    <RangePicker
+                      className={styles.w100}
+                      value={selectedFilterDuration}
+                      allowEmpty={[false, false]}
+                      onChange={handleFilterDurationChanged}
+                      disabledDate={(current) => current && current > moment().endOf('day')}
+                      ranges={{
+                        'Last 7 Days': [moment().startOf('day').subtract(7, 'days'), moment().endOf('day')],
+                        'Last 14 Days': [moment().startOf('day').subtract(14, 'days'), moment().endOf('day')],
+                        'Last 30 Days': [moment().startOf('day').subtract(30, 'days'), moment().endOf('day')],
+                        'Last Month': [
+                          moment().subtract(1, 'month').startOf('month'),
+                          moment().subtract(1, 'month').endOf('month'),
+                        ],
+                      }}
                     />
                   </Col>
                 )}
