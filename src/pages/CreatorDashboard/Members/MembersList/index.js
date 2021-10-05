@@ -400,7 +400,7 @@ const MembersList = () => {
     () => {
       const initialColumns = [
         {
-          title: 'First Name',
+          title: 'Full Name',
           dataIndex: 'first_name',
           key: 'first_name',
           render: (text, record) => `${record.first_name ?? ''} ${record.last_name ?? '-'}`,
