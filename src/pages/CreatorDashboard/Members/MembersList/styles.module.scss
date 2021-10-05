@@ -4,6 +4,14 @@
   width: 100%;
 }
 
+.activityText {
+  font-size: 12px;
+}
+
+.filterDropdown {
+  width: 100% !important;
+}
+
 .orangeBtn {
   background-color: map-get($map: $colors, $key: 'Pumpkin') !important;
   border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
