@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 
 import { Row, Col, Button, Form, Select, Space, Input, Radio, Typography, Card, Empty, Tag, Modal } from 'antd';
-import { CheckCircleTwoTone, DownOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -10,7 +10,7 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, tagColors } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
@@ -35,15 +35,15 @@ const memberActivityFilterOptions = {
     value: 'all',
   },
   ALL_INACTIVE: {
-    label: 'Not active for a certain time',
+    label: 'Inactive for',
     value: 'all_inactive',
   },
   VIDEO_INACTIVE: {
-    label: 'Not bought a video for a certain time',
+    label: 'No videos bought since',
     value: 'video_inactive',
   },
   SESSION_INACTIVE: {
-    label: 'Not bought a session for a certain time',
+    label: 'No sessions bought since',
     value: 'session_inactive',
   },
 };
@@ -80,7 +80,6 @@ const MembersList = () => {
   // isPrivateCommunity will be true when the user settings 'member_requires_invite' is true
   const [isPrivateCommunity, setIsPrivateCommunity] = useState(false);
 
-  const [showFilter, setShowFilter] = useState(false);
   const [selectedMemberActivityFilter, setSelectedMemberActivityFilter] = useState(
     memberActivityFilterOptions.ALL.value
   );
@@ -94,7 +93,7 @@ const MembersList = () => {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags.map((tag, idx) => ({ ...tag, color: tagColors[idx % tagColors.length] })));
       }
     } catch (error) {
       showErrorModal('Failed fetching creator members tags', error?.response?.data?.message || 'Something went wrong.');
@@ -341,7 +340,12 @@ const MembersList = () => {
   };
 
   const renderMemberInteractionDetails = useCallback((memberDetails) => {
-    const noActivityTag = <Tag> No Activity </Tag>;
+    const noActivityTag = (
+      <Text type="secondary" className={styles.activityText}>
+        {' '}
+        No Activity{' '}
+      </Text>
+    );
 
     const interactionDetails = memberDetails?.interaction_details ?? null;
 
@@ -355,11 +359,6 @@ const MembersList = () => {
       return noActivityTag;
     }
 
-    const tagColors = {
-      session: 'blue',
-      video: 'purple',
-    };
-
     const activityTags = Object.entries(interactionDetails)
       .map(([productName, activityDetails]) => {
         const activityMoment = moment(activityDetails.last_interaction);
@@ -370,9 +369,11 @@ const MembersList = () => {
         }
 
         return (
-          <Tag key={productName} color={tagColors[productName] ?? 'green'}>
+          // <Tag key={productName} color={tagColors[productName] ?? 'green'}>
+          <Text className={styles.activityText}>
             Last bought a {productName} {activityMoment.fromNow()}
-          </Tag>
+          </Text>
+          // </Tag>
         );
       })
       .filter((tag) => tag);
@@ -391,18 +392,19 @@ const MembersList = () => {
           title: 'First Name',
           dataIndex: 'first_name',
           key: 'first_name',
+          render: (text, record) => `${record.first_name ?? ''} ${record.last_name ?? '-'}`,
         },
-        {
-          title: 'Last Name',
-          dataIndex: 'last_name',
-          key: 'last_name',
-          render: (text, record) => record.last_name || '-',
-        },
+        // {
+        //   title: 'Last Name',
+        //   dataIndex: 'last_name',
+        //   key: 'last_name',
+        //   render: (text, record) => record.last_name || '-',
+        // },
         {
           title: 'Activity',
           dataIndex: 'interaction_details',
           key: 'interaction_details',
-          width: '200px',
+          width: '220px',
           render: (text, record) => renderMemberInteractionDetails(record),
         },
       ];
@@ -426,8 +428,16 @@ const MembersList = () => {
                   }))}
                 />
               </Form.Item>
+            ) : record.tag.external_id ? (
+              // <Text> {record.tag.name} </Text>
+              <Tag
+                color={creatorMemberTags?.find((tag) => tag.external_id === record.tag.external_id)?.color ?? 'blue'}
+              >
+                {' '}
+                {record.tag.name}{' '}
+              </Tag>
             ) : (
-              <Text> {record.tag.name} </Text>
+              '-'
             ),
           // filterIcon: (filtered) => (
           //   <Tooltip defaultVisible={true} title="Click here to filter">
@@ -605,10 +615,6 @@ const MembersList = () => {
     );
   };
 
-  const handleShowFilterClicked = () => {
-    setShowFilter((prevState) => !prevState);
-  };
-
   const handleMemberActivityFilterChanged = (value) => {
     resetUIState();
     setSelectedMemberActivityFilter(value);
@@ -623,92 +629,91 @@ const MembersList = () => {
     <div className={styles.box}>
       <Row gutter={[16, 16]}>
         <Col xs={24}>
-          <Title level={4}> Members List </Title>
-        </Col>
-        <Col xs={24}>
-          <Row gutter={[8, 8]} align="middle">
-            <Col>
-              <Text> Search members : </Text>
-            </Col>
-            <Col>
-              <Search
-                enterButton="Search"
-                placeholder="Member first/last name"
-                onSearch={handleMemberSearch}
-                className={styles.searchInput}
-              />
-            </Col>
-          </Row>
-          <Paragraph type="secondary" className={styles.mt10}>
-            To see all members, empty the search bar and hit Search again
-          </Paragraph>
-        </Col>
-        <Col xs={24}>
-          <Radio.Group value={archiveView} onChange={handleArchiveViewChanged}>
-            {Object.values(memberViews).map((view) => (
-              <Radio.Button key={view.value} value={view.value}>
-                {view.label}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
-        </Col>
-        <Col xs={24}>
-          <Button type="link" onClick={handleShowFilterClicked} icon={<DownOutlined rotate={showFilter ? 180 : 0} />}>
-            {showFilter ? 'Hide' : 'Show'} Filters
-          </Button>
-          {showFilter && (
-            <Row gutter={[8, 8]} className={styles.p10}>
-              <Col xs={24}>
-                <Space align="middle">
-                  {creatorMemberTags.length > 0 && (
-                    <div className={styles.filterContainer}>
-                      <Title level={5} className={styles.filterTitle}>
-                        Tags
-                      </Title>
-                      <Select
-                        showArrow
-                        allowClear
-                        mode="multiple"
-                        placeholder="Tags to show (empty = all)"
-                        maxTagCount={3}
-                        value={selectedTagFilters}
-                        onChange={setSelectedTagFilters}
-                        options={Object.entries(creatorMemberTags).map(([key, val]) => ({
-                          label: val.name,
-                          value: val.external_id,
-                        }))}
-                        className={styles.filterDropdown}
+          <Row gutter={[8, 8]}>
+            <Col xs={24} md={12}>
+              <Row gutter={[8, 8]}>
+                <Col xs={24}>
+                  <Title level={4}> Members List </Title>
+                </Col>
+                <Col xs={24}>
+                  <Row gutter={[8, 8]} align="middle">
+                    <Col>
+                      <Text> Search members : </Text>
+                    </Col>
+                    <Col>
+                      <Search
+                        enterButton="Search"
+                        placeholder="Member first/last name"
+                        onSearch={handleMemberSearch}
+                        className={styles.searchInput}
                       />
-                    </div>
-                  )}
-                  <div className={styles.filterContainer}>
+                    </Col>
+                  </Row>
+                  <Paragraph type="secondary" className={styles.mt10}>
+                    To see all members, empty the search bar and hit Search again
+                  </Paragraph>
+                </Col>
+                <Col xs={24}>
+                  <Radio.Group value={archiveView} onChange={handleArchiveViewChanged}>
+                    {Object.values(memberViews).map((view) => (
+                      <Radio.Button key={view.value} value={view.value}>
+                        {view.label}
+                      </Radio.Button>
+                    ))}
+                  </Radio.Group>
+                </Col>
+              </Row>
+            </Col>
+            <Col xs={24} md={12}>
+              <Row gutter={[8, 12]}>
+                {creatorMemberTags.length > 0 && (
+                  <Col xs={24} md={12}>
                     <Title level={5} className={styles.filterTitle}>
-                      Activity
+                      Tags
                     </Title>
                     <Select
-                      value={selectedMemberActivityFilter}
-                      onChange={handleMemberActivityFilterChanged}
-                      options={Object.values(memberActivityFilterOptions)}
+                      showArrow
+                      allowClear
+                      mode="multiple"
+                      placeholder="Tags to show (empty = all)"
+                      maxTagCount={3}
+                      value={selectedTagFilters}
+                      onChange={setSelectedTagFilters}
+                      options={Object.entries(creatorMemberTags).map(([key, val]) => ({
+                        label: val.name,
+                        value: val.external_id,
+                      }))}
                       className={styles.filterDropdown}
                     />
-                  </div>
-                  {selectedMemberActivityFilter !== memberActivityFilterOptions.ALL.value ? (
-                    <div className={styles.filterContainer}>
-                      <Title level={5} className={styles.filterTitle}>
-                        Time Period
-                      </Title>
-                      <Select
-                        value={selectedFilterDurationOption}
-                        onChange={handleFilterDurationChanged}
-                        options={Object.values(filterDurationOptions)}
-                        className={styles.filterDropdown}
-                      />
-                    </div>
-                  ) : null}
-                </Space>
-              </Col>
-            </Row>
-          )}
+                  </Col>
+                )}
+                <Col xs={24} md={12}>
+                  <Title level={5} className={styles.filterTitle}>
+                    Activity
+                  </Title>
+                  <Select
+                    value={selectedMemberActivityFilter}
+                    onChange={handleMemberActivityFilterChanged}
+                    options={Object.values(memberActivityFilterOptions)}
+                    className={styles.filterDropdown}
+                  />
+                </Col>
+                {selectedMemberActivityFilter !== memberActivityFilterOptions.ALL.value && (
+                  <Col xs={24}>
+                    <Title level={5} className={styles.filterTitle}>
+                      Time Period
+                    </Title>
+                    <Select
+                      value={selectedFilterDurationOption}
+                      onChange={handleFilterDurationChanged}
+                      options={Object.values(filterDurationOptions)}
+                      className={styles.filterDropdown}
+                    />
+                  </Col>
+                )}
+              </Row>
+            </Col>
+          </Row>
         </Col>
 
         <Col xs={24}>

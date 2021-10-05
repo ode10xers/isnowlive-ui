@@ -4,12 +4,12 @@
   width: 100%;
 }
 
-.filterContainer {
-  width: clamp(200px, 250px, 300px);
+.activityText {
+  font-size: 12px;
+}
 
-  .filterDropdown {
-    width: 100% ;
-  }
+.filterDropdown {
+  width: 100% !important;
 }
 
 .orangeBtn {
