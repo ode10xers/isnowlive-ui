@@ -21,6 +21,8 @@ import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/sub
 import { redirectToMembershipPage } from 'utils/redirect';
 import { convertHexToHSL, formatHSLStyleString } from 'utils/colors';
 
+import { getAuthCookie } from 'services/authCookie';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
@@ -142,7 +144,13 @@ const Subscriptions = () => {
 
   const redirectToAttendeeDashboard = () => {
     const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) || 'app';
-    window.open(`${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}`, '_self');
+    const authToken = getAuthTokenFromLS() || getAuthCookie() || userDetails?.auth_token || '';
+    window.open(
+      `${baseUrl}${Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage}${
+        authToken ? `?signupAuthToken=${authToken}` : ''
+      }`,
+      '_blank'
+    );
   };
 
   const handleSignInClicked = () => {
