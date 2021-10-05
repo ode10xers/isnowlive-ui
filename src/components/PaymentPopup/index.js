@@ -429,9 +429,25 @@ const PaymentPopup = () => {
     );
   };
 
+  const getProductOrderType = () => {
+    switch (productType) {
+      case productTypeConstants.COURSE:
+        return orderType.COURSE;
+      case productTypeConstants.CLASS:
+        return orderType.CLASS;
+      case productTypeConstants.PASS:
+        return orderType.PASS;
+      case productTypeConstants.VIDEO:
+        return orderType.VIDEO;
+      default:
+        return null;
+    }
+  };
+
   const handlePurchaseFreeProduct = async () => {
     const orderResponse = await handleBeforePayment();
-    await handleAfterPayment(orderResponse, null);
+    const orderType = getProductOrderType();
+    await handleAfterPayment(orderResponse, orderType);
   };
 
   const isFree = () =>

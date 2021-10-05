@@ -10,6 +10,11 @@ export const paymentProvider = {
   PAYPAL: 'PAYPAL',
 };
 
+export const couponTypes = {
+  ABSOLUTE: 'ABSOLUTE',
+  PERCENTAGE: 'PERCENTAGE',
+};
+
 export const socialMediaIcons = {
   website: WebsiteLogo,
   facebook_link: FacebookLogo,
