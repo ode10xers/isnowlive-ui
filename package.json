@@ -27,7 +27,6 @@
     "mobile-detect": "^1.4.4",
     "moment": "^2.29.0",
     "moment-range": "^4.0.2",
-    "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-add-to-calendar": "^0.1.5",
@@ -49,6 +48,7 @@
     "react-share": "^4.3.1",
     "react-switch-selector": "^1.2.1",
     "react-syntax-highlighter": "^15.4.3",
+    "sass": "^1.42.1",
     "swiper": "^6.8.1"
   },
   "scripts": {
