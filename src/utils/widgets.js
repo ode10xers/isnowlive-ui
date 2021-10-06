@@ -300,7 +300,20 @@ export const widgetComponentsName = {
     value: 'memberships',
     label: 'Memberships - Cards',
     product: 'Membership',
-    styling: [],
+    styling: [
+      {
+        key: '--membership-widget-background-color',
+        label: 'Plugin Background Color',
+      },
+      {
+        key: '--membership-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--membership-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+    ],
   },
 };
 

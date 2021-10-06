@@ -18,11 +18,11 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 import { redirectToPluginVideoDetailsPage } from 'utils/redirect';
 import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
 
+import { getAuthCookie } from 'services/authCookie';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { getAuthCookie } from 'services/authCookie';
-import { getAuthTokenFromLS } from 'services/localAuthToken';
 
 const { Title } = Typography;
 const { useBreakpoint } = Grid;
