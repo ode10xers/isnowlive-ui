@@ -531,7 +531,7 @@ const PassDetails = ({ match }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
         {selectedPassDetails?.videos?.slice(0, videoItemLimit).map((video) => (
-          <Col xs={16} sm={14} lg={12} key={video.external_id}>
+          <Col xs={16} sm={14} md={10} lg={12} key={video.external_id}>
             <VideoListCard video={video} />
           </Col>
         ))}

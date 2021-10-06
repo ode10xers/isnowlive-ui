@@ -573,8 +573,6 @@ const NewVideoDetails = ({ match }) => {
     let userPurchasedPass = usablePass;
     let userPurchasedSubscription = usableSubscription;
 
-    console.log(selectedPaymentInstrument);
-
     if (!shouldFollowUpGetVideo) {
       // If user logged in from AuthModal
       // We fetch the usable subscriptions/pass info

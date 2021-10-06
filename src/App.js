@@ -48,7 +48,8 @@ const PaymentRedirectVerify = lazy(() => import('pages/PaymentRedirectVerify'));
 const PaymentVerification = lazy(() => import('pages/PaymentVerification'));
 const PaymentRetry = lazy(() => import('pages/PaymentRetry'));
 const SessionReschedule = lazy(() => import('pages/SessionReschedule'));
-const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
+// const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
+const NewMembershipDetails = lazy(() => import('pages/ProductDetails/NewMembershipDetails'));
 // const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
 const NewVideoDetails = lazy(() => import('pages/ProductDetails/NewVideoDetails'));
 const CourseDetails = lazy(() => import('pages/ProductDetails/CourseDetails'));
@@ -269,10 +270,10 @@ function App() {
               component={MembershipDetailPreview}
             />
             <RouteWithLayout
-              layout={MobileLayout}
+              layout={NavbarFullWidthLayout}
               exact
               path={Routes.membershipDetails}
-              component={MembershipDetails}
+              component={NewMembershipDetails}
             />
 
             <RouteWithLayout

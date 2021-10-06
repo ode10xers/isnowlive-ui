@@ -1,0 +1,198 @@
+@import '../../../styles/variables.scss';
+
+.membershipDetailsPageContainer {
+  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  padding: 50px;
+
+  @media screen and (min-width: 1440px) {
+    padding: 100px;
+  }
+  
+  @media screen and (max-width: 1025px) {
+    padding: 30px;
+  }
+
+  @media screen and (max-width: 769px) {
+    padding: 20px;
+  }
+
+  @media screen and (max-width: 526px) {
+    padding: 8px;
+  }
+}
+
+.sectionHeading {
+  color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
+}
+
+.dotSeparator {
+  opacity: 0.4;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'Black')}) !important;
+  font-size: 16px;
+
+  
+  @media screen and (max-width: 1025px) {
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 769px) {
+    font-size: 18px;
+  }
+
+  @media screen and (max-width: 526px) {
+    font-size: 12px;
+  }
+}
+
+.buySection {
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 34px rgba(0, 0, 0, 0.1);
+  background-color: map-get($map: $colors, $key: 'White');
+
+  // Make it sticky from tablet upwards
+  @media screen and (min-width: 992px) {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 72px;
+  }
+
+  .buySectionHeader {
+    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+    font-size: 24px;
+  }
+
+  .loadingPlaceholder {
+    min-height: 60px;
+    width: 100%;
+  }
+
+  .loadingPlaceholderLarge {
+    min-height: 200px;
+    width: 100%;
+  }
+
+  .buyButton {
+    background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+    border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &.darkText {
+      color: map-get($map: $colors, $key: 'Zeus') !important;
+    }
+
+    &.whiteText {
+      color: map-get($colors, 'White') !important;
+    }
+  }
+
+  .buyableSubsItem {
+    border: 1px dashed map-get($map: $colors, $key: 'Silver');
+    padding: 12px;
+    cursor: pointer;
+
+    .subsCheckContainer {
+      align-self: center;
+
+      .checkIcon {
+        font-size: 20px;
+        color: map-get($map: $colors, $key: 'Silver');
+      }
+
+      .subsItemName {
+        font-size: 18px;
+
+        @media screen and (max-width: 1025px) {
+          font-size: 16px;
+        }
+
+        @media screen and (max-width: 769px) {
+          font-size: 14px;
+        }
+
+        &.longText {
+          font-size: 14px;
+
+          @media screen and (max-width: 1025px) {
+            font-size: 12px;
+          }
+
+          @media screen and (max-width: 769px) {
+            font-size: 11px;
+          }
+        }
+      }
+    }
+
+    .subsItemDesc {
+      align-self: center;
+      text-align: right;
+      font-size: 14px;
+    }
+
+    &.selected {
+      border: 1px solid var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
+
+      .subsCheckContainer {
+        .subsItemName {
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
+        }
+
+        .checkIcon {
+          font-size: 20px;
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
+        }
+      }
+
+      .subsItemDesc {
+        color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
+      }
+    }
+  }
+}
+
+.currentSubsDetailsContainer {
+  padding: 12px;
+  position:relative;
+
+  .subsName {
+    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+    font-size: 42px !important;
+
+    @media screen and (max-width: 768px) {
+      font-size: 32px !important;
+    }
+
+    @media screen and (max-width: 526px) {
+      font-size: 24px !important;
+    }
+  }
+
+  .subsDetailItem {
+    color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+    font-size: 18px;
+
+    @media screen and (max-width: 1025px) {
+      font-size: 16px;
+    }
+
+    @media screen and (max-width: 769px) {
+      font-size: 18px;
+    }
+
+    @media screen and (max-width: 526px) {
+      font-size: 12px;
+    }
+
+    .subsDetailItemIcon {
+      margin-right: 8px;
+      
+      @media screen and (max-width: 526px) {
+        margin-right: 3px;
+      }
+    }
+  }
+}

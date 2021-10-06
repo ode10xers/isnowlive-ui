@@ -198,6 +198,7 @@ export default {
       http.get(`/secure/creator/payments/earnings/subscriptions?page_no=${pageNo}&per_page${perPage}`),
     getEarningsBySubscriptionId: (subscriptionId) =>
       http.get(`/secure/creator/payments/earnings/subscriptions/id/${subscriptionId}`),
+    getSubscriptionById: (subscriptionId) => http.get(`/subscriptions/${subscriptionId}`),
     getSubscriptionsByUsername: () => http.get(`/subscriptions`),
     getSubscriptionsForSession: (sessionId) => http.get(`/subscriptions?session_id=${sessionId}`),
     getSubscriptionsForVideo: (videoId) => http.get(`/subscriptions?video_id=${videoId}`),
