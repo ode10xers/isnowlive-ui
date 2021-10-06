@@ -8,6 +8,7 @@ import apis from 'apis';
 
 import AuthModal from 'components/AuthModal';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import { generateColorPalletteForProfile } from 'utils/colors';
@@ -31,7 +32,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 const { Title, Text } = Typography;
 const {
@@ -326,7 +326,6 @@ const NewMembershipDetails = ({ match }) => {
             <Text className={styles.subsDetailItem}>
               {generateBaseCreditsText(selectedSubsDetails).replace(' credits/period', '')}
             </Text>
-            <Text className={styles.subsDetailItem}>{selectedSubsDetails?.product_credits ?? 0} Credits</Text>
             <Text className={styles.subsDetailItem}>
               Renewed every {generateSubscriptionDuration(selectedSubsDetails, true)}
             </Text>
