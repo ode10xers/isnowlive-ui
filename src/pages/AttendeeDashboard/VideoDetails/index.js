@@ -101,6 +101,8 @@ const VideoDetails = ({ match, history }) => {
       if (isAPISuccess(status) && data) {
         const orderExpired = !isBeforeDate(data.expiry);
         setVideoOrderDetails({ ...data, isExpired: orderExpired });
+        setVideoToken(null);
+        setStartVideo(false);
       }
     } catch (error) {
       console.error(error);
