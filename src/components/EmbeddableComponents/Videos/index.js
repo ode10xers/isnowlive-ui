@@ -95,7 +95,7 @@ const Videos = () => {
     setShowAuthModal(false);
   };
 
-  const redirectToAttendeeDashboard = () => {
+  const redirectToAttendeeDashboard = useCallback(() => {
     const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) || 'app';
     const authToken = getAuthTokenFromLS() || getAuthCookie() || userDetails?.auth_token || '';
     window.open(
@@ -104,7 +104,7 @@ const Videos = () => {
       }`,
       '_blank'
     );
-  };
+  }, [userDetails]);
 
   const handleFilterToggleClicked = () => {
     setShowFilter((prevValue) => !prevValue);
@@ -114,13 +114,13 @@ const Videos = () => {
     setGroupView(videoGroupName);
   };
 
-  const handleSignInClicked = () => {
+  const handleSignInClicked = useCallback(() => {
     if (userDetails) {
       redirectToAttendeeDashboard();
     } else {
       setShowAuthModal(true);
     }
-  };
+  }, [userDetails, redirectToAttendeeDashboard]);
 
   const handlePluginVideoItemsClicked = (video) => {
     redirectToPluginVideoDetailsPage(video);
@@ -190,6 +190,20 @@ const Videos = () => {
     }
   };
 
+  const signInButton = useMemo(
+    () =>
+      userDetails ? (
+        <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
+          My Dashboard
+        </Button>
+      ) : (
+        <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
+          Sign In/Up
+        </Button>
+      ),
+    [userDetails, handleSignInClicked]
+  );
+
   const groupFilters = (
     <Row gutter={[8, 12]} className={styles.filterSection}>
       <Col xs={12}>
@@ -203,15 +217,7 @@ const Videos = () => {
         </Button>
       </Col>
       <Col xs={12} className={styles.textAlignRight}>
-        {userDetails ? (
-          <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
-            My Dashboard
-          </Button>
-        ) : (
-          <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
-            Sign In/Up
-          </Button>
-        )}
+        {signInButton}
       </Col>
       {showFilter && (
         <Col xs={24} className={styles.filterContainer}>
