@@ -1174,7 +1174,7 @@ const NewVideoDetails = ({ match }) => {
                   </Col>
                   <Col xs={24}>
                     <Row gutter={[8, 12]} align="middle" className={styles.bundleSummaryContainer}>
-                      <Col xs={24} md={12} className={styles.textAlignCenter}>
+                      <Col xs={24} md={14} className={styles.textAlignCenter}>
                         <Space
                           align="center"
                           className={styles.bundleSummaryTextContainer}
@@ -1192,7 +1192,7 @@ const NewVideoDetails = ({ match }) => {
                           )}
                         </Space>
                       </Col>
-                      <Col xs={24} md={12}>
+                      <Col xs={24} md={10}>
                         <Button
                           block
                           disabled={!selectedPass}
@@ -1214,17 +1214,6 @@ const NewVideoDetails = ({ match }) => {
                             className={styles.buyBtnTextContainer}
                           >
                             <Text className={styles.buyBtnText}> BUY VIDEO & PASS </Text>
-                            {/* {selectedPass ? (
-                              <Text className={styles.buyBtnText}>
-                                {selectedPass?.total_price > 0 ? (
-                                  <>
-                                    {selectedPass?.currency?.toUpperCase() ?? ''} {selectedPass?.total_price ?? 0}
-                                  </>
-                                ) : (
-                                  'Free'
-                                )}
-                              </Text>
-                            ) : null} */}
                           </Space>
                         </Button>
                       </Col>
@@ -1298,7 +1287,7 @@ const NewVideoDetails = ({ match }) => {
                   </Col>
                   <Col xs={24}>
                     <Row gutter={[8, 12]} align="middle" className={styles.bundleSummaryContainer}>
-                      <Col xs={24} md={12} className={styles.textAlignCenter}>
+                      <Col xs={24} md={14} className={styles.textAlignCenter}>
                         <Space
                           align="center"
                           className={styles.bundleSummaryTextContainer}
@@ -1316,7 +1305,7 @@ const NewVideoDetails = ({ match }) => {
                           )}
                         </Space>
                       </Col>
-                      <Col xs={24} md={12}>
+                      <Col xs={24} md={10}>
                         <Button
                           block
                           disabled={!selectedSubscription}
@@ -1338,18 +1327,6 @@ const NewVideoDetails = ({ match }) => {
                             className={styles.buyBtnTextContainer}
                           >
                             <Text className={styles.buyBtnText}> BUY VIDEO & MEMBERSHIP </Text>
-                            {/* {selectedSubscription ? (
-                              <Text className={styles.buyBtnText}>
-                                {selectedSubscription?.total_price > 0 ? (
-                                  <>
-                                    {selectedSubscription?.currency?.toUpperCase() ?? ''}{' '}
-                                    {selectedSubscription?.total_price ?? 0}
-                                  </>
-                                ) : (
-                                  'Free'
-                                )}
-                              </Text>
-                            ) : null} */}
                           </Space>
                         </Button>
                       </Col>

@@ -36,7 +36,7 @@
         object-fit: cover;
         border-radius: 12px;
         height: 160px;
-        border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
+        border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1') !important;
 
         @media screen and (max-width: 992px) and (min-width:767px) {
           height: 130px;
@@ -61,7 +61,7 @@
         object-fit: cover;
         width: 100%;
         height: 160px;
-        border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
+        border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1') !important;
 
         @media screen and (max-width: 992px) and (min-width:767px) {
           height: 130px;

@@ -2,6 +2,7 @@
 
 .membershipDetailsPageContainer {
   background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  min-height: 100vh;
   padding: 50px;
 
   @media screen and (min-width: 1440px) {
