@@ -113,13 +113,13 @@ const Videos = () => {
     setGroupView(videoGroupName);
   };
 
-  const handleSignInClicked = useCallback(() => {
+  const handleSignInClicked = () => {
     if (userDetails) {
       redirectToAttendeeDashboard();
     } else {
       setShowAuthModal(true);
     }
-  }, [userDetails, redirectToAttendeeDashboard]);
+  };
 
   const handlePluginVideoItemsClicked = (video) => {
     redirectToPluginVideoDetailsPage(video);
@@ -189,18 +189,14 @@ const Videos = () => {
     }
   };
 
-  const signInButton = useMemo(
-    () =>
-      userDetails ? (
-        <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
-          My Dashboard
-        </Button>
-      ) : (
-        <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
-          Sign In/Up
-        </Button>
-      ),
-    [userDetails, handleSignInClicked]
+  const signInButton = userDetails ? (
+    <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
+      My Dashboard
+    </Button>
+  ) : (
+    <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
+      Sign In/Up
+    </Button>
   );
 
   const groupFilters = (
