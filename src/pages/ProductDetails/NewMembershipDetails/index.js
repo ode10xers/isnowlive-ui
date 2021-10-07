@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Spin, Button, Divider, message } from 'antd';
+import { Row, Col, Typography, Space, Spin, Button, Empty, Drawer, Divider, message } from 'antd';
 import { BarsOutlined, CheckCircleFilled } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -51,6 +51,8 @@ const NewMembershipDetails = ({ match }) => {
   const [selectedSubsDetails, setSelectedSubsDetails] = useState(null);
   const [initialSubsDetails, setInitialSubsDetails] = useState(null);
   const [authModalVisible, setAuthModalVisible] = useState(false);
+  const [moreView, setMoreView] = useState('sessions');
+  const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
 
   const [creatorProfile, setCreatorProfile] = useState(null);
 
@@ -270,8 +272,18 @@ const NewMembershipDetails = ({ match }) => {
   };
 
   // TODO: Clarify the approach here
-  const handleSeeMoreSessions = () => {};
-  const handleSeeMoreVideos = () => {};
+  const handleSeeMoreSessions = () => {
+    setMoreView('sessions');
+    setBottomSheetsVisible(true);
+  };
+  const handleSeeMoreVideos = () => {
+    setMoreView('videos');
+    setBottomSheetsVisible(true);
+  };
+
+  const handleCloseBottomSheets = () => {
+    setBottomSheetsVisible(false);
+  };
 
   //#endregion End of UI Handlers
 
@@ -364,6 +376,19 @@ const NewMembershipDetails = ({ match }) => {
     </>
   );
 
+  const moreSessionsListView =
+    selectedSubsDetails?.product_details['SESSION']?.length > 0 ? (
+      <Row gutter={[16, 16]}>
+        {selectedSubsDetails?.product_details['SESSION']?.map((session) => (
+          <Col xs={24} md={12} lg={8} xl={6} key={`more_${session.session_external_id}`}>
+            <SessionListCard session={session} />
+          </Col>
+        ))}
+      </Row>
+    ) : (
+      <Empty description="No sessions to show" />
+    );
+
   const videoItemLimit = 5;
   const subsVideoList = (
     <>
@@ -392,6 +417,19 @@ const NewMembershipDetails = ({ match }) => {
       </Row>
     </>
   );
+
+  const moreVideosListView =
+    selectedSubsDetails?.product_details['VIDEO']?.length > 0 ? (
+      <Row gutter={[16, 16]}>
+        {selectedSubsDetails?.product_details['VIDEO']?.map((video) => (
+          <Col xs={24} md={12} lg={8} xl={6} key={`more_${video.external_id}`}>
+            <VideoListCard video={video} />
+          </Col>
+        ))}
+      </Row>
+    ) : (
+      <Empty description="No videos to show" />
+    );
 
   const moreMembershipHeader = (
     <Col xs={24}>
@@ -501,6 +539,27 @@ const NewMembershipDetails = ({ match }) => {
           {buySection}
         </Col>
       </Row>
+      <Drawer
+        visible={bottomSheetsVisible}
+        placement="bottom"
+        height={560}
+        bodyStyle={{ padding: 10 }}
+        title={
+          <Text className={styles.bottomSheetsTitle}>
+            {`${moreView[0].toUpperCase()}${moreView.slice(1)} included in membership`}
+          </Text>
+        }
+        headerStyle={{
+          color: `var(--membership-plugin-cta-background-color, var(--passion-profile-darker-color, #0050B3))`,
+          background: `var(--membership-widget-background-color, var(--passion-profile-light-color, #F1FBFF))`,
+          borderRadius: '12px 12px 0 0',
+          boxShadow: 'inset 0px -1px 0px #E6F5FB',
+        }}
+        onClose={handleCloseBottomSheets}
+        className={styles.moreContentDrawer}
+      >
+        {moreView === 'sessions' ? moreSessionsListView : moreVideosListView}
+      </Drawer>
     </div>
   );
 };
