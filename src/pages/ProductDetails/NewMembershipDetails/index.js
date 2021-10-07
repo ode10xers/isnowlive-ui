@@ -303,7 +303,7 @@ const NewMembershipDetails = ({ match }) => {
       >
         <Row gutter={[8, 8]}>
           <Col xs={12} className={styles.subsCheckContainer}>
-            <Space align="center">
+            <Space align="baseline">
               <CheckCircleFilled className={styles.checkIcon} />
               <Text className={classNames(styles.subsItemName, subs?.name.length > 20 ? styles.longText : undefined)}>
                 {subs?.name}
