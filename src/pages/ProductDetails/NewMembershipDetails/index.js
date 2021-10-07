@@ -355,12 +355,12 @@ const NewMembershipDetails = ({ match }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.subsContentContainer}>
         {selectedSubsDetails?.product_details['SESSION']?.slice(0, sessionItemLimit).map((session) => (
-          <Col xs={18} sm={16} md={14} lg={12} key={session.session_external_id}>
+          <Col xs={18} sm={14} md={10} lg={12} key={session.session_external_id}>
             <SessionListCard session={session} />
           </Col>
         ))}
         {selectedSubsDetails?.product_details['SESSION']?.length > sessionItemLimit ? (
-          <Col xs={18} sm={16} md={14} lg={12} className={styles.fadedItemContainer}>
+          <Col xs={18} sm={14} md={10} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreSessions}>
                 <BarsOutlined className={styles.seeMoreIcon} />
