@@ -138,7 +138,13 @@ const NewMembershipDetails = ({ match }) => {
     let profileStyleObject = {};
 
     // Prevent any coloring to happen inside widget
-    if (!isInIframeWidget() && creatorProfile && creatorProfile?.profile?.color) {
+    if (isInIframeWidget()) {
+      profileStyleObject = {
+        '--passion-profile-primary-color': 'var(--membership-plugin-cta-background-color)',
+        '--passion-profile-dark-color': 'var(--membership-plugin-cta-background-color)',
+        '--passion-profile-darker-color': 'var(--membership-plugin-cta-background-color)',
+      };
+    } else if (creatorProfile && creatorProfile?.profile?.color) {
       profileStyleObject = {
         ...profileStyleObject,
         ...generateColorPalletteForProfile(creatorProfile?.profile?.color, creatorProfile?.profile?.new_profile),
@@ -477,8 +483,9 @@ const NewMembershipDetails = ({ match }) => {
         ) : null}
         <Col xs={24}>
           <Row justify="center">
-            <Col>
+            <Col xs={18}>
               <Button
+                block
                 size="large"
                 type="primary"
                 onClick={handleBuySubscriptionClicked}
@@ -490,7 +497,8 @@ const NewMembershipDetails = ({ match }) => {
                     : styles.lightText
                 )}
               >
-                BUY NOW | {renderSubsPrice(selectedSubsDetails)}
+                BUY NOW <Divider type="vertical" className={styles.buyBtnDivider} />{' '}
+                {renderSubsPrice(selectedSubsDetails)}
               </Button>
             </Col>
           </Row>

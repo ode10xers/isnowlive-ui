@@ -51,12 +51,12 @@
     font-size: 13px !important;
     font-weight: 500;
 
-    &.lightText {
-      --text-color : var(--primary-color-lightest, #{map-get($colors, 'White')}) !important;
-    }
-
     &.darkText {
       --text-color : var(--primary-color-dark, #{map-get($colors, 'Zeus')}) !important;
+    }
+
+    &.lightText {
+      --text-color : var(--primary-color-lightest, #{map-get($colors, 'White')}) !important;
     }
 
     color : var(--text-color);
