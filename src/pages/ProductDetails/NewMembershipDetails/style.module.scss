@@ -224,11 +224,12 @@
     &::-webkit-scrollbar-thumb {
       border-radius: 20px;
       background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'WhiteSmoke1')});
-      border: 3px solid var(--passion-profile-light-color, #{map-get($colors, 'White')});
+      // border: 3px solid var(--passion-profile-light-color, #{map-get($colors, 'White')});
+      border: none;
     }
 
     &::-webkit-scrollbar-track {
-      background: var(--passion-profile-lightest-color, #{map-get($colors, 'White1')});
+      background: var(--passion-profile-lightest-color, transparent);
     }
   }
 }

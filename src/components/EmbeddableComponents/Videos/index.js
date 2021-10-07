@@ -35,6 +35,7 @@ const Videos = () => {
     state: { userDetails },
   } = useGlobalContext();
 
+  console.log(userDetails);
   const { xs, sm, md, lg } = useBreakpoint();
 
   const [videos, setVideos] = useState([]);
