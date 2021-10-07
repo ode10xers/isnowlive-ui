@@ -35,7 +35,6 @@ const Videos = () => {
     state: { userDetails },
   } = useGlobalContext();
 
-  console.log(userDetails);
   const { xs, sm, md, lg } = useBreakpoint();
 
   const [videos, setVideos] = useState([]);
@@ -64,9 +63,8 @@ const Videos = () => {
 
   useEffect(() => {
     fetchCreatorVideos();
-
     document.body.style.background = 'var(--video-widget-background-color, transparent)';
-  }, [fetchCreatorVideos]);
+  }, [fetchCreatorVideos, userDetails]);
 
   const videosByGroup = useMemo(() => {
     return videos.reduce((acc, video) => {
