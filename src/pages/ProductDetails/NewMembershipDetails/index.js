@@ -138,13 +138,7 @@ const NewMembershipDetails = ({ match }) => {
     let profileStyleObject = {};
 
     // Prevent any coloring to happen inside widget
-    if (isInIframeWidget()) {
-      profileStyleObject = {
-        '--passion-profile-primary-color': 'var(--membership-plugin-cta-background-color)',
-        '--passion-profile-dark-color': 'var(--membership-plugin-cta-background-color)',
-        '--passion-profile-darker-color': 'var(--membership-plugin-cta-background-color)',
-      };
-    } else if (creatorProfile && creatorProfile?.profile?.color) {
+    if (!isInIframeWidget() && creatorProfile && creatorProfile?.profile?.color) {
       profileStyleObject = {
         ...profileStyleObject,
         ...generateColorPalletteForProfile(creatorProfile?.profile?.color, creatorProfile?.profile?.new_profile),
@@ -561,7 +555,7 @@ const NewMembershipDetails = ({ match }) => {
           color: `var(--membership-plugin-cta-background-color, var(--passion-profile-darker-color, #0050B3))`,
           background: `var(--membership-widget-background-color, var(--passion-profile-light-color, #F1FBFF))`,
           borderRadius: '12px 12px 0 0',
-          boxShadow: 'inset 0px -1px 0px #E6F5FB',
+          boxShadow: 'inset 0px -1px 0px rgba(0,0,0 0.4)',
         }}
         onClose={handleCloseBottomSheets}
         className={styles.moreContentDrawer}
