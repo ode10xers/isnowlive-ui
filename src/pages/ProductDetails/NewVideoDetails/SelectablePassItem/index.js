@@ -65,7 +65,7 @@ const SelectablePassItem = ({
                   <Text className={styles.passPrice}>{pass?.total_price ?? 0}</Text>
                 </>
               ) : (
-                'Free'
+                <Text className={styles.passPrice}>Free</Text>
               )}
             </Col>
           </Row>

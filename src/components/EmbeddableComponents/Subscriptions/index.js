@@ -21,7 +21,7 @@ import {
   isBrightColorShade,
 } from 'utils/helper';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
-import { redirectToMembershipPage } from 'utils/redirect';
+import { redirectToPluginMembershipDetailsPage } from 'utils/redirect';
 import { convertHexToHSL, formatHSLStyleString } from 'utils/colors';
 
 import { getAuthCookie } from 'services/authCookie';
@@ -187,6 +187,10 @@ const Subscriptions = () => {
     }
   };
 
+  const handleDetailsClicked = (subs) => {
+    redirectToPluginMembershipDetailsPage(subs);
+  };
+
   const authModalCallback = () => {
     if (selectedSubscription) {
       setIsBuying(true);
@@ -284,7 +288,7 @@ const Subscriptions = () => {
     <Row gutter={[8, 24]} align="stretch">
       {subscriptions.map((subs) => (
         <Col xs={24} sm={12} md={8} lg={6} key={subs.external_id}>
-          <NewSubscriptionItem subscription={subs} onBuy={handleBuyClicked} onDetails={redirectToMembershipPage} />
+          <NewSubscriptionItem subscription={subs} onBuy={handleBuyClicked} onDetails={handleDetailsClicked} />
         </Col>
       ))}
     </Row>

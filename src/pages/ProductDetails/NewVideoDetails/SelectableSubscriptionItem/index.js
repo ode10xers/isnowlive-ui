@@ -67,7 +67,7 @@ const SelectableSubscriptionItem = ({
                   <Text className={styles.subscriptionPrice}>{subscription?.total_price ?? 0}</Text>
                 </>
               ) : (
-                'Free'
+                <Text className={styles.subscriptionPrice}>Free</Text>
               )}
             </Col>
           </Row>

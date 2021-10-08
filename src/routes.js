@@ -29,6 +29,7 @@ const Routes = {
     root: '/plugins',
     details: {
       video: '/details/video/:video_id',
+      subscriptions: '/details/membership/:membership_id',
     },
   },
   previewPages: {

@@ -355,12 +355,12 @@ const NewMembershipDetails = ({ match }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.subsContentContainer}>
         {selectedSubsDetails?.product_details['SESSION']?.slice(0, sessionItemLimit).map((session) => (
-          <Col xs={18} sm={16} md={14} lg={12} key={session.session_external_id}>
+          <Col xs={18} sm={14} md={10} lg={12} key={session.session_external_id}>
             <SessionListCard session={session} />
           </Col>
         ))}
         {selectedSubsDetails?.product_details['SESSION']?.length > sessionItemLimit ? (
-          <Col xs={18} sm={16} md={14} lg={12} className={styles.fadedItemContainer}>
+          <Col xs={18} sm={14} md={10} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreSessions}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -477,8 +477,9 @@ const NewMembershipDetails = ({ match }) => {
         ) : null}
         <Col xs={24}>
           <Row justify="center">
-            <Col>
+            <Col xs={18}>
               <Button
+                block
                 size="large"
                 type="primary"
                 onClick={handleBuySubscriptionClicked}
@@ -490,7 +491,8 @@ const NewMembershipDetails = ({ match }) => {
                     : styles.lightText
                 )}
               >
-                BUY NOW | {renderSubsPrice(selectedSubsDetails)}
+                BUY NOW <Divider type="vertical" className={styles.buyBtnDivider} />{' '}
+                {renderSubsPrice(selectedSubsDetails)}
               </Button>
             </Col>
           </Row>
@@ -553,7 +555,7 @@ const NewMembershipDetails = ({ match }) => {
           color: `var(--membership-plugin-cta-background-color, var(--passion-profile-darker-color, #0050B3))`,
           background: `var(--membership-widget-background-color, var(--passion-profile-light-color, #F1FBFF))`,
           borderRadius: '12px 12px 0 0',
-          boxShadow: 'inset 0px -1px 0px #E6F5FB',
+          boxShadow: 'inset 0px -1px 0px rgba(0,0,0 0.4)',
         }}
         onClose={handleCloseBottomSheets}
         className={styles.moreContentDrawer}

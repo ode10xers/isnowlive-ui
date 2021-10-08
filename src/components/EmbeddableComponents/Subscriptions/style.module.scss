@@ -5,7 +5,6 @@
   width: 100%;
 }
 
-// TODO: Match this with CSS Vars for subscription plugin
 .signupButton {
   background-color: var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
@@ -51,12 +50,12 @@
     font-size: 13px !important;
     font-weight: 500;
 
-    &.lightText {
-      --text-color : var(--primary-color-lightest, #{map-get($colors, 'White')}) !important;
-    }
-
     &.darkText {
       --text-color : var(--primary-color-dark, #{map-get($colors, 'Zeus')}) !important;
+    }
+
+    &.lightText {
+      --text-color : var(--primary-color-lightest, #{map-get($colors, 'White')}) !important;
     }
 
     color : var(--text-color);

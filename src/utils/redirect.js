@@ -75,7 +75,6 @@ export const redirectToPluginVideoDetailsPage = (video) => {
     video_id: video.external_id,
   })}`;
   window.open(targetUrl, '_self');
-  // window.location.assign(targetUrl);
 };
 
 export const redirectToCoursesPage = (course) => {
@@ -136,4 +135,19 @@ export const redirectToMembershipPage = (subscription) => {
   // } else {
   //   window.open(targetUrl);
   // }
+};
+
+export const redirectToPluginMembershipDetailsPage = (subs) => {
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
+
+  const baseUrl = generateUrlFromUsername(subs.creator_username || urlUsername);
+
+  const targetUrl = `${baseUrl}${Routes.plugins.root}${generatePath(Routes.plugins.details.subscriptions, {
+    membership_id: subs.external_id,
+  })}`;
+  window.open(targetUrl, '_self');
 };
