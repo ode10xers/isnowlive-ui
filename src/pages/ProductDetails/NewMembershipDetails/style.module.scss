@@ -224,7 +224,7 @@
 
     &::-webkit-scrollbar-thumb {
       border-radius: 20px;
-      background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'WhiteSmoke1')});
+      background-color: var(--passion-profile-light-color, transparent);
       // border: 3px solid var(--passion-profile-light-color, #{map-get($colors, 'White')});
       border: none;
     }
@@ -237,7 +237,7 @@
 
 .moreContentDrawer {
   .bottomSheetsTitle {
-    color: var(--passion-profile-darker-color, var(--membership-plugin-cta-background-color, #{map-get($colors, 'Smalt')})) !important;
+    color: var(--passion-profile-darker-color, var(--membership-plugin-text-color, #{map-get($colors, 'Smalt')})) !important;
   }
 
   :global {

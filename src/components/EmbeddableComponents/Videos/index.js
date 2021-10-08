@@ -64,7 +64,7 @@ const Videos = () => {
   useEffect(() => {
     fetchCreatorVideos();
     document.body.style.background = 'var(--video-widget-background-color, transparent)';
-  }, [fetchCreatorVideos, userDetails]);
+  }, [fetchCreatorVideos]);
 
   const videosByGroup = useMemo(() => {
     return videos.reduce((acc, video) => {
@@ -94,7 +94,7 @@ const Videos = () => {
     setShowAuthModal(false);
   };
 
-  const redirectToAttendeeDashboard = useCallback(() => {
+  const redirectToAttendeeDashboard = () => {
     const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) || 'app';
     const authToken = getAuthTokenFromLS() || getAuthCookie() || userDetails?.auth_token || '';
     window.open(
@@ -103,7 +103,7 @@ const Videos = () => {
       }`,
       '_blank'
     );
-  }, [userDetails]);
+  };
 
   const handleFilterToggleClicked = () => {
     setShowFilter((prevValue) => !prevValue);

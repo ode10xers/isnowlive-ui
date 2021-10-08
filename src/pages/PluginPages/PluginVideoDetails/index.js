@@ -5,12 +5,7 @@ import { LeftOutlined } from '@ant-design/icons';
 
 import NewVideoDetails from 'pages/ProductDetails/NewVideoDetails';
 
-// import { getUsernameFromUrl } from 'utils/helper';
-import {
-  // generateWidgetLink,
-  widgetComponentsName,
-  localStoragePluginStylingKeyPrefix,
-} from 'utils/widgets';
+import { widgetComponentsName, localStoragePluginStylingKeyPrefix } from 'utils/widgets';
 
 import styles from './style.module.scss';
 
@@ -33,15 +28,6 @@ const PluginVideoDetails = ({ match, history }) => {
     initializePluginStyling();
   }, [initializePluginStyling]);
 
-  // const redirectToVideoPlugin = () => {
-  //   const queryParamsData = {
-  //     isWidget: true,
-  //     widgetType: widgetComponentsName.VIDEOS.value,
-  //   };
-
-  //   window.open(generateWidgetLink(queryParamsData, getUsernameFromUrl()), '_self');
-  // };
-
   return (
     <div className={styles.pluginVideoDetailsPage}>
       <Row gutter={[8, 8]} className={styles.pageContainer}>
@@ -53,7 +39,6 @@ const PluginVideoDetails = ({ match, history }) => {
               icon={<LeftOutlined />}
               className={styles.backButton}
               onClick={() => history.goBack()}
-              // onClick={redirectToVideoPlugin}
             >
               Back
             </Button>
