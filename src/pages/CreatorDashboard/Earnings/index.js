@@ -28,6 +28,7 @@ import styles from './styles.module.scss';
 const cashIcon = require('assets/images/cash.png');
 const checkIcon = require('assets/images/check.png');
 const timerIcon = require('assets/images/timer.png');
+const bankIcon = require('assets/images/bank.png');
 
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -345,6 +346,8 @@ const Earnings = () => {
   const paidOut = paymentBoxLayout('Paid Out', null, 'success', balance?.paid_out, checkIcon);
 
   const inProcess = paymentBoxLayout('In Process', null, 'default', balance?.in_process, timerIcon);
+
+  const inTransit = paymentBoxLayout('In Transit To Bank', null, 'default', balance?.available, bankIcon);
 
   const stripePaymentDashboard = (
     <div className={styles.box2}>
@@ -697,12 +700,17 @@ const Earnings = () => {
               ? paypalEditEmail
               : stripePaymentDashboard}
           </Col>
-          <Col xs={24} lg={8}>
-            {balance?.currency &&
-              balance?.currency !== 'inr' &&
-              userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
-              availableForPayout}
-          </Col>
+          {balance?.currency &&
+          balance?.currency !== 'inr' &&
+          userDetails?.profile?.payment_provider === paymentProvider.STRIPE ? (
+            <Col xs={24} lg={8}>
+              {availableForPayout}
+            </Col>
+          ) : (
+            <Col xs={24} lg={8}>
+              {inTransit}
+            </Col>
+          )}
         </Row>
         <Row className={styles.mt20}>
           <Col xs={24} lg={8}>
