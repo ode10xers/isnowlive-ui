@@ -1,7 +1,7 @@
 @import '../../../styles/variables.scss';
 
 .coursePluginContainer {
-  background-color: var(--course-widget-background-color);
+  background-color: var(--course-widget-background-color, transparent);
   width: 100%;
 
   .courseListContainer {

@@ -427,12 +427,12 @@ const PassDetails = ({ match }) => {
           ?.filter((session) => session.type === 'NORMAL')
           .slice(0, sessionItemLimit)
           .map((session) => (
-            <Col xs={18} sm={16} md={14} lg={12} key={session.session_external_id}>
+            <Col xs={18} sm={14} md={10} lg={12} key={session.session_external_id}>
               <SessionListCard session={session} />
             </Col>
           ))}
         {selectedPassDetails?.sessions?.filter((session) => session.type === 'NORMAL').length > sessionItemLimit ? (
-          <Col xs={18} sm={16} md={14} lg={12} className={styles.fadedItemContainer}>
+          <Col xs={18} sm={14} md={10} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreSessions}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -479,13 +479,13 @@ const PassDetails = ({ match }) => {
           ?.filter((session) => session.type === 'AVAILABILITY')
           .slice(0, availabilityItemLimit)
           .map((session) => (
-            <Col xs={20} sm={16} md={14} lg={12} key={session.session_external_id}>
+            <Col xs={18} sm={14} md={10} lg={12} key={session.session_external_id}>
               <AvailabilityListItem availability={session} />
             </Col>
           ))}
         {selectedPassDetails?.sessions?.filter((session) => session.type === 'AVAILABILITY').length >
         availabilityItemLimit ? (
-          <Col xs={20} sm={16} md={14} lg={12} className={styles.fadedItemContainer}>
+          <Col xs={18} sm={14} md={10} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreAvailabilities}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -531,7 +531,7 @@ const PassDetails = ({ match }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
         {selectedPassDetails?.videos?.slice(0, videoItemLimit).map((video) => (
-          <Col xs={16} sm={14} lg={12} key={video.external_id}>
+          <Col xs={16} sm={14} md={10} lg={12} key={video.external_id}>
             <VideoListCard video={video} />
           </Col>
         ))}

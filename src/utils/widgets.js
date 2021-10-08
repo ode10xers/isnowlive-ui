@@ -300,7 +300,36 @@ export const widgetComponentsName = {
     value: 'memberships',
     label: 'Memberships - Cards',
     product: 'Membership',
-    styling: [],
+    styling: [
+      {
+        key: '--membership-widget-background-color',
+        label: 'Plugin Background Color',
+      },
+      {
+        key: '--membership-plugin-text-color',
+        label: 'Other Text Color',
+      },
+      {
+        key: '--membership-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--membership-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+      {
+        key: '--session-list-card-background-color',
+        label: 'Session Card Background',
+      },
+      {
+        key: '--session-list-card-font-color',
+        label: 'Session Card Text Color',
+      },
+      {
+        key: '--video-plugin-text-color',
+        label: 'Video Text Color',
+      },
+    ],
   },
 };
 

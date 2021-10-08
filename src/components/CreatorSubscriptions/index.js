@@ -12,7 +12,6 @@ import ShowcaseSubscriptionCards from 'components/ShowcaseSubscriptionCards';
 import dateUtil from 'utils/date';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { isAPISuccess, orderType, isUnapprovedUserError, productType } from 'utils/helper';
-// import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
 
