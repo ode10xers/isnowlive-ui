@@ -580,7 +580,7 @@ const VideoDetails = ({ match }) => {
       if (video.pay_what_you_want) {
         flexiblePaymentDetails = {
           enabled: true,
-          minimumPrice: video.price,
+          minimumPrice: video.total_price,
         };
       }
 

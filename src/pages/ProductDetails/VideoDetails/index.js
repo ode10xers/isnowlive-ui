@@ -493,7 +493,7 @@ const VideoDetails = ({ match, history }) => {
       if (videoData?.pay_what_you_want) {
         flexiblePaymentDetails = {
           enabled: true,
-          minimumPrice: videoData?.price,
+          minimumPrice: videoData?.total_price,
         };
       }
 

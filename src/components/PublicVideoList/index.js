@@ -48,7 +48,7 @@ const PublicVideoList = ({ videos }) => {
     if (selectedVideo.pay_what_you_want) {
       flexiblePaymentDetails = {
         enabled: true,
-        minimumPrice: selectedVideo.price,
+        minimumPrice: selectedVideo.total_price,
       };
     }
 

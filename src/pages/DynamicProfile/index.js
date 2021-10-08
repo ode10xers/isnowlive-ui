@@ -305,9 +305,10 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
     (urlPath) => {
       const scrollToElement = (elementId) => {
         const targetElement = document.getElementById(elementId);
+        console.log(targetElement);
         if (targetElement) {
-          targetElement.scrollIntoView();
-          window.scrollBy(0, -70);
+          targetElement.scrollIntoView({ block: 'center', inline: 'nearest' });
+          // window.scrollBy(0, -70);
         }
       };
 
