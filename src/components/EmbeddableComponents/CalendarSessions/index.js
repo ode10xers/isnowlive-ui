@@ -162,7 +162,7 @@ const CalendarSessions = () => {
     if (selectedInventory.pay_what_you_want) {
       flexiblePaymentDetails = {
         enabled: true,
-        minimumPrice: selectedInventory.price,
+        minimumPrice: selectedInventory.total_price,
       };
     }
 
