@@ -336,7 +336,7 @@ const NewMembershipDetails = ({ match }) => {
           <Space align="center" split={<Text className={styles.dotSeparator}>●</Text>}>
             <Text className={styles.subsDetailItem}>{renderSubsPrice(selectedSubsDetails)}</Text>
             <Text className={styles.subsDetailItem}>
-              {generateBaseCreditsText(selectedSubsDetails).replace(' credits/period', '')}
+              {generateBaseCreditsText(selectedSubsDetails, false).replace(' credits/period', '')}
             </Text>
             <Text className={styles.subsDetailItem}>
               Renewed every {generateSubscriptionDuration(selectedSubsDetails, true)}
@@ -410,7 +410,12 @@ const NewMembershipDetails = ({ match }) => {
               </div>
             </div>
             <div className={styles.fadedItem}>
-              <VideoListCard video={selectedSubsDetails?.product_details['VIDEO'][videoItemLimit]} />
+              <VideoListCard
+                video={selectedSubsDetails?.product_details['VIDEO'][videoItemLimit]}
+                handleClick={() =>
+                  handleVideoItemClicked(selectedSubsDetails?.product_details['VIDEO'][videoItemLimit])
+                }
+              />
             </div>
           </Col>
         ) : null}
@@ -423,7 +428,7 @@ const NewMembershipDetails = ({ match }) => {
       <Row gutter={[16, 16]}>
         {selectedSubsDetails?.product_details['VIDEO']?.map((video) => (
           <Col xs={24} md={12} lg={8} xl={6} key={`more_${video.external_id}`}>
-            <VideoListCard video={video} />
+            <VideoListCard video={video} handleClick={() => handleVideoItemClicked(video)} />
           </Col>
         ))}
       </Row>
