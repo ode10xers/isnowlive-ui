@@ -1122,7 +1122,7 @@ const NewVideoDetails = ({ match }) => {
                     <Row gutter={[12, 12]} align="middle">
                       <Col xs={24} md={11}>
                         <div className={styles.smallProductPreview}>
-                          <div className={styles.smallProductPreviewOverlay}>This Video (1 credit)</div>
+                          <div className={styles.smallProductPreviewOverlay}>This Video (1 pass credit)</div>
                           <Image
                             loading="lazy"
                             width="100%"
