@@ -57,7 +57,7 @@
   }
 }
 
-.formHeadingText{
+.formHeadingText {
   min-width: 360px;
   font-weight: 700;
   font-size: 36px;
@@ -72,25 +72,25 @@
   }
 }
 
-.formHeadingSubtext{
+.formHeadingSubtext {
   font-size: 20px;
   line-height: 32px;
   text-align: center;
   color: #232323;
   padding-bottom: 40px;
-  
+
   @media screen and (max-width: 526px) {
     font-size: 16px;
     padding-bottom: 20px;
   }
 }
 
-.formContent{
+.formContent {
   width: 100%;
   text-align: center;
 }
 
-.submitButton{
+.submitButton {
   @extend .orangeBtn;
   min-height: 52px !important;
   border-radius: 8px !important;
@@ -98,7 +98,7 @@
   font-size: 20px !important;
   line-height: 24px !important;
 
-  &:disabled{
-    opacity : 0.7;
+  &:disabled {
+    opacity: 0.7;
   }
 }

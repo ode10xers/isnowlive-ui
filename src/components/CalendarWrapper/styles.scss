@@ -185,14 +185,16 @@
     display: none;
   }
   .rbc-toolbar {
-    color : var(--calendar-plugin-heading-font-color, #373a3c);
+    color: var(--calendar-plugin-heading-font-color, #373a3c);
     .rbc-btn-group {
       > button {
-        background-color : var(--calendar-plugin-heading-background-color, #f5f5f5);
+        background-color: var(--calendar-plugin-heading-background-color, #f5f5f5);
         color: var(--calendar-plugin-heading-font-color, #373a3c);
-        
-        &:focus, &:hover, &.rbc-active {
-          background-color : var(--calendar-plugin-heading-font-color, #373a3c); 
+
+        &:focus,
+        &:hover,
+        &.rbc-active {
+          background-color: var(--calendar-plugin-heading-font-color, #373a3c);
           color: var(--calendar-plugin-heading-background-color, #f5f5f5);
         }
       }
@@ -205,9 +207,9 @@
       color: var(--calendar-plugin-heading-font-color, #373a3c);
     }
 
-    .rbc-agenda-date-cell, .rbc-agenda-time-cell {
+    .rbc-agenda-date-cell,
+    .rbc-agenda-time-cell {
       color: var(--calendar-plugin-heading-font-color, #373a3c);
-      
     }
   }
 
@@ -216,13 +218,13 @@
       .rbc-time-header-content {
         .rbc-row {
           .rbc-header.rbc-today {
-            background : var(--calendar-plugin-heading-font-color, #f5f5f5);
-            color : var(--calendar-plugin-heading-background-color, #373a3c);
+            background: var(--calendar-plugin-heading-font-color, #f5f5f5);
+            color: var(--calendar-plugin-heading-background-color, #373a3c);
           }
-        } 
-      } 
-    } 
-  } 
+        }
+      }
+    }
+  }
 
   .rbc-off-range-bg {
     background-color: transparent;
@@ -238,8 +240,8 @@
   .rbc-month-view {
     .rbc-month-row {
       .rbc-today {
-        background : var(--calendar-plugin-heading-background-color, #eaf6ff);
-        opacity : 0.6;
+        background: var(--calendar-plugin-heading-background-color, #eaf6ff);
+        opacity: 0.6;
       }
     }
   }

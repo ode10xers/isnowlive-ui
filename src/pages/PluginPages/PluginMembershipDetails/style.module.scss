@@ -10,7 +10,7 @@
   padding-left: 20px;
 
   .backButton {
-    color : var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
-    border-color : var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    color: var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    border-color: var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
   }
 }

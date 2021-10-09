@@ -63,6 +63,7 @@ const productKeys = {
   SUBSCRIPTION: 'membership',
 };
 
+/** @deprecated */
 const ProfilePreview = ({ username = getLocalUserDetails().username || null }) => {
   const history = useHistory();
   const location = useLocation();

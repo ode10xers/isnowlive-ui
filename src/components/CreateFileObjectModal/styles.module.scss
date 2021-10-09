@@ -7,7 +7,7 @@
 .fileLabel {
   text-align: right;
 
-  @media screen and (max-width:575px) {
+  @media screen and (max-width: 575px) {
     text-align: left;
   }
 }
@@ -15,8 +15,8 @@
 .filenameButton {
   color: map-get($colors, $key: 'KellyGreen') !important;
   font-weight: bold !important;
-  
+
   > span {
-    white-space:pre-wrap;
+    white-space: pre-wrap;
   }
 }

@@ -13,14 +13,17 @@
   .thumbnailContainer {
     width: 100%;
     // src : https://stackoverflow.com/questions/33604360/using-css-only-to-remove-the-black-bars-from-youtube-hqdefault-image
-    padding-bottom : 56.25%;
+    padding-bottom: 56.25%;
     position: relative;
     overflow: hidden;
 
     :global {
       .ant-image {
         position: absolute;
-        top: -16.75%; bottom: 0; left: 0; right: 0;
+        top: -16.75%;
+        bottom: 0;
+        left: 0;
+        right: 0;
       }
     }
 

@@ -29,10 +29,8 @@ const NavbarLayout = lazy(() => import('layouts/NavbarLayout'));
 const MobileLayout = lazy(() => import('layouts/MobileLayout'));
 const FullWidthLayout = lazy(() => import('layouts/FullWidthLayout'));
 
-const Home = lazy(() => import('pages/Home'));
 const Profile = lazy(() => import('pages/Profile'));
 const LiveStream = lazy(() => import('pages/LiveStream'));
-const ProfilePreview = lazy(() => import('pages/ProfilePreview'));
 const SignUp = lazy(() => import('pages/SignUp'));
 const Login = lazy(() => import('pages/Login'));
 const AdminLogin = lazy(() => import('pages/AdminLogin'));
@@ -45,12 +43,9 @@ const AttendeeDashboard = lazy(() => import('pages/AttendeeDashboard'));
 const ResetPassword = lazy(() => import('pages/ResetPassword'));
 const EmailVerification = lazy(() => import('pages/EmailVerification'));
 const PaymentRedirectVerify = lazy(() => import('pages/PaymentRedirectVerify'));
-const PaymentVerification = lazy(() => import('pages/PaymentVerification'));
 const PaymentRetry = lazy(() => import('pages/PaymentRetry'));
 const SessionReschedule = lazy(() => import('pages/SessionReschedule'));
-// const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
 const NewMembershipDetails = lazy(() => import('pages/ProductDetails/NewMembershipDetails'));
-// const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
 const NewVideoDetails = lazy(() => import('pages/ProductDetails/NewVideoDetails'));
 const CourseDetails = lazy(() => import('pages/ProductDetails/CourseDetails'));
 const PassDetails = lazy(() => import('pages/ProductDetails/PassDetails'));
@@ -254,14 +249,14 @@ function App() {
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionCreate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
-            <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+            {/* <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} /> */}
             <PrivateRoute layout={DefaultLayout} path={Routes.paymentRetry} component={PaymentRetry} />
-            <PrivateRoute
+            {/* <PrivateRoute
               layout={DefaultLayout}
               exact
               path={Routes.stripePaymentSuccess}
               component={PaymentVerification}
-            />
+            /> */}
             <PrivateRoute layout={NavbarLayout} exact path={Routes.paymentConfirm} component={PaymentRedirectVerify} />
             <RouteWithLayout
               layout={MobileLayout}
@@ -275,7 +270,6 @@ function App() {
               path={Routes.membershipDetails}
               component={NewMembershipDetails}
             />
-
             <RouteWithLayout
               layout={NavbarFullWidthLayout}
               exact
@@ -311,7 +305,6 @@ function App() {
               path={Routes.previewPages.videos}
               component={VideoDetailPreview}
             />
-            {/* <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
             <RouteWithLayout
               layout={NavbarFullWidthLayout}
               exact
@@ -344,8 +337,6 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.signup} component={SignUp} />
-            {/* New Pages are put higher for more priority matching */}
-            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
             <RouteWithLayout
               layout={MobileLayout}
               exact
