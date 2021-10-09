@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
-import { Row, Col, Button, Image, Typography, Space, Spin, Divider, message } from 'antd';
+import { Row, Col, Button, Grid, Image, Typography, Space, Spin, Divider, message } from 'antd';
 import {
   FilePdfOutlined,
   CalendarOutlined,
@@ -60,6 +60,7 @@ const {
 } = dateUtil;
 
 const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 
 const paymentInstruments = {
   ONE_OFF: 'one-off',
@@ -74,6 +75,7 @@ const NewVideoDetails = ({ match }) => {
     showPaymentPopup,
     state: { userDetails },
   } = useGlobalContext();
+  const { xs, sm, md, lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -827,7 +829,6 @@ const NewVideoDetails = ({ match }) => {
       </div>
     ) : null;
 
-  // TODO: Revisit this once design is done
   const renderVideoDocumentUrl = () => {
     const documentData = videoData?.document ?? null;
 
@@ -1032,7 +1033,7 @@ const NewVideoDetails = ({ match }) => {
           split={<Divider type="vertical" className={styles.buyBtnDivider} />}
           className={styles.buyBtnTextContainer}
         >
-          <Text className={styles.buyBtnText}>GET THIS VIDEO ONLY</Text>
+          <Text className={styles.buyBtnText}>BUY THIS VIDEO</Text>
           <Text className={styles.buyBtnText}>
             {videoData?.pay_what_you_want
               ? 'Flexible'
@@ -1092,23 +1093,8 @@ const NewVideoDetails = ({ match }) => {
         <Row gutter={[12, 16]} justify="space-around">
           <Col xs={24} className={styles.textAlignCenter}>
             <Title level={3} className={styles.paymentInstrumentHeadingText}>
-              Get discounted price with {paymentInstrumentTextArr.join(' or ')}{' '}
+              Get discounted price when you buy this with a {paymentInstrumentTextArr.join(' or ')}{' '}
             </Title>
-            {/* <Space
-              direction={lg ? 'horizontal' : 'vertical'}
-              align="middle"
-              split={
-                <Divider type={lg ? 'vertical' : 'horizontal'} className={styles.paymentInstrumentHeadingDivider} />
-              }
-              className={styles.paymentInstrumentHeadingContainer}
-            >
-              <Title level={3} className={styles.paymentInstrumentHeadingText}>
-                Make Big Savings
-              </Title>
-              <Title level={3} className={styles.paymentInstrumentHeadingText}>
-                Buy this video with a {paymentInstrumentTextArr.join(' or ')}{' '}
-              </Title>
-            </Space> */}
           </Col>
           {relatedPassesAvailable && (
             <Col xs={24} lg={12}>
@@ -1136,7 +1122,7 @@ const NewVideoDetails = ({ match }) => {
                     <Row gutter={[12, 12]} align="middle">
                       <Col xs={24} md={11}>
                         <div className={styles.smallProductPreview}>
-                          <div className={styles.smallProductPreviewOverlay}>This Video (FREE)</div>
+                          <div className={styles.smallProductPreviewOverlay}>This Video (1 credit)</div>
                           <Image
                             loading="lazy"
                             width="100%"
@@ -1249,7 +1235,7 @@ const NewVideoDetails = ({ match }) => {
                     <Row gutter={[12, 12]} align="middle">
                       <Col xs={24} md={11}>
                         <div className={styles.smallProductPreview}>
-                          <div className={styles.smallProductPreviewOverlay}>This Video (FREE)</div>
+                          <div className={styles.smallProductPreviewOverlay}>This Video (1 membership credit)</div>
                           <Image
                             loading="lazy"
                             width="100%"
@@ -1357,31 +1343,42 @@ const NewVideoDetails = ({ match }) => {
 
   const otherVideosLimit = 5;
 
-  const similarVideosSection = useMemo(
-    () => (
-      <div>
-        <Row gutter={[8, 8]}>
-          <Col xs={24}>
-            <Title level={4} className={styles.similarVideosHeading}>
-              Similar Videos
-            </Title>
-          </Col>
-          <Col xs={24}>
-            <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
-              {otherVideos
-                .filter((video) => video.external_id !== videoData?.external_id)
-                .slice(0, otherVideosLimit)
-                .map((video) => (
-                  <Col xs={20} sm={18} md={9} lg={7} xl={5} key={video.external_id}>
-                    <VideoListCard video={video} handleClick={() => handleOtherVideoClicked(video)} />
-                  </Col>
-                ))}
-            </Row>
-          </Col>
-        </Row>
-      </div>
-    ),
-    [otherVideos, videoData, handleOtherVideoClicked]
+  const getVideoItemFlexLayout = () => {
+    if (xs) {
+      return '85%';
+    } else if (lg) {
+      return '24%';
+    } else if (md) {
+      return '30%';
+    } else if (sm) {
+      return '45%';
+    } else {
+      return 'auto';
+    }
+  };
+
+  const similarVideosSection = (
+    <div>
+      <Row gutter={[8, 8]}>
+        <Col xs={24}>
+          <Title level={4} className={styles.similarVideosHeading}>
+            Similar Videos
+          </Title>
+        </Col>
+        <Col xs={24}>
+          <Row gutter={[8, 8]} className={styles.horizontalVideoList}>
+            {otherVideos
+              .filter((video) => video.external_id !== videoData?.external_id)
+              .slice(0, otherVideosLimit)
+              .map((video) => (
+                <Col flex={getVideoItemFlexLayout()} key={video.external_id}>
+                  <VideoListCard video={video} handleClick={() => handleOtherVideoClicked(video)} />
+                </Col>
+              ))}
+          </Row>
+        </Col>
+      </Row>
+    </div>
   );
 
   //#endregion End of UI Components
