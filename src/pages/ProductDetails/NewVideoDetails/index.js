@@ -1032,7 +1032,7 @@ const NewVideoDetails = ({ match }) => {
           split={<Divider type="vertical" className={styles.buyBtnDivider} />}
           className={styles.buyBtnTextContainer}
         >
-          <Text className={styles.buyBtnText}>BUY DIRECTLY</Text>
+          <Text className={styles.buyBtnText}>GET THIS VIDEO ONLY</Text>
           <Text className={styles.buyBtnText}>
             {videoData?.pay_what_you_want
               ? 'Flexible'
