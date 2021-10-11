@@ -206,6 +206,8 @@ const CourseDetails = ({ match }) => {
 
   //#region Start of Buy Logics
 
+  const showWaitlistPopup = async () => {};
+
   const showConfirmPaymentPopup = async () => {
     if (!course) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
@@ -545,6 +547,61 @@ const CourseDetails = ({ match }) => {
     ));
   };
 
+  const courseBuyButton = (
+    <Button
+      size="large"
+      type="primary"
+      className={classNames(
+        styles.courseBuyBtn,
+        isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+          ? styles.darkText
+          : styles.lightText,
+        !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
+          ? styles.disabled
+          : undefined
+      )}
+      onClick={handleCourseBuyClicked}
+      disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
+    >
+      {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
+        `Course has reached max capacity`
+      ) : !course?.modules ? (
+        // NOTE : Empty here means that there is no modules at all
+        // There can be a case where the modules are all outlines
+        `Cannot purchase an empty course`
+      ) : (
+        <>
+          {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
+          {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
+        </>
+      )}
+    </Button>
+  );
+
+  const waitlistSection = (
+    <Space size="large" direction="vertical" align="center" className={styles.waitlistInfoContainer}>
+      <Text className={styles.waitlistHelpText}>
+        {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
+      </Text>
+      <Button
+        size="large"
+        type="primary"
+        className={classNames(
+          styles.courseBuyBtn,
+          isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+            ? styles.darkText
+            : styles.lightText
+        )}
+        onClick={handleCourseBuyClicked}
+      >
+        Join Waitlist
+      </Button>
+      <Text className={styles.waitlistHelpText}>
+        You will be notified when the creator opens the course for purchase
+      </Text>
+    </Space>
+  );
+
   // NOTE: Currently this component only supports type = YOUTUBE
   const coursePreviewEmbed = (
     <div className={styles.coursePreviewContainer}>
@@ -571,7 +628,11 @@ const CourseDetails = ({ match }) => {
 
   return (
     <div className={styles.newCourseDetails}>
-      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
+      <AuthModal
+        visible={showAuthModal}
+        closeModal={closeAuthModal}
+        onLoggedInCallback={course?.waitlist ? showWaitlistPopup : showConfirmPaymentPopup}
+      />
       <Loader loading={isLoading} size="large">
         <Row gutter={[8, 50]}>
           <Col xs={24}>
@@ -592,36 +653,7 @@ const CourseDetails = ({ match }) => {
                       {course?.description && (
                         <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
                       )}
-                      <Button
-                        size="large"
-                        type="primary"
-                        className={classNames(
-                          styles.courseBuyBtn,
-                          isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-                            ? styles.darkText
-                            : styles.lightText,
-                          !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
-                            ? styles.disabled
-                            : undefined
-                        )}
-                        onClick={handleCourseBuyClicked}
-                        disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
-                      >
-                        {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
-                          `Course has reached max capacity`
-                        ) : !course?.modules ? (
-                          // NOTE : Empty here means that there is no modules at all
-                          // There can be a case where the modules are all outlines
-                          `Cannot purchase an empty course`
-                        ) : (
-                          <>
-                            {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
-                            {course?.total_price > 0
-                              ? `${course?.currency?.toUpperCase()} ${course?.total_price}`
-                              : 'Free'}
-                          </>
-                        )}
-                      </Button>
+                      {course?.waitlist ? waitlistSection : courseBuyButton}
                     </Space>
                   </div>
                 </div>
