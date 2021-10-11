@@ -5,11 +5,11 @@ import Routes from 'routes';
 import { getLocalUserDetails } from 'utils/storage';
 
 import http from 'services/http';
+import { mapUserToPendo } from 'services/integrations/pendo';
+import { resetMixPanel } from 'services/integrations/mixpanel';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { deleteAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
-import { resetMixPanel } from 'services/integrations/mixpanel';
 import { trackUserLoginInGTM, clearGTMUserAttributes } from 'services/integrations/googleTagManager';
-import { mapUserToPendo } from 'services/integrations/pendo';
 
 const Context = createContext(null);
 
@@ -75,6 +75,18 @@ const reducer = (state, action) => {
           productType: null,
         },
       };
+    case 'SHOW_WAITLIST_POPUP':
+      return {
+        ...state,
+        waitlistPopupVisible: true,
+        ...action.payload,
+      };
+    case 'HIDE_WAITLIST_POPUP':
+      return {
+        ...state,
+        waitlistPopupVisible: false,
+        waitlistPopupData: null,
+      };
     default:
       return state;
   }
@@ -100,6 +112,8 @@ const GlobalDataProvider = ({ children }) => {
       productId: null,
       productType: null,
     },
+    waitlistPopupVisible: false,
+    waitlistPopupData: null,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -149,6 +163,14 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'HIDE_PAYMENT_POPUP' });
   }
 
+  function showWaitlistPopup(waitlistPopupData = null) {
+    dispatch({ type: 'SHOW_WAITLIST_POPUP', payload: { waitlistPopupData } });
+  }
+
+  function hideWaitlistPopup() {
+    dispatch({ type: 'HIDE_WAITLIST_POPUP' });
+  }
+
   function showSendEmailPopup(emailPopupData) {
     dispatch({ type: 'SHOW_SEND_EMAIL_POPUP', payload: emailPopupData });
   }
@@ -181,6 +203,8 @@ const GlobalDataProvider = ({ children }) => {
     hidePaymentPopup,
     showSendEmailPopup,
     hideSendEmailPopup,
+    showWaitlistPopup,
+    hideWaitlistPopup,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
