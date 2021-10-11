@@ -38,11 +38,12 @@ import {
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { defaultPlatformFeePercentage } from 'utils/constants';
+import { defaultPlatformFeePercentage, paymentProvider } from 'utils/constants';
 
 import { courseCreatePageLayout, coursePageTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import { useGlobalContext } from 'services/globalContext';
 
 const coursePriceTypes = {
   FREE: {
@@ -74,6 +75,10 @@ const { Title, Text } = Typography;
 
 const CourseForm = ({ match, history }) => {
   const [form] = Form.useForm();
+
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
 
   const courseId = match.params.course_id;
 
@@ -788,8 +793,13 @@ const CourseForm = ({ match, history }) => {
                   )}
                 </Row>
               </Col>
-              <Col xs={24}>
-                <Form.Item required label="Buying Method" {...courseCreatePageLayout} hidden={courseId}>
+              <Col xs={userDetails?.profile?.payment_provider !== paymentProvider.STRIPE ? 0 : 24}>
+                <Form.Item
+                  required
+                  label="Buying Method"
+                  {...courseCreatePageLayout}
+                  hidden={courseId || userDetails?.profile?.payment_provider !== paymentProvider.STRIPE}
+                >
                   <Form.Item
                     id="waitlist"
                     name="waitlist"

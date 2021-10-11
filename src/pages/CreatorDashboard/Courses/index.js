@@ -62,6 +62,7 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { paymentProvider } from 'utils/constants';
 
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -72,7 +73,10 @@ const {
 
 const Courses = ({ history }) => {
   const { md, xl } = useBreakpoint();
-  const { showSendEmailPopup } = useGlobalContext();
+  const {
+    state: { userDetails },
+    showSendEmailPopup,
+  } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -1021,35 +1025,39 @@ const Courses = ({ history }) => {
                 key="published"
               >
                 <Row gutter={[12, 20]}>
+                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
+                    <Col xs={24}>
+                      <Title level={5}>Waitlist Course</Title>
+                      {!md ? (
+                        <Row gutter={[8, 16]}>
+                          <Col xs={24}>
+                            <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedPublished}>
+                              {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                            </Button>
+                          </Col>
+                          {courses?.filter((course) => course.is_published && course.waitlist).map(renderCourseItem)}
+                        </Row>
+                      ) : (
+                        <Table
+                          size="small"
+                          sticky={true}
+                          columns={generateWaitlistedCourseColumns(true)}
+                          data={courses?.filter((course) => course.is_published && course.waitlist)}
+                          rowKey={(record) => record.id}
+                          expandable={{
+                            expandedRowRender: renderWaitlistUserList,
+                            expandRowByClick: true,
+                            expandIconColumnIndex: -1,
+                            expandedRowKeys: expandedWaitlistedPublishedRowKeys,
+                          }}
+                        />
+                      )}
+                    </Col>
+                  )}
                   <Col xs={24}>
-                    <Title level={5}>Waitlist Course</Title>
-                    {!md ? (
-                      <Row gutter={[8, 16]}>
-                        <Col xs={24}>
-                          <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedPublished}>
-                            {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                          </Button>
-                        </Col>
-                        {courses?.filter((course) => course.is_published && course.waitlist).map(renderCourseItem)}
-                      </Row>
-                    ) : (
-                      <Table
-                        size="small"
-                        sticky={true}
-                        columns={generateWaitlistedCourseColumns(true)}
-                        data={courses?.filter((course) => course.is_published && course.waitlist)}
-                        rowKey={(record) => record.id}
-                        expandable={{
-                          expandedRowRender: renderWaitlistUserList,
-                          expandRowByClick: true,
-                          expandIconColumnIndex: -1,
-                          expandedRowKeys: expandedWaitlistedPublishedRowKeys,
-                        }}
-                      />
+                    {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
+                      <Title level={5}>Normal Course</Title>
                     )}
-                  </Col>
-                  <Col xs={24}>
-                    <Title level={5}>Normal Course</Title>
                     {!md ? (
                       <Row gutter={[8, 16]}>
                         <Col xs={24}>
@@ -1087,35 +1095,40 @@ const Courses = ({ history }) => {
                 key="unpublished"
               >
                 <Row gutter={[12, 20]}>
+                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
+                    <Col xs={24}>
+                      <Title level={5}>Waitlist Course</Title>
+                      {!md ? (
+                        <Row gutter={[8, 16]}>
+                          <Col xs={24}>
+                            <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedUnpublished}>
+                              {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                            </Button>
+                          </Col>
+                          {courses?.filter((course) => !course.is_published && course.waitlist).map(renderCourseItem)}
+                        </Row>
+                      ) : (
+                        <Table
+                          size="small"
+                          sticky={true}
+                          columns={generateWaitlistedCourseColumns(false)}
+                          data={courses?.filter((course) => !course.is_published && course.waitlist)}
+                          rowKey={(record) => record.id}
+                          expandable={{
+                            expandedRowRender: renderWaitlistUserList,
+                            expandRowByClick: true,
+                            expandIconColumnIndex: -1,
+                            expandedRowKeys: expandedUnpublishedRowKeys,
+                          }}
+                        />
+                      )}
+                    </Col>
+                  )}
+
                   <Col xs={24}>
-                    <Title level={5}>Waitlist Course</Title>
-                    {!md ? (
-                      <Row gutter={[8, 16]}>
-                        <Col xs={24}>
-                          <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedUnpublished}>
-                            {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                          </Button>
-                        </Col>
-                        {courses?.filter((course) => !course.is_published && course.waitlist).map(renderCourseItem)}
-                      </Row>
-                    ) : (
-                      <Table
-                        size="small"
-                        sticky={true}
-                        columns={generateWaitlistedCourseColumns(false)}
-                        data={courses?.filter((course) => !course.is_published && course.waitlist)}
-                        rowKey={(record) => record.id}
-                        expandable={{
-                          expandedRowRender: renderWaitlistUserList,
-                          expandRowByClick: true,
-                          expandIconColumnIndex: -1,
-                          expandedRowKeys: expandedUnpublishedRowKeys,
-                        }}
-                      />
+                    {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
+                      <Title level={5}>Normal Course</Title>
                     )}
-                  </Col>
-                  <Col xs={24}>
-                    <Title level={5}>Normal Course</Title>
                     {!md ? (
                       <Row gutter={[8, 16]}>
                         <Col xs={24}>
