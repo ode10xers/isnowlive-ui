@@ -185,21 +185,6 @@ const Courses = ({ history }) => {
         if (data?.id) {
           redirectToEditCourse(data?.id);
         }
-        // Modal.confirm({
-        //   closable: true,
-        //   icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-        //   title: 'Course successfully cloned!',
-        //   content: (
-        //     <>
-        //       <Paragraph>
-        //         The cloned course will be unpublished by default. You can continue to edit it and publish it later.
-        //       </Paragraph>
-        //     </>
-        //   ),
-        //   okText: 'Continue to edit',
-        //   onOk: () => (data.id ? redirectToEditCourse(data?.id) : false),
-        //   cancelText: 'Close',
-        // });
       }
     } catch (error) {
       console.error(error);
@@ -241,7 +226,9 @@ const Courses = ({ history }) => {
 
   const copyCourseLink = (courseId) => {
     const username = getLocalUserDetails().username;
-    const pageLink = `${generateUrlFromUsername(username)}/c/${courseId}`;
+    const pageLink = `${generateUrlFromUsername(username)}${generatePath(Routes.courseDetails, {
+      course_id: courseId,
+    })}`;
 
     copyToClipboard(pageLink);
   };
@@ -433,7 +420,7 @@ const Courses = ({ history }) => {
                     <Tooltip title="Copy Course Link">
                       <Button
                         type="link"
-                        onClick={() => copyCourseLink(record.id)}
+                        onClick={() => copyCourseLink(record.internal_id)}
                         icon={<CopyTwoTone twoToneColor="#08979c" />}
                       />
                     </Tooltip>
@@ -609,14 +596,6 @@ const Courses = ({ history }) => {
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
-            // <Tooltip title="Copy Course Link">
-            //   <Button
-            //     type="text"
-            //     className={styles.detailsButton}
-            //     onClick={() => copyCourseLink(course.id)}
-            //     icon={<CopyOutlined />}
-            //   />
-            // </Tooltip>,
             <Popover
               trigger="click"
               content={
@@ -625,7 +604,7 @@ const Courses = ({ history }) => {
                     <Button
                       type="link"
                       className={styles.detailsButton}
-                      onClick={() => copyCourseLink(course.id)}
+                      onClick={() => copyCourseLink(course.internal_id)}
                       icon={<CopyTwoTone twoToneColor="#08979c" />}
                     />
                   </Tooltip>

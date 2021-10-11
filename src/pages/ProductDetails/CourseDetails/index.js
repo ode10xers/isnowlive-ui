@@ -13,6 +13,8 @@ import {
   PlusOutlined,
   NotificationOutlined,
   FilePdfOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -142,11 +144,11 @@ const CourseDetails = ({ match }) => {
   }, []);
 
   const getCourseDetails = useCallback(
-    async (courseId) => {
+    async (course_id) => {
       setIsLoading(true);
 
       try {
-        const { status, data } = await apis.courses.getDetails(courseId);
+        const { status, data } = await apis.courses.getDetails(course_id);
 
         if (isAPISuccess(status) && data) {
           setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.name) ?? []);
@@ -693,7 +695,13 @@ const CourseDetails = ({ match }) => {
               <Title level={5} className={styles.coursePreviewTitle}>
                 See what happens inside the course
               </Title>
-              <Carousel dots={{ className: styles.carouselDots }} className={styles.coursePreviewImagesContainer}>
+              <Carousel
+                arrows={true}
+                prevArrow={<LeftOutlined />}
+                nextArrow={<RightOutlined />}
+                dots={{ className: styles.carouselDots }}
+                className={styles.coursePreviewImagesContainer}
+              >
                 {renderImagePreviews(course?.preview_image_url)}
               </Carousel>
             </Col>

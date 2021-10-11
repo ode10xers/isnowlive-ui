@@ -33,6 +33,7 @@ const {
   formatDate: { getVideoMinutesDuration },
 } = dateUtil;
 
+// TODO: This is an old version of UI. Change this to use new version
 const VideoDetailPreview = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [videoData, setVideoData] = useState(null);
