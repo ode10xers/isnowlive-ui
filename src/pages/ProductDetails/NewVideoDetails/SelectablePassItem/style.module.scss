@@ -25,32 +25,16 @@
 
     .passDetailsDivider {
       border-left-color: var(--primary-dark-color);
-      height: 1.3em;
+      height: 1.4em;
     }
   }
 
-  .extraDividerContainer {
-  //   &::before,
-  //   &::after {
-  //     width: 8px;
-  //     content: '';
-  //     height: 12px;
-  //     position: absolute;
-  //     top: calc(50% - 6px);
-  //     border: 1px solid var(--primary-light-color);
-  //     background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
-  //   }
-  //   &::before {
-  //     left: -9px;
-  //     border-radius: 0 8px 8px 0;
-  //     border-left: none;
-  //   }
-  //   &::after {
-  //     right: -9px;
-  //     border-radius: 8px 0 0 8px;
-  //     border-right: none
-  //   }
+  .passProductText {
+    color: var(--primary-dark-color);
+    font-size: 12px;
+  }
 
+  .extraDividerContainer {
     .extraDivider {
       margin: 2px auto;
     }
