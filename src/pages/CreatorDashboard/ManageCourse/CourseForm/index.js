@@ -798,7 +798,7 @@ const CourseForm = ({ match, history }) => {
                   required
                   label="Buying Method"
                   {...courseCreatePageLayout}
-                  hidden={courseId || userDetails?.profile?.payment_provider !== paymentProvider.STRIPE}
+                  hidden={userDetails?.profile?.payment_provider !== paymentProvider.STRIPE}
                 >
                   <Form.Item
                     id="waitlist"
@@ -806,7 +806,7 @@ const CourseForm = ({ match, history }) => {
                     className={styles.inlineFormItem}
                     rules={validationRules.requiredValidation}
                   >
-                    <Radio.Group>
+                    <Radio.Group disabled={courseDetails && courseDetails?.waitlist}>
                       <Radio value={false}>Direct Buy</Radio>
                       <Radio value={true}>Waitlist</Radio>
                     </Radio.Group>

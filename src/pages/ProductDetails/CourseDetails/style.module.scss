@@ -20,7 +20,7 @@
     opacity: 0.6;
   }
 
-  &:hover {
+  &:hover, &:focus {
     filter: brightness(120%);
     background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
     border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});

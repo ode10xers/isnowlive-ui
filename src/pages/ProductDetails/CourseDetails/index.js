@@ -56,7 +56,7 @@ const {
 const CourseDetails = ({ match }) => {
   const courseId = match.params.course_id;
 
-  const { showPaymentPopup } = useGlobalContext();
+  const { showPaymentPopup, showWaitlistPopup } = useGlobalContext();
 
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -206,7 +206,20 @@ const CourseDetails = ({ match }) => {
 
   //#region Start of Buy Logics
 
-  const showWaitlistPopup = async () => {};
+  const openWaitlistPopup = async () => {
+    if (!course) {
+      showErrorModal('Something went wrong', 'Invalid Course Selected');
+      return;
+    }
+
+    const waitlistPopupData = {
+      productId: course?.id,
+      productName: course?.name,
+      productType: productType.COURSE,
+    };
+
+    showWaitlistPopup(waitlistPopupData);
+  };
 
   const showConfirmPaymentPopup = async () => {
     if (!course) {
@@ -631,7 +644,7 @@ const CourseDetails = ({ match }) => {
       <AuthModal
         visible={showAuthModal}
         closeModal={closeAuthModal}
-        onLoggedInCallback={course?.waitlist ? showWaitlistPopup : showConfirmPaymentPopup}
+        onLoggedInCallback={course?.waitlist ? openWaitlistPopup : showConfirmPaymentPopup}
       />
       <Loader loading={isLoading} size="large">
         <Row gutter={[8, 50]}>

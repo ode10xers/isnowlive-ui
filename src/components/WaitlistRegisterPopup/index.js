@@ -19,7 +19,10 @@ import { useGlobalContext } from 'services/globalContext';
 const { Title } = Typography;
 
 const WaitlistRegisterPopup = () => {
-  const { hideWaitlistPopup } = useGlobalContext();
+  const {
+    state: { waitlistPopupVisible },
+    hideWaitlistPopup,
+  } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -65,7 +68,7 @@ const WaitlistRegisterPopup = () => {
     } catch (error) {
       console.error('Failed fetching creator details for payment', error?.response);
     }
-    setIsLoading(true);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -95,7 +98,7 @@ const WaitlistRegisterPopup = () => {
 
   return (
     <Modal
-      visible={true}
+      visible={waitlistPopupVisible}
       closable={true}
       maskClosable={true}
       centered={true}

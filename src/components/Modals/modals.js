@@ -828,8 +828,42 @@ export const showWaitlistHelperModal = (productName = 'course') => {
           Once you've decided that enough people has joined the waitlist, you can open the {productName} for purchase
           and the waitlisted users will be notified about this so they can come and buy the {productName}.
         </Paragraph>
+        <Paragraph>A {productName} that had waitlist enabled and then closed cannot re-enable waitlist.</Paragraph>
       </>
     ),
     okText: 'Got it',
+  });
+};
+
+export const showWaitlistJoinedModal = (productName = 'course') => {
+  const username = getUsernameFromUrl();
+
+  Modal.success({
+    centered: true,
+    mask: true,
+    maskClosable: true,
+    closable: true,
+    title: 'Spot reserved',
+    content: (
+      <>
+        <Paragraph>You have successfully joined the waitlist for this {productName}.</Paragraph>
+        <Paragraph>
+          We will notify you via email when the creator opens the {productName}, and then you can purchase this{' '}
+          {productName}.
+        </Paragraph>
+      </>
+    ),
+    okText: 'Go to dashboard',
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
   });
 };
