@@ -14,7 +14,6 @@ import {
   Tag,
   Tooltip,
   Space,
-  Divider,
   Grid,
   Modal,
   List,
@@ -756,7 +755,19 @@ const Courses = ({ history }) => {
     return initialColumns;
   };
 
-  // TODO: Adjust this with the data in waitlist_user
+  const waitlistUserColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'full_name',
+      key: 'full_name',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+  ];
+
   const buyersColumns = [
     {
       title: 'Name',
@@ -790,13 +801,12 @@ const Courses = ({ history }) => {
 
   //#region Start Of Render Functions
 
-  // TODO: Adjust this with the data in waitlist_user
   const renderWaitlistUserList = (record) => (
     <div className={classNames(styles.mb20, styles.mt20)}>
       <Table
-        columns={buyersColumns}
-        data={record.waitlist_user ?? []}
-        rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
+        columns={waitlistUserColumns}
+        data={record.waitlist_users ?? []}
+        rowKey={(user) => `${user.full_name}_${user.email}`}
       />
     </div>
   );
@@ -807,15 +817,29 @@ const Courses = ({ history }) => {
         <Table
           columns={buyersColumns}
           data={record.buyers ?? []}
-          rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
+          rowKey={(buyer) => `${buyer.name}_${buyer.date_of_purchase}`}
         />
       </div>
     );
   };
 
-  // TODO: Adjust this with the data in waitlist_user
   const renderMobileWaitlistUserCards = (waitlistUser) => {
-    return <div></div>;
+    const layout = (label, value) => (
+      <Row>
+        <Col span={8}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={16}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Col xs={24} key={waitlistUser.email}>
+        <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {waitlistUser.full_name} </Title>}>
+          {layout('Email', <Text strong> {waitlistUser.email || ''} </Text>)}
+        </Card>
+      </Col>
+    );
   };
 
   const renderMobileSubscriberCards = (subscriber) => {
@@ -848,9 +872,6 @@ const Courses = ({ history }) => {
         <Col span={17}>: {value}</Col>
       </Row>
     );
-
-    const sessionCount = getCourseSessionContentCount(course?.modules ?? []);
-    const videoCount = getCourseVideoContentCount(course?.modules ?? []);
 
     return (
       <Col xs={24} key={course.id}>
@@ -961,15 +982,7 @@ const Courses = ({ history }) => {
                 : `${toShortDateMonth(course.start_date)} - ${toShortDateMonth(course.end_date)}`}
             </Text>
           )}
-          {layout(
-            'Content',
-            <Tag color="blue">
-              <Space split={<Divider type="vertical" />}>
-                {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
-                {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
-              </Space>
-            </Tag>
-          )}
+          {layout('Content', renderCourseContents('', course))}
           {layout(
             'Price',
             <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
@@ -979,17 +992,25 @@ const Courses = ({ history }) => {
         {course.waitlist
           ? course.is_published
             ? expandedWaitlistedPublishedRowKeys.includes(course.id) && (
-                <Row className={styles.cardExpansion}>{course.waitlist_users?.map(renderMobileWaitlistUserCards)}</Row>
+                <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                  {course.waitlist_users?.map(renderMobileWaitlistUserCards)}
+                </Row>
               )
             : expandedWaitlistedUnpublishedRowKeys.includes(course.id) && (
-                <Row className={styles.cardExpansion}>{course.waitlist_users?.map(renderMobileWaitlistUserCards)}</Row>
+                <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                  {course.waitlist_users?.map(renderMobileWaitlistUserCards)}
+                </Row>
               )
           : course.is_published
           ? expandedPublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+              <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                {course.buyers?.map(renderMobileSubscriberCards)}
+              </Row>
             )
           : expandedUnpublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+              <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                {course.buyers?.map(renderMobileSubscriberCards)}
+              </Row>
             )}
       </Col>
     );
@@ -1088,8 +1109,7 @@ const Courses = ({ history }) => {
               <Panel
                 header={
                   <Title level={4} className={styles.collapseHeaderText}>
-                    {' '}
-                    Unpublished{' '}
+                    Unpublished
                   </Title>
                 }
                 key="unpublished"
