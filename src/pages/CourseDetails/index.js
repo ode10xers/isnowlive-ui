@@ -67,7 +67,7 @@ const CourseDetails = ({ match, history }) => {
   const getCourseDetails = useCallback(
     async (courseId) => {
       try {
-        const { status, data } = await apis.courses.getDetails(courseId);
+        const { status, data } = await apis.courses.getDetailsByInternalId(courseId);
 
         if (isAPISuccess(status) && data) {
           setCourse(data);

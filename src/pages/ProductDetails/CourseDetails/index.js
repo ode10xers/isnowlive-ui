@@ -148,7 +148,15 @@ const CourseDetails = ({ match }) => {
       setIsLoading(true);
 
       try {
-        const { status, data } = await apis.courses.getDetails(course_id);
+        let targetAPI = null;
+
+        if (isNaN(course_id)) {
+          targetAPI = apis.courses.getDetailsByExternalId;
+        } else {
+          targetAPI = apis.courses.getDetailsByInternalId;
+        }
+
+        const { status, data } = await targetAPI(course_id);
 
         if (isAPISuccess(status) && data) {
           setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.name) ?? []);
