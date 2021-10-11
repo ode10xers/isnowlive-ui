@@ -4,6 +4,29 @@
   color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
 }
 
+.courseBuyBtn {
+  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+
+  &.lightText {
+    color : map-get($colors, 'White');
+  }
+
+  &.darkText {
+    color : map-get($colors, 'Zeus');
+  }
+
+  &.disabled {
+    opacity: 0.6;
+  }
+
+  &:hover {
+    filter: brightness(120%);
+    background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+  }
+}
+
 .longDescriptionTitle {
   color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
 
@@ -75,23 +98,6 @@
 
         @media screen and (max-width: 526px) {
           margin: 20px auto 0;
-        }
-
-        .courseBuyBtn {
-          background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
-          border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
-
-          &.lightText {
-            color : map-get($colors, 'White');
-          }
-
-          &.darkText {
-            color : map-get($colors, 'Zeus');
-          }
-
-          &.disabled {
-            opacity: 0.6;
-          }
         }
 
         .courseName {

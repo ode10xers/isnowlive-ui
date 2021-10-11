@@ -447,7 +447,24 @@ const CourseDetails = ({ match }) => {
           </Space>
         );
       case 'DOCUMENT':
-        return <Text type="secondary">{contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable</Text>;
+        // return <Text type="secondary">{contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable</Text>;
+        return (
+          <Button
+            type="primary"
+            className={classNames(
+              styles.courseBuyBtn,
+              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                ? styles.darkText
+                : styles.lightText,
+              !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
+                ? styles.disabled
+                : undefined
+            )}
+            onClick={handleCourseBuyClicked}
+          >
+            {contentData?.is_downloadable ? 'Download' : 'Preview'}
+          </Button>
+        );
       default:
         break;
     }
