@@ -810,3 +810,26 @@ export const showTagOptionsHelperModal = (productName = 'session') => {
     afterClose: resetBodyStyle,
   });
 };
+
+export const showWaitlistHelperModal = (productName = 'course') => {
+  Modal.info({
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'What is waitlist?',
+    width: 640,
+    content: (
+      <>
+        <Paragraph>
+          The waitlist feature helps you measure the interest of your customers to this {productName}. You will be able
+          to see how many people are commited to buying this product from the people who joined the waitlist.
+        </Paragraph>
+        <Paragraph>
+          Once you've decided that enough people has joined the waitlist, you can open the {productName} for purchase
+          and the waitlisted users will be notified about this so they can come and buy the {productName}.
+        </Paragraph>
+      </>
+    ),
+    okText: 'Got it',
+  });
+};
