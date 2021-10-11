@@ -16,10 +16,6 @@
   }
 }
 
-.longContentWrapper {
-  // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
-
-}
 .longContentWrapper * {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
@@ -330,6 +326,16 @@
 
     @media screen and (max-width: 525px) {
       padding: 50px 12px 12px !important;
+    }
+
+    :global {
+      .ant-carousel .slick-prev,
+      .ant-carousel .slick-next,
+      .ant-carousel .slick-prev:hover,
+      .ant-carousel .slick-next:hover {
+        font-size: 18px;
+        color: var(--passion-profile-darker-color, #006cd0);
+      }
     }
 
     .coursePreviewTitle {

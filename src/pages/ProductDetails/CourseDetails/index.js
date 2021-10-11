@@ -13,6 +13,8 @@ import {
   PlusOutlined,
   NotificationOutlined,
   FilePdfOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -693,7 +695,13 @@ const CourseDetails = ({ match }) => {
               <Title level={5} className={styles.coursePreviewTitle}>
                 See what happens inside the course
               </Title>
-              <Carousel dots={{ className: styles.carouselDots }} className={styles.coursePreviewImagesContainer}>
+              <Carousel
+                arrows={true}
+                prevArrow={<LeftOutlined />}
+                nextArrow={<RightOutlined />}
+                dots={{ className: styles.carouselDots }}
+                className={styles.coursePreviewImagesContainer}
+              >
                 {renderImagePreviews(course?.preview_image_url)}
               </Carousel>
             </Col>
