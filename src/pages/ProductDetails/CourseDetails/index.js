@@ -142,11 +142,11 @@ const CourseDetails = ({ match }) => {
   }, []);
 
   const getCourseDetails = useCallback(
-    async (courseId) => {
+    async (course_id) => {
       setIsLoading(true);
 
       try {
-        const { status, data } = await apis.courses.getDetails(courseId);
+        const { status, data } = await apis.courses.getDetails(course_id);
 
         if (isAPISuccess(status) && data) {
           setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.name) ?? []);

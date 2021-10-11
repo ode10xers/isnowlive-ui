@@ -85,7 +85,9 @@ export const redirectToCoursesPage = (course) => {
   }
 
   const baseUrl = generateUrlFromUsername(course.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}${course.is_dummy ? Routes.previewPages.root : ''}/c/${course.id}`;
+  const targetUrl = `${baseUrl}${course.is_dummy ? Routes.previewPages.root : ''}${generatePath(Routes.courseDetails, {
+    course_id: course.internal_id,
+  })}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
