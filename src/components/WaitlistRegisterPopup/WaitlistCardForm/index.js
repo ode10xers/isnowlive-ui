@@ -162,15 +162,17 @@ const WaitlistCardForm = () => {
         break;
     }
 
-    try {
-      const { status } = await targetAPI(productId);
+    if (targetAPI) {
+      try {
+        const { status } = await targetAPI(productId);
 
-      if (isAPISuccess(status)) {
-        return true;
+        if (isAPISuccess(status)) {
+          return true;
+        }
+      } catch (error) {
+        console.error(error);
+        showErrorModal('Failed to join course wait-list', error?.response?.data?.message || 'Something went wrong');
       }
-    } catch (error) {
-      console.error(error);
-      showErrorModal('Failed to join course wait-list', error?.response?.data?.message || 'Something went wrong');
     }
 
     return false;
