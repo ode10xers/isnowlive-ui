@@ -16,6 +16,7 @@ import {
   Space,
   Grid,
   Modal,
+  Popconfirm,
   List,
   message,
 } from 'antd';
@@ -208,15 +209,42 @@ const Courses = ({ history }) => {
     setIsLoading(true);
 
     try {
-      const { status } = await apis.courses.updateCourse(course.id);
+      const { status } = await apis.waitlist.closeCourseWaitlist(course.id);
 
       if (isAPISuccess(status)) {
-        // TODO: Show better modal here
-        message.success('Course opened!');
+        showSuccessModal(
+          'Course open for registration',
+          <>
+            <Paragraph>The course is now available for purchase and the wait-list has been closed.</Paragraph>
+            <Paragraph>
+              We have sent notification emails to users who have joined the wait-list so they can come and purchase the
+              course
+            </Paragraph>
+          </>
+        );
+        fetchAllCoursesForCreator();
       }
     } catch (error) {
       console.error(error);
       showErrorModal('Failed to close wait-list', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const deleteCourse = async (course) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.courses.deleteCourse(course.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Course has been cancelled!');
+        fetchAllCoursesForCreator();
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to cancel course', error?.response?.data?.message || 'Something went wrong');
     }
 
     setIsLoading(false);
@@ -400,8 +428,6 @@ const Courses = ({ history }) => {
     });
   };
 
-  const handleDeleteWaitlistClicked = (record) => {};
-
   const renderCourseName = (text, record) => {
     return {
       props: {
@@ -490,6 +516,17 @@ const Courses = ({ history }) => {
               <Tooltip title="Send Customer Email">
                 <Button type="link" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
               </Tooltip>
+              <Popconfirm
+                title="Are you sure about cancelling the course?"
+                okButtonProps={{ danger: true }}
+                okText="Yes, cancel the course"
+                cancelText="Nevermind"
+                onConfirm={() => deleteCourse(record)}
+              >
+                <Tooltip title="Cancel Course">
+                  <Button danger type="link" icon={<DeleteOutlined />} />
+                </Tooltip>
+              </Popconfirm>
               <Tooltip title="Clone This Course">
                 <Button type="text" onClick={() => cloneCourse(record)} icon={<ExportOutlined />} />
               </Tooltip>
@@ -577,14 +614,17 @@ const Courses = ({ history }) => {
                   icon={<CarryOutOutlined />}
                 />
               </Tooltip>
-              <Tooltip title="Cancel Course">
-                <Button
-                  danger
-                  type="link"
-                  onClick={() => handleDeleteWaitlistClicked(record)}
-                  icon={<DeleteOutlined />}
-                />
-              </Tooltip>
+              <Popconfirm
+                title="Are you sure about cancelling the course?"
+                okButtonProps={{ danger: true }}
+                okText="Yes, cancel the course"
+                cancelText="Nevermind"
+                onConfirm={() => deleteCourse(record)}
+              >
+                <Tooltip title="Cancel Course">
+                  <Button danger type="link" icon={<DeleteOutlined />} />
+                </Tooltip>
+              </Popconfirm>
               <Tooltip title="Clone This Course">
                 <Button type="text" onClick={() => cloneCourse(record)} icon={<ExportOutlined />} />
               </Tooltip>
@@ -916,20 +956,23 @@ const Courses = ({ history }) => {
                           icon={<CarryOutOutlined />}
                         />
                       </Tooltip>
-                      <Tooltip title="Cancel Course">
-                        <Button
-                          danger
-                          type="link"
-                          onClick={() => handleDeleteWaitlistClicked(course)}
-                          icon={<DeleteOutlined />}
-                        />
-                      </Tooltip>
                     </>
                   ) : (
                     <Tooltip title="Send Customer Email">
                       <Button type="link" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
                     </Tooltip>
                   )}
+                  <Popconfirm
+                    title="Are you sure about cancelling the course?"
+                    okButtonProps={{ danger: true }}
+                    okText="Yes, cancel the course"
+                    cancelText="Nevermind"
+                    onConfirm={() => deleteCourse(course)}
+                  >
+                    <Tooltip title="Cancel Course">
+                      <Button danger type="link" icon={<DeleteOutlined />} />
+                    </Tooltip>
+                  </Popconfirm>
                   <Tooltip title="Clone This Course">
                     <Button type="text" onClick={() => cloneCourse(course)} icon={<ExportOutlined />} />
                   </Tooltip>

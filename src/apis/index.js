@@ -34,6 +34,7 @@ export default {
   },
   waitlist: {
     joinCourseWaitlist: (courseId) => http.post(`/secure/customer/waitlist/courses/${courseId}`),
+    closeCourseWaitlist: (courseId) => http.post(`/secure/creator/courses/${courseId}/close-waitlist`),
   },
   payment: {
     stripe: {
@@ -162,6 +163,7 @@ export default {
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
   },
   courses: {
+    deleteCourse: (courseId) => http.delete(`/secure/creator/courses/${courseId}`),
     getCoursesByUsername: () => http.get(`/courses`),
     getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
     getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
