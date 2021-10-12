@@ -312,6 +312,7 @@ const PaymentPopup = () => {
     return result;
   };
 
+  // TODO: Adjust the popup behavior here to prevent double popup
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
     if (orderResponse && orderResponse?.is_successful_order) {
       if (verifyOrderRes === orderType.PASS) {
