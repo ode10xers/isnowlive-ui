@@ -808,7 +808,7 @@ const CourseForm = ({ match, history }) => {
                   >
                     <Radio.Group disabled={courseDetails && courseDetails?.waitlist}>
                       <Radio value={false}>Direct Buy</Radio>
-                      <Radio value={true}>Waitlist</Radio>
+                      <Radio value={true}>Wait-list</Radio>
                     </Radio.Group>
                   </Form.Item>
                   <Form.Item className={styles.inlineFormItem}>
@@ -818,7 +818,7 @@ const CourseForm = ({ match, history }) => {
                       onClick={() => showWaitlistHelperModal('course')}
                       icon={<InfoCircleOutlined />}
                     >
-                      What is waitlist?
+                      What is wait-list?
                     </Button>
                   </Form.Item>
                 </Form.Item>

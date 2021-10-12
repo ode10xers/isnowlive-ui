@@ -607,7 +607,7 @@ const CourseDetails = ({ match }) => {
         )}
         onClick={handleCourseBuyClicked}
       >
-        Join Waitlist
+        Join Wait-list
       </Button>
       <Text className={styles.waitlistHelpText}>
         You will be notified when the creator opens the course for purchase

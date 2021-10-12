@@ -42,6 +42,7 @@ import TagListPopup from 'components/TagListPopup';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { paymentProvider } from 'utils/constants';
 import { getLocalUserDetails } from 'utils/storage';
 import {
   getCourseSessionContentCount,
@@ -61,7 +62,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import { paymentProvider } from 'utils/constants';
 
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -216,7 +216,7 @@ const Courses = ({ history }) => {
       }
     } catch (error) {
       console.error(error);
-      showErrorModal('Failed to close waitlist', error?.response?.data?.message || 'Something went wrong.');
+      showErrorModal('Failed to close wait-list', error?.response?.data?.message || 'Something went wrong.');
     }
 
     setIsLoading(false);
@@ -371,26 +371,28 @@ const Courses = ({ history }) => {
 
   const handleCloseWaitlistClicked = (course) => {
     Modal.confirm({
+      centered: true,
       closable: true,
       maskClosable: true,
-      centered: true,
-      okText: 'Close Waitlist',
+      width: 640,
+      okText: 'Close Wait-list',
       onOk: () => closeCourseWaitlist(course),
       afterClose: resetBodyStyle,
-      title: 'Are you sure about closing the waitlist?',
+      title: 'Are you sure about closing the wait-list?',
       content: (
         <>
-          <Paragraph>The following things will happen once the waitlist is closed</Paragraph>
+          <Paragraph>The following things will happen once the wait-list is closed</Paragraph>
           <List
+            size="large"
             dataSource={[
-              'Users who have joined the waitlist will be notified to buy the course',
-              'The course will be open to buy for anyone, and the waitlist feature will be removed',
+              'Users who have joined the wait-list will be notified to buy the course',
+              'Anyone will be able to purchase the course and the wait-list will be closed',
             ]}
             renderItem={(item) => (
-              <List.Item>
-                <CheckCircleTwoTone twoToneColor="#1890ff" />
-                <Text strong>{item}</Text>
-              </List.Item>
+              <List.Item.Meta
+                avatar={<CheckCircleTwoTone twoToneColor="#1890ff" />}
+                description={<Paragraph strong>{item}</Paragraph>}
+              />
             )}
           />
         </>
@@ -567,7 +569,7 @@ const Courses = ({ history }) => {
                   icon={<CopyTwoTone twoToneColor="#08979c" />}
                 />
               </Tooltip>
-              <Tooltip title="Start Selling Course">
+              <Tooltip title="Open Registrations">
                 <Button
                   type="link"
                   className={styles.successBtn}
@@ -613,20 +615,20 @@ const Courses = ({ history }) => {
         {record.is_published ? (
           expandedWaitlistedPublishedRowKeys.includes(record.id) ? (
             <Button block type="link" onClick={() => collapseRowWaitlistedPublished(record.id)}>
-              {record.waitlist_users?.length} Waitlist <UpOutlined />
+              {record.waitlist_users?.length} Wait-list <UpOutlined />
             </Button>
           ) : (
             <Button block type="link" onClick={() => expandRowWaitlistedPublished(record.id)}>
-              {record.waitlist_users?.length} Waitlist <DownOutlined />
+              {record.waitlist_users?.length} Wait-list <DownOutlined />
             </Button>
           )
         ) : expandedWaitlistedUnpublishedRowKeys.includes(record.id) ? (
           <Button block type="link" onClick={() => collapseRowWaitlistedUnpublished(record.id)}>
-            {record.waitlist_users?.length} Waitlist <UpOutlined />
+            {record.waitlist_users?.length} Wait-list <UpOutlined />
           </Button>
         ) : (
           <Button block type="link" onClick={() => expandRowWaitlistedUnpublished(record.id)}>
-            {record.waitlist_users?.length} Waitlist <DownOutlined />
+            {record.waitlist_users?.length} Wait-list <DownOutlined />
           </Button>
         )}
       </Col>
@@ -906,7 +908,7 @@ const Courses = ({ history }) => {
                   </Tooltip>
                   {course.waitlist ? (
                     <>
-                      <Tooltip title="Start Selling Course">
+                      <Tooltip title="Open Registrations">
                         <Button
                           type="link"
                           className={styles.successBtn}
@@ -1046,35 +1048,36 @@ const Courses = ({ history }) => {
                 key="published"
               >
                 <Row gutter={[12, 20]}>
-                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
-                    <Col xs={24}>
-                      <Title level={5}>Waitlist Course</Title>
-                      {!md ? (
-                        <Row gutter={[8, 16]}>
-                          <Col xs={24}>
-                            <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedPublished}>
-                              {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                            </Button>
-                          </Col>
-                          {courses?.filter((course) => course.is_published && course.waitlist).map(renderCourseItem)}
-                        </Row>
-                      ) : (
-                        <Table
-                          size="small"
-                          sticky={true}
-                          columns={generateWaitlistedCourseColumns(true)}
-                          data={courses?.filter((course) => course.is_published && course.waitlist)}
-                          rowKey={(record) => record.id}
-                          expandable={{
-                            expandedRowRender: renderWaitlistUserList,
-                            expandRowByClick: true,
-                            expandIconColumnIndex: -1,
-                            expandedRowKeys: expandedWaitlistedPublishedRowKeys,
-                          }}
-                        />
-                      )}
-                    </Col>
-                  )}
+                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
+                    courses?.filter((course) => course.is_published && course.waitlist).length > 0 && (
+                      <Col xs={24}>
+                        <Title level={5}>Wait-list Course</Title>
+                        {!md ? (
+                          <Row gutter={[8, 16]}>
+                            <Col xs={24}>
+                              <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedPublished}>
+                                {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                              </Button>
+                            </Col>
+                            {courses?.filter((course) => course.is_published && course.waitlist).map(renderCourseItem)}
+                          </Row>
+                        ) : (
+                          <Table
+                            size="small"
+                            sticky={true}
+                            columns={generateWaitlistedCourseColumns(true)}
+                            data={courses?.filter((course) => course.is_published && course.waitlist)}
+                            rowKey={(record) => record.id}
+                            expandable={{
+                              expandedRowRender: renderWaitlistUserList,
+                              expandRowByClick: true,
+                              expandIconColumnIndex: -1,
+                              expandedRowKeys: expandedWaitlistedPublishedRowKeys,
+                            }}
+                          />
+                        )}
+                      </Col>
+                    )}
                   <Col xs={24}>
                     {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
                       <Title level={5}>Normal Course</Title>
@@ -1115,35 +1118,36 @@ const Courses = ({ history }) => {
                 key="unpublished"
               >
                 <Row gutter={[12, 20]}>
-                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
-                    <Col xs={24}>
-                      <Title level={5}>Waitlist Course</Title>
-                      {!md ? (
-                        <Row gutter={[8, 16]}>
-                          <Col xs={24}>
-                            <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedUnpublished}>
-                              {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                            </Button>
-                          </Col>
-                          {courses?.filter((course) => !course.is_published && course.waitlist).map(renderCourseItem)}
-                        </Row>
-                      ) : (
-                        <Table
-                          size="small"
-                          sticky={true}
-                          columns={generateWaitlistedCourseColumns(false)}
-                          data={courses?.filter((course) => !course.is_published && course.waitlist)}
-                          rowKey={(record) => record.id}
-                          expandable={{
-                            expandedRowRender: renderWaitlistUserList,
-                            expandRowByClick: true,
-                            expandIconColumnIndex: -1,
-                            expandedRowKeys: expandedUnpublishedRowKeys,
-                          }}
-                        />
-                      )}
-                    </Col>
-                  )}
+                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
+                    courses?.filter((course) => !course.is_published && course.waitlist).length > 0 && (
+                      <Col xs={24}>
+                        <Title level={5}>Wait-list Course</Title>
+                        {!md ? (
+                          <Row gutter={[8, 16]}>
+                            <Col xs={24}>
+                              <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedUnpublished}>
+                                {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                              </Button>
+                            </Col>
+                            {courses?.filter((course) => !course.is_published && course.waitlist).map(renderCourseItem)}
+                          </Row>
+                        ) : (
+                          <Table
+                            size="small"
+                            sticky={true}
+                            columns={generateWaitlistedCourseColumns(false)}
+                            data={courses?.filter((course) => !course.is_published && course.waitlist)}
+                            rowKey={(record) => record.id}
+                            expandable={{
+                              expandedRowRender: renderWaitlistUserList,
+                              expandRowByClick: true,
+                              expandIconColumnIndex: -1,
+                              expandedRowKeys: expandedUnpublishedRowKeys,
+                            }}
+                          />
+                        )}
+                      </Col>
+                    )}
 
                   <Col xs={24}>
                     {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (

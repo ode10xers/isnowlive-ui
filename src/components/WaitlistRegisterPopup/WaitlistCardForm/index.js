@@ -170,7 +170,7 @@ const WaitlistCardForm = () => {
       }
     } catch (error) {
       console.error(error);
-      showErrorModal('Failed to join course waitlist', error?.response?.data?.message || 'Something went wrong');
+      showErrorModal('Failed to join course wait-list', error?.response?.data?.message || 'Something went wrong');
     }
 
     return false;
@@ -218,7 +218,7 @@ const WaitlistCardForm = () => {
         }
       } catch (error) {
         console.error(error);
-        message.error('An error occurred while joining waitlist');
+        message.error('An error occurred while joining wait-list');
       }
     }
 
@@ -234,7 +234,7 @@ const WaitlistCardForm = () => {
       <Col xs={24}>
         {savedUserCards?.length > 0 ? (
           <Paragraph>
-            Click on the <Text strong>Join Waitlist</Text> button below to join the waitlist for this{' '}
+            Click on the <Text strong>Join Wait-list</Text> button below to join the wait-list for this{' '}
             {productType?.toLowerCase()}.
           </Paragraph>
         ) : (
@@ -252,7 +252,7 @@ const WaitlistCardForm = () => {
           dataSource={[productName]}
           renderItem={(item) => (
             <List.Item>
-              <List.Item.Meta title={item} description={<Text className={styles.greenText}>Spot Reservation</Text>} />
+              <List.Item.Meta title={item} />
             </List.Item>
           )}
         />
@@ -285,7 +285,7 @@ const WaitlistCardForm = () => {
               disabled={savedUserCards?.length === 0 && isButtonDisabled}
               loading={isSubmitting}
             >
-              Join Waitlist
+              Join Wait-list
             </Button>
           </Col>
         </Row>

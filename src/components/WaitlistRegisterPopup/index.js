@@ -16,6 +16,8 @@ import { isAPISuccess, getUsernameFromUrl, reservedDomainName, isInCreatorDashbo
 
 import { useGlobalContext } from 'services/globalContext';
 
+import styles from './style.module.scss';
+
 const { Title } = Typography;
 
 const WaitlistRegisterPopup = () => {
@@ -103,11 +105,15 @@ const WaitlistRegisterPopup = () => {
       maskClosable={true}
       centered={true}
       footer={null}
-      title={<Title level={4}>Reserve Your Spot</Title>}
+      title={
+        <Title level={4} className={styles.textAlignCenter}>
+          Reserve Your Spot
+        </Title>
+      }
       onCancel={hideWaitlistPopup}
       afterClose={resetBodyStyle}
     >
-      <Spin spinning={isLoading} tip="Fetching waitlist details">
+      <Spin spinning={isLoading} tip="Fetching wait-list details">
         <Elements stripe={stripePromise}>
           <WaitlistCardForm />
         </Elements>
