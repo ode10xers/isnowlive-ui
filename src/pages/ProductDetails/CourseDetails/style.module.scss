@@ -17,8 +17,9 @@
   }
 
   &.disabled {
-    opacity: 0.6;
-    color: map-get($colors, 'Zeus');
+    opacity: 0.8;
+    color: map-get($colors, 'Black');
+    font-weight: 500;
   }
 
   &:hover, &:focus {
