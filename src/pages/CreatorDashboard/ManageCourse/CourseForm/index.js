@@ -28,16 +28,22 @@ import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
 import TextEditor from 'components/TextEditor';
 import PriceInputCalculator from 'components/PriceInputCalculator';
-import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
+import {
+  showErrorModal,
+  showSuccessModal,
+  showTagOptionsHelperModal,
+  showWaitlistHelperModal,
+} from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { defaultPlatformFeePercentage } from 'utils/constants';
+import { defaultPlatformFeePercentage, paymentProvider } from 'utils/constants';
 
 import { courseCreatePageLayout, coursePageTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import { useGlobalContext } from 'services/globalContext';
 
 const coursePriceTypes = {
   FREE: {
@@ -58,6 +64,7 @@ const formInitialValues = {
   topic: [],
   faqs: [],
   priceType: coursePriceTypes.FREE.name,
+  waitlist: false,
   price: 10,
   courseTagType: 'anyone',
   selectedMemberTags: [],
@@ -68,6 +75,10 @@ const { Title, Text } = Typography;
 
 const CourseForm = ({ match, history }) => {
   const [form] = Form.useForm();
+
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
 
   const courseId = match.params.course_id;
 
@@ -148,6 +159,7 @@ const CourseForm = ({ match, history }) => {
             courseTagType: data.tag?.length > 0 ? 'selected' : 'anyone',
             selectedMemberTags: data.tag?.map((tagData) => tagData.external_id),
             preview_video_urls: data.preview_video_urls ?? [],
+            waitlist: data.waitlist ?? false,
           });
 
           if (data.currency) {
@@ -285,6 +297,7 @@ const CourseForm = ({ match, history }) => {
       tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
       preview_image_url: previewImageUrls ?? [],
       preview_video_urls: values.preview_video_urls ?? [],
+      waitlist: values.waitlist ?? false,
       ...modulesData,
     };
 
@@ -779,6 +792,36 @@ const CourseForm = ({ match, history }) => {
                     </Col>
                   )}
                 </Row>
+              </Col>
+              <Col xs={userDetails?.profile?.payment_provider !== paymentProvider.STRIPE ? 0 : 24}>
+                <Form.Item
+                  required
+                  label="Buying Method"
+                  {...courseCreatePageLayout}
+                  hidden={userDetails?.profile?.payment_provider !== paymentProvider.STRIPE}
+                >
+                  <Form.Item
+                    id="waitlist"
+                    name="waitlist"
+                    className={styles.inlineFormItem}
+                    rules={validationRules.requiredValidation}
+                  >
+                    <Radio.Group disabled={courseDetails && courseDetails?.waitlist}>
+                      <Radio value={false}>Direct Buy</Radio>
+                      <Radio value={true}>Wait-list</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() => showWaitlistHelperModal('course')}
+                      icon={<InfoCircleOutlined />}
+                    >
+                      What is wait-list?
+                    </Button>
+                  </Form.Item>
+                </Form.Item>
               </Col>
               <Col xs={24}>
                 <Form.Item label="Bookable by member with Tag" required {...courseCreatePageLayout}>

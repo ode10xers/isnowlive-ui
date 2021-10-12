@@ -4,6 +4,29 @@
   color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
 }
 
+.courseBuyBtn {
+  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+
+  &.lightText {
+    color: map-get($colors, 'White');
+  }
+
+  &.darkText {
+    color: map-get($colors, 'Zeus');
+  }
+
+  &.disabled {
+    opacity: 0.6;
+  }
+
+  &:hover, &:focus {
+    filter: brightness(120%);
+    background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+  }
+}
+
 .longDescriptionTitle {
   color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
 
@@ -17,10 +40,10 @@
 }
 
 .longContentWrapper * {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: transparent !important;
-    // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+  background-color: transparent !important;
+  // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
 }
 
 .paddedContent {
@@ -47,7 +70,7 @@
       object-fit: cover;
       min-height: 550px;
 
-      @media screen and (max-width:992px) {
+      @media screen and (max-width: 992px) {
         min-height: 320px;
       }
     }
@@ -75,23 +98,6 @@
 
         @media screen and (max-width: 526px) {
           margin: 20px auto 0;
-        }
-
-        .courseBuyBtn {
-          background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
-          border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
-
-          &.lightText {
-            color : map-get($colors, 'White');
-          }
-
-          &.darkText {
-            color : map-get($colors, 'Zeus');
-          }
-
-          &.disabled {
-            opacity: 0.6;
-          }
         }
 
         .courseName {
@@ -129,9 +135,32 @@
 
         .courseDesc * {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-              sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
           background-color: transparent !important;
           color: map-get($colors, 'White') !important;
+        }
+      }
+
+      .waitlistInfoContainer {
+        margin-top: 30px;
+        max-width: 1000px;
+        padding: 0 20px 20px;
+
+        .waitlistHelpText {
+          color: map-get($colors, 'White') !important;
+          font-size: 18px;
+
+          @media screen and (max-width: 1025px) {
+            font-size: 16px;
+          }
+
+          @media screen and (max-width: 769px) {
+            font-size: 14px;
+          }
+
+          @media screen and (max-width: 526px) {
+            font-size: 12px;
+          }
         }
       }
     }
@@ -185,7 +214,7 @@
         text-align: center;
         display: block;
         font-weight: 700;
-        color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
 
         @media screen and (max-width: 1140px) {
           font-size: 24px;
@@ -232,8 +261,7 @@
           text-align: center;
           font-size: 20px;
           font-weight: 600;
-  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
-
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
         }
 
         .personaItemContent {
@@ -242,9 +270,9 @@
 
         .personaItemContent * {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-              sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-            background-color: transparent !important;
-            // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+          background-color: transparent !important;
+          // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
         }
       }
     }
@@ -285,7 +313,7 @@
 
         .moduleContentItems {
           color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
-          
+
           .moduleContentName {
             font-weight: 500;
             color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
@@ -318,7 +346,11 @@
   .coursePreviewImagesSection {
     margin: -50px 0;
     padding: 30px 80px !important;
-    background: linear-gradient(41.18deg, var(--passion-profile-lightest-color, #e6f7ff) 16.22%, var(--passion-profile-light-color, #fff5f6) 82.56%);
+    background: linear-gradient(
+      41.18deg,
+      var(--passion-profile-lightest-color, #e6f7ff) 16.22%,
+      var(--passion-profile-light-color, #fff5f6) 82.56%
+    );
 
     @media screen and (max-width: 769px) {
       padding: 20px !important;
@@ -411,9 +443,9 @@
         }
         .faqContentWrapper * {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-              sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-              background-color: transparent !important;
-              // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+          background-color: transparent !important;
+          // color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
         }
       }
     }
