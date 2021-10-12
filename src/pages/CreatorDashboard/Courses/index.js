@@ -655,20 +655,20 @@ const Courses = ({ history }) => {
         {record.is_published ? (
           expandedWaitlistedPublishedRowKeys.includes(record.id) ? (
             <Button block type="link" onClick={() => collapseRowWaitlistedPublished(record.id)}>
-              {record.waitlist_users?.length} Wait-list <UpOutlined />
+              {record.waitlist_users?.length} Waitlist <UpOutlined />
             </Button>
           ) : (
             <Button block type="link" onClick={() => expandRowWaitlistedPublished(record.id)}>
-              {record.waitlist_users?.length} Wait-list <DownOutlined />
+              {record.waitlist_users?.length} Waitlist <DownOutlined />
             </Button>
           )
         ) : expandedWaitlistedUnpublishedRowKeys.includes(record.id) ? (
           <Button block type="link" onClick={() => collapseRowWaitlistedUnpublished(record.id)}>
-            {record.waitlist_users?.length} Wait-list <UpOutlined />
+            {record.waitlist_users?.length} Waitlist <UpOutlined />
           </Button>
         ) : (
           <Button block type="link" onClick={() => expandRowWaitlistedUnpublished(record.id)}>
-            {record.waitlist_users?.length} Wait-list <DownOutlined />
+            {record.waitlist_users?.length} Waitlist <DownOutlined />
           </Button>
         )}
       </Col>
@@ -1185,7 +1185,7 @@ const Courses = ({ history }) => {
                               expandedRowRender: renderWaitlistUserList,
                               expandRowByClick: true,
                               expandIconColumnIndex: -1,
-                              expandedRowKeys: expandedUnpublishedRowKeys,
+                              expandedRowKeys: expandedWaitlistedUnpublishedRowKeys,
                             }}
                           />
                         )}
