@@ -675,7 +675,7 @@ const Courses = ({ history }) => {
     </Row>
   );
 
-  const generateWaitlistedCourseColumns = (published) => {
+  const generateCourseColumns = (published = false, waitlisted = false) => {
     const initialColumns = [
       {
         title: 'Course Name',
@@ -705,68 +705,17 @@ const Courses = ({ history }) => {
         render: renderCoursePrice,
       },
       {
-        title: published ? (
-          <Button ghost type="primary" onClick={() => toggleExpandAllWaitlistedPublished()}>
-            {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
-        ) : (
-          <Button ghost type="primary" onClick={() => toggleExpandAllWaitlistedUnpublished()}>
-            {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
-        ),
-        width: !xl ? '200px' : '310px',
-        align: 'right',
-        render: renderWaitlistedCourseActions,
-      },
-    ];
-
-    if (creatorMemberTags.length > 0) {
-      const tagColumnPosition = 1;
-      const tagColumnObject = {
-        title: 'Viewable By',
-        key: 'tag',
-        dataIndex: 'tag',
-        width: '110px',
-        render: (text, record) => <TagListPopup tags={record.tag} />,
-      };
-
-      initialColumns.splice(tagColumnPosition, 0, tagColumnObject);
-    }
-
-    return initialColumns;
-  };
-
-  const generateCourseColumns = (published) => {
-    const initialColumns = [
-      {
-        title: 'Course Name',
-        dataIndex: 'name',
-        key: 'name',
-        render: renderCourseName,
-      },
-      {
-        title: 'Duration',
-        dataIndex: 'start_time',
-        key: 'start_time',
-        width: !xl ? '80px' : '120px',
-        render: renderCourseDuration,
-      },
-      {
-        title: 'Course Content',
-        dataIndex: 'modules',
-        key: 'modules',
-        width: '170px',
-        render: renderCourseContents,
-      },
-      {
-        title: 'Price',
-        dataIndex: 'price',
-        key: 'price',
-        width: '90px',
-        render: renderCoursePrice,
-      },
-      {
-        title: published ? (
+        title: waitlisted ? (
+          published ? (
+            <Button ghost type="primary" onClick={() => toggleExpandAllWaitlistedPublished()}>
+              {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          ) : (
+            <Button ghost type="primary" onClick={() => toggleExpandAllWaitlistedUnpublished()}>
+              {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          )
+        ) : published ? (
           <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
             {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
@@ -777,7 +726,7 @@ const Courses = ({ history }) => {
         ),
         width: !xl ? '200px' : '310px',
         align: 'right',
-        render: renderCourseActions,
+        render: waitlisted ? renderWaitlistedCourseActions : renderCourseActions,
       },
     ];
 
@@ -1108,7 +1057,7 @@ const Courses = ({ history }) => {
                           <Table
                             size="small"
                             sticky={true}
-                            columns={generateWaitlistedCourseColumns(true)}
+                            columns={generateCourseColumns(true, true)}
                             data={courses?.filter((course) => course.is_published && course.waitlist)}
                             rowKey={(record) => record.id}
                             expandable={{
@@ -1138,7 +1087,7 @@ const Courses = ({ history }) => {
                       <Table
                         size="small"
                         sticky={true}
-                        columns={generateCourseColumns(true)}
+                        columns={generateCourseColumns(true, false)}
                         data={courses?.filter((course) => course.is_published && !course.waitlist)}
                         rowKey={(record) => record.id}
                         expandable={{
@@ -1178,7 +1127,7 @@ const Courses = ({ history }) => {
                           <Table
                             size="small"
                             sticky={true}
-                            columns={generateWaitlistedCourseColumns(false)}
+                            columns={generateCourseColumns(false, true)}
                             data={courses?.filter((course) => !course.is_published && course.waitlist)}
                             rowKey={(record) => record.id}
                             expandable={{
@@ -1209,7 +1158,8 @@ const Courses = ({ history }) => {
                       <Table
                         size="small"
                         sticky={true}
-                        columns={generateCourseColumns(false)}
+                        // columns={generateCourseColumns(false)}
+                        columns={generateCourseColumns(false, false)}
                         data={courses?.filter((course) => !course.is_published && !course.waitlist)}
                         rowKey={(record) => record.id}
                         expandable={{
