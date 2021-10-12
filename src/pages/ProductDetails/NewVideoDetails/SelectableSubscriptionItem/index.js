@@ -65,7 +65,7 @@ const SelectableSubscriptionItem = ({
             <Col flex="1 1 auto">
               <Text className={styles.subscriptionName}>{subscription?.name}</Text>
             </Col>
-            <Col flex="0 0 90px" className={styles.textAlignRight}>
+            <Col flex="0 0 64px" className={styles.textAlignRight}>
               {subscription?.total_price > 0 ? (
                 <>
                   <Text className={styles.subscriptionCurrency}>{subscription?.currency?.toUpperCase() ?? ''} </Text>
