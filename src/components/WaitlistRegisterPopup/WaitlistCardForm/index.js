@@ -241,8 +241,8 @@ const WaitlistCardForm = () => {
           </Paragraph>
         ) : (
           <Paragraph>
-            You will need to enter your card details below.{' '}
-            <Text strong>Rest assured that you will not be charged anything.</Text>{' '}
+            You will need to enter your card details below. Rest assured that{' '}
+            <Text strong>you will NOT be charged anything.</Text>{' '}
           </Paragraph>
         )}
         <Paragraph>
