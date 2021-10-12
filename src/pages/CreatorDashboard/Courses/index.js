@@ -217,8 +217,7 @@ const Courses = ({ history }) => {
           <>
             <Paragraph>The course is now available for purchase and the wait-list has been closed.</Paragraph>
             <Paragraph>
-              We have sent notification emails to users who have joined the wait-list so they can come and purchase the
-              course
+              We've also notified the users in the wait-list that this course is available for purchase on your website.
             </Paragraph>
           </>
         );
