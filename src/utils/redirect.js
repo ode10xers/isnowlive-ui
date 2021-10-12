@@ -75,7 +75,6 @@ export const redirectToPluginVideoDetailsPage = (video) => {
     video_id: video.external_id,
   })}`;
   window.open(targetUrl, '_self');
-  // window.location.assign(targetUrl);
 };
 
 export const redirectToCoursesPage = (course) => {
@@ -86,7 +85,9 @@ export const redirectToCoursesPage = (course) => {
   }
 
   const baseUrl = generateUrlFromUsername(course.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}${course.is_dummy ? Routes.previewPages.root : ''}/c/${course.id}`;
+  const targetUrl = `${baseUrl}${course.is_dummy ? Routes.previewPages.root : ''}${generatePath(Routes.courseDetails, {
+    course_id: course.internal_id,
+  })}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
@@ -136,4 +137,19 @@ export const redirectToMembershipPage = (subscription) => {
   // } else {
   //   window.open(targetUrl);
   // }
+};
+
+export const redirectToPluginMembershipDetailsPage = (subs) => {
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
+
+  const baseUrl = generateUrlFromUsername(subs.creator_username || urlUsername);
+
+  const targetUrl = `${baseUrl}${Routes.plugins.root}${generatePath(Routes.plugins.details.subscriptions, {
+    membership_id: subs.external_id,
+  })}`;
+  window.open(targetUrl, '_self');
 };

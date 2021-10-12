@@ -63,7 +63,6 @@ const Videos = () => {
 
   useEffect(() => {
     fetchCreatorVideos();
-
     document.body.style.background = 'var(--video-widget-background-color, transparent)';
   }, [fetchCreatorVideos]);
 
@@ -190,6 +189,16 @@ const Videos = () => {
     }
   };
 
+  const signInButton = userDetails ? (
+    <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
+      My Dashboard
+    </Button>
+  ) : (
+    <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
+      Sign In/Up
+    </Button>
+  );
+
   const groupFilters = (
     <Row gutter={[8, 12]} className={styles.filterSection}>
       <Col xs={12}>
@@ -203,15 +212,7 @@ const Videos = () => {
         </Button>
       </Col>
       <Col xs={12} className={styles.textAlignRight}>
-        {userDetails ? (
-          <Button className={styles.signupButton} type="primary" onClick={handleSignInClicked}>
-            My Dashboard
-          </Button>
-        ) : (
-          <Button className={styles.signupButton} type="primary" icon={<UserOutlined />} onClick={handleSignInClicked}>
-            Sign In/Up
-          </Button>
-        )}
+        {signInButton}
       </Col>
       {showFilter && (
         <Col xs={24} className={styles.filterContainer}>

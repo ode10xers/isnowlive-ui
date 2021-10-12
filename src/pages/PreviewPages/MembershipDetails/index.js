@@ -34,6 +34,7 @@ import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 
+// TODO: This is an old version of UI. Change this to use new version
 const MembershipDetailPreview = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [creatorProfile, setCreatorProfile] = useState(null);

@@ -323,8 +323,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               rules={
                 !selectedPass
                   ? validationRules.numberValidation(
-                      `Please input valid price (min. ${record.price})`,
-                      record.price,
+                      `Please input valid price (min. ${record.total_price})`,
+                      record.total_price,
                       false
                     )
                   : []
@@ -1054,7 +1054,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         if (classDetails.pay_what_you_want) {
           flexiblePaymentDetails = {
             enabled: true,
-            minimumPrice: classDetails.price,
+            minimumPrice: classDetails.total_price,
           };
         }
 

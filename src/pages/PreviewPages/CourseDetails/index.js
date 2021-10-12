@@ -129,7 +129,9 @@ const CourseDetailPreview = ({ match, history }) => {
     if (match.params.course_id && creatorProfile) {
       const templateData = creatorProfile?.profile?.category ?? 'YOGA';
 
-      const targetCourse = dummy[templateData].COURSES.find((course) => course.id === match.params.course_id);
+      const targetCourse = dummy[templateData].COURSES.find(
+        (course) => course.internal_id === parseInt(match.params.course_id)
+      );
 
       if (targetCourse) {
         fetchCourseContentDetails(targetCourse, templateData);

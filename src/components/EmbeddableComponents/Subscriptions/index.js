@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 import { Row, Col, Spin, Button, Typography, Divider, message } from 'antd';
 import { CaretRightOutlined, CheckCircleFilled, UserOutlined } from '@ant-design/icons';
 
@@ -16,9 +17,11 @@ import {
   getUsernameFromUrl,
   isUnapprovedUserError,
   generateUrlFromUsername,
+  convertHexToRGB,
+  isBrightColorShade,
 } from 'utils/helper';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
-import { redirectToMembershipPage } from 'utils/redirect';
+import { redirectToPluginMembershipDetailsPage } from 'utils/redirect';
 import { convertHexToHSL, formatHSLStyleString } from 'utils/colors';
 
 import { getAuthCookie } from 'services/authCookie';
@@ -40,9 +43,11 @@ const NewSubscriptionItem = ({ subscription = null, onBuy, onDetails }) => {
 
   const colorObj = {
     '--primary-color': formatHSLStyleString(h, s, l),
-    '--primary-color-light': formatHSLStyleString(h, s, l + 40 * lightnessMultiplier),
+    '--primary-color-light': formatHSLStyleString(h, s, l + 10),
+    '--primary-color-lighter': formatHSLStyleString(h, s, l + 40 * lightnessMultiplier),
     '--primary-color-lightest': formatHSLStyleString(h, s, l + 50 * lightnessMultiplier),
-    '--primary-color-dark': formatHSLStyleString(h, s, l - 25),
+    '--primary-color-dark': formatHSLStyleString(h, s, l - 20),
+    '--primary-color-darkest': formatHSLStyleString(h, s, l - 35),
   };
 
   return (
@@ -61,10 +66,10 @@ const NewSubscriptionItem = ({ subscription = null, onBuy, onDetails }) => {
             <Col xs={24}>
               <CheckCircleFilled className={styles.subscriptionIcon} /> {subscription?.product_credits ?? 0} Credits
             </Col>
-            <Col xs={24}>
+            {/* <Col xs={24}>
               <CheckCircleFilled className={styles.subscriptionIcon} /> Usable on{' '}
               {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}
-            </Col>
+            </Col> */}
             <Col xs={24}>
               <CheckCircleFilled className={styles.subscriptionIcon} /> Renewed every{' '}
               {generateSubscriptionDuration(subscription, true)}
@@ -72,7 +77,16 @@ const NewSubscriptionItem = ({ subscription = null, onBuy, onDetails }) => {
           </Row>
         </Col>
         <Col xs={24} className={styles.textAlignCenter}>
-          <Button className={styles.subscriptionBuyButton} type="primary" onClick={() => onBuy(subscription)}>
+          <Button
+            block
+            size="large"
+            className={classNames(
+              styles.subscriptionBuyButton,
+              isBrightColorShade(convertHexToRGB(subscriptionColor)) ? styles.darkText : styles.lightText
+            )}
+            type="primary"
+            onClick={() => onBuy(subscription)}
+          >
             BUY NOW <Divider type="vertical" className={styles.subscriptionBuyDivider} />{' '}
             {subscription?.currency?.toUpperCase() ?? ''} {subscription?.total_price}
           </Button>
@@ -173,6 +187,10 @@ const Subscriptions = () => {
     }
   };
 
+  const handleDetailsClicked = (subs) => {
+    redirectToPluginMembershipDetailsPage(subs);
+  };
+
   const authModalCallback = () => {
     if (selectedSubscription) {
       setIsBuying(true);
@@ -267,10 +285,10 @@ const Subscriptions = () => {
   //#region Start of UI Components
 
   const subscriptionList = (
-    <Row gutter={[8, 24]}>
+    <Row gutter={[8, 24]} align="stretch">
       {subscriptions.map((subs) => (
         <Col xs={24} sm={12} md={8} lg={6} key={subs.external_id}>
-          <NewSubscriptionItem subscription={subs} onBuy={handleBuyClicked} onDetails={redirectToMembershipPage} />
+          <NewSubscriptionItem subscription={subs} onBuy={handleBuyClicked} onDetails={handleDetailsClicked} />
         </Col>
       ))}
     </Row>

@@ -810,3 +810,61 @@ export const showTagOptionsHelperModal = (productName = 'session') => {
     afterClose: resetBodyStyle,
   });
 };
+
+export const showWaitlistHelperModal = (productName = 'course') => {
+  Modal.info({
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'What is wait-list?',
+    width: 640,
+    content: (
+      <>
+        <Paragraph>
+          The wait-list feature helps you measure the interest of your customers in this {productName}. You will be able
+          to see how many people are committed to buying this {productName} under the wait-list.
+        </Paragraph>
+        <Paragraph>
+          Once you've decided that enough people have joined the wait-list, you can open the {productName} registrations
+          (and close the wait-list) and the wait-listed users will be notified about this so they can come and purchase
+          the {productName}.
+        </Paragraph>
+        <Paragraph>You cannot re-open the wait-list once you close it</Paragraph>
+      </>
+    ),
+    okText: 'Got it',
+  });
+};
+
+export const showWaitlistJoinedModal = (productName = 'course') => {
+  const username = getUsernameFromUrl();
+
+  Modal.success({
+    mask: true,
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'Spot reserved',
+    content: (
+      <>
+        <Paragraph>You have successfully joined the wait-list for this {productName}.</Paragraph>
+        <Paragraph>
+          We will notify you via email when the creator opens the {productName}, and then you can purchase this{' '}
+          {productName}.
+        </Paragraph>
+      </>
+    ),
+    okText: 'Go to dashboard',
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
+  });
+};

@@ -48,7 +48,8 @@ const PaymentRedirectVerify = lazy(() => import('pages/PaymentRedirectVerify'));
 const PaymentVerification = lazy(() => import('pages/PaymentVerification'));
 const PaymentRetry = lazy(() => import('pages/PaymentRetry'));
 const SessionReschedule = lazy(() => import('pages/SessionReschedule'));
-const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
+// const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
+const NewMembershipDetails = lazy(() => import('pages/ProductDetails/NewMembershipDetails'));
 // const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
 const NewVideoDetails = lazy(() => import('pages/ProductDetails/NewVideoDetails'));
 const CourseDetails = lazy(() => import('pages/ProductDetails/CourseDetails'));
@@ -72,6 +73,7 @@ const PluginPages = lazy(() => import('pages/PluginPages'));
 
 // const CookieConsentPopup = lazy(() => import('components/CookieConsentPopup'));
 const PaymentPopup = lazy(() => import('components/PaymentPopup'));
+const WaitlistRegisterPopup = lazy(() => import('components/WaitlistRegisterPopup'));
 const SendCustomerEmailModal = lazy(() => import('components/SendCustomerEmailModal'));
 
 function RouteWithLayout({ layout, component, ...rest }) {
@@ -233,6 +235,7 @@ function App() {
   return (
     <Suspense fallback={<div> Loading... </div>}>
       <PaymentPopup />
+      <WaitlistRegisterPopup />
       {userDetails && userDetails.is_creator && <SendCustomerEmailModal />}
       <Router>
         {isWidget && isReadyToLoad && publishedWidgets.includes(widgetType) ? (
@@ -269,10 +272,10 @@ function App() {
               component={MembershipDetailPreview}
             />
             <RouteWithLayout
-              layout={MobileLayout}
+              layout={NavbarFullWidthLayout}
               exact
               path={Routes.membershipDetails}
-              component={MembershipDetails}
+              component={NewMembershipDetails}
             />
 
             <RouteWithLayout
