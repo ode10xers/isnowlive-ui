@@ -31,22 +31,15 @@ import { showErrorModal } from 'components/Modals/modals';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { isInIframeWidget } from 'utils/widgets';
 import { redirectToInventoryPage } from 'utils/redirect';
+import { generateUrlFromUsername, generateQueryString } from 'utils/url';
 import {
   getCourseDocumentContentCount,
   getCourseOrderSessionContentCount,
   getCourseOrderVideoContentCount,
 } from 'utils/course';
-import {
-  getDuration,
-  isAPISuccess,
-  isUnapprovedUserError,
-  generateQueryString,
-  preventDefaults,
-  generateUrlFromUsername,
-} from 'utils/helper';
+import { getDuration, isAPISuccess, preventDefaults, isUnapprovedUserError } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -664,7 +657,7 @@ const DashboardPage = ({ history }) => {
         <Space direction="vertical" align="middle" className={styles.w100}>
           <Title level={4}> Your Purchased Sessions </Title>
           <div className={styles.sessionsContainer}>
-            {isMobileDevice ? (
+            {!md ? (
               <Spin spinning={isSessionLoading}>
                 {upcomingSessions.length > 0 ? (
                   <Row gutter={[10, 10]}>{upcomingSessions.map(renderMobileSessionItem)}</Row>
@@ -715,7 +708,7 @@ const DashboardPage = ({ history }) => {
         <Space direction="vertical" className={styles.w100}>
           <Title level={4}> Your Purchased Courses </Title>
           <div className={styles.coursesContainer}>
-            {isMobileDevice ? (
+            {!md ? (
               <Spin spinning={isCourseLoading}>
                 {courses.length > 0 ? (
                   <Row gutter={[8, 8]}>{courses.map(renderMobileCourseItem)}</Row>

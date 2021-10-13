@@ -1,39 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Form, Input, Typography, Tag, Card, message, InputNumber } from 'antd';
+import { Row, Col, Button, Form, Input, Typography, Tag, Grid, Card, InputNumber, message } from 'antd';
 import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
-import Loader from 'components/Loader';
 import Table from 'components/Table';
+import Loader from 'components/Loader';
 import SignInForm from 'components/SignInForm';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
   showErrorModal,
+  showAlreadyBookedModal,
+  showBookSingleSessionSuccessModal,
   showBookSessionWithPassSuccessModal,
   showPurchasePassAndBookSessionSuccessModal,
-  showBookSingleSessionSuccessModal,
-  showAlreadyBookedModal,
   showBookSessionWithSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
-import { isMobileDevice } from 'utils/device';
-import {
-  getUsernameFromUrl,
-  generateUrlFromUsername,
-  isUnapprovedUserError,
-  isAPISuccess,
-  paymentSource,
-  orderType,
-  productType,
-} from 'utils/helper';
+import { isUnapprovedUserError, isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl, generateUrlFromUsername } from 'utils/url';
+import { paymentSource, orderType, productType } from 'utils/constants';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
@@ -43,6 +36,7 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './styles.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 const { Item } = Form;
 
 const {
@@ -59,7 +53,6 @@ const formInitialValues = {
   pwyw_price: null,
 };
 
-// TODO: Migrate from using isMobileDevice here
 const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDetails = false, fullWidth = false }) => {
   const {
     state: { userDetails },
@@ -67,6 +60,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     logOut,
     showPaymentPopup,
   } = useGlobalContext();
+  const { lg } = useBreakpoint();
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -1158,9 +1152,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         {shouldShowSignInForm ? (
           <Col
             xs={24}
-            lg={fullWidth ? 24 : { span: 14, offset: isMobileDevice ? 1 : 0 }}
-            order={isMobileDevice ? 2 : 1}
-            className={isMobileDevice ? styles.mt20 : styles.mt50}
+            lg={fullWidth ? 24 : { span: 14, offset: !lg ? 1 : 0 }}
+            order={!lg ? 2 : 1}
+            className={!lg ? styles.mt20 : styles.mt50}
           >
             <SignInForm user={user} hideSignInForm={hideSignInForm} />
           </Col>
@@ -1168,9 +1162,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
           <>
             <Col
               xs={24}
-              lg={fullWidth ? 24 : { span: 14, offset: isMobileDevice ? 1 : 0 }}
-              order={isMobileDevice ? 2 : 1}
-              className={isMobileDevice ? styles.mt20 : styles.mt50}
+              lg={fullWidth ? 24 : { span: 14, offset: !lg ? 1 : 0 }}
+              order={!lg ? 2 : 1}
+              className={!lg ? styles.mt20 : styles.mt50}
             >
               <div className={styles.sessionRegistrationWrapper}>
                 <Row>
@@ -1280,7 +1274,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                               Purchased pass(es) usable for this{' '}
                               {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}
                             </Title>
-                            {isMobileDevice ? (
+                            {!lg ? (
                               userPasses.map(renderUserPassItem)
                             ) : (
                               <Table
@@ -1334,7 +1328,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                                   {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                                   {classDetails.type === 'NORMAL' ? 'class' : 'time slot'}
                                 </Title>
-                                {isMobileDevice ? (
+                                {!lg ? (
                                   availablePasses.map(renderPassItem)
                                 ) : (
                                   <Table
@@ -1400,7 +1394,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                                 <Col xs={24}>
                                   <Paragraph>
                                     Please select the date & time for the class you wish to attend
-                                    {isMobileDevice ? '' : ', in the calendar on the side'}
+                                    {!lg ? '' : ', in the calendar on the side'}
                                   </Paragraph>
                                 </Col>
                               )}
@@ -1416,9 +1410,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             {!isInventoryDetails && (
               <Col
                 xs={24}
-                lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
-                order={isMobileDevice ? 1 : 2}
-                className={isMobileDevice ? styles.mt20 : styles.mt50}
+                lg={{ span: 9, offset: !lg ? 0 : 1 }}
+                order={!lg ? 1 : 2}
+                className={!lg ? styles.mt20 : styles.mt50}
               >
                 <SessionInventorySelect
                   inventories={

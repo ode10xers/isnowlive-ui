@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, message, Typography } from 'antd';
+import { Row, Col, Typography, Grid, message } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
@@ -13,22 +13,18 @@ import HostDetails from 'components/HostDetails';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
-import SessionRegistration from 'components/SessionRegistration';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+import SessionRegistration from 'components/SessionRegistration';
 
-import { isMobileDevice } from 'utils/device';
-import {
-  generateUrlFromUsername,
-  isAPISuccess,
-  reservedDomainName,
-  isUnapprovedUserError,
-  getUsernameFromUrl,
-} from 'utils/helper';
 import dateUtil from 'utils/date';
+import { reservedDomainName } from 'utils/constants';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 const {
   formatDate: { getTimeDiff },
 } = dateUtil;
@@ -36,6 +32,8 @@ const {
 const SoldOutImage = require('assets/images/sold_out.png');
 
 const InventoryDetails = ({ match, history }) => {
+  const { lg } = useBreakpoint();
+
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
@@ -127,7 +125,7 @@ const InventoryDetails = ({ match, history }) => {
           )}
         </Col>
         <Col xs={24} lg={14}>
-          <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
+          <Title level={!lg ? 2 : 1}>{session?.name}</Title>
         </Col>
         <Col xs={24} lg={10}>
           <SessionDate schedule={session} />
@@ -188,7 +186,7 @@ const InventoryDetails = ({ match, history }) => {
             )}
           </Row>
         </Col>
-        <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : undefined}>
+        <Col xs={24} lg={{ span: 8, offset: 1 }} className={!lg ? styles.mt20 : undefined}>
           <HostDetails host={creator} />
         </Col>
         {session?.is_course && courses ? (

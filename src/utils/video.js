@@ -1,5 +1,5 @@
 import parseQueryString from 'utils/parseQueryString';
-import { generateQueryString } from './helper';
+import { generateQueryString } from './url';
 
 export const getYoutubeVideoDetails = async (videoUrl) => {
   const queryStrings = generateQueryString({

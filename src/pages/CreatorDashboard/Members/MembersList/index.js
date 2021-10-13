@@ -26,14 +26,15 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, tagColors } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
+import { tagColors } from 'utils/colors';
 
 import styles from './styles.module.scss';
 
 const { Text, Title, Paragraph } = Typography;
-const { Search } = Input;
 const { RangePicker } = DatePicker;
 const { useBreakpoint } = Grid;
+const { Search } = Input;
 
 const memberViews = {
   ACTIVE: {

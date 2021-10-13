@@ -9,8 +9,8 @@ import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { videoSourceType } from 'utils/constants';
 import { redirectToVideosPage } from 'utils/redirect';
-import { videoSourceType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 

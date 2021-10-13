@@ -15,19 +15,14 @@ import SessionCards from 'components/SessionCards';
 import DocumentEmbed from 'components/DocumentEmbed';
 import CreatorProfile from 'components/CreatorProfile';
 import DefaultImage from 'components/Icons/DefaultImage';
-import { showErrorModal, showWarningModal } from 'components/Modals/modals';
 import NextCourseContentButton from 'components/NextCourseContentButton';
+import { showErrorModal, showWarningModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
+import { reservedDomainName, videoSourceType } from 'utils/constants';
+import { isAPISuccess, isUnapprovedUserError, preventDefaults } from 'utils/helper';
 import { localStorageActiveCourseContentDataKey, localStorageAttendeeCourseDataKey } from 'utils/course';
-import {
-  isAPISuccess,
-  reservedDomainName,
-  isUnapprovedUserError,
-  videoSourceType,
-  preventDefaults,
-} from 'utils/helper';
 
 import styles from './style.module.scss';
 

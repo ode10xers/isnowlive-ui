@@ -25,22 +25,12 @@ import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
 import { showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile } from 'utils/colors';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
-import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
-import {
-  isAPISuccess,
-  orderType,
-  productType,
-  videoSourceType,
-  paymentSource,
-  isUnapprovedUserError,
-  preventDefaults,
-  deepCloneObject,
-  isBrightColorShade,
-  convertHexToRGB,
-} from 'utils/helper';
+import { orderType, productType, videoSourceType, paymentSource } from 'utils/constants';
+import { generateColorPalletteForProfile, isBrightColorShade, convertHexToRGB } from 'utils/colors';
+import { isAPISuccess, preventDefaults, deepCloneObject, isUnapprovedUserError } from 'utils/helper';
+import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 
 import { useGlobalContext } from 'services/globalContext';
 

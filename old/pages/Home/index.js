@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Routes from 'routes';
+
 import ProfilePreview from 'pages/ProfilePreview';
 
-import { getUsernameFromUrl, reservedDomainName } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/helper';
 
 const Home = () => {
   const history = useHistory();

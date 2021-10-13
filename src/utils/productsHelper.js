@@ -1,4 +1,4 @@
-import { courseType } from './helper';
+import { courseType } from './constants';
 
 /* Products = all the sellable entity in our app - sessions, passes, courses etc
   This is the helper file to do different common things related to product here */

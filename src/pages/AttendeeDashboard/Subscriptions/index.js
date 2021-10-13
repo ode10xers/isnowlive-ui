@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Row, Col, Card, Button, Typography, Space, Drawer, Collapse, Popconfirm } from 'antd';
+import { Row, Col, Card, Button, Typography, Space, Drawer, Collapse, Grid, Popconfirm } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -11,19 +11,21 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isAPISuccess, orderType, isUnapprovedUserError, preventDefaults } from 'utils/helper';
+import { orderType } from 'utils/constants';
 import { generateBaseCreditsText } from 'utils/subscriptions';
-import { isMobileDevice } from 'utils/device';
+import { isAPISuccess, isUnapprovedUserError, preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 const {
   formatDate: { toLongDateWithDayTime, toShortDateWithYear },
 } = dateUtil;
 
 const Subscriptions = () => {
+  const { lg } = useBreakpoint();
   const [isLoading, setIsLoading] = useState([]);
   const [subscriptionOrders, setSubscriptionOrders] = useState({
     active: [],
@@ -447,7 +449,7 @@ const Subscriptions = () => {
             <Text> Credits details: </Text>
           </Col>
 
-          <Col xs={24} className={isMobileDevice ? undefined : styles.subSection}>
+          <Col xs={24} className={!lg ? undefined : styles.subSection}>
             <Space align="left">
               <Row gutter={[8, 8]}>
                 <Col xs={24}>
@@ -469,7 +471,7 @@ const Subscriptions = () => {
               <Col xs={24}>
                 <Text> Usable for products: </Text>
               </Col>
-              <Col xs={24} className={isMobileDevice ? undefined : styles.subSection}>
+              <Col xs={24} className={!lg ? undefined : styles.subSection}>
                 <Space direction="horizontal">
                   {Object.entries(subscription?.products).map(([key, val]) => (
                     <Button
@@ -491,7 +493,7 @@ const Subscriptions = () => {
                 <Title level={5}> Usage History </Title>
               </Col>
               <Col xs={24}>
-                {isMobileDevice ? (
+                {!lg ? (
                   <Row gutter={[8, 8]} justify="center">
                     {renderMobileSubscriptionUsageList(subscription.usage_details, isActive)}
                   </Row>
@@ -608,7 +610,7 @@ const Subscriptions = () => {
         <Col xs={24}>
           <Collapse defaultActiveKey="active">
             <Panel header={<Title level={5}> Active </Title>} key="active">
-              {isMobileDevice ? (
+              {!lg ? (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
                     <Button block ghost type="primary" onClick={() => toggleExpandAllActiveRow()}>
@@ -637,7 +639,7 @@ const Subscriptions = () => {
               )}
             </Panel>
             <Panel header={<Title level={5}> Expired </Title>} key="expired">
-              {isMobileDevice ? (
+              {!lg ? (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
                     <Col xs={24}>
@@ -674,7 +676,7 @@ const Subscriptions = () => {
         title={`${selectedSubscription?.subscription_name} ${selectedProductDetailsKey?.toLowerCase()} details`}
         onClose={handleDrawerClose}
         visible={detailsDrawerVisible}
-        width={isMobileDevice ? 320 : 520}
+        width={!lg ? 320 : 520}
       >
         {renderProductDetails()}
       </Drawer>

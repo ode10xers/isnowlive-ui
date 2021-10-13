@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 // import { useHistory } from 'react-router';
 import classNames from 'classnames';
-import { Form, Typography, Button, Row, Col, Input, message, Spin } from 'antd';
+import { Form, Typography, Button, Row, Col, Input, Grid, message, Spin } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -9,9 +9,9 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
-import { isMobileDevice } from 'utils/device';
 
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { gtmTriggerEvents, customNullValue, pushToDataLayer } from 'services/integrations/googleTagManager';
@@ -20,13 +20,15 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './style.module.scss';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 const { creator } = mixPanelEventTags;
 
 // TODO: This page still have some old logic (need to cleanup)
 // The old logic is related to dashboard checking, etc
 const Profile = () => {
-  // const history = useHistory();
   const { setUserDetails } = useGlobalContext();
+  const { lg } = useBreakpoint();
+
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
   const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
@@ -141,12 +143,7 @@ const Profile = () => {
           <div className={styles.formHeadingText}>Name your Site</div>
           <div className={styles.formHeadingSubtext}>Set a public URL for your website</div>
           <div className={styles.formContent}>
-            <Form
-              form={form}
-              onFinish={onFinish}
-              labelAlign={isMobileDevice ? 'left' : 'right'}
-              scrollToFirstError={true}
-            >
+            <Form form={form} onFinish={onFinish} labelAlign={!lg ? 'left' : 'right'} scrollToFirstError={true}>
               <Form.Item className={styles.nameInputWrapper}>
                 <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
                   <Input placeholder="First Name" />

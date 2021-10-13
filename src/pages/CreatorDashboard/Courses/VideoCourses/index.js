@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse, Tag } from 'antd';
+import { Row, Col, Tooltip, Typography, Button, Card, Grid, Empty, Collapse, Tag } from 'antd';
 import {
   MailOutlined,
   CopyOutlined,
@@ -14,13 +14,14 @@ import Table from 'components/Table';
 import TagListPopup from 'components/TagListPopup';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+import { copyToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { copyToClipboard, generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 
 import styles from './styles.module.scss';
 
 const { Text, Title } = Typography;
+const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 
 const {
@@ -37,6 +38,7 @@ const VideoCourses = ({
   showSendEmailModal,
   creatorMemberTags,
 }) => {
+  const { lg } = useBreakpoint();
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
 
@@ -370,7 +372,7 @@ const VideoCourses = ({
       {videoCourses?.length > 0 ? (
         <Collapse defaultActiveKey="published">
           <Panel header={<Title level={5}> Published </Title>} key="published">
-            {isMobileDevice ? (
+            {!lg ? (
               <Row gutter={[8, 16]}>
                 <Col xs={24}>
                   <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
@@ -396,7 +398,7 @@ const VideoCourses = ({
             )}
           </Panel>
           <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
-            {isMobileDevice ? (
+            {!lg ? (
               <Row gutter={[8, 16]}>
                 <Col xs={24}>
                   <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>

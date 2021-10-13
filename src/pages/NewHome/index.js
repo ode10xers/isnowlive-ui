@@ -4,7 +4,8 @@ import { useHistory } from 'react-router-dom';
 import Routes from 'routes';
 import DynamicProfile from 'pages/DynamicProfile';
 
-import { getUsernameFromUrl, reservedDomainName } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 
 const NewHome = () => {
   const history = useHistory();

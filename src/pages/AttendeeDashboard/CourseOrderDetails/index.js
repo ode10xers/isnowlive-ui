@@ -3,13 +3,28 @@ import { generatePath } from 'react-router';
 import ReactHtmlParser from 'react-html-parser';
 import moment from 'moment';
 
-import { Row, Col, Image, Collapse, Button, Divider, List, Typography, Spin, Popover, Space, Card, Tag } from 'antd';
 import {
-  ArrowLeftOutlined,
+  Row,
+  Col,
+  Image,
+  Collapse,
+  Button,
+  Divider,
+  List,
+  Typography,
+  Spin,
+  Popover,
+  Grid,
+  Space,
+  Card,
+  Tag,
+} from 'antd';
+import {
   DownOutlined,
-  VideoCameraOutlined,
-  PlayCircleOutlined,
   FilePdfOutlined,
+  ArrowLeftOutlined,
+  PlayCircleOutlined,
+  VideoCameraOutlined,
 } from '@ant-design/icons';
 
 import Routes from 'routes';
@@ -19,28 +34,22 @@ import { showErrorModal } from 'components/Modals/modals';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+import { generateUrlFromUsername } from 'utils/url';
 import { redirectToInventoryPage } from 'utils/redirect';
-import {
-  isAPISuccess,
-  isUnapprovedUserError,
-  preventDefaults,
-  generateUrlFromUsername,
-  deepCloneObject,
-  videoSourceType,
-} from 'utils/helper';
+import { attendeeProductOrderTypes, videoSourceType } from 'utils/constants';
+import { isAPISuccess, preventDefaults, deepCloneObject, isUnapprovedUserError } from 'utils/helper';
 import {
   getCourseDocumentContentCount,
-  getCourseOrderSessionContentCount,
   getCourseOrderVideoContentCount,
-  localStorageAttendeeCourseDataKey,
   storeActiveCourseContentInfoInLS,
+  getCourseOrderSessionContentCount,
+  localStorageAttendeeCourseDataKey,
 } from 'utils/course';
-import { attendeeProductOrderTypes } from 'utils/constants';
 
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 
 const {
@@ -49,6 +58,8 @@ const {
 } = dateUtil;
 
 const CourseOrderDetails = ({ match, history }) => {
+  const { lg } = useBreakpoint();
+
   const courseOrderID = match.params.course_order_id;
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrderDetails, setCourseOrderDetails] = useState(null);
@@ -411,7 +422,7 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderCourseCurriculums = (courseModules = []) => {
     return courseModules.map((courseModule) => (
       <Panel key={courseModule.name} header={<Text className={styles.moduleHeader}> {courseModule.name} </Text>}>
-        {isMobileDevice ? (
+        {!lg ? (
           <Row gutter={[8, 8]} justify="center" className={styles.mobileCourseModuleContainer}>
             {courseModule?.module_content?.map((content) =>
               renderMobileModuleContent(courseModule.module_idx, content)

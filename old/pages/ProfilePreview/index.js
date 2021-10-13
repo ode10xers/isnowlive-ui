@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+
 import { Typography, Button, Row, Col, Tabs, Card, message, Radio, Empty } from 'antd';
 import {
-  TagsOutlined,
-  VideoCameraOutlined,
-  GlobalOutlined,
-  ArrowLeftOutlined,
-  EditOutlined,
-  PlayCircleOutlined,
   BookOutlined,
+  TagsOutlined,
+  EditOutlined,
+  GlobalOutlined,
   ScheduleOutlined,
+  ArrowLeftOutlined,
+  PlayCircleOutlined,
+  VideoCameraOutlined,
 } from '@ant-design/icons';
+
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
 
@@ -27,9 +29,9 @@ import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
 import AuthModal from 'components/AuthModal';
 import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 import {
-  generateUrlFromUsername,
   isAPISuccess,
   parseEmbedCode,
   paymentSource,
@@ -37,11 +39,11 @@ import {
   productType,
   isUnapprovedUserError,
 } from 'utils/helper';
+import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import dateUtil from 'utils/date';
+import { generateUrlFromUsername } from 'utils/url';
 import { formatPassesData, getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
-import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 import { useGlobalContext } from 'services/globalContext';

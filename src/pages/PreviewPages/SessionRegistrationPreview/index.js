@@ -14,7 +14,7 @@ import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
@@ -41,6 +41,7 @@ const formInitialValues = {
 
 // NOTE : Mostly similar to SessionRegistration Component
 // The difference is buy logic is removed, and no fetching user passes/subscriptions
+// TODO: Update this later to match new design
 const SessionRegistrationPreview = ({
   availablePasses = [],
   classDetails,

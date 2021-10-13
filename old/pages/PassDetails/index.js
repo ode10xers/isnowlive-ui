@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Row, Col, Typography, Space, Divider, Card, Button, message } from 'antd';
+import { Row, Col, Typography, Space, Divider, Card, Button, Grid, message } from 'antd';
 import classNames from 'classnames';
 
 import apis from 'apis';
@@ -11,25 +11,20 @@ import AuthModal from 'components/AuthModal';
 import CreatorProfile from 'components/CreatorProfile';
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
-import { isMobileDevice } from 'utils/device';
-import {
-  isAPISuccess,
-  reservedDomainName,
-  orderType,
-  productType,
-  isUnapprovedUserError,
-  getUsernameFromUrl,
-} from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { isAPISuccess, reservedDomainName, orderType, productType, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 /** @deprecated */
 const PassDetails = ({ match, history }) => {
   const { showPaymentPopup } = useGlobalContext();
+  const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
@@ -191,7 +186,7 @@ const PassDetails = ({ match, history }) => {
             {pass && (
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
                 <Col xs={24} className={styles.p20}>
-                  <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 8 : 24 }}>
+                  <Card className={styles.passCard} bodyStyle={{ padding: !lg ? 8 : 24 }}>
                     <Row gutter={[8, 16]} align="center">
                       <Col xs={24} md={18}>
                         <Row gutter={8}>
@@ -201,7 +196,7 @@ const PassDetails = ({ match, history }) => {
                             </Title>
                           </Col>
                           <Col xs={24}>
-                            <Space size={isMobileDevice ? 8 : 'middle'}>
+                            <Space size={!lg ? 8 : 'middle'}>
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
                                 {pass && pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
                               </Text>

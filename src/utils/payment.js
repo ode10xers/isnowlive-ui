@@ -1,16 +1,11 @@
 import { message } from 'antd';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import { getLocalUserDetails } from 'utils/storage';
-import {
-  generateQueryString,
-  generateUrlFromUsername,
-  getUsernameFromUrl,
-  isAPISuccess,
-  isUnapprovedUserError,
-} from 'utils/helper';
-import Routes from 'routes';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl, generateQueryString } from 'utils/url';
 
 // User API now also gives currency info
 // This function will fetch the creator currency from

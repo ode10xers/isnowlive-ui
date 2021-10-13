@@ -6,10 +6,11 @@ import SideNavigation from 'components/SideNavigation';
 import NavbarHeader from 'components/NavbarHeader';
 import DashboardHeader from 'components/DashboardHeader';
 
-import { getUsernameFromUrl, reservedDomainName } from 'utils/helper';
+import { reservedDomainName } from 'utils/constants';
+import { getUsernameFromUrl } from 'utils/url';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 import styles from './style.module.scss';
-import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 const { Content, Sider, Header } = Layout;
 const { Text } = Typography;

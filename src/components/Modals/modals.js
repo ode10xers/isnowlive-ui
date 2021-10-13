@@ -6,26 +6,21 @@ import Routes from 'routes';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import { getLocalUserDetails } from 'utils/storage';
-import {
-  productType,
-  generateUrlFromUsername,
-  getUsernameFromUrl,
-  reservedDomainName,
-  generateMailToLink,
-} from 'utils/helper';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import { productType, reservedDomainName } from 'utils/constants';
+import { generateUrlFromUsername, getUsernameFromUrl, generateMailToLink } from 'utils/url';
 import {
   getUserPassOrderDetails,
   getUserVideoOrderDetails,
   getSessionInventoryDetails,
   getCreatorProfileByUsername,
 } from 'utils/orderHelper';
-import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 import { getAuthCookie } from 'services/authCookie';
 
 import styles from './style.modules.scss';
-import { getAuthTokenFromLS } from 'services/localAuthToken';
 
 const { Text, Paragraph } = Typography;
 

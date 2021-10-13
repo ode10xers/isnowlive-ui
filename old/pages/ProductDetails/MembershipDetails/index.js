@@ -21,6 +21,7 @@ import DynamicProfileComponentContainer from 'components/DynamicProfileComponent
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { getUsernameFromUrl } from 'utils/url';
 import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import {
@@ -30,7 +31,6 @@ import {
   orderType,
   isUnapprovedUserError,
   productType,
-  getUsernameFromUrl,
   reservedDomainName,
 } from 'utils/helper';
 

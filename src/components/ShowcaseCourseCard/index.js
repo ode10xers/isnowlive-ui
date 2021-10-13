@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
+import classNames from 'classnames';
 
 import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 
@@ -8,27 +8,20 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
+import DefaultImage from 'components/Icons/DefaultImage';
 import {
   showPurchaseSingleCourseSuccessModal,
   showGetCourseWithSubscriptionSuccessModal,
   showErrorModal,
   showAlreadyBookedModal,
 } from 'components/Modals/modals';
-import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import { redirectToCoursesPage } from 'utils/redirect';
-import {
-  isValidFile,
-  isAPISuccess,
-  orderType,
-  courseType,
-  productType,
-  paymentSource,
-  isUnapprovedUserError,
-} from 'utils/helper';
+import { orderType, courseType, productType, paymentSource } from 'utils/constants';
+import { isValidFile, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 

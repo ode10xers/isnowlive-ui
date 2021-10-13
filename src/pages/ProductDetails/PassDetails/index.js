@@ -16,26 +16,17 @@ import apis from 'apis';
 
 import AuthModal from 'components/AuthModal';
 import { generateCardHeadingStyle } from 'components/ContainerCard';
-import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { getExternalLink } from 'utils/url';
 import { isMobileDevice } from 'utils/device';
-import { socialMediaIcons } from 'utils/constants';
-import { generateColorPalletteForProfile } from 'utils/colors';
-import {
-  orderType,
-  productType,
-  isAPISuccess,
-  convertHexToRGB,
-  reservedDomainName,
-  getUsernameFromUrl,
-  isBrightColorShade,
-  isUnapprovedUserError,
-} from 'utils/helper';
+import { getExternalLink, getUsernameFromUrl } from 'utils/url';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { socialMediaIcons, orderType, productType, reservedDomainName } from 'utils/constants';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext';
 

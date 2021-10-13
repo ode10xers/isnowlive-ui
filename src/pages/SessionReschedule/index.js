@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Row, Col, Typography, Button, Popconfirm, Card, Modal, message } from 'antd';
+import { Row, Col, Typography, Button, Popconfirm, Card, Modal, Grid, message } from 'antd';
 import { UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -10,15 +10,16 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CreatorProfile from 'components/CreatorProfile';
 
-import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
-import { getDuration, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
+import { getDuration } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
+import { redirectToInventoryPage } from 'utils/redirect';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 
 import styles from './styles.module.scss';
-import { redirectToInventoryPage } from 'utils/redirect';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const {
   formatDate: { toLongDateWithDay, toLocaleTime, toLocaleDate, toLongDateWithLongDay, getTimeDiff },
@@ -27,6 +28,8 @@ const {
 
 const whiteColor = '#FFFFFF';
 const SessionReschedule = () => {
+  const { lg } = useBreakpoint();
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
@@ -301,13 +304,13 @@ const SessionReschedule = () => {
 
       <Row className={styles.mt50}>
         <Col span={24} className={styles.mb20}>
-          <Title level={isMobileDevice ? 4 : 2}>Available Sessions</Title>
+          <Title level={!lg ? 4 : 2}>Available Sessions</Title>
           <Text type="primary" strong>
             All event times shown below are in your local time zone ({getCurrentLongTimezone()})
           </Text>
         </Col>
         <Col span={24}>
-          {isMobileDevice ? (
+          {!lg ? (
             <Loader loading={isSessionLoading} size="large" text="Loading sessions">
               {availableSessions.length > 0 ? (
                 <Table

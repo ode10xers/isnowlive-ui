@@ -19,8 +19,10 @@ import { showErrorModal } from 'components/Modals/modals';
 import type { Session, SessionInventory } from 'types/models/session';
 
 import dateUtil from 'utils/date';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 import { generateColorPalletteForProfile } from 'utils/colors';
-import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import useQueryParamState from 'hooks/useQueryParamState';
 

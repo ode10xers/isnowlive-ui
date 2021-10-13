@@ -30,25 +30,15 @@ import SelectablePassItem from './SelectablePassItem';
 import SelectableSubscriptionItem from './SelectableSubscriptionItem';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
-import {
-  orderType,
-  productType,
-  isAPISuccess,
-  paymentSource,
-  preventDefaults,
-  videoSourceType,
-  convertHexToRGB,
-  getUsernameFromUrl,
-  reservedDomainName,
-  isBrightColorShade,
-  isUnapprovedUserError,
-} from 'utils/helper';
 import dateUtil from 'utils/date';
-import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import { generateBaseCreditsText } from 'utils/subscriptions';
-import { generateColorPalletteForProfile } from 'utils/colors';
 import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
+import { isAPISuccess, preventDefaults, isUnapprovedUserError } from 'utils/helper';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
+import { orderType, productType, paymentSource, videoSourceType, reservedDomainName } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 

@@ -1,7 +1,10 @@
 import moment from 'moment';
 import { message } from 'antd';
-import dateUtil from 'utils/date';
-import { getCreatorDetailsInLS, getLocalUserDetails } from './storage';
+
+import dateUtil from './date';
+import { getUsernameFromUrl } from './url';
+import { getLocalUserDetails } from './storage';
+import { reservedDomainName } from './constants';
 
 const {
   formatDate: { getTimeDiff },
@@ -15,22 +18,7 @@ const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing thi
 export const isUnapprovedUserError = (errorResponse) =>
   errorResponse?.status === FORBIDDEN && errorResponse?.data?.message === UNAPPROVED_USER_ERROR_MESSAGE;
 
-export const isInCustomDomain = () =>
-  !window.location.hostname.includes('passion.do') && !window.location.hostname.includes('localhost');
-
-// TODO: Might want to adjust the string here once the decision on Onboarding is decided
 export const isInCreatorDashboard = () => window.location.pathname.includes('creator/dashboard');
-
-export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
-
-export const getUsernameFromUrl = () => {
-  if (isInCustomDomain()) {
-    // If in a custom domain
-    return getCreatorDetailsInLS()?.username || 'app';
-  }
-
-  return window.location.hostname.split('.')[0] || 'app';
-};
 
 export const getCreatorUsernameForHeader = () => {
   const creatorUsername = getUsernameFromUrl();
@@ -50,17 +38,6 @@ export const getCreatorUsernameForHeader = () => {
     // else don't send anything
     return '';
   }
-};
-
-export const generateQueryString = (data) => {
-  return Object.entries(data)
-    .map(([key, val]) => `${key}=${val}`)
-    .join('&');
-};
-
-export const generateMailToLink = (creatorProfileData) => {
-  const passionEmail = 'friends@passion.do';
-  return `mailto:${creatorProfileData.email}?cc=${passionEmail}&subject=I%20would%20like%20to%20join%20your%20community&body=Hi%20${creatorProfileData.first_name}`;
 };
 
 const appendScript = (src, charset) => {
@@ -161,76 +138,6 @@ export const isValidFile = (url) => {
   return false;
 };
 
-export const generateUrlFromUsername = (username) => {
-  if (isInCustomDomain()) {
-    return window.location.origin;
-  }
-
-  let newUrl = '';
-  if (process.env.NODE_ENV === 'development') {
-    newUrl = 'http://' + username + '.localhost:' + window.location.port;
-  } else if (window.location.origin.includes('stage')) {
-    newUrl = 'https://' + username + '.stage.passion.do';
-  } else {
-    newUrl = 'https://' + username + '.passion.do';
-  }
-  return newUrl;
-};
-
-export const generateUrl = (targetDomain = 'app') => {
-  let newUrl = '';
-  if (process.env.NODE_ENV === 'development') {
-    newUrl = `http://${targetDomain === 'app' ? '' : targetDomain + '.'}localhost:` + window.location.port;
-  } else if (window.location.origin.includes('stage')) {
-    newUrl = `https://${targetDomain}.stage.passion.do`;
-  } else {
-    newUrl = `https://${targetDomain}.passion.do`;
-  }
-  return newUrl;
-};
-
-// TODO: Currently it's only for hex colors, adjust when implementing other styling (fonts, etc)
-export const generateWidgetCSSVarsFromJSON = (objData) => {
-  const stylesData = Object.entries(objData).filter(([key, val]) => val);
-
-  return '* { ' + stylesData.map(([key, val]) => `${key} : #${val}`).join('; ') + '}';
-};
-
-// TODO: Move color related helpers to colors.js
-export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-
-export const convertHexToRGB = (hexColor) => {
-  const color = +('0x' + hexColor.slice(1).replace(hexColor.length < 5 && /./g, '$&$&'));
-
-  const r = color >> 16;
-  const g = (color >> 8) & 255;
-  const b = color & 255;
-
-  return [r, g, b];
-};
-
-// NOTE: make sure the scale and value is inversely proportional
-// e.g. if we want big scale numbers, value should be small
-export const getShadeForHexColor = (hexColor, scale = 1, value = 44, darker = true) => {
-  const rgbColor = convertHexToRGB(hexColor);
-
-  const scaleMultiplier = darker ? -1 : 1;
-
-  const colorShade = rgbColor.map((color) => Math.min(Math.max(color + scaleMultiplier * scale * value, 0), 255));
-  return `#${colorShade.map((color) => color.toString(16).padStart(2, '0')).join('')}`;
-};
-
-export const isBrightColorShade = ([r, g, b]) => {
-  // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
-  const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
-
-  // Using the HSP value, determine whether the color is light or dark
-  // return hsp > 127.5;
-  return hsp > 180.5;
-};
-
-export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];
-
 export const getDuration = (start_time, end_time) => {
   const duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration < 0) {
@@ -240,12 +147,6 @@ export const getDuration = (start_time, end_time) => {
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
   return `${hours > 0 ? `${hours} Hr` : ''} ${minutes > 0 ? `${minutes} min` : ''}`;
-};
-
-export const scrollToErrorField = (errorFields) => {
-  const errorElement = document.getElementById(errorFields[0].name);
-  errorElement.focus();
-  errorElement.scrollIntoView();
 };
 
 export const getPaymentStatus = (status) => {
@@ -305,64 +206,3 @@ export const preventDefaults = (e) => {
   e.preventDefault();
   e.stopPropagation();
 };
-
-export const ZoomAuthType = {
-  OAUTH: 'OAUTH',
-  JWT: 'JWT',
-  NOT_CONNECTED: 'NOT_CONNECTED',
-};
-
-export const StripeAccountStatus = {
-  NOT_CONNECTED: 'NOT_CONNECTED',
-  VERIFICATION_PENDING: 'VERIFICATION_PENDING',
-  CONNECTED: 'CONNECTED',
-};
-
-export const StripePaymentStatus = {
-  AWAITING_CAPTURE: 'AWAITING_CAPTURE',
-  AWAITING_METHOD: 'AWAITING_METHOD',
-  AWAITING_ACTION: 'AWAITING_ACTION',
-  AWAITING_CONFIRMATION: 'AWAITING_CONFIRMATION ',
-  AUTHORIZATION_REQUIRED: 'AUTHORIZATION_REQUIRED',
-  SUCCESS: 'SUCCESS',
-};
-
-export const paymentSource = {
-  GATEWAY: 'PAYMENT_GATEWAY',
-  PASS: 'PASS',
-  SUBSCRIPTION: 'SUBSCRIPTION',
-};
-
-export const orderType = {
-  CLASS: 'SESSION_ORDER',
-  PASS: 'PASS_ORDER',
-  VIDEO: 'VIDEO_ORDER',
-  COURSE: 'COURSE_ORDER',
-  SUBSCRIPTION: 'SUBSCRIPTION_ORDER',
-};
-
-export const courseType = {
-  LIVE: 'LIVE', // Live sessions only
-  VIDEO: 'VIDEO', // Videos only
-  MIXED: 'MIXED',
-  VIDEO_SEQ: 'VIDEO_SEQUENCE', // Deprecated
-  VIDEO_NON_SEQ: 'VIDEO_NON_SEQUENCE', // Deprecated
-};
-
-export const videoSourceType = {
-  CLOUDFLARE: 'CLOUDFLARE',
-  YOUTUBE: 'YOUTUBE',
-};
-
-export const productType = {
-  CLASS: 'Session',
-  PASS: 'Pass',
-  VIDEO: 'Video',
-  COURSE: 'Course',
-  SUBSCRIPTION: 'Membership',
-  PRODUCT: 'Product', //As a default
-};
-
-export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-export const reservedDomainName = ['app', ...(process.env.NODE_ENV === 'development' ? ['localhost'] : [])];

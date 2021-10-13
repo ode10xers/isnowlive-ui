@@ -7,7 +7,8 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 
-import { getUsernameFromUrl, isAPISuccess } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
 import { generateDefaultText } from 'utils/legals';
 
 import styles from './styles.module.scss';

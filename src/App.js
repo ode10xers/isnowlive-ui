@@ -5,8 +5,9 @@ import Routes from 'routes';
 import apis from 'apis';
 
 import parseQueryString from 'utils/parseQueryString';
+import { isAPISuccess } from 'utils/helper';
+import { isInCustomDomain } from 'utils/url';
 import { storeCreatorDetailsToLS } from 'utils/storage';
-import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
 
 import http from 'services/http';
