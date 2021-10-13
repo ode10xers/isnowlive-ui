@@ -1489,6 +1489,7 @@ const UploadVideoModal = ({
                           </Col>
                           <Col xs={24}>
                             <Image
+                              loading="lazy"
                               preview={false}
                               src={editedVideo?.thumbnail_url}
                               className={styles.centeredPreview}

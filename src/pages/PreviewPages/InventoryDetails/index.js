@@ -90,6 +90,7 @@ const InventoryDetailsPreview = ({ match, history }) => {
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24} className={classNames(styles.imageWrapper, styles.mb20)}>
           <img
+            loading="lazy"
             className={styles.coverImage}
             src={session?.session_image_url || DefaultImage()}
             alt="Session Detail"

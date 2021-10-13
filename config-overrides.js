@@ -65,8 +65,11 @@ module.exports = function override(config, env) {
     ...config.output,
     pathinfo: false,
   };
-  return smp.wrap({
+
+  const returnTarget = {
     ...config,
     ...(isEnvProduction ? getBabelLoader(config).options.plugins.push('react-remove-properties') : {}),
-  });
+  };
+
+  return isEnvProduction ? smp.wrap(returnTarget) : returnTarget;
 };

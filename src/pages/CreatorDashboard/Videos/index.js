@@ -322,6 +322,7 @@ const Videos = () => {
             },
             children: (
               <Image
+                loading="lazy"
                 src={record.thumbnail_url || 'error'}
                 alt={record.title}
                 height={100}

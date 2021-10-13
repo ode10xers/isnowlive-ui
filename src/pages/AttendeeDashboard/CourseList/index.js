@@ -147,6 +147,7 @@ const CourseList = () => {
       width: md ? '150px' : '180px',
       render: (text, record) => (
         <Image
+          loading="lazy"
           src={text || 'error'}
           alt={record.course?.name}
           fallback={DefaultImage()}

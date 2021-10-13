@@ -111,6 +111,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
       {showCoverImage && (
         <Col xs={24} className={styles.coverImageWrapper}>
           <Image
+            loading="lazy"
             preview={false}
             width={coverImage ? '100%' : 200}
             className={styles.coverImage}
@@ -124,7 +125,13 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
         className={classNames(styles.profileImageWrapper, showCoverImage && coverImage ? styles.withCover : undefined)}
       >
         <div className={styles.profileImage}>
-          <Image preview={false} width={'100%'} src={profileImage || 'error'} fallback={DefaultImage()} />
+          <Image
+            loading="lazy"
+            preview={false}
+            width={'100%'}
+            src={profileImage || 'error'}
+            fallback={DefaultImage()}
+          />
           <div className={styles.userName}>{renderCreatorName()}</div>
           <div className={styles.shareButton}>
             <Share

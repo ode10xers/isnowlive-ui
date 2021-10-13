@@ -758,6 +758,7 @@ const VideoDetails = ({ match }) => {
                       cover={
                         video?.thumbnail_url ? (
                           <Image
+                            loading="lazy"
                             className={styles.videoDetailsCardCover}
                             preview={false}
                             src={video?.thumbnail_url}

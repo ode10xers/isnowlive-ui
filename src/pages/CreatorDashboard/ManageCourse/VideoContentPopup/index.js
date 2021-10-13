@@ -103,6 +103,7 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
       <Row gutter={[12, 12]} className={styles.contentPopupItem}>
         <Col xs={24} md={10}>
           <Image
+            loading="lazy"
             src={video.thumbnail_url || 'error'}
             alt={video.title}
             fallback={DefaultImage()}

@@ -207,9 +207,6 @@ const CalendarSessions = () => {
                   All event times shown below are in your local time zone ({getCurrentLongTimezone()})
                 </Text>
               </Col>
-              {/* <Col xs={10}>
-                <img src={logo} alt="Passion.do" className={styles.passionLogo} />
-              </Col> */}
             </Row>
 
             <CalendarWrapper
