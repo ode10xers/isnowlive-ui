@@ -1,7 +1,7 @@
 @import '../../../../styles/variables.scss';
 
 .courseListContainer {
-  @media screen and (max-width:767px) {
+  @media screen and (max-width: 767px) {
     flex-flow: row nowrap !important;
     overflow-x: scroll;
     padding-bottom: 6px !important;

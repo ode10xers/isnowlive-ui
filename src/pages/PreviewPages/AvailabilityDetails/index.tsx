@@ -124,7 +124,9 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
 
       //@ts-ignore
       const dummyAvailabilities = dummy[templateData].AVAILABILITIES;
-      const targetAvail = dummyAvailabilities.find((avail : Session) => avail.session_id === parseInt(match?.params?.session_id));
+      const targetAvail = dummyAvailabilities.find(
+        (avail: Session) => avail.session_id === parseInt(match?.params?.session_id)
+      );
 
       if (targetAvail) {
         setAvailability(targetAvail);
@@ -236,6 +238,7 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
       {/* @ts-ignore */}
       <Loader loading={isLoading} size="large" text="Loading availability">
         <Image
+          loading="lazy"
           className={styles.availabilityHeaderImage}
           preview={false}
           src={availability?.session_image_url}
@@ -419,4 +422,4 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
   );
 };
 
-export default AvailabilityDetailPreview
+export default AvailabilityDetailPreview;

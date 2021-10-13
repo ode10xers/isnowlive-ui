@@ -810,7 +810,13 @@ const NewVideoDetails = ({ match }) => {
         <Row gutter={[8, 8]}>
           {videoData?.document?.url?.includes('/image/') ? (
             <Col xs={24} className={styles.textAlignCenter}>
-              <Image width="100%" preview={false} className={styles.mt10} src={videoData?.document?.url} />
+              <Image
+                loading="lazy"
+                width="100%"
+                preview={false}
+                className={styles.mt10}
+                src={videoData?.document?.url}
+              />
             </Col>
           ) : videoData?.document?.url?.includes('.pdf') ? (
             <Col xs={24}>

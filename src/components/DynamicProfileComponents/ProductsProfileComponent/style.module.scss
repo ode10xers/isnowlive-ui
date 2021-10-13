@@ -33,9 +33,12 @@
       }
 
       &.selectedMenu {
-        background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+        background-color: var(
+          --passion-profile-primary-color,
+          #{map-get($map: $colors, $key: 'DodgerBlue')}
+        ) !important;
         color: map-get($map: $colors, $key: 'White') !important;
-        
+
         &.lightBg {
           color: map-get($map: $colors, $key: 'Zeus') !important;
         }

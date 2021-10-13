@@ -1,5 +1,9 @@
 const TerserPlugin = require('terser-webpack-plugin');
 
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+
+const smp = new SpeedMeasurePlugin();
+
 const getBabelLoader = (config, isOutsideOfApp) => {
   let babelLoaderFilter;
   if (isOutsideOfApp) {
@@ -22,6 +26,10 @@ module.exports = function override(config, env) {
   const isEnvProductionProfile = isEnvProduction && process.argv.includes('--profile');
   config.optimization = {
     ...config.optimization,
+    runtimeChunk: true,
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
+    splitChunks: false,
     minimizer: config.optimization.minimizer.map((plugin) => {
       if (plugin.constructor.name === 'TerserPlugin') {
         return new TerserPlugin({
@@ -52,8 +60,16 @@ module.exports = function override(config, env) {
       return plugin;
     }),
   };
-  return {
+
+  config.output = {
+    ...config.output,
+    pathinfo: false,
+  };
+
+  const returnTarget = {
     ...config,
     ...(isEnvProduction ? getBabelLoader(config).options.plugins.push('react-remove-properties') : {}),
   };
+
+  return isEnvProduction ? smp.wrap(returnTarget) : returnTarget;
 };

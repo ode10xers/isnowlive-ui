@@ -76,7 +76,9 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   useEffect(() => {
     if (selectedMonth) {
       if (selectedDate === undefined) {
-        const availInv = availability?.inventory.filter((inv) => moment(inv.start_time).format('MMMM YYYY') === selectedMonth).find((inv) => !(inv.num_participants > 0));
+        const availInv = availability?.inventory
+          .filter((inv) => moment(inv.start_time).format('MMMM YYYY') === selectedMonth)
+          .find((inv) => !(inv.num_participants > 0));
 
         if (availInv) {
           setSelectedDate(moment(availInv.start_time).format('YYYY-MM-DD'));
@@ -127,7 +129,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     setIsLoading(false);
   }, []);
 
-  const fetchAvailabilityPasses = useCallback(async (session_id : string) => {
+  const fetchAvailabilityPasses = useCallback(async (session_id: string) => {
     setIsLoading(true);
 
     try {
@@ -269,6 +271,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       {/* @ts-ignore */}
       <Loader loading={isLoading} size="large" text="Loading availability">
         <Image
+          loading="lazy"
           className={styles.availabilityHeaderImage}
           preview={false}
           src={availability?.session_image_url}

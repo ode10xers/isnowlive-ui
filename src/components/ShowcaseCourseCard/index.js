@@ -295,6 +295,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
                   <Row gutter={[16, 8]}>
                     <Col xs={24} sm={isOnAttendeeDashboard ? 12 : 10} lg={10} className={styles.courseImageWrapper}>
                       <Image
+                        loading="lazy"
                         preview={false}
                         height={isMobileDevice ? 100 : 130}
                         className={styles.courseImage}

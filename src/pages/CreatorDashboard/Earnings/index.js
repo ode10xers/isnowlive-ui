@@ -329,7 +329,7 @@ const Earnings = () => {
           <ShowAmount amount={amount} currency={balance?.currency.toUpperCase()} />
         </Col>
         <Col xs={6}>
-          <img src={image} height={40} alt="" />
+          <img loading="lazy" src={image} height={40} alt="" />
         </Col>
       </Row>
     </div>

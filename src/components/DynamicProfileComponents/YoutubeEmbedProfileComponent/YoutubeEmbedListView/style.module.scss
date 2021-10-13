@@ -1,7 +1,7 @@
 @import '../../../../styles/variables.scss';
 
 .youtubeItemListContainer {
-  @media screen and (max-width:767px) {
+  @media screen and (max-width: 767px) {
     flex-flow: row nowrap !important;
     overflow-x: scroll;
     padding-bottom: 6px !important;
@@ -23,5 +23,5 @@
 }
 
 .closePlayerButton {
-  color : var(--passion-profile-dark-color, #{map-get($colors, 'Smalt')}) !important;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'Smalt')}) !important;
 }

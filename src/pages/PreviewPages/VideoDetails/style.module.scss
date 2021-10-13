@@ -2,7 +2,7 @@
 
 .icon {
   margin-right: 10px;
-  color : var(--passion-profile-darker-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--passion-profile-darker-color, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
 .videoDetailsPage {
@@ -50,13 +50,12 @@
 
     .videoDescription {
       margin: 20px 0;
-
     }
     .videoDescription * {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        background: transparent !important;
-        color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
     }
   }
 
@@ -85,20 +84,23 @@
       background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'AliceBlue')});
 
       .buyVideoBtn {
-        background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+        background-color: var(
+          --passion-profile-primary-color,
+          #{map-get($map: $colors, $key: 'DodgerBlue')}
+        ) !important;
         border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
 
         &.darkText {
-          --video-button-text-color : var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')});
+          --video-button-text-color: var(--passion-profile-darker-color, #{map-get($colors, 'Zeus')});
         }
 
         &.lightText {
-          --video-button-text-color : #{map-get($colors, 'White')};
+          --video-button-text-color: #{map-get($colors, 'White')};
         }
 
         color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
         .buyVideoBtnContent {
-          height: 24px; 
+          height: 24px;
           margin-left: 10px;
           color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
 

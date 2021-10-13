@@ -1,30 +1,35 @@
-import React, { useCallback } from 'react'
-import { Col, Row } from 'antd'
+import React, { useCallback } from 'react';
+import { Col, Row } from 'antd';
 // import { Swiper, SwiperSlide } from 'swiper/react'
 
-import AvailabilityListItem from '../AvailabilityListItem'
+import AvailabilityListItem from '../AvailabilityListItem';
 
-import type { Session } from 'types/models/session'
+import type { Session } from 'types/models/session';
 // import { isMobileDevice } from 'utils/device'
 
 import styles from './style.module.scss';
 
 export interface AvailabilityListViewProps {
-  availabilities?: Session[]
-  isContained?: boolean
+  availabilities?: Session[];
+  isContained?: boolean;
 }
 
-const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({
-  availabilities = [],
-  isContained = false
-}) => {
-  const renderAvailabilityListItem = useCallback((availability: Session) => (
-    // <SwiperSlide key={availability.session_id}>
-    <Col xs={isContained ? 24 : 20} md={12} lg={isContained ? 12 : 8} key={availability.session_external_id ?? availability.session_id}>
-      <AvailabilityListItem availability={availability} />
-    </Col>
-    // </SwiperSlide>
-  ), [isContained])
+const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({ availabilities = [], isContained = false }) => {
+  const renderAvailabilityListItem = useCallback(
+    (availability: Session) => (
+      // <SwiperSlide key={availability.session_id}>
+      <Col
+        xs={isContained ? 24 : 20}
+        md={12}
+        lg={isContained ? 12 : 8}
+        key={availability.session_external_id ?? availability.session_id}
+      >
+        <AvailabilityListItem availability={availability} />
+      </Col>
+      // </SwiperSlide>
+    ),
+    [isContained]
+  );
 
   return (
     <div>
@@ -41,7 +46,7 @@ const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({
         </Row>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-export default AvailabilityListView
+export default AvailabilityListView;

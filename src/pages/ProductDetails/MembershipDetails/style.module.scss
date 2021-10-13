@@ -34,7 +34,7 @@
 }
 
 .itemListContainer {
-  @media screen and (max-width:767px) {
+  @media screen and (max-width: 767px) {
     flex-flow: row nowrap !important;
     overflow-x: scroll;
     padding-bottom: 6px !important;
@@ -65,12 +65,12 @@
 
 .icon {
   margin-right: 10px;
-  color : var(--passion-profile-darker-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--passion-profile-darker-color, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
 .backButton {
-  color : var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
-  border-color : var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
 .stickyBottomBar {

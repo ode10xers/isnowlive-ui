@@ -1,9 +1,9 @@
 @import '../../../../styles/variables.scss';
 
 .passItem {
-  padding : 8px 4px;
+  padding: 8px 4px;
   border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
-  border-radius : 6px;
+  border-radius: 6px;
   background-color: var(--passion-profile-light-color, #{map-get($colors, 'PaleCornflowerBlue')});
 
   &::before,
@@ -24,11 +24,11 @@
   &::after {
     right: 6px;
     border-radius: 8px 0 0 8px;
-    border-right: none
+    border-right: none;
   }
 
   .passTitle {
-    color : var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
     text-align: center;
     margin: 0;
     font-size: 18px;
@@ -51,7 +51,8 @@
       }
     }
 
-    .passValidity, .passPrice {
+    .passValidity,
+    .passPrice {
       color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
       font-size: 14px;
       font-weight: 400;

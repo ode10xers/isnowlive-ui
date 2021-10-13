@@ -216,7 +216,7 @@ const VideoDetailPreview = ({ match, history }) => {
                 {/* Video Thumbnail */}
                 <Col xs={24}>
                   <div className={styles.videoImageContainer}>
-                    <Image preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
+                    <Image loading="lazy" preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
                   </div>
                 </Col>
 

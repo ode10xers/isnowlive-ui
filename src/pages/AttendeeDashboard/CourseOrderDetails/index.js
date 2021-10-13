@@ -200,7 +200,7 @@ const CourseOrderDetails = ({ match, history }) => {
     <div className={styles.courseOrderDetailsContainer}>
       <Row gutter={[12, 12]}>
         <Col xs={24} md={12} lg={8}>
-          <Image className={styles.courseImage} src={orderDetails?.course.course_image_url} />
+          <Image loading="lazy" className={styles.courseImage} src={orderDetails?.course.course_image_url} />
         </Col>
         <Col xs={24} md={12} lg={16}>
           <Space direction="vertical">

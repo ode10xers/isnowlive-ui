@@ -39,7 +39,7 @@ const DashboardHeader = () => {
   return (
     <Row className={styles.headerContainer} gutter={[20, 8]}>
       <Col className={styles.logoWrapper}>
-        <img src={logo} alt="Passion.do" className={styles.logo} />
+        <img loading="lazy" src={logo} alt="Passion.do" className={styles.logo} />
       </Col>
       <Col className={styles.navItemWrapper}>
         <DashboardToggle />

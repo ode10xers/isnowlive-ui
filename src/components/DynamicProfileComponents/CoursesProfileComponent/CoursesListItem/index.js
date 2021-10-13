@@ -21,6 +21,7 @@ const CourseListItem = ({ course }) => {
     <div className={styles.courseCoverContainer}>
       <div className={styles.courseImageContainer}>
         <Image
+          loading="lazy"
           preview={false}
           className={styles.courseImage}
           src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
