@@ -124,7 +124,9 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
 
       //@ts-ignore
       const dummyAvailabilities = dummy[templateData].AVAILABILITIES;
-      const targetAvail = dummyAvailabilities.find((avail : Session) => avail.session_id === parseInt(match?.params?.session_id));
+      const targetAvail = dummyAvailabilities.find(
+        (avail: Session) => avail.session_id === parseInt(match?.params?.session_id)
+      );
 
       if (targetAvail) {
         setAvailability(targetAvail);
@@ -420,4 +422,4 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
   );
 };
 
-export default AvailabilityDetailPreview
+export default AvailabilityDetailPreview;

@@ -38,7 +38,7 @@
         height: 160px;
         border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1') !important;
 
-        @media screen and (max-width: 992px) and (min-width:767px) {
+        @media screen and (max-width: 992px) and (min-width: 767px) {
           height: 130px;
         }
 
@@ -63,7 +63,7 @@
         height: 160px;
         border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1') !important;
 
-        @media screen and (max-width: 992px) and (min-width:767px) {
+        @media screen and (max-width: 992px) and (min-width: 767px) {
           height: 130px;
         }
 
@@ -79,7 +79,10 @@
   }
 
   .videoTitle {
-    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}));
+    color: var(
+      --passion-profile-darker-color,
+      var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')})
+    );
     padding: 12px;
 
     margin-top: -10px;

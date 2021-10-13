@@ -1,23 +1,24 @@
 @import '../../../styles/variables.scss';
 
 .mobileOnly {
-  display : none !important;
-  
+  display: none !important;
+
   @media screen and (max-width: 769px) {
-    display : initial;
+    display: initial;
   }
 }
 
 .desktopOnly {
   @media screen and (max-width: 769px) {
-    display : none;
+    display: none;
   }
 }
 
-.dateView, .formView {
+.dateView,
+.formView {
   @media screen and (max-width: 769px) {
     &.hidden {
-      display : none;
+      display: none;
     }
   }
 }
@@ -31,7 +32,7 @@
   @media screen and (min-width: 1440px) {
     padding: 100px;
   }
-  
+
   @media screen and (max-width: 1025px) {
     padding: 30px;
   }
@@ -46,7 +47,7 @@
 }
 
 .readMoreButton {
-  color : var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   font-weight: 600;
 }
 
@@ -64,7 +65,7 @@
   color: #c4c4c4 !important;
   font-size: 18px;
   // margin-bottom: 14px;
-  align-self : center;
+  align-self: center;
   padding: 0 6px;
 
   @media screen and (max-width: 527px) {
@@ -73,10 +74,7 @@
 }
 
 .availabilityInfo {
-  color: var(
-    --passion-profile-darker-color,
-    #{map-get($map: $colors, $key: 'PrussianBlue')}
-  ) !important;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'PrussianBlue')}) !important;
   font-size: 22px;
   text-transform: uppercase;
 
@@ -86,10 +84,7 @@
 }
 
 .availabilityTitle {
-  color: var(
-    --passion-profile-darker-color,
-    #{map-get($map: $colors, $key: 'PrussianBlue')}
-  ) !important;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'PrussianBlue')}) !important;
   font-size: 30px !important;
 
   @media screen and (max-width: 527px) {
@@ -98,18 +93,15 @@
 }
 
 .availabilityLocation {
-  color: var(
-    --passion-profile-darker-color,
-    #{map-get($map: $colors, $key: 'PrussianBlue')}
-  ) !important;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'PrussianBlue')}) !important;
 
   font-size: 16px !important;
-  margin-bottom : 20px !important;
+  margin-bottom: 20px !important;
 }
 
 .availabilityDivider {
-  margin-top : 10px;
-  margin-bottom : 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .availabilityDescription {
@@ -117,7 +109,7 @@
     --passion-profile-darker-color,
     var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
   ) !important;
-  margin-bottom : 0 !important;
+  margin-bottom: 0 !important;
 
   // p,
   // span {
@@ -126,9 +118,9 @@
 
 .availabilityDescription * {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: transparent !important;
-    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+  background-color: transparent !important;
+  color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
 }
 
 .availabilityTitleWrapper {
@@ -203,7 +195,7 @@
   margin: 30px 0;
 
   @media screen and (min-width: 769px) {
-    display : none !important;
+    display: none !important;
   }
 }
 
@@ -211,8 +203,8 @@
   color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   margin: 10px 0 0;
-  
+
   @media screen and (min-width: 769px) {
-    display : none !important;
+    display: none !important;
   }
 }

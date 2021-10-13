@@ -21,7 +21,7 @@
   margin-left: 5px;
 
   @media screen and (max-width: 992px) and (min-width: 525px) {
-    margin-left : 64px;
+    margin-left: 64px;
   }
 }
 
@@ -34,12 +34,12 @@
 }
 
 .navItemWrapper {
-  flex : 1 1 auto;
+  flex: 1 1 auto;
   text-align: left;
-  
+
   @media screen and (max-width: 600px) {
     flex: 1 1 100%;
     text-align: center;
-    align-self:center
+    align-self: center;
   }
 }

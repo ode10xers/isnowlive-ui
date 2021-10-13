@@ -35,7 +35,11 @@ const DynamicProfileComponentContainer: React.FC<DynamicProfileComponentContaine
           {title}
         </Text>
       </Col>
-      {editView && isEditing && <Col flex="0 0 120px" className={styles.textAlignRight}>{editView}</Col>}
+      {editView && isEditing && (
+        <Col flex="0 0 120px" className={styles.textAlignRight}>
+          {editView}
+        </Col>
+      )}
     </Row>
     <Row>
       <Col span={24}>{children}</Col>

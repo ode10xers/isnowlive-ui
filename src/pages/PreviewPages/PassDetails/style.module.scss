@@ -7,7 +7,7 @@
   @media screen and (min-width: 1440px) {
     padding: 100px;
   }
-  
+
   @media screen and (max-width: 1025px) {
     padding: 30px;
   }
@@ -171,8 +171,8 @@
   padding: 12px 20px;
   border: 1px solid var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
   border-radius: 8px;
-  position:relative;
-  z-index : 7;
+  position: relative;
+  z-index: 7;
 
   background: linear-gradient(
     220.68deg,
@@ -218,7 +218,7 @@
 
     .passDetailItemIcon {
       margin-right: 8px;
-      
+
       @media screen and (max-width: 526px) {
         margin-right: 3px;
       }
@@ -243,26 +243,26 @@
   &::after {
     right: -1px;
     border-radius: 16px 0 0 16px;
-    border-right: none
+    border-right: none;
   }
 }
 
 .mobileStickyTopContainer {
-  @media screen and (min-width:992px) {
-    display : none;
+  @media screen and (min-width: 992px) {
+    display: none;
   }
-  
-  z-index : 2;
-  position : absolute;
-  bottom : 0;
-  left : 4px;
+
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  left: 4px;
   width: calc(100% - 8px);
 
   .mobileStickyTop {
     width: 100%;
     border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
-    border-radius : 12px;
-    background : linear-gradient(
+    border-radius: 12px;
+    background: linear-gradient(
       220.68deg,
       var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}) -10.5%,
       var(--passion-profile-lightest-color, #{map-get($colors, 'ColumbiaBlue')}) 52.15%,
@@ -271,19 +271,19 @@
     padding: 2px 8px;
 
     .stickyTopPassName {
-      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
-      font-size : 16px;
+      color: var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
+      font-size: 16px;
     }
-    
+
     .stickyTopDetails {
-      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
+      color: var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
       font-size: 12px;
     }
 
     .dropdownIcon {
-      margin-top : 12px;
-      font-size : 24px;
-      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')})
+      margin-top: 12px;
+      font-size: 24px;
+      color: var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
     }
   }
 }
@@ -311,7 +311,7 @@
 }
 
 .bottomOffset {
-  margin-bottom : 100px;
+  margin-bottom: 100px;
 }
 
 .creatorProfileSection {
@@ -329,21 +329,19 @@
     padding: 0 12px !important;
 
     .bio * {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        background: transparent !important;
-        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
-      
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
 
     .collapsedBio * {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        background: transparent !important;
-        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
-      .collapsedBio {
-
+    .collapsedBio {
       max-height: 72px;
       overflow: hidden;
     }

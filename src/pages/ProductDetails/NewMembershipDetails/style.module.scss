@@ -8,7 +8,7 @@
   @media screen and (min-width: 1440px) {
     padding: 100px;
   }
-  
+
   @media screen and (max-width: 1025px) {
     padding: 30px;
   }
@@ -23,12 +23,18 @@
 }
 
 .sectionHeading {
-  color: var(--passion-profile-dark-color, var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Cobalt')})) !important;
+  color: var(
+    --passion-profile-dark-color,
+    var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Cobalt')})
+  ) !important;
 }
 
 .dotSeparator {
   opacity: 0.4;
-  color: var(--passion-profile-dark-color, var(--membership-plugin-text-color, #{map-get($colors, 'Black')})) !important;
+  color: var(
+    --passion-profile-dark-color,
+    var(--membership-plugin-text-color, #{map-get($colors, 'Black')})
+  ) !important;
   font-size: 16px;
 
   @media screen and (max-width: 1025px) {
@@ -58,12 +64,18 @@
   }
 
   .buySectionHeader {
-    color: var(--passion-profile-darker-color, var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Smalt')})) !important;
+    color: var(
+      --passion-profile-darker-color,
+      var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Smalt')})
+    ) !important;
     font-size: 24px;
   }
 
   .moreMembershipSectionHeader {
-    color: var(--passion-profile-darker-color, var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Smalt')})) !important;
+    color: var(
+      --passion-profile-darker-color,
+      var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Smalt')})
+    ) !important;
   }
 
   .loadingPlaceholder {
@@ -77,8 +89,14 @@
   }
 
   .buyButton {
-    background-color: var(--passion-profile-primary-color, var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
-    border-color: var(--passion-profile-primary-color, var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
+    background-color: var(
+      --passion-profile-primary-color,
+      var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+    ) !important;
+    border-color: var(
+      --passion-profile-primary-color,
+      var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+    ) !important;
 
     &:hover {
       opacity: 0.8;
@@ -91,8 +109,8 @@
     &.lightText {
       --text-color: map-get($colors, 'White') !important;
     }
-    
-    color : var(--membership-plugin-cta-font-color, var(--text-color, #{map-get($colors, 'White')}));
+
+    color: var(--membership-plugin-cta-font-color, var(--text-color, #{map-get($colors, 'White')}));
     font-size: 15px;
 
     .buyBtnDivider {
@@ -116,7 +134,10 @@
       }
 
       .subsItemName {
-        color: var(--passion-profile-darker-color, var(--membership-plugin-text-color, #{map-get($colors, 'Zeus')})) !important;
+        color: var(
+          --passion-profile-darker-color,
+          var(--membership-plugin-text-color, #{map-get($colors, 'Zeus')})
+        ) !important;
         font-size: 18px;
 
         @media screen and (max-width: 1025px) {
@@ -144,26 +165,42 @@
     .subsItemDesc {
       align-self: center;
       text-align: right;
-      color: var(--passion-profile-darker-color, var(--membership-plugin-text-color, #{map-get($colors, 'Zeus')})) !important;
+      color: var(
+        --passion-profile-darker-color,
+        var(--membership-plugin-text-color, #{map-get($colors, 'Zeus')})
+      ) !important;
       font-size: 14px;
     }
 
     &.selected {
-      border: 1px solid var(--passion-profile-primary-color, var(--membership-plugin-cta-background-color #{map-get($map: $colors, $key: 'DodgerBlue')}));
+      border: 1px solid
+        var(
+          --passion-profile-primary-color,
+          var(--membership-plugin-cta-background-color #{map-get($map: $colors, $key: 'DodgerBlue')})
+        );
 
       .subsCheckContainer {
         .subsItemName {
-          color: var(--passion-profile-primary-color, var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'Cobalt')})) !important;
+          color: var(
+            --passion-profile-primary-color,
+            var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'Cobalt')})
+          ) !important;
         }
 
         .checkIcon {
           font-size: 20px;
-          color: var(--passion-profile-primary-color, var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')}));
+          color: var(
+            --passion-profile-primary-color,
+            var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+          );
         }
       }
 
       .subsItemDesc {
-        color: var(--passion-profile-primary-color, var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'Cobalt')})) !important;
+        color: var(
+          --passion-profile-primary-color,
+          var(--membership-plugin-cta-background-color, #{map-get($map: $colors, $key: 'Cobalt')})
+        ) !important;
       }
     }
   }
@@ -171,10 +208,13 @@
 
 .currentSubsDetailsContainer {
   padding: 12px;
-  position:relative;
+  position: relative;
 
   .subsName {
-    color: var(--passion-profile-darker-color, var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Smalt')})) !important;
+    color: var(
+      --passion-profile-darker-color,
+      var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'Smalt')})
+    ) !important;
     font-size: 42px !important;
 
     @media screen and (max-width: 768px) {
@@ -187,7 +227,10 @@
   }
 
   .subsDetailItem {
-    color: var(--passion-profile-dark-color, var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'DodgerBlue')})) !important;
+    color: var(
+      --passion-profile-dark-color,
+      var(--membership-plugin-text-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+    ) !important;
     font-size: 18px;
 
     @media screen and (max-width: 1025px) {
@@ -204,7 +247,7 @@
 
     .subsDetailItemIcon {
       margin-right: 8px;
-      
+
       @media screen and (max-width: 526px) {
         margin-right: 3px;
       }
@@ -237,12 +280,18 @@
 
 .moreContentDrawer {
   .bottomSheetsTitle {
-    color: var(--passion-profile-darker-color, var(--membership-plugin-text-color, #{map-get($colors, 'Smalt')})) !important;
+    color: var(
+      --passion-profile-darker-color,
+      var(--membership-plugin-text-color, #{map-get($colors, 'Smalt')})
+    ) !important;
   }
 
   :global {
     .ant-drawer-content {
-      background-color: var(--passion-profile-lightest-color, var(--membership-widget-background-color,  #{map-get($colors, 'White')}));
+      background-color: var(
+        --passion-profile-lightest-color,
+        var(--membership-widget-background-color, #{map-get($colors, 'White')})
+      );
     }
   }
 }
