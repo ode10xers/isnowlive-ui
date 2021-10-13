@@ -32,6 +32,10 @@ export default {
     updateCustomDomainForCreator: (payload) => http.post('/secure/creator/profile/custom-domain', payload),
     updateCreatorFeeSettings: (payload) => http.post('/secure/creator/settings/platform-fee', payload),
   },
+  waitlist: {
+    joinCourseWaitlist: (courseId) => http.post(`/secure/customer/waitlist/courses/${courseId}`),
+    closeCourseWaitlist: (courseId) => http.post(`/secure/creator/courses/${courseId}/close-waitlist`),
+  },
   payment: {
     stripe: {
       onboardUser: (payload) => http.post('/secure/creator/profile/stripe', payload),
@@ -46,6 +50,8 @@ export default {
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
+    setupUserCard: () => http.post('/secure/customer/payment/setup-card'),
+    saveCustomerCard: (payload) => http.post('/secure/customer/payment/save-card', payload),
     retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
     paypal: {
       initiateCreatorPayPalAccount: (payload) => http.post('/secure/creator/profile/paypal', payload),
@@ -157,10 +163,12 @@ export default {
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
   },
   courses: {
+    deleteCourse: (courseId) => http.delete(`/secure/creator/courses/${courseId}`),
     getCoursesByUsername: () => http.get(`/courses`),
     getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
     getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
-    getDetails: (courseId) => http.get(`/courses/${courseId}`),
+    getDetailsByInternalId: (courseInternalId) => http.get(`/courses/internal/${courseInternalId}`),
+    getDetailsByExternalId: (courseExternalId) => http.get(`/courses/external/${courseExternalId}`),
     getCreatorCourses: () => http.get('/secure/creator/courses'),
     getCreatorCourseDetailsById: (courseId) => http.get(`/secure/creator/courses/${courseId}`),
     createCourse: (payload) => http.post('/secure/creator/courses', payload),

@@ -260,6 +260,7 @@ const VideoDetails = ({ match, history }) => {
           {videoOrderDetails?.isExpired ? (
             <div className={classNames(styles.videoWrapper, styles.expired)}>
               <Image
+                loading="lazy"
                 preview={false}
                 className={styles.videoThumbnail}
                 src={videoOrderDetails?.thumbnail_url || video?.thumbnail_url || 'error'}
@@ -286,6 +287,7 @@ const VideoDetails = ({ match, history }) => {
                     <PlayCircleOutlined className={styles.playIcon} />
                     <div className={styles.imageOverlay}>
                       <Image
+                        loading="lazy"
                         preview={false}
                         className={styles.videoThumbnail}
                         src={videoOrderDetails?.thumbnail_url || video?.thumbnail_url || 'error'}

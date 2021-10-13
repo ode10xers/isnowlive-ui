@@ -42,6 +42,21 @@ const SelectablePassItem = ({
     }
   };
 
+  const generateUsableProductsForPassText = (pass) => {
+    const videosCount = pass?.videos?.length ?? 0;
+
+    const sessionsCount = pass?.session?.filter((session) => session.type === 'NORMAL')?.length ?? 0;
+    const availabilityCount = pass?.session?.filter((session) => session.type === 'AVAILABILITY')?.length ?? 0;
+
+    const textArr = [
+      `${videosCount > 0 ? `${videosCount} Videos` : ''}`,
+      `${sessionsCount > 0 ? `${sessionsCount} Sessions` : ''}`,
+      `${availabilityCount > 0 ? `${availabilityCount} Availabilities` : ''}`,
+    ].filter((text) => text);
+
+    return textArr.join(', ');
+  };
+
   const [h, s, l] = convertHexToHSL(pass?.color_code ?? '#1890ff');
 
   const colorObj = {
@@ -79,6 +94,9 @@ const SelectablePassItem = ({
             <Text className={styles.passDetailsItem}>{pass?.class_count ?? 0} Credits</Text>
             <Text className={styles.passDetailsItem}>{pass?.validity ?? 0} Days Validity</Text>
           </Space>
+        </Col>
+        <Col xs={24}>
+          <Text className={styles.passProductText}>Usable for {generateUsableProductsForPassText(pass)}</Text>
         </Col>
         {showExtra && (
           <>

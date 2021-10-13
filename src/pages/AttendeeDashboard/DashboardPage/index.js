@@ -289,7 +289,7 @@ const DashboardPage = ({ history }) => {
     >
       <Row gutter={[12, 12]}>
         <Col xs={24} md={10} lg={14} xl={12}>
-          <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
+          <Image loading="lazy" className={styles.coverImage} src={video.thumbnail_url} preview={false} />
         </Col>
         <Col xs={24} md={14} lg={10} xl={12}>
           <Row>
@@ -478,6 +478,7 @@ const DashboardPage = ({ history }) => {
       width: md ? '150px' : '180px',
       render: (text, record) => (
         <Image
+          loading="lazy"
           src={text || 'error'}
           alt={record.course?.name}
           fallback={DefaultImage()}

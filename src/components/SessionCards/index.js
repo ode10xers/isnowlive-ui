@@ -62,6 +62,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                       <Row gutter={[8, 8]}>
                         <Col xs={24}>
                           <Image
+                            loading="lazy"
                             preview={false}
                             // height={100}
                             className={styles.cardImage}
@@ -102,6 +103,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                       <Row gutter={16}>
                         <Col xs={24} md={11}>
                           <Image
+                            loading="lazy"
                             preview={false}
                             // height={136}
                             // width="100%"

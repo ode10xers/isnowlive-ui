@@ -196,6 +196,7 @@
 
   .buyBtnText {
     font-size: 14px;
+    font-weight: 500;
   }
 
   .buyBtnDivider {
@@ -278,13 +279,13 @@
         top: 50%;
         left: 50%;
         z-index: 1;
-        margin-top: -20px;
-        margin-left: -90px;
+        margin-top: -16px;
+        margin-left: -104px;
         padding: 6px 12px;
-        width: 180px;
+        width: 220px;
         background: rgba(0, 0, 0, 0.4);
-        color: map-get($map: $colors, $key: 'White');
-        font-size: 16px;
+        color: #ffffff;
+        font-size: 12px;
         border-radius: 8px;
         text-align: center;
       }

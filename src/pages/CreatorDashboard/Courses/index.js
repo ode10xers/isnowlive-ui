@@ -14,8 +14,10 @@ import {
   Tag,
   Tooltip,
   Space,
-  Divider,
   Grid,
+  Modal,
+  Popconfirm,
+  List,
   message,
 } from 'antd';
 import {
@@ -27,6 +29,9 @@ import {
   ProfileOutlined,
   CopyTwoTone,
   ExportOutlined,
+  CarryOutOutlined,
+  DeleteOutlined,
+  CheckCircleTwoTone,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -35,9 +40,10 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import TagListPopup from 'components/TagListPopup';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { paymentProvider } from 'utils/constants';
 import { getLocalUserDetails } from 'utils/storage';
 import {
   getCourseSessionContentCount,
@@ -58,7 +64,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 const { useBreakpoint } = Grid;
 const {
@@ -67,7 +73,10 @@ const {
 
 const Courses = ({ history }) => {
   const { md, xl } = useBreakpoint();
-  const { showSendEmailPopup } = useGlobalContext();
+  const {
+    state: { userDetails },
+    showSendEmailPopup,
+  } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -75,6 +84,8 @@ const Courses = ({ history }) => {
 
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
+  const [expandedWaitlistedPublishedRowKeys, setExpandedWaitlistedPublishedRowKeys] = useState([]);
+  const [expandedWaitlistedUnpublishedRowKeys, setExpandedWaitlistedUnpublishedRowKeys] = useState([]);
 
   //#region Start of API Functions
 
@@ -176,6 +187,7 @@ const Courses = ({ history }) => {
         start_date: course.start_date ?? moment().startOf('day').utc().format(),
         end_date: course.end_date ?? moment().endOf('day').add(10, 'day').utc().format(),
         modules: course.modules ?? [],
+        waitlist: course.waitlist ?? false,
       };
 
       const { status, data } = await apis.courses.createCourse(clonedPayload);
@@ -185,26 +197,55 @@ const Courses = ({ history }) => {
         if (data?.id) {
           redirectToEditCourse(data?.id);
         }
-        // Modal.confirm({
-        //   closable: true,
-        //   icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-        //   title: 'Course successfully cloned!',
-        //   content: (
-        //     <>
-        //       <Paragraph>
-        //         The cloned course will be unpublished by default. You can continue to edit it and publish it later.
-        //       </Paragraph>
-        //     </>
-        //   ),
-        //   okText: 'Continue to edit',
-        //   onOk: () => (data.id ? redirectToEditCourse(data?.id) : false),
-        //   cancelText: 'Close',
-        // });
       }
     } catch (error) {
       console.error(error);
       showErrorModal('Failed to clone course', error.response?.data?.message || 'Something went wrong.');
     }
+    setIsLoading(false);
+  };
+
+  const closeCourseWaitlist = async (course) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.waitlist.closeCourseWaitlist(course.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal(
+          'Course open for registration',
+          <>
+            <Paragraph>The course is now available for purchase and the wait-list has been closed.</Paragraph>
+            <Paragraph>
+              We've also notified the users in the wait-list that this course is available for purchase on your website.
+            </Paragraph>
+          </>
+        );
+        fetchAllCoursesForCreator();
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to close wait-list', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const deleteCourse = async (course) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.courses.deleteCourse(course.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Course has been cancelled!');
+        fetchAllCoursesForCreator();
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to cancel course', error?.response?.data?.message || 'Something went wrong');
+    }
+
     setIsLoading(false);
   };
 
@@ -241,7 +282,9 @@ const Courses = ({ history }) => {
 
   const copyCourseLink = (courseId) => {
     const username = getLocalUserDetails().username;
-    const pageLink = `${generateUrlFromUsername(username)}/c/${courseId}`;
+    const pageLink = `${generateUrlFromUsername(username)}${generatePath(Routes.courseDetails, {
+      course_id: courseId,
+    })}`;
 
     copyToClipboard(pageLink);
   };
@@ -278,7 +321,7 @@ const Courses = ({ history }) => {
       setExpandedPublishedRowKeys([]);
     } else {
       setExpandedPublishedRowKeys(
-        courses?.filter((liveCourse) => liveCourse.is_published).map((liveCourse) => liveCourse.id)
+        courses?.filter((course) => course.is_published && !course.waitlist).map((course) => course.id)
       );
     }
   };
@@ -297,7 +340,7 @@ const Courses = ({ history }) => {
       setExpandedUnpublishedRowKeys([]);
     } else {
       setExpandedUnpublishedRowKeys(
-        courses?.filter((liveCourse) => !liveCourse.is_published).map((liveCourse) => liveCourse.id)
+        courses?.filter((course) => !course.is_published && !course.waitlist).map((course) => course.id)
       );
     }
   };
@@ -311,88 +354,367 @@ const Courses = ({ history }) => {
   const collapseRowUnpublished = (rowKey) =>
     setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
+  const toggleExpandAllWaitlistedPublished = () => {
+    if (expandedWaitlistedPublishedRowKeys.length > 0) {
+      setExpandedWaitlistedPublishedRowKeys([]);
+    } else {
+      setExpandedWaitlistedPublishedRowKeys(
+        courses?.filter((course) => course.is_published && course.waitlist).map((course) => course.id)
+      );
+    }
+  };
+
+  const expandRowWaitlistedPublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedWaitlistedPublishedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedWaitlistedPublishedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRowWaitlistedPublished = (rowKey) =>
+    setExpandedWaitlistedPublishedRowKeys(expandedWaitlistedPublishedRowKeys.filter((key) => key !== rowKey));
+
+  const toggleExpandAllWaitlistedUnpublished = () => {
+    if (expandedWaitlistedUnpublishedRowKeys.length > 0) {
+      setExpandedWaitlistedUnpublishedRowKeys([]);
+    } else {
+      setExpandedWaitlistedUnpublishedRowKeys(
+        courses?.filter((course) => !course.is_published && course.waitlist).map((course) => course.id)
+      );
+    }
+  };
+
+  const expandRowWaitlistedUnpublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedWaitlistedUnpublishedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedWaitlistedUnpublishedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRowWaitlistedUnpublished = (rowKey) =>
+    setExpandedWaitlistedUnpublishedRowKeys(expandedWaitlistedUnpublishedRowKeys.filter((key) => key !== rowKey));
+
   //#endregion End Of Expandable Logics
 
   //#region Start Of Table Columns
 
-  const generateLiveCourseColumns = (published) => {
+  const handleCloseWaitlistClicked = (course) => {
+    Modal.confirm({
+      centered: true,
+      closable: true,
+      maskClosable: true,
+      width: 640,
+      okText: 'Close Wait-list',
+      onOk: () => closeCourseWaitlist(course),
+      afterClose: resetBodyStyle,
+      title: 'Are you sure about closing the wait-list?',
+      content: (
+        <>
+          <Paragraph>The following things will happen once the wait-list is closed</Paragraph>
+          <List
+            size="large"
+            dataSource={[
+              'Users who have joined the wait-list will be notified to buy the course',
+              'Anyone will be able to purchase the course and the wait-list will be closed',
+            ]}
+            renderItem={(item) => (
+              <List.Item.Meta
+                avatar={<CheckCircleTwoTone twoToneColor="#1890ff" />}
+                description={<Paragraph strong>{item}</Paragraph>}
+              />
+            )}
+          />
+        </>
+      ),
+    });
+  };
+
+  const renderCourseName = (text, record) => {
+    return {
+      props: {
+        style: {
+          borderLeft: `6px solid ${record.color_code || '#FFF'}`,
+        },
+      },
+      children: (
+        <>
+          <Text> {record?.name} </Text>
+          {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
+        </>
+      ),
+    };
+  };
+
+  const renderCourseDuration = (text, record) =>
+    record?.type === 'VIDEO'
+      ? `${record?.validity ?? 0} days`
+      : `${toShortDateMonth(record.start_date)} - ${toShortDateMonth(record.end_date)}`;
+
+  const renderCourseContents = (text, record) => {
+    const sessionCount = getCourseSessionContentCount(record?.modules ?? []);
+    const videoCount = getCourseVideoContentCount(record?.modules ?? []);
+    const docCount = getCourseDocumentContentCount(record?.modules ?? []);
+    const emptyCount = getCourseEmptyContentCount(record?.modules ?? []);
+
+    if (!sessionCount && !videoCount && !docCount) {
+      return <Tag>{`${emptyCount} outlines`}</Tag>;
+    }
+
+    return (
+      <Space size={1} wrap={true}>
+        {sessionCount > 0 ? (
+          <Tag className={styles.mb5} color="blue">
+            {`${sessionCount} sessions`}
+          </Tag>
+        ) : null}
+        {videoCount > 0 ? (
+          <Tag className={styles.mb5} color="purple">
+            {`${videoCount} videos`}
+          </Tag>
+        ) : null}
+        {docCount > 0 ? (
+          <Tag className={styles.mb5} color="magenta">
+            {`${docCount} files`}
+          </Tag>
+        ) : null}
+        {emptyCount > 0 ? <Tag>{`${emptyCount} outlines`}</Tag> : null}
+      </Space>
+    );
+  };
+
+  const renderCoursePrice = (text, record) =>
+    record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free';
+
+  const renderCourseActions = (text, record) => (
+    <Row gutter={4} justify="end" align="middle">
+      <Col xs={6} xl={3}>
+        <Tooltip title="Edit Course Details">
+          <Button
+            block
+            type="text"
+            onClick={() => redirectToEditCourse(record.id)}
+            icon={<EditTwoTone twoToneColor="#08979c" />}
+          />
+        </Tooltip>
+      </Col>
+      <Col xs={6} xl={3}>
+        <Tooltip title="Edit Course Modules">
+          <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
+        </Tooltip>
+      </Col>
+      <Col xs={12} xl={5}>
+        <Popover
+          placement="topRight"
+          content={
+            <Space>
+              <Tooltip title="Copy Course Link">
+                <Button
+                  type="link"
+                  onClick={() => copyCourseLink(record.internal_id)}
+                  icon={<CopyTwoTone twoToneColor="#08979c" />}
+                />
+              </Tooltip>
+              <Tooltip title="Send Customer Email">
+                <Button type="link" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+              </Tooltip>
+              <Popconfirm
+                title="Are you sure about cancelling the course?"
+                okButtonProps={{ danger: true }}
+                okText="Yes, cancel the course"
+                cancelText="Nevermind"
+                onConfirm={() => deleteCourse(record)}
+              >
+                <Tooltip title="Cancel Course">
+                  <Button danger type="link" icon={<DeleteOutlined />} />
+                </Tooltip>
+              </Popconfirm>
+              <Tooltip title="Clone This Course">
+                <Button type="text" onClick={() => cloneCourse(record)} icon={<ExportOutlined />} />
+              </Tooltip>
+            </Space>
+          }
+        >
+          <Button block type="text">
+            More
+          </Button>
+        </Popover>
+      </Col>
+      <Col xs={12} xl={5}>
+        {record.is_published ? (
+          <Tooltip title="Hide Course">
+            <Button danger block type="link" onClick={() => unpublishCourse(record)}>
+              Hide
+            </Button>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Unhide Course">
+            <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
+              Show
+            </Button>
+          </Tooltip>
+        )}
+      </Col>
+      <Col xs={12} xl={8}>
+        {record.is_published ? (
+          expandedPublishedRowKeys.includes(record.id) ? (
+            <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
+              {record.buyers?.length} Buyers <UpOutlined />
+            </Button>
+          ) : (
+            <Button block type="link" onClick={() => expandRowPublished(record.id)}>
+              {record.buyers?.length} Buyers <DownOutlined />
+            </Button>
+          )
+        ) : expandedUnpublishedRowKeys.includes(record.id) ? (
+          <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
+            {record.buyers?.length} Buyers <UpOutlined />
+          </Button>
+        ) : (
+          <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
+            {record.buyers?.length} Buyers <DownOutlined />
+          </Button>
+        )}
+      </Col>
+    </Row>
+  );
+
+  const renderWaitlistedCourseActions = (text, record) => (
+    <Row gutter={4} justify="end" align="middle">
+      <Col xs={6} xl={3}>
+        <Tooltip title="Edit Course Details">
+          <Button
+            block
+            type="text"
+            onClick={() => redirectToEditCourse(record.id)}
+            icon={<EditTwoTone twoToneColor="#08979c" />}
+          />
+        </Tooltip>
+      </Col>
+      <Col xs={6} xl={3}>
+        <Tooltip title="Edit Course Modules">
+          <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
+        </Tooltip>
+      </Col>
+      <Col xs={12} xl={5}>
+        <Popover
+          placement="topRight"
+          content={
+            <Space>
+              <Tooltip title="Copy Course Link">
+                <Button
+                  type="link"
+                  onClick={() => copyCourseLink(record.internal_id)}
+                  icon={<CopyTwoTone twoToneColor="#08979c" />}
+                />
+              </Tooltip>
+              <Tooltip title="Open Registrations">
+                <Button
+                  type="link"
+                  className={styles.successBtn}
+                  onClick={() => handleCloseWaitlistClicked(record)}
+                  icon={<CarryOutOutlined />}
+                />
+              </Tooltip>
+              <Popconfirm
+                title="Are you sure about cancelling the course?"
+                okButtonProps={{ danger: true }}
+                okText="Yes, cancel the course"
+                cancelText="Nevermind"
+                onConfirm={() => deleteCourse(record)}
+              >
+                <Tooltip title="Cancel Course">
+                  <Button danger type="link" icon={<DeleteOutlined />} />
+                </Tooltip>
+              </Popconfirm>
+              <Tooltip title="Clone This Course">
+                <Button type="text" onClick={() => cloneCourse(record)} icon={<ExportOutlined />} />
+              </Tooltip>
+            </Space>
+          }
+        >
+          <Button block type="text">
+            More
+          </Button>
+        </Popover>
+      </Col>
+      <Col xs={12} xl={5}>
+        {record.is_published ? (
+          <Tooltip title="Hide Course">
+            <Button danger block type="link" onClick={() => unpublishCourse(record)}>
+              Hide
+            </Button>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Unhide Course">
+            <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
+              Show
+            </Button>
+          </Tooltip>
+        )}
+      </Col>
+      <Col xs={12} xl={8}>
+        {record.is_published ? (
+          expandedWaitlistedPublishedRowKeys.includes(record.id) ? (
+            <Button block type="link" onClick={() => collapseRowWaitlistedPublished(record.id)}>
+              {record.waitlist_users?.length} Waitlist <UpOutlined />
+            </Button>
+          ) : (
+            <Button block type="link" onClick={() => expandRowWaitlistedPublished(record.id)}>
+              {record.waitlist_users?.length} Waitlist <DownOutlined />
+            </Button>
+          )
+        ) : expandedWaitlistedUnpublishedRowKeys.includes(record.id) ? (
+          <Button block type="link" onClick={() => collapseRowWaitlistedUnpublished(record.id)}>
+            {record.waitlist_users?.length} Waitlist <UpOutlined />
+          </Button>
+        ) : (
+          <Button block type="link" onClick={() => expandRowWaitlistedUnpublished(record.id)}>
+            {record.waitlist_users?.length} Waitlist <DownOutlined />
+          </Button>
+        )}
+      </Col>
+    </Row>
+  );
+
+  const generateCourseColumns = (published = false, waitlisted = false) => {
     const initialColumns = [
       {
         title: 'Course Name',
         dataIndex: 'name',
         key: 'name',
-        render: (text, record) => {
-          return {
-            props: {
-              style: {
-                borderLeft: `6px solid ${record.color_code || '#FFF'}`,
-              },
-            },
-            children: (
-              <>
-                <Text> {record?.name} </Text>
-                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
-              </>
-            ),
-          };
-        },
+        render: renderCourseName,
       },
       {
         title: 'Duration',
         dataIndex: 'start_time',
         key: 'start_time',
         width: !xl ? '80px' : '120px',
-        render: (text, record) =>
-          record?.type === 'VIDEO'
-            ? `${record?.validity ?? 0} days`
-            : `${toShortDateMonth(record.start_date)} - ${toShortDateMonth(record.end_date)}`,
+        render: renderCourseDuration,
       },
       {
         title: 'Course Content',
-        dataIndex: 'inventory_ids',
-        key: 'inventory_ids',
+        dataIndex: 'modules',
+        key: 'modules',
         width: '170px',
-        render: (text, record) => {
-          const sessionCount = getCourseSessionContentCount(record?.modules ?? []);
-          const videoCount = getCourseVideoContentCount(record?.modules ?? []);
-          const docCount = getCourseDocumentContentCount(record?.modules ?? []);
-          const emptyCount = getCourseEmptyContentCount(record?.modules ?? []);
-
-          if (!sessionCount && !videoCount && !docCount) {
-            return <Tag>{`${emptyCount} outlines`}</Tag>;
-          }
-
-          return (
-            <Space size={1} wrap={true}>
-              {sessionCount > 0 ? (
-                <Tag className={styles.mb5} color="blue">
-                  {`${sessionCount} sessions`}
-                </Tag>
-              ) : null}
-              {videoCount > 0 ? (
-                <Tag className={styles.mb5} color="purple">
-                  {`${videoCount} videos`}
-                </Tag>
-              ) : null}
-              {docCount > 0 ? (
-                <Tag className={styles.mb5} color="magenta">
-                  {`${docCount} files`}
-                </Tag>
-              ) : null}
-              {emptyCount > 0 ? <Tag>{`${emptyCount} outlines`}</Tag> : null}
-            </Space>
-          );
-        },
+        render: renderCourseContents,
       },
       {
         title: 'Price',
         dataIndex: 'price',
         key: 'price',
         width: '90px',
-        render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
+        render: renderCoursePrice,
       },
       {
-        title: published ? (
+        title: waitlisted ? (
+          published ? (
+            <Button ghost type="primary" onClick={() => toggleExpandAllWaitlistedPublished()}>
+              {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          ) : (
+            <Button ghost type="primary" onClick={() => toggleExpandAllWaitlistedUnpublished()}>
+              {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          )
+        ) : published ? (
           <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
             {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
@@ -403,92 +725,7 @@ const Courses = ({ history }) => {
         ),
         width: !xl ? '200px' : '310px',
         align: 'right',
-        render: (text, record) => (
-          <Row gutter={4} justify="end" align="middle">
-            {/* <Col xs={6} xl={3}>
-              <Tooltip title="Send Customer Email">
-                <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
-              </Tooltip>
-            </Col> */}
-            <Col xs={6} xl={3}>
-              <Tooltip title="Edit Course Details">
-                <Button
-                  block
-                  type="text"
-                  onClick={() => redirectToEditCourse(record.id)}
-                  icon={<EditTwoTone twoToneColor="#08979c" />}
-                />
-              </Tooltip>
-            </Col>
-            <Col xs={6} xl={3}>
-              <Tooltip title="Edit Course Modules">
-                <Button block type="link" onClick={() => redirectToEditModules(record.id)} icon={<ProfileOutlined />} />
-              </Tooltip>
-            </Col>
-            <Col xs={12} xl={5}>
-              <Popover
-                placement="topRight"
-                content={
-                  <Space>
-                    <Tooltip title="Copy Course Link">
-                      <Button
-                        type="link"
-                        onClick={() => copyCourseLink(record.id)}
-                        icon={<CopyTwoTone twoToneColor="#08979c" />}
-                      />
-                    </Tooltip>
-                    <Tooltip title="Send Customer Email">
-                      <Button type="link" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
-                    </Tooltip>
-                    <Tooltip title="Clone This Course">
-                      <Button type="text" onClick={() => cloneCourse(record)} icon={<ExportOutlined />} />
-                    </Tooltip>
-                  </Space>
-                }
-              >
-                <Button block type="text">
-                  More
-                </Button>
-              </Popover>
-            </Col>
-            <Col xs={12} xl={5}>
-              {record.is_published ? (
-                <Tooltip title="Hide Course">
-                  <Button danger block type="link" onClick={() => unpublishCourse(record)}>
-                    Hide
-                  </Button>
-                </Tooltip>
-              ) : (
-                <Tooltip title="Unhide Course">
-                  <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
-                    Show
-                  </Button>
-                </Tooltip>
-              )}
-            </Col>
-            <Col xs={12} xl={8}>
-              {record.is_published ? (
-                expandedPublishedRowKeys.includes(record.id) ? (
-                  <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
-                    {record.buyers?.length} Buyers <UpOutlined />
-                  </Button>
-                ) : (
-                  <Button block type="link" onClick={() => expandRowPublished(record.id)}>
-                    {record.buyers?.length} Buyers <DownOutlined />
-                  </Button>
-                )
-              ) : expandedUnpublishedRowKeys.includes(record.id) ? (
-                <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
-                  {record.buyers?.length} Buyers <UpOutlined />
-                </Button>
-              ) : (
-                <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
-                  {record.buyers?.length} Buyers <DownOutlined />
-                </Button>
-              )}
-            </Col>
-          </Row>
-        ),
+        render: waitlisted ? renderWaitlistedCourseActions : renderCourseActions,
       },
     ];
 
@@ -507,6 +744,19 @@ const Courses = ({ history }) => {
 
     return initialColumns;
   };
+
+  const waitlistUserColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'full_name',
+      key: 'full_name',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+  ];
 
   const buyersColumns = [
     {
@@ -541,15 +791,44 @@ const Courses = ({ history }) => {
 
   //#region Start Of Render Functions
 
+  const renderWaitlistUserList = (record) => (
+    <div className={classNames(styles.mb20, styles.mt20)}>
+      <Table
+        columns={waitlistUserColumns}
+        data={record.waitlist_users ?? []}
+        rowKey={(user) => `${user.full_name}_${user.email}`}
+      />
+    </div>
+  );
+
   const renderBuyersList = (record) => {
     return (
       <div className={classNames(styles.mb20, styles.mt20)}>
         <Table
           columns={buyersColumns}
-          data={record.buyers}
-          rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
+          data={record.buyers ?? []}
+          rowKey={(buyer) => `${buyer.name}_${buyer.date_of_purchase}`}
         />
       </div>
+    );
+  };
+
+  const renderMobileWaitlistUserCards = (waitlistUser) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={8}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={16}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Col xs={24} key={waitlistUser.email}>
+        <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {waitlistUser.full_name} </Title>}>
+          {layout('Email', <Text strong> {waitlistUser.email || ''} </Text>)}
+        </Card>
+      </Col>
     );
   };
 
@@ -584,9 +863,6 @@ const Courses = ({ history }) => {
       </Row>
     );
 
-    const sessionCount = getCourseSessionContentCount(course?.modules ?? []);
-    const videoCount = getCourseVideoContentCount(course?.modules ?? []);
-
     return (
       <Col xs={24} key={course.id}>
         <Card
@@ -598,9 +874,6 @@ const Courses = ({ history }) => {
             </div>
           }
           actions={[
-            // <Tooltip title="Send Customer Email">
-            //   <Button type="text" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
-            // </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -609,14 +882,6 @@ const Courses = ({ history }) => {
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
-            // <Tooltip title="Copy Course Link">
-            //   <Button
-            //     type="text"
-            //     className={styles.detailsButton}
-            //     onClick={() => copyCourseLink(course.id)}
-            //     icon={<CopyOutlined />}
-            //   />
-            // </Tooltip>,
             <Popover
               trigger="click"
               content={
@@ -625,13 +890,37 @@ const Courses = ({ history }) => {
                     <Button
                       type="link"
                       className={styles.detailsButton}
-                      onClick={() => copyCourseLink(course.id)}
+                      onClick={() => copyCourseLink(course.internal_id)}
                       icon={<CopyTwoTone twoToneColor="#08979c" />}
                     />
                   </Tooltip>
-                  <Tooltip title="Send Customer Email">
-                    <Button type="link" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
-                  </Tooltip>
+                  {course.waitlist ? (
+                    <>
+                      <Tooltip title="Open Registrations">
+                        <Button
+                          type="link"
+                          className={styles.successBtn}
+                          onClick={() => handleCloseWaitlistClicked(course)}
+                          icon={<CarryOutOutlined />}
+                        />
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <Tooltip title="Send Customer Email">
+                      <Button type="link" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
+                    </Tooltip>
+                  )}
+                  <Popconfirm
+                    title="Are you sure about cancelling the course?"
+                    okButtonProps={{ danger: true }}
+                    okText="Yes, cancel the course"
+                    cancelText="Nevermind"
+                    onConfirm={() => deleteCourse(course)}
+                  >
+                    <Tooltip title="Cancel Course">
+                      <Button danger type="link" icon={<DeleteOutlined />} />
+                    </Tooltip>
+                  </Popconfirm>
                   <Tooltip title="Clone This Course">
                     <Button type="text" onClick={() => cloneCourse(course)} icon={<ExportOutlined />} />
                   </Tooltip>
@@ -653,7 +942,19 @@ const Courses = ({ history }) => {
                 </Button>
               </Tooltip>
             ),
-            course.is_published ? (
+            course.waitlist ? (
+              course.is_published ? (
+                expandedWaitlistedPublishedRowKeys.includes(course.id) ? (
+                  <Button type="link" onClick={() => collapseRowWaitlistedPublished(course.id)} icon={<UpOutlined />} />
+                ) : (
+                  <Button type="link" onClick={() => expandRowWaitlistedPublished(course.id)} icon={<DownOutlined />} />
+                )
+              ) : expandedWaitlistedUnpublishedRowKeys.includes(course.id) ? (
+                <Button type="link" onClick={() => collapseRowWaitlistedUnpublished(course.id)} icon={<UpOutlined />} />
+              ) : (
+                <Button type="link" onClick={() => expandRowWaitlistedUnpublished(course.id)} icon={<DownOutlined />} />
+              )
+            ) : course.is_published ? (
               expandedPublishedRowKeys.includes(course.id) ? (
                 <Button type="link" onClick={() => collapseRowPublished(course.id)} icon={<UpOutlined />} />
               ) : (
@@ -674,27 +975,35 @@ const Courses = ({ history }) => {
                 : `${toShortDateMonth(course.start_date)} - ${toShortDateMonth(course.end_date)}`}
             </Text>
           )}
-          {layout(
-            'Content',
-            <Tag color="blue">
-              <Space split={<Divider type="vertical" />}>
-                {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
-                {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
-              </Space>
-            </Tag>
-          )}
+          {layout('Content', renderCourseContents('', course))}
           {layout(
             'Price',
             <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
           )}
           {creatorMemberTags.length > 0 && <TagListPopup tags={course.tag} mobileView={true} />}
         </Card>
-        {course.is_published
+        {course.waitlist
+          ? course.is_published
+            ? expandedWaitlistedPublishedRowKeys.includes(course.id) && (
+                <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                  {course.waitlist_users?.map(renderMobileWaitlistUserCards)}
+                </Row>
+              )
+            : expandedWaitlistedUnpublishedRowKeys.includes(course.id) && (
+                <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                  {course.waitlist_users?.map(renderMobileWaitlistUserCards)}
+                </Row>
+              )
+          : course.is_published
           ? expandedPublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+              <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                {course.buyers?.map(renderMobileSubscriberCards)}
+              </Row>
             )
           : expandedUnpublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+              <Row className={styles.cardExpansion} gutter={[8, 8]}>
+                {course.buyers?.map(renderMobileSubscriberCards)}
+              </Row>
             )}
       </Col>
     );
@@ -720,57 +1029,148 @@ const Courses = ({ history }) => {
         <Col xs={24}>
           <Loader loading={isLoading} size="large" text="Fetching Courses">
             <Collapse defaultActiveKey={['published', 'unpublished']}>
-              <Panel header={<Title level={5}> Published </Title>} key="published">
-                {!md ? (
-                  <Row gutter={[8, 16]}>
-                    <Col xs={24}>
-                      <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
-                        {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                      </Button>
-                    </Col>
-                    {courses?.filter((liveCourse) => liveCourse.is_published).map(renderCourseItem)}
-                  </Row>
-                ) : (
-                  <Table
-                    size="small"
-                    sticky={true}
-                    columns={generateLiveCourseColumns(true)}
-                    data={courses?.filter((liveCourse) => liveCourse.is_published)}
-                    rowKey={(record) => record.id}
-                    expandable={{
-                      expandedRowRender: renderBuyersList,
-                      expandRowByClick: true,
-                      expandIconColumnIndex: -1,
-                      expandedRowKeys: expandedPublishedRowKeys,
-                    }}
-                  />
-                )}
+              <Panel
+                header={
+                  <Title level={4} className={styles.collapseHeaderText}>
+                    {' '}
+                    Published{' '}
+                  </Title>
+                }
+                key="published"
+              >
+                <Row gutter={[12, 20]}>
+                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
+                    courses?.filter((course) => course.is_published && course.waitlist).length > 0 && (
+                      <Col xs={24}>
+                        <Title level={5}>Wait-list Course</Title>
+                        {!md ? (
+                          <Row gutter={[8, 16]}>
+                            <Col xs={24}>
+                              <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedPublished}>
+                                {expandedWaitlistedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                              </Button>
+                            </Col>
+                            {courses?.filter((course) => course.is_published && course.waitlist).map(renderCourseItem)}
+                          </Row>
+                        ) : (
+                          <Table
+                            size="small"
+                            sticky={true}
+                            columns={generateCourseColumns(true, true)}
+                            data={courses?.filter((course) => course.is_published && course.waitlist)}
+                            rowKey={(record) => record.id}
+                            expandable={{
+                              expandedRowRender: renderWaitlistUserList,
+                              expandRowByClick: true,
+                              expandIconColumnIndex: -1,
+                              expandedRowKeys: expandedWaitlistedPublishedRowKeys,
+                            }}
+                          />
+                        )}
+                      </Col>
+                    )}
+                  <Col xs={24}>
+                    {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
+                      <Title level={5}>Normal Course</Title>
+                    )}
+                    {!md ? (
+                      <Row gutter={[8, 16]}>
+                        <Col xs={24}>
+                          <Button block ghost type="primary" onClick={toggleExpandAllPublished}>
+                            {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                          </Button>
+                        </Col>
+                        {courses?.filter((course) => course.is_published && !course.waitlist).map(renderCourseItem)}
+                      </Row>
+                    ) : (
+                      <Table
+                        size="small"
+                        sticky={true}
+                        columns={generateCourseColumns(true, false)}
+                        data={courses?.filter((course) => course.is_published && !course.waitlist)}
+                        rowKey={(record) => record.id}
+                        expandable={{
+                          expandedRowRender: renderBuyersList,
+                          expandRowByClick: true,
+                          expandIconColumnIndex: -1,
+                          expandedRowKeys: expandedPublishedRowKeys,
+                        }}
+                      />
+                    )}
+                  </Col>
+                </Row>
               </Panel>
-              <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
-                {!md ? (
-                  <Row gutter={[8, 16]}>
-                    <Col xs={24}>
-                      <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
-                        {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                      </Button>
-                    </Col>
-                    {courses?.filter((liveCourse) => !liveCourse.is_published).map(renderCourseItem)}
-                  </Row>
-                ) : (
-                  <Table
-                    size="small"
-                    sticky={true}
-                    columns={generateLiveCourseColumns(false)}
-                    data={courses?.filter((liveCourse) => !liveCourse.is_published)}
-                    rowKey={(record) => record.id}
-                    expandable={{
-                      expandedRowRender: renderBuyersList,
-                      expandRowByClick: true,
-                      expandIconColumnIndex: -1,
-                      expandedRowKeys: expandedUnpublishedRowKeys,
-                    }}
-                  />
-                )}
+              <Panel
+                header={
+                  <Title level={4} className={styles.collapseHeaderText}>
+                    Unpublished
+                  </Title>
+                }
+                key="unpublished"
+              >
+                <Row gutter={[12, 20]}>
+                  {userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
+                    courses?.filter((course) => !course.is_published && course.waitlist).length > 0 && (
+                      <Col xs={24}>
+                        <Title level={5}>Wait-list Course</Title>
+                        {!md ? (
+                          <Row gutter={[8, 16]}>
+                            <Col xs={24}>
+                              <Button block ghost type="primary" onClick={toggleExpandAllWaitlistedUnpublished}>
+                                {expandedWaitlistedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                              </Button>
+                            </Col>
+                            {courses?.filter((course) => !course.is_published && course.waitlist).map(renderCourseItem)}
+                          </Row>
+                        ) : (
+                          <Table
+                            size="small"
+                            sticky={true}
+                            columns={generateCourseColumns(false, true)}
+                            data={courses?.filter((course) => !course.is_published && course.waitlist)}
+                            rowKey={(record) => record.id}
+                            expandable={{
+                              expandedRowRender: renderWaitlistUserList,
+                              expandRowByClick: true,
+                              expandIconColumnIndex: -1,
+                              expandedRowKeys: expandedWaitlistedUnpublishedRowKeys,
+                            }}
+                          />
+                        )}
+                      </Col>
+                    )}
+
+                  <Col xs={24}>
+                    {userDetails?.profile?.payment_provider === paymentProvider.STRIPE && (
+                      <Title level={5}>Normal Course</Title>
+                    )}
+                    {!md ? (
+                      <Row gutter={[8, 16]}>
+                        <Col xs={24}>
+                          <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
+                            {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                          </Button>
+                        </Col>
+                        {courses?.filter((course) => !course.is_published && !course.waitlist).map(renderCourseItem)}
+                      </Row>
+                    ) : (
+                      <Table
+                        size="small"
+                        sticky={true}
+                        // columns={generateCourseColumns(false)}
+                        columns={generateCourseColumns(false, false)}
+                        data={courses?.filter((course) => !course.is_published && !course.waitlist)}
+                        rowKey={(record) => record.id}
+                        expandable={{
+                          expandedRowRender: renderBuyersList,
+                          expandRowByClick: true,
+                          expandIconColumnIndex: -1,
+                          expandedRowKeys: expandedUnpublishedRowKeys,
+                        }}
+                      />
+                    )}
+                  </Col>
+                </Row>
               </Panel>
             </Collapse>
           </Loader>

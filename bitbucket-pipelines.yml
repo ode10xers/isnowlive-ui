@@ -13,7 +13,7 @@ pipelines:
             - npm
           script:
             - npm install --cache .npmcache
-            - npm rebuild node-sass #required since the version in cache is different because node version change
+            # - npm rebuild node-sass #required since the version in cache is different because node version change
             - npm run build:prod
           artifacts:
             - build/**
@@ -42,7 +42,7 @@ pipelines:
             - npm
           script:
             - npm install --cache .npmcache
-            - npm rebuild node-sass #required since the version in cache is different because node version change
+            # - npm rebuild node-sass #required since the version in cache is different because node version change
             - npm run build:stage
           artifacts:
             - build/**
@@ -71,5 +71,5 @@ pipelines:
             - npm
           script:
             - npm install --cache .npmcache
-            - npm rebuild node-sass #required since the version in cache is different because node version change
+            # - npm rebuild node-sass #required since the version in cache is different because node version change
             - npm run build

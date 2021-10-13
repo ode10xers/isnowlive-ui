@@ -444,6 +444,7 @@ const videos = [
 
 const courses = [
   {
+    internal_id: 200,
     is_dummy: true,
     name: 'Beginners Yoga Course',
     description:
@@ -498,6 +499,7 @@ const courses = [
     current_capacity: 10,
   },
   {
+    internal_id: 322,
     is_dummy: true,
     name: 'Intermediate Yoga Course',
     description:
@@ -547,6 +549,7 @@ const courses = [
     current_capacity: 1,
   },
   {
+    internal_id: 420,
     is_dummy: true,
     name: 'Expert Yoga Course',
     description:

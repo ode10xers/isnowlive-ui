@@ -117,8 +117,9 @@ const SessionDetails = ({ match, history }) => {
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24}>
           <Image
+            loading="lazy"
             preview={false}
-            width={'100%'}
+            width="100%"
             className={classNames(styles.coverImage, styles.mb20)}
             src={session?.session_image_url || 'error'}
             fallback={DefaultImage()}

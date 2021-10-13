@@ -3,11 +3,12 @@ import React from 'react';
 import { Row, Col, Button, Typography } from 'antd';
 import { CaretRightOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { redirectToMembershipPage } from 'utils/redirect';
+import { redirectToMembershipPage, redirectToPluginMembershipDetailsPage } from 'utils/redirect';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import { convertHexToHSL, formatHSLStyleString } from 'utils/colors';
 
 import styles from './style.module.scss';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 const { Text, Paragraph } = Typography;
 
@@ -39,7 +40,11 @@ const SelectableSubscriptionItem = ({
     if (onDetails) {
       onDetails(subscription);
     } else {
-      redirectToMembershipPage(subscription);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        redirectToPluginMembershipDetailsPage(subscription);
+      } else {
+        redirectToMembershipPage(subscription);
+      }
     }
   };
 
@@ -60,7 +65,7 @@ const SelectableSubscriptionItem = ({
             <Col flex="1 1 auto">
               <Text className={styles.subscriptionName}>{subscription?.name}</Text>
             </Col>
-            <Col flex="0 0 90px" className={styles.textAlignRight}>
+            <Col flex="0 0 64px" className={styles.textAlignRight}>
               {subscription?.total_price > 0 ? (
                 <>
                   <Text className={styles.subscriptionCurrency}>{subscription?.currency?.toUpperCase() ?? ''} </Text>

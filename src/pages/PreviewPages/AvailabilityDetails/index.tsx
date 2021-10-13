@@ -238,6 +238,7 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
       {/* @ts-ignore */}
       <Loader loading={isLoading} size="large" text="Loading availability">
         <Image
+          loading="lazy"
           className={styles.availabilityHeaderImage}
           preview={false}
           src={availability?.session_image_url}

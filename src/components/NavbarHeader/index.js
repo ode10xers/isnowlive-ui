@@ -160,7 +160,7 @@ const NavbarHeader = () => {
   if (reservedDomainName.includes(username)) {
     return (
       <div>
-        <img src={logo} alt="Passion.do" height="44px" />
+        <img loading="lazy" src={logo} alt="Passion.do" height="44px" />
       </div>
     );
   }

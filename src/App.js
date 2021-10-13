@@ -68,6 +68,7 @@ const PluginPages = lazy(() => import('pages/PluginPages'));
 
 // const CookieConsentPopup = lazy(() => import('components/CookieConsentPopup'));
 const PaymentPopup = lazy(() => import('components/PaymentPopup'));
+const WaitlistRegisterPopup = lazy(() => import('components/WaitlistRegisterPopup'));
 const SendCustomerEmailModal = lazy(() => import('components/SendCustomerEmailModal'));
 
 function RouteWithLayout({ layout, component, ...rest }) {
@@ -229,6 +230,7 @@ function App() {
   return (
     <Suspense fallback={<div> Loading... </div>}>
       <PaymentPopup />
+      <WaitlistRegisterPopup />
       {userDetails && userDetails.is_creator && <SendCustomerEmailModal />}
       <Router>
         {isWidget && isReadyToLoad && publishedWidgets.includes(widgetType) ? (

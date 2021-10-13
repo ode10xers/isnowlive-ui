@@ -38,6 +38,7 @@ const HostDetails = ({ host }) => {
         </Col>
         <Col flex={isMobileDevice ? '80px' : '120px'}>
           <Image
+            loading="lazy"
             preview={false}
             className={isMobileDevice ? styles.profileImageSmall : styles.profileImage}
             width={isMobileDevice ? 80 : 120}

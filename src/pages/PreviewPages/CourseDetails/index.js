@@ -129,7 +129,9 @@ const CourseDetailPreview = ({ match, history }) => {
     if (match.params.course_id && creatorProfile) {
       const templateData = creatorProfile?.profile?.category ?? 'YOGA';
 
-      const targetCourse = dummy[templateData].COURSES.find((course) => course.id === match.params.course_id);
+      const targetCourse = dummy[templateData].COURSES.find(
+        (course) => course.internal_id === parseInt(match.params.course_id)
+      );
 
       if (targetCourse) {
         fetchCourseContentDetails(targetCourse, templateData);
@@ -334,7 +336,7 @@ const CourseDetailPreview = ({ match, history }) => {
           <Row gutter={[10, 10]} justify="center" align="middle">
             {carouselItem.map((imageUrl, imageIndex) => (
               <Col xs={12} md={6} key={`${imageIndex}_${imageUrl}`}>
-                <Image width="100%" className={styles.coursePreviewImage} src={imageUrl} />
+                <Image loading="lazy" width="100%" className={styles.coursePreviewImage} src={imageUrl} />
               </Col>
             ))}
           </Row>
@@ -366,6 +368,7 @@ const CourseDetailPreview = ({ match, history }) => {
               <Col xs={24}>
                 <div className={styles.courseImageContainer}>
                   <Image
+                    loading="lazy"
                     width="100%"
                     className={styles.courseCoverImage}
                     src={course?.course_image_url}
@@ -489,7 +492,7 @@ const CourseDetailPreview = ({ match, history }) => {
                 {generateLongDescriptionTemplate('Know your mentor', creatorProfile?.profile?.bio)}
               </Col>
               <Col xs={24} md={6} className={styles.textAlignCenter}>
-                <Image className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
+                <Image loading="lazy" className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
               </Col>
             </Row>
           </Col>

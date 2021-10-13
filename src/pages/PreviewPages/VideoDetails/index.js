@@ -33,6 +33,7 @@ const {
   formatDate: { getVideoMinutesDuration },
 } = dateUtil;
 
+// TODO: This is an old version of UI. Change this to use new version
 const VideoDetailPreview = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [videoData, setVideoData] = useState(null);
@@ -215,7 +216,7 @@ const VideoDetailPreview = ({ match, history }) => {
                 {/* Video Thumbnail */}
                 <Col xs={24}>
                   <div className={styles.videoImageContainer}>
-                    <Image preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
+                    <Image loading="lazy" preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
                   </div>
                 </Col>
 

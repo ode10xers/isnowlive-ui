@@ -60,6 +60,7 @@ const SessionListCard = ({ session }) => {
       {/* <div className={styles.extraTagsContainer}>{extraTags}</div> */}
       <div className={styles.sessionImageContainer}>
         <Image
+          loading="lazy"
           preview={false}
           className={styles.sessionImage}
           src={isValidFile(adjustedSession?.session_image_url) ? adjustedSession?.session_image_url : DefaultImage}

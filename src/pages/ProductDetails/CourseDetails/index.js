@@ -13,6 +13,8 @@ import {
   PlusOutlined,
   NotificationOutlined,
   FilePdfOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -20,7 +22,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
 import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
-import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import { showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { generateColorPalletteForProfile } from 'utils/colors';
@@ -54,7 +56,7 @@ const {
 const CourseDetails = ({ match }) => {
   const courseId = match.params.course_id;
 
-  const { showPaymentPopup } = useGlobalContext();
+  const { showPaymentPopup, showWaitlistPopup } = useGlobalContext();
 
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -142,11 +144,19 @@ const CourseDetails = ({ match }) => {
   }, []);
 
   const getCourseDetails = useCallback(
-    async (courseId) => {
+    async (course_id) => {
       setIsLoading(true);
 
       try {
-        const { status, data } = await apis.courses.getDetails(courseId);
+        let targetAPI = null;
+
+        if (isNaN(course_id)) {
+          targetAPI = apis.courses.getDetailsByExternalId;
+        } else {
+          targetAPI = apis.courses.getDetailsByInternalId;
+        }
+
+        const { status, data } = await targetAPI(course_id);
 
         if (isAPISuccess(status) && data) {
           setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.name) ?? []);
@@ -195,6 +205,21 @@ const CourseDetails = ({ match }) => {
   }, [creatorProfile]);
 
   //#region Start of Buy Logics
+
+  const openWaitlistPopup = async () => {
+    if (!course) {
+      showErrorModal('Something went wrong', 'Invalid Course Selected');
+      return;
+    }
+
+    const waitlistPopupData = {
+      productId: course?.id,
+      productName: course?.name,
+      productType: productType.COURSE,
+    };
+
+    showWaitlistPopup(waitlistPopupData);
+  };
 
   const showConfirmPaymentPopup = async () => {
     if (!course) {
@@ -265,7 +290,7 @@ const CourseDetails = ({ match }) => {
             payment_order_id: data.course_order_id,
           };
         } else {
-          showPurchaseSingleCourseSuccessModal();
+          // showPurchaseSingleCourseSuccessModal();
           return {
             ...data,
             is_successful_order: true,
@@ -437,7 +462,24 @@ const CourseDetails = ({ match }) => {
           </Space>
         );
       case 'DOCUMENT':
-        return <Text type="secondary">{contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable</Text>;
+        // return <Text type="secondary">{contentData?.is_downloadable ?? false ? '' : 'Not'} Downloadable</Text>;
+        return (
+          <Button
+            type="primary"
+            className={classNames(
+              styles.courseBuyBtn,
+              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                ? styles.darkText
+                : styles.lightText,
+              !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
+                ? styles.disabled
+                : undefined
+            )}
+            onClick={handleCourseBuyClicked}
+          >
+            {contentData?.is_downloadable ? 'Download' : 'Preview'}
+          </Button>
+        );
       default:
         break;
     }
@@ -497,7 +539,7 @@ const CourseDetails = ({ match }) => {
           <Row gutter={[10, 10]} justify="center" align="middle">
             {carouselItem.map((imageUrl, imageIndex) => (
               <Col xs={12} md={6} key={`${imageIndex}_${imageUrl}`}>
-                <Image width="100%" className={styles.coursePreviewImage} src={imageUrl} />
+                <Image loading="lazy" width="100%" className={styles.coursePreviewImage} src={imageUrl} />
               </Col>
             ))}
           </Row>
@@ -517,6 +559,61 @@ const CourseDetails = ({ match }) => {
       </Panel>
     ));
   };
+
+  const courseBuyButton = (
+    <Button
+      size="large"
+      type="primary"
+      className={classNames(
+        styles.courseBuyBtn,
+        isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+          ? styles.darkText
+          : styles.lightText,
+        !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
+          ? styles.disabled
+          : undefined
+      )}
+      onClick={handleCourseBuyClicked}
+      disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
+    >
+      {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
+        `Course has reached max capacity`
+      ) : !course?.modules ? (
+        // NOTE : Empty here means that there is no modules at all
+        // There can be a case where the modules are all outlines
+        `Cannot purchase an empty course`
+      ) : (
+        <>
+          {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
+          {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
+        </>
+      )}
+    </Button>
+  );
+
+  const waitlistSection = (
+    <Space size="large" direction="vertical" align="center" className={styles.waitlistInfoContainer}>
+      <Text className={styles.waitlistHelpText}>
+        {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
+      </Text>
+      <Button
+        size="large"
+        type="primary"
+        className={classNames(
+          styles.courseBuyBtn,
+          isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+            ? styles.darkText
+            : styles.lightText
+        )}
+        onClick={handleCourseBuyClicked}
+      >
+        Join Wait-list
+      </Button>
+      <Text className={styles.waitlistHelpText}>
+        You will be notified when the creator opens the course for purchase
+      </Text>
+    </Space>
+  );
 
   // NOTE: Currently this component only supports type = YOUTUBE
   const coursePreviewEmbed = (
@@ -544,7 +641,11 @@ const CourseDetails = ({ match }) => {
 
   return (
     <div className={styles.newCourseDetails}>
-      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
+      <AuthModal
+        visible={showAuthModal}
+        closeModal={closeAuthModal}
+        onLoggedInCallback={course?.waitlist ? openWaitlistPopup : showConfirmPaymentPopup}
+      />
       <Loader loading={isLoading} size="large">
         <Row gutter={[8, 50]}>
           <Col xs={24}>
@@ -552,6 +653,7 @@ const CourseDetails = ({ match }) => {
               <Col xs={24}>
                 <div className={styles.courseImageContainer}>
                   <Image
+                    loading="lazy"
                     width="100%"
                     className={styles.courseCoverImage}
                     src={course?.course_image_url}
@@ -565,36 +667,7 @@ const CourseDetails = ({ match }) => {
                       {course?.description && (
                         <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
                       )}
-                      <Button
-                        size="large"
-                        type="primary"
-                        className={classNames(
-                          styles.courseBuyBtn,
-                          isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-                            ? styles.darkText
-                            : styles.lightText,
-                          !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
-                            ? styles.disabled
-                            : undefined
-                        )}
-                        onClick={handleCourseBuyClicked}
-                        disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
-                      >
-                        {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
-                          `Course has reached max capacity`
-                        ) : !course?.modules ? (
-                          // NOTE : Empty here means that there is no modules at all
-                          // There can be a case where the modules are all outlines
-                          `Cannot purchase an empty course`
-                        ) : (
-                          <>
-                            {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
-                            {course?.total_price > 0
-                              ? `${course?.currency?.toUpperCase()} ${course?.total_price}`
-                              : 'Free'}
-                          </>
-                        )}
-                      </Button>
+                      {course?.waitlist ? waitlistSection : courseBuyButton}
                     </Space>
                   </div>
                 </div>
@@ -683,7 +756,7 @@ const CourseDetails = ({ match }) => {
                 {generateLongDescriptionTemplate('Know your mentor', creatorProfile?.profile?.bio)}
               </Col>
               <Col xs={24} md={6} className={styles.textAlignCenter}>
-                <Image className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
+                <Image loading="lazy" className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
               </Col>
             </Row>
           </Col>
@@ -693,7 +766,13 @@ const CourseDetails = ({ match }) => {
               <Title level={5} className={styles.coursePreviewTitle}>
                 See what happens inside the course
               </Title>
-              <Carousel dots={{ className: styles.carouselDots }} className={styles.coursePreviewImagesContainer}>
+              <Carousel
+                arrows={true}
+                prevArrow={<LeftOutlined />}
+                nextArrow={<RightOutlined />}
+                dots={{ className: styles.carouselDots }}
+                className={styles.coursePreviewImagesContainer}
+              >
                 {renderImagePreviews(course?.preview_image_url)}
               </Carousel>
             </Col>

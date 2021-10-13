@@ -923,7 +923,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
               <div className={styles.passionBranding} onClick={handlePassionBrandingClicked}>
                 Build your site with
                 <span className={styles.passionLogoContainer}>
-                  <img src={PassionLogo} alt="Passion.do" className={styles.passionLogo} />
+                  <img loading="lazy" src={PassionLogo} alt="Passion.do" className={styles.passionLogo} />
                 </span>
               </div>
             </Col>

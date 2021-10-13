@@ -75,6 +75,8 @@ const {
     or Subscription Order Object (for type 'SUBSCRIPTION')
 */
 
+// TODO: Tidy things up here, context data doesn't need to be passed down since
+// child components can access directly
 const PaymentPopup = () => {
   const [form] = Form.useForm();
   const {
@@ -310,6 +312,7 @@ const PaymentPopup = () => {
     return result;
   };
 
+  // TODO: Adjust the popup behavior here to prevent double popup
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
     if (orderResponse && orderResponse?.is_successful_order) {
       if (verifyOrderRes === orderType.PASS) {
@@ -483,7 +486,7 @@ const PaymentPopup = () => {
       centered={true}
       footer={null}
       title={<Title level={4}> Confirm your purchase </Title>}
-      onCancel={() => closePaymentPopup()}
+      onCancel={closePaymentPopup}
     >
       <Row gutter={[8, 32]} justify="center">
         <Col xs={24}>
