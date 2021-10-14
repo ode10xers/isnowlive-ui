@@ -30,6 +30,7 @@ const SessionContentPopup = ({
   courseStartDate = null,
   courseEndDate = null,
   changeCourseDates,
+  excludedSessions = [],
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [inventories, setInventories] = useState([]);
@@ -45,13 +46,14 @@ const SessionContentPopup = ({
       const { status, data } = await apis.session.getUpcomingSession();
 
       if (isAPISuccess(status) && data) {
-        setInventories(data);
+        // setInventories(data);
+        setInventories(data.filter((inventory) => !excludedSessions.includes(inventory.inventory_external_id)));
       }
     } catch (error) {
       showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
-  }, []);
+  }, [excludedSessions]);
 
   useEffect(() => {
     if (visible) {

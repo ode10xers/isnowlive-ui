@@ -206,6 +206,7 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
 
+  const [excludedSessionsInModal, setExcludedSessionsInModal] = useState([]);
   // const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
   // const [excludedFilesInModal, setExcludedFilesInModal] = useState([]);
 
@@ -350,7 +351,6 @@ const CourseModulesForm = ({ match, history }) => {
   // NOTE : Since now we support duplicates, we want the duplicates to show up
   // so the propagate video popup shows up properly
   const getVideoContentIDsFromModules = (modules = []) => [
-    // ...new Set(
     ...modules.reduce(
       (acc, module) =>
         (acc = acc.concat(
@@ -360,7 +360,6 @@ const CourseModulesForm = ({ match, history }) => {
         )),
       []
     ),
-    // ),
   ];
 
   const getSessionContentIDsFromModules = (modules = []) => [
@@ -400,6 +399,11 @@ const CourseModulesForm = ({ match, history }) => {
   //   const currModules = form.getFieldValue('modules');
   //   return getFileContentIDsFromModules(currModules);
   // };
+
+  const getExcludedSessionContentsForModal = () => {
+    const currModules = form.getFieldValue('modules');
+    return getSessionContentIDsFromModules(currModules);
+  };
 
   const isVideoContentModified = (newModules) => {
     if (!courseDetails?.modules) {
@@ -768,6 +772,7 @@ const CourseModulesForm = ({ match, history }) => {
   const openSessionPopup = (moduleIndex) => {
     const addContentFunction = initializeAddContentFunction(moduleIndex);
     setAddSessionContentMethod(() => addContentFunction);
+    setExcludedSessionsInModal(getExcludedSessionContentsForModal());
     setSessionPopupVisible(true);
   };
 
@@ -842,6 +847,7 @@ const CourseModulesForm = ({ match, history }) => {
         courseStartDate={courseStartDate}
         courseEndDate={courseEndDate}
         changeCourseDates={handleChangeCourseDates}
+        excludedSessions={excludedSessionsInModal}
       />
       <VideoContentPopup
         visible={videoPopupVisible}
