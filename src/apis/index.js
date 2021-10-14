@@ -5,6 +5,11 @@ export default {
   admin: {
     login: (payload) => http.post('/auth/login/admin', payload),
   },
+  platform_subscriptions: {
+    getCreatorPlatformSubscriptions: () => http.get('/secure/creator/platform/subscriptions'),
+    cancelCreatorPlatformSubscription: (platformSubscriptionId) =>
+      http.delete(`/secure/creator/platform/subscriptions/${platformSubscriptionId}`),
+  },
   user: {
     login: (payload) => http.post('/auth/login', payload),
     signup: (payload) => http.post('/user', payload),
