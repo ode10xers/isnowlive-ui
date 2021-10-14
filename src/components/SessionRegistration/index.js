@@ -794,7 +794,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
           showBookSingleSessionSuccessModal(inventoryId);
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -857,7 +857,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -890,7 +890,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {
@@ -922,7 +922,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         showBookSessionWithSubscriptionSuccessModal(payload.inventory_id);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {

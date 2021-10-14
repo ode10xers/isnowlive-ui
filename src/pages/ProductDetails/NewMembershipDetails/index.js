@@ -208,7 +208,7 @@ const NewMembershipDetails = ({ match }) => {
           showPurchaseSubscriptionSuccessModal();
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

@@ -186,7 +186,7 @@ const PassDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

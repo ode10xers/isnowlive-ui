@@ -354,7 +354,7 @@ const NewVideoDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -415,7 +415,7 @@ const NewVideoDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -451,7 +451,7 @@ const NewVideoDetails = ({ match }) => {
         setIsLoading(false);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {
@@ -511,7 +511,7 @@ const NewVideoDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -544,7 +544,7 @@ const NewVideoDetails = ({ match }) => {
         setIsLoading(false);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {

@@ -98,7 +98,7 @@ const PublicPassList = ({ passes }) => {
           showPurchasePassSuccessModal(data.pass_order_id);
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

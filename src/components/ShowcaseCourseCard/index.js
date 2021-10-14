@@ -186,7 +186,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
         setSelectedCourse(null);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {
@@ -239,7 +239,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
           showPurchaseSingleCourseSuccessModal();
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
