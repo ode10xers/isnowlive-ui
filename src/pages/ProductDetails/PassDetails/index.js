@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
+import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, Grid, message } from 'antd';
 import {
   CaretDownOutlined,
   CheckCircleFilled,
@@ -22,7 +22,6 @@ import AvailabilityListItem from 'components/DynamicProfileComponents/Availabili
 import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { getExternalLink, getUsernameFromUrl } from 'utils/url';
 import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { socialMediaIcons, orderType, productType, reservedDomainName } from 'utils/constants';
@@ -37,9 +36,11 @@ const {
 } = dateUtil;
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const PassDetails = ({ match }) => {
   const { showPaymentPopup } = useGlobalContext();
+  const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -627,7 +628,7 @@ const PassDetails = ({ match }) => {
             {creatorPasses
               .filter((pass) => pass.external_id !== initialPassDetails?.external_id)
               .sort((a, b) => b.total_price - a.total_price)
-              .slice(0, isMobileDevice ? 2 : 5)
+              .slice(0, !lg ? 2 : 5)
               .map(renderBuyablePassItem)}
           </>
         ) : null}

@@ -108,7 +108,6 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     () => availability?.inventory.find((inv) => inv.inventory_id === Number(selectedInventoryId)),
     [availability, selectedInventoryId]
   );
-  // const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
   const [view, setView] = useState<AvailabilityDetailsView>('date');
 
   const [creatorProfile, setCreatorProfile] = useState<any>(null);

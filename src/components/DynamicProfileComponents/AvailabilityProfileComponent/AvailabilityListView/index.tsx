@@ -1,11 +1,9 @@
 import React, { useCallback } from 'react';
 import { Col, Row } from 'antd';
-// import { Swiper, SwiperSlide } from 'swiper/react'
 
 import AvailabilityListItem from '../AvailabilityListItem';
 
 import type { Session } from 'types/models/session';
-// import { isMobileDevice } from 'utils/device'
 
 import styles from './style.module.scss';
 
@@ -17,7 +15,6 @@ export interface AvailabilityListViewProps {
 const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({ availabilities = [], isContained = false }) => {
   const renderAvailabilityListItem = useCallback(
     (availability: Session) => (
-      // <SwiperSlide key={availability.session_id}>
       <Col
         xs={isContained ? 24 : 20}
         md={12}
@@ -26,7 +23,6 @@ const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({ availabili
       >
         <AvailabilityListItem availability={availability} />
       </Col>
-      // </SwiperSlide>
     ),
     [isContained]
   );
@@ -34,13 +30,6 @@ const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({ availabili
   return (
     <div>
       {availabilities.length > 0 ? (
-        // <Row>
-        //   <Col span={24}>
-        //     <Swiper slidesPerView={isMobileDevice ? 1.2 : 2.2}>
-        //       {availabilities.map(renderAvailabilityListItem)}
-        //     </Swiper>
-        //   </Col>
-        // </Row>
         <Row gutter={[12, 4]} className={isContained ? undefined : styles.availabilitiesContainer}>
           {availabilities.map(renderAvailabilityListItem)}
         </Row>

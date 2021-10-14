@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Row, Col, Button, Typography, Tooltip, Card, Empty, Popconfirm } from 'antd';
+import { Row, Col, Button, Typography, Tooltip, Card, Empty, Grid, Popconfirm } from 'antd';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -11,15 +11,17 @@ import CreateFileObjectModal from 'components/CreateFileObjectModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const Files = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { lg } = useBreakpoint();
+
   const [files, setFiles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [createFileModalVisible, setCreateFileModalVisible] = useState(false);
 
   const [selectedFileObject, setSelectedFileObject] = useState(null);
@@ -173,7 +175,7 @@ const Files = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          {isMobileDevice ? (
+          {!lg ? (
             files.length > 0 ? (
               <Loader loading={isLoading} text="Fetching files details...">
                 <Row gutter={[16, 16]} justify="center">

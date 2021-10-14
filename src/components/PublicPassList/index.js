@@ -7,9 +7,8 @@ import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-// import SessionCards from 'components/SessionCards';
-import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import AuthModal from 'components/AuthModal';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 

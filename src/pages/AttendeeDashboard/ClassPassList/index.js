@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Button, Typography, Collapse, Card, Tag } from 'antd';
+
+import { Row, Col, Grid, Button, Typography, Collapse, Card, Tag } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-// import SessionCards from 'components/SessionCards';
-// import SimpleVideoCardsList from 'components/SimpleVideoCardsList'
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { isUnapprovedUserError } from 'utils/helper';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 
@@ -21,15 +19,17 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+const { useBreakpoint } = Grid;
 
 const {
   formatDate: { toShortDate },
 } = dateUtil;
 
 const ClassPassList = () => {
+  const { lg } = useBreakpoint();
   const [passes, setPasses] = useState([]);
-  const [expiredPasses, setExpiredPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [expiredPasses, setExpiredPasses] = useState([]);
   const [expandedActiveRowKeys, setExpandedActiveRowKeys] = useState([]);
   const [expandedExpiredRowKeys, setExpandedExpiredRowKeys] = useState([]);
 
@@ -240,10 +240,7 @@ const ClassPassList = () => {
           <Col xs={24}>
             <Text className={styles.ml20}> Sessions bookable with this pass </Text>
           </Col>
-          <Col xs={24}>
-            {/* <SessionCards sessions={record.sessions} /> */}
-            {renderSessionList(record.sessions)}
-          </Col>
+          <Col xs={24}>{renderSessionList(record.sessions)}</Col>
         </>
       )}
       {record.videos?.length > 0 && (
@@ -251,10 +248,7 @@ const ClassPassList = () => {
           <Col xs={24}>
             <Text className={styles.ml20}> Videos purchasable with this pass </Text>
           </Col>
-          <Col xs={24}>
-            {/* <SimpleVideoCardsList passDetails={record} videos={record.videos} /> */}
-            {renderVideoList(record.videos)}
-          </Col>
+          <Col xs={24}>{renderVideoList(record.videos)}</Col>
         </>
       )}
     </Row>
@@ -356,7 +350,7 @@ const ClassPassList = () => {
             <Panel header={<Title level={5}> Active Passes </Title>} key="Active">
               <Row gutter={[8, 8]}>
                 <Col xs={24}>
-                  {isMobileDevice ? (
+                  {!lg ? (
                     <Loader loading={isLoading} size="large" text="Loading Active Passes">
                       <Row gutter={[8, 8]}>{passes.map(renderPassItem)}</Row>
                     </Loader>
@@ -381,7 +375,7 @@ const ClassPassList = () => {
             <Panel header={<Title level={5}> Expired Passes </Title>} key="Expired">
               <Row gutter={[8, 8]}>
                 <Col xs={24}>
-                  {isMobileDevice ? (
+                  {!lg ? (
                     <Loader loading={isLoading} size="large" text="Loading Expired Passes">
                       <Row gutter={[8, 8]}>{expiredPasses.map(renderPassItem)}</Row>
                     </Loader>

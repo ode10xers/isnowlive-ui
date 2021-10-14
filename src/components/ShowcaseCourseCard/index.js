@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 
-import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
+import { Row, Col, Image, Typography, Button, Tag, Card, Grid, message } from 'antd';
 
 import apis from 'apis';
 
@@ -17,7 +17,6 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import { redirectToCoursesPage } from 'utils/redirect';
 import { orderType, courseType, productType, paymentSource } from 'utils/constants';
@@ -28,6 +27,7 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './styles.module.scss';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 const {
   formatDate: { toShortDateWithYear },
   timezoneUtils: { getTimezoneLocation },
@@ -35,6 +35,7 @@ const {
 
 const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPage }) => {
   const history = useHistory();
+  const { lg } = useBreakpoint();
 
   const {
     showPaymentPopup,
@@ -290,7 +291,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
                       <Image
                         loading="lazy"
                         preview={false}
-                        height={isMobileDevice ? 100 : 130}
+                        height={!lg ? 100 : 130}
                         className={styles.courseImage}
                         src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
                       />

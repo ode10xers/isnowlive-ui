@@ -66,23 +66,6 @@ const Subscriptions = () => {
 
   const renderProductDetails = () => {
     if (selectedSubscription) {
-      // return selectedProductDetailsKey === 'SESSION' ? (
-      //   <SessionCards
-      //     sessions={selectedSubscription?.product_details['SESSION']}
-      //     shouldFetchInventories={true}
-      //     compactView={true}
-      //   />
-      // ) : selectedProductDetailsKey === 'VIDEO' ? (
-      //   <Row gutter={[8, 8]} justify="center">
-      //     {selectedSubscription?.product_details['VIDEO'].map((video) => (
-      //       <Col xs={24} key={video.external_id}>
-      //         <VideoCard video={video} />
-      //       </Col>
-      //     ))}
-      //   </Row>
-      // ) : (
-      //   <Text disabled> No product details to show </Text>
-      // );
       return selectedProductDetailsKey === 'SESSION' ? (
         renderSessionList(selectedSubscription?.product_details['SESSION'])
       ) : selectedProductDetailsKey === 'VIDEO' ? (
