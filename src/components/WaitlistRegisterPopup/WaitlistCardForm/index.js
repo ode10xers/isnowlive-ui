@@ -7,7 +7,8 @@ import apis from 'apis';
 
 import { showErrorModal, showWaitlistJoinedModal } from 'components/Modals/modals';
 
-import { isUnapprovedUserError, isAPISuccess, productType as productTypes } from 'utils/helper';
+import { productType as productTypes } from 'utils/constants';
+import { isUnapprovedUserError, isAPISuccess } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 

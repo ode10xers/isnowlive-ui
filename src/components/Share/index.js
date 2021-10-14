@@ -18,8 +18,6 @@ import {
   WhatsappShareButton,
 } from 'react-share';
 
-import { isMobileDevice } from 'utils/device';
-
 const { Item } = Menu;
 
 const Share = ({ label, title, shareUrl }) => {
@@ -58,7 +56,7 @@ const Share = ({ label, title, shareUrl }) => {
 
   return (
     <Dropdown overlay={menu} placement="bottomLeft">
-      <Button size={isMobileDevice ? 'small' : 'middle'} icon={<ShareAltOutlined />}>
+      <Button size="middle" icon={<ShareAltOutlined />}>
         {label}
       </Button>
     </Dropdown>

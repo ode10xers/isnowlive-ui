@@ -1,35 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Collapse, Empty } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Collapse, Grid, Empty } from 'antd';
 import {
-  DownOutlined,
   UpOutlined,
-  PlusCircleOutlined,
+  DownOutlined,
   EditOutlined,
   CopyOutlined,
-  EyeInvisibleOutlined,
   MailOutlined,
+  PlusCircleOutlined,
+  EyeInvisibleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import CreatePassModal from 'components/CreatePassModal';
 import TagListPopup from 'components/TagListPopup';
+import CreatePassModal from 'components/CreatePassModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
-import { defaultPlatformFeePercentage } from 'utils/constants';
-import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType } from 'utils/helper';
+import { isAPISuccess, copyToClipboard } from 'utils/helper';
+import { defaultPlatformFeePercentage, productType } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 const {
   formatDate: { toDateAndTime },
@@ -38,6 +39,7 @@ const {
 
 const ClassPassList = () => {
   const { showSendEmailPopup } = useGlobalContext();
+  const { lg } = useBreakpoint();
 
   const [targetPass, setTargetPass] = useState(null);
   const [passes, setPasses] = useState([]);
@@ -569,7 +571,7 @@ const ClassPassList = () => {
             <Panel header={<Title level={5}> Published </Title>} key="published">
               {passes?.filter((pass) => pass.is_published).length > 0 ? (
                 <>
-                  {isMobileDevice ? (
+                  {!lg ? (
                     <Loader loading={isLoading} size="large" text="Loading Passes">
                       <Row gutter={[8, 16]}>{passes?.filter((pass) => pass.is_published).map(renderPassItem)}</Row>
                     </Loader>
@@ -596,7 +598,7 @@ const ClassPassList = () => {
             <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
               {passes?.filter((pass) => !pass.is_published).length > 0 ? (
                 <>
-                  {isMobileDevice ? (
+                  {!lg ? (
                     <Loader loading={isLoading} size="large" text="Loading Passes">
                       <Row gutter={[8, 16]}>{passes?.filter((pass) => !pass.is_published).map(renderPassItem)}</Row>
                     </Loader>

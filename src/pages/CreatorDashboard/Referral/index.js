@@ -1,23 +1,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Button, Typography, Collapse, Empty } from 'antd';
+import classNames from 'classnames';
+
+import { Row, Col, Button, Typography, Collapse, Empty, Grid } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
+
 import apis from 'apis';
-import dateUtil from 'utils/date';
+
 import Loader from 'components/Loader';
 import Table from 'components/Table';
 import { showErrorModal } from 'components/Modals/modals';
-import { isMobileDevice } from 'utils/device';
+
+import dateUtil from 'utils/date';
 import { isAPISuccess } from 'utils/helper';
+
 import styles from './styles.module.scss';
-import classNames from 'classnames';
+
 const {
   formatDate: { toLongDateWithDayTime },
 } = dateUtil;
 
 const { Title } = Typography;
 const { Panel } = Collapse;
+const { useBreakpoint } = Grid;
 
 const Referral = () => {
+  const { lg } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
   const [referralData, setReferralData] = useState([]);
 
@@ -159,7 +166,7 @@ const Referral = () => {
           <Collapse defaultActiveKey="Published">
             <Panel header={<Title level={5}> List of all Referrals </Title>} key="Published">
               {referralData?.length ? (
-                isMobileDevice ? (
+                !lg ? (
                   <Loader loading={isLoading} size="large" text="Loading referral data">
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>

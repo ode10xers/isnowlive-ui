@@ -31,13 +31,8 @@ import Routes from 'routes';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
 
-import {
-  deepCloneObject,
-  isAPISuccess,
-  preventDefaults,
-  isInCreatorDashboard,
-  generateUrlFromUsername,
-} from 'utils/helper';
+import { deepCloneObject, isAPISuccess, preventDefaults, isInCreatorDashboard } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 

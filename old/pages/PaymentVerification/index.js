@@ -27,6 +27,7 @@ const {
 
 // NOTE: This page is no longer used, since in-page payment is implemented
 // For handling payment redirects, we are using PaymentRedirectVerification
+/** @deprecated */
 const PaymentVerification = () => {
   const location = useLocation();
   const history = useHistory();

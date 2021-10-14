@@ -43,7 +43,8 @@ import FileContentPopup from '../FileContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { isAPISuccess, deepCloneObject, videoSourceType, preventDefaults } from 'utils/helper';
+import { videoSourceType } from 'utils/constants';
+import { isAPISuccess, deepCloneObject, preventDefaults } from 'utils/helper';
 
 import { courseCreatePageLayout } from 'layouts/FormLayouts';
 

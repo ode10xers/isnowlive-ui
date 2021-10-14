@@ -8,8 +8,9 @@ import Routes from 'routes';
 
 import VideoListCard from '../VideoListCard';
 
+import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from 'utils/helper';
+import { isInCreatorDashboard, preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 

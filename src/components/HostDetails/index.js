@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Image, Space, Typography } from 'antd';
-import { GlobalOutlined, FacebookOutlined, TwitterOutlined, InstagramOutlined } from '@ant-design/icons';
 import ReactHtmlParser from 'react-html-parser';
 
+import { Row, Col, Image, Space, Typography } from 'antd';
+import { GlobalOutlined, FacebookOutlined, TwitterOutlined, InstagramOutlined } from '@ant-design/icons';
+
 import DefaultImage from '../Icons/DefaultImage/index';
+
 import { isMobileDevice } from 'utils/device';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 
 import styles from './styles.module.scss';
-import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 
 const { Title, Link } = Typography;
 

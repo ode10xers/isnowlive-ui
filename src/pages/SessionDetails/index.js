@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography, Tabs } from 'antd';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { Row, Col, Image, Typography, Tabs, Grid, message } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -15,20 +15,18 @@ import PublicVideoList from 'components/PublicVideoList';
 import SessionRegistration from 'components/SessionRegistration';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
-import { isMobileDevice } from 'utils/device';
-import {
-  generateUrlFromUsername,
-  isAPISuccess,
-  reservedDomainName,
-  isUnapprovedUserError,
-  getUsernameFromUrl,
-} from 'utils/helper';
+import { reservedDomainName } from 'utils/constants';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const SessionDetails = ({ match, history }) => {
+  const { lg } = useBreakpoint();
+
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
@@ -185,7 +183,7 @@ const SessionDetails = ({ match, history }) => {
             )}
           </Row>
         </Col>
-        <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : undefined}>
+        <Col xs={24} lg={{ span: 9, offset: 1 }} className={!lg ? styles.mt20 : undefined}>
           {creator && <HostDetails host={creator} />}
         </Col>
       </Row>

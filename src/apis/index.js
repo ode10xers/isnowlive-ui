@@ -1,5 +1,5 @@
 import http from 'services/http';
-import { generateQueryString } from 'utils/helper';
+import { generateQueryString } from 'utils/url';
 
 export default {
   admin: {

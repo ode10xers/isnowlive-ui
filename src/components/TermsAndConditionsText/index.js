@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 
 import { Typography, Checkbox } from 'antd';
 
 import apis from 'apis';
 
-import { generateUrlFromUsername, isAPISuccess, getUsernameFromUrl } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 
 import styles from './styles.module.scss';
-import classNames from 'classnames';
 
 const { Paragraph, Link } = Typography;
 

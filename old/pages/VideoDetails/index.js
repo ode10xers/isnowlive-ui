@@ -25,6 +25,7 @@ import {
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
+import { getUsernameFromUrl } from 'utils/url';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 import {
   isAPISuccess,
@@ -33,7 +34,6 @@ import {
   productType,
   reservedDomainName,
   isUnapprovedUserError,
-  getUsernameFromUrl,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';

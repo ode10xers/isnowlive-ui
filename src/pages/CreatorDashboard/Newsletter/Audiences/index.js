@@ -6,7 +6,6 @@ import apis from 'apis';
 
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import AudienceImport from './AudienceImport';
-// import AudienceList from './AudienceList';
 import EmailList from './EmailList';
 
 import { isAPISuccess } from 'utils/helper';

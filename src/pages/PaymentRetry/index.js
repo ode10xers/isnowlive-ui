@@ -11,16 +11,11 @@ import config from 'config';
 import Loader from 'components/Loader';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
+import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 import { verifyPaymentForOrder } from 'utils/payment';
-import {
-  isAPISuccess,
-  orderType,
-  StripePaymentStatus,
-  getUsernameFromUrl,
-  reservedDomainName,
-  isInCreatorDashboard,
-} from 'utils/helper';
+import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
+import { StripePaymentStatus, reservedDomainName, orderType } from 'utils/constants';
 
 const PaymentRetry = () => {
   const location = useLocation();

@@ -10,9 +10,10 @@ import config from 'config';
 import WaitlistCardForm from './WaitlistCardForm';
 import { resetBodyStyle } from 'components/Modals/modals';
 
-import { paymentProvider } from 'utils/constants';
+import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getUsernameFromUrl, reservedDomainName, isInCreatorDashboard } from 'utils/helper';
+import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
+import { paymentProvider, reservedDomainName } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 

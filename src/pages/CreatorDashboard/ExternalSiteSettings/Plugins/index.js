@@ -6,9 +6,10 @@ import { SketchPicker } from 'react-color';
 import { Row, Col, Select, Typography, Button, Tooltip, Form, Input } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
-import { copyToClipboard, generateWidgetCSSVarsFromJSON } from 'utils/helper';
-import { generateWidgetLink, widgetComponentsName } from 'utils/widgets';
 import validationRules from 'utils/validation';
+import { copyToClipboard } from 'utils/helper';
+import { generateWidgetCSSVarsFromJSON } from 'utils/colors';
+import { generateWidgetLink, widgetComponentsName } from 'utils/widgets';
 
 import styles from './styles.module.scss';
 

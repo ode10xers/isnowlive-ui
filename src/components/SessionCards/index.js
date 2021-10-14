@@ -6,9 +6,10 @@ import { BookTwoTone } from '@ant-design/icons';
 
 import Loader from 'components/Loader';
 
-import { isValidFile, isoDayOfWeek } from 'utils/helper';
-import { redirectToSessionsPage } from 'utils/redirect';
+import { isValidFile } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
+import { isoDayOfWeek } from 'utils/constants';
+import { redirectToSessionsPage } from 'utils/redirect';
 import { mapInventoryDays, getDaysForSession } from 'utils/session';
 
 import styles from './styles.module.scss';

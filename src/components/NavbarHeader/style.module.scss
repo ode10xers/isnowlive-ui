@@ -62,7 +62,7 @@
       color: var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
     }
 
-    .ant-menu-item-active {
+    .ant-menu-item-active, .ant-menu-item-selected {
       color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
       border-bottom: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
     }

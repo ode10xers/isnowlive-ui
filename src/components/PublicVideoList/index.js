@@ -11,7 +11,8 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isAPISuccess, orderType, paymentSource, productType, isUnapprovedUserError } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { orderType, paymentSource, productType } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -100,7 +101,7 @@ const PublicVideoList = ({ videos }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

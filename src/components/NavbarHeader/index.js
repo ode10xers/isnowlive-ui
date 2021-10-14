@@ -10,9 +10,11 @@ import AuthModal from 'components/AuthModal';
 import DashboardToggle from 'components/DashboardToggle';
 import { resetBodyStyle } from 'components/Modals/modals';
 
+import { isAPISuccess } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
+import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
-import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
+import { reservedDomainName } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 

@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
+import moment from 'moment';
+
 import { Row, Col, Typography, Button, Card, message, Popconfirm, Space } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -10,9 +14,6 @@ import {
   DeleteOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
-import moment from 'moment';
-import { useHistory, useLocation } from 'react-router-dom';
-import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -25,10 +26,12 @@ import SessionInfo from 'components/SessionInfo';
 import ParticipantsList from 'components/ParticipantsList';
 import EventAddressModal from 'components/EventAddressModal';
 import InventoryDocumentEditor from './InventoryDocumentEditor';
+import InventoryDescriptionEditor from './InventoryDescriptionEditor';
 
 import dateUtil from 'utils/date';
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard, isValidFile } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
+import { isAPISuccess, getDuration, copyToClipboard, isValidFile } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -38,7 +41,6 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
-import InventoryDescriptionEditor from './InventoryDescriptionEditor';
 
 const {
   formatDate: { toLongDateWithDay, getTimeDiff },

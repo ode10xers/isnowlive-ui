@@ -2,8 +2,9 @@ import React from 'react';
 
 import { Row, Col, Typography } from 'antd';
 
+import { preventDefaults } from 'utils/helper';
+import { getShadeForHexColor } from 'utils/colors';
 import { redirectToMembershipPage } from 'utils/redirect';
-import { getShadeForHexColor, preventDefaults } from 'utils/helper';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 
 import styles from './style.module.scss';

@@ -9,9 +9,11 @@ import dummy from 'data/dummy';
 
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
-import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
-import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
 import { isInIframeWidget } from 'utils/widgets';
+import { reservedDomainName } from 'utils/constants';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 
 import styles from './style.module.scss';
 

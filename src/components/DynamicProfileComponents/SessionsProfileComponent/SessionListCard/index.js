@@ -5,11 +5,12 @@ import { Card, Space, Typography, Image, Divider, Row, Col, Spin, Tag } from 'an
 import { ClockCircleOutlined, HourglassOutlined } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
-import { isValidFile, preventDefaults, isoDayOfWeek } from 'utils/helper';
+import { isoDayOfWeek } from 'utils/constants';
+import { isValidFile, preventDefaults } from 'utils/helper';
+import { getDaysForSession, mapInventoryDays } from 'utils/session';
 import { redirectToInventoryPage, redirectToSessionsPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
-import { getDaysForSession, mapInventoryDays } from 'utils/session';
 const DefaultImage = require('assets/images/greybg.jpg');
 
 const {

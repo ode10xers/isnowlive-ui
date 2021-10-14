@@ -8,7 +8,7 @@ import Routes from 'routes';
 
 import DashboardToggle from 'components/DashboardToggle';
 
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 
 import { useGlobalContext } from 'services/globalContext';
 

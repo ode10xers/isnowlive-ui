@@ -21,11 +21,12 @@ import VideoListView from '../VideosProfileComponent/VideoListView';
 import CoursesListView from '../CoursesProfileComponent/CoursesListView';
 import ProductsEditView from './ProductsEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import ContainerCard from 'components/ContainerCard';
 
-import { convertHexToRGB, isAPISuccess, isBrightColorShade, isInCreatorDashboard } from 'utils/helper';
+import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
+import { convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import styles from './style.module.scss';
-import ContainerCard from 'components/ContainerCard';
 
 const { Text } = Typography;
 

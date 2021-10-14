@@ -43,7 +43,8 @@ import YoutubeLinksEditForm from './YoutubeLinksEditForm';
 import { newProfileFormLayout } from 'layouts/FormLayouts';
 
 import validationRules from 'utils/validation';
-import { deepCloneObject, isAPISuccess, preventDefaults, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
+import { deepCloneObject, isAPISuccess, preventDefaults, copyToClipboard } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 

@@ -11,23 +11,14 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
-import { generateColorPalletteForProfile } from 'utils/colors';
-import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
-
 import dateUtil from 'utils/date';
+import { getUsernameFromUrl } from 'utils/url';
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import { orderType, productType, reservedDomainName } from 'utils/constants';
+import { isAPISuccess, preventDefaults, isUnapprovedUserError } from 'utils/helper';
 import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
-import {
-  orderType,
-  productType,
-  isAPISuccess,
-  preventDefaults,
-  convertHexToRGB,
-  getUsernameFromUrl,
-  reservedDomainName,
-  isBrightColorShade,
-  isUnapprovedUserError,
-} from 'utils/helper';
+import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -217,7 +208,7 @@ const NewMembershipDetails = ({ match }) => {
           showPurchaseSubscriptionSuccessModal();
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

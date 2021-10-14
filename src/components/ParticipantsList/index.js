@@ -1,19 +1,23 @@
 import React from 'react';
-import { Typography, Card, Row, Col } from 'antd';
+import { Typography, Card, Row, Col, Grid } from 'antd';
 
 import Table from 'components/Table';
-import { isMobileDevice } from 'utils/device';
+
 import dateUtil from 'utils/date';
-import { getPaymentStatus, paymentSource } from 'utils/helper';
+import { paymentSource } from 'utils/constants';
+import { getPaymentStatus } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 const {
   formatDate: { toLongDate, toLongDateWithDay },
 } = dateUtil;
 
 const ParticipantsList = ({ participants, isPast, currency }) => {
+  const { lg } = useBreakpoint();
+
   const columns = [
     {
       title: 'Name',
@@ -77,11 +81,7 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
   return (
     <div>
       <Title level={5}>{!isPast && 'Current'} Registrations</Title>
-      {isMobileDevice ? (
-        participants?.map(renderParticipant)
-      ) : (
-        <Table columns={columns} data={participants} loading={false} />
-      )}
+      {!lg ? participants?.map(renderParticipant) : <Table columns={columns} data={participants} loading={false} />}
     </div>
   );
 };

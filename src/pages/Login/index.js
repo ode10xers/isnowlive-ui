@@ -7,8 +7,9 @@ import apis from 'apis';
 import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
+import { isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 import { getRememberUserEmail } from 'utils/storage';
-import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 import {

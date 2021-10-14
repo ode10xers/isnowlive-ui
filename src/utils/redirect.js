@@ -1,8 +1,11 @@
 import { generatePath } from 'react-router';
+
 import Routes from 'routes';
-import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 'utils/helper';
-// import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+
 import { getLocalUserDetails } from 'utils/storage';
+import { reservedDomainName } from 'utils/constants';
+import { getUsernameFromUrl, generateUrlFromUsername } from 'utils/url';
+// import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 export const redirectToInventoryPage = (inventory) => {
   let urlUsername = getUsernameFromUrl();
