@@ -104,16 +104,14 @@ function App() {
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
   const [shouldFetchCreatorDetails, setShouldFetchCreatorDetails] = useState(true);
   const isWidget = isWidgetUrl() || isInIframeWidget();
-  const windowLocation = window.location;
-  const { authCode, widgetType } = parseQueryString(windowLocation.search);
+  // Query Params for Plugins
+  const { authCode, widgetType } = parseQueryString(window.location.search);
 
   // Logic to sign in from Webflow redirection
   // As well as handle auth token passing from widget to site
   // (widgets store tokens in LS while site uses cookies)
-  let signupAuthToken =
-    window.location.search &&
-    window.location.search.includes('signupAuthToken=') &&
-    window.location.search.split('signupAuthToken=')[1];
+  let { signupAuthToken, redirectUrl = null } = parseQueryString(window.location.search);
+
   if (signupAuthToken === '') {
     signupAuthToken = false;
   }
@@ -122,7 +120,11 @@ function App() {
     setAuthCookie(signupAuthToken);
     http.setAuthToken(signupAuthToken);
 
-    window.location = window.location.origin + window.location.pathname;
+    if (redirectUrl) {
+      window.location.href = decodeURIComponent(redirectUrl);
+    } else {
+      window.location = window.location.origin + window.location.pathname;
+    }
   }
 
   // Logic to initially save creator details in LS
