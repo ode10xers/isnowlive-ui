@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+
 import { Row, Col, Typography, Popconfirm, Button, Card, Radio, Empty, Tooltip, Space, Grid } from 'antd';
 import {
   DeleteOutlined,
@@ -13,7 +15,6 @@ import {
   MailOutlined,
   CompassOutlined,
 } from '@ant-design/icons';
-import { useHistory, useLocation } from 'react-router-dom';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -21,14 +22,15 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
-import MeetingDetailsModal from 'components/MeetingDetailsModal';
 import EventAddressModal from 'components/EventAddressModal';
+import MeetingDetailsModal from 'components/MeetingDetailsModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+import { productType } from 'utils/constants';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getDuration, generateUrlFromUsername, copyToClipboard, productType } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
+import { isAPISuccess, getDuration, copyToClipboard } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -57,11 +59,11 @@ const bookingViews = {
   EMPTY: 'empty',
 };
 
-// TODO: Rework the isMobileDevice usage here to use useBreakpoint hooks
+// TODO: Rework the !lg usage here to use useBreakpoint hooks
 const SessionsInventories = ({ match }) => {
   const { showSendEmailPopup } = useGlobalContext();
 
-  const { xs } = useBreakpoint();
+  const { xs, lg } = useBreakpoint();
 
   const history = useHistory();
   const location = useLocation();
@@ -71,7 +73,7 @@ const SessionsInventories = ({ match }) => {
   const [filteredByDateSession, setFilteredByDateSession] = useState([]);
   const [isPast, setIsPast] = useState(false);
   const [view, setView] = useState('list');
-  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
+  const [calendarView, setCalendarView] = useState(!lg ? 'day' : 'month');
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [zoomDetailsModalVisible, setZoomDetailsModalVisible] = useState(false);
   const [offlineEventAddressModalVisible, setOfflineEventAddressModalVisible] = useState(false);
@@ -184,16 +186,14 @@ const SessionsInventories = ({ match }) => {
   };
 
   const trackAndStartSession = (data) => {
-    const eventTag = isMobileDevice
-      ? creator.click.sessions.list.mobile.startSession
-      : creator.click.sessions.list.startSession;
+    const eventTag = !lg ? creator.click.sessions.list.mobile.startSession : creator.click.sessions.list.startSession;
 
     trackSimpleEvent(eventTag, { session_data: data });
     window.open(data.start_url);
   };
 
   const openSessionInventoryDetails = (item) => {
-    const eventTag = isMobileDevice
+    const eventTag = !lg
       ? creator.click.sessions.list.mobile.sessionDetails
       : isPast
       ? creator.click.sessions.list.pastSessionsDetails
@@ -667,7 +667,7 @@ const SessionsInventories = ({ match }) => {
                   </Button>
                 </Col>
                 <Col xs={24}>
-                  {isMobileDevice ? (
+                  {!lg ? (
                     <Loader
                       loading={isLoading}
                       size="large"

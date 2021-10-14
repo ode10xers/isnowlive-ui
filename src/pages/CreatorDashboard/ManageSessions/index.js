@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+
 import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, Collapse, Grid } from 'antd';
 import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { useHistory, useLocation } from 'react-router-dom';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -13,7 +14,8 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrlFromUsername, copyToClipboard, isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
+import { copyToClipboard, isAPISuccess } from 'utils/helper';
 
 import {
   mixPanelEventTags,

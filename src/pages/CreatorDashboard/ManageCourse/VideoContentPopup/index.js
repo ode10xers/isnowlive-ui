@@ -9,7 +9,8 @@ import Routes from 'routes';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal, resetBodyStyle } from 'components/Modals/modals';
 
-import { isAPISuccess, preventDefaults, videoSourceType } from 'utils/helper';
+import { videoSourceType } from 'utils/constants';
+import { isAPISuccess, preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
 

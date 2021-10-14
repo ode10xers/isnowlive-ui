@@ -12,8 +12,10 @@ import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistrationPreview from '../SessionRegistrationPreview';
 
+import { isAPISuccess } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 
 import styles from './style.module.scss';
 

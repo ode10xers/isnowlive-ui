@@ -4,8 +4,9 @@ import classNames from 'classnames';
 import { Card, Typography, Image, Row, Col } from 'antd';
 
 import dateUtil from 'utils/date';
-import { courseType, isValidFile, preventDefaults } from 'utils/helper';
+import { courseType } from 'utils/constants';
 import { redirectToCoursesPage } from 'utils/redirect';
+import { isValidFile, preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');

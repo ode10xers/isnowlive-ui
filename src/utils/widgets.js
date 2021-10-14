@@ -1,4 +1,4 @@
-import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 import parseQueryString from 'utils/parseQueryString';
 

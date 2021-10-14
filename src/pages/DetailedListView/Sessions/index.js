@@ -12,9 +12,11 @@ import dummy from 'data/dummy';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 import dateUtil from 'utils/date';
-import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
-import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
 import { isInIframeWidget } from 'utils/widgets';
+import { reservedDomainName } from 'utils/constants';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import parseQueryString from 'utils/parseQueryString';
 
 import styles from './style.module.scss';

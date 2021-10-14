@@ -10,7 +10,8 @@ import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isAPISuccess, orderType, productType, paymentSource, isUnapprovedUserError } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { orderType, productType, paymentSource } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -126,7 +127,7 @@ const CalendarSessions = () => {
           showBookSingleSessionSuccessModal(inventoryId);
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

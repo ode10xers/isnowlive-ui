@@ -1,17 +1,22 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
 import { Row, Col, Typography, Button, Tooltip } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
-import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { copyToClipboard } from 'utils/helper';
+
 import apis from 'apis';
-import dateUtil from 'utils/date';
+
 import Table from 'components/Table';
 import { showErrorModal } from 'components/Modals/modals';
-import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+
+import { copyToClipboard, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
+import { getLocalUserDetails } from 'utils/storage';
+import dateUtil from 'utils/date';
+
 import styles from './styles.module.scss';
+
 const {
   formatDate: { toLongDateWithDayTime },
 } = dateUtil;

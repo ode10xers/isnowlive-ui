@@ -1,15 +1,16 @@
 import React from 'react';
-import { Row, Col, Button, Typography, List } from 'antd';
+import { Row, Col, Button, Typography, Grid, List } from 'antd';
 import { FilePdfOutlined } from '@ant-design/icons';
 
 import { isValidFile, isInCreatorDashboard } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
 
+const { useBreakpoint } = Grid;
 const { Text } = Typography;
 
 const SessionInfo = ({ session }) => {
+  const { lg } = useBreakpoint();
   const documentUrls = session?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [];
 
   const renderSessionPrice = () => {
@@ -32,7 +33,7 @@ const SessionInfo = ({ session }) => {
     <Row justify="space-between" gutter={[8, 16]}>
       <Col xs={12} lg={8}>
         <Text className={styles.text} type="secondary">
-          {!isMobileDevice && 'Session '}Type
+          {!!lg && 'Session '}Type
         </Text>
         <Text className={styles.subText}>{session?.group ? 'Group' : '1-on-1'}</Text>
       </Col>
@@ -47,7 +48,7 @@ const SessionInfo = ({ session }) => {
       {documentUrls.length > 0 && (
         <Col xs={24} lg={session?.is_course ? 16 : 8}>
           <Text className={styles.text} type="secondary">
-            {!isMobileDevice && 'Session '}Pre-read file(s)
+            {!!lg && 'Session '}Pre-read file(s)
           </Text>
           <List
             size="small"

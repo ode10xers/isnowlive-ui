@@ -21,18 +21,11 @@ import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile } from 'utils/colors';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName, videoSourceType } from 'utils/constants';
+import { isAPISuccess, deepCloneObject, preventDefaults } from 'utils/helper';
 import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
-import {
-  isAPISuccess,
-  deepCloneObject,
-  preventDefaults,
-  reservedDomainName,
-  getUsernameFromUrl,
-  videoSourceType,
-  convertHexToRGB,
-  isBrightColorShade,
-} from 'utils/helper';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import styles from './style.module.scss';
 

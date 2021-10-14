@@ -19,8 +19,10 @@ import { showErrorModal } from 'components/Modals/modals';
 import type { Session, SessionInventory } from 'types/models/session';
 
 import dateUtil from 'utils/date';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 import { generateColorPalletteForProfile } from 'utils/colors';
-import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import useQueryParamState from 'hooks/useQueryParamState';
 
@@ -106,7 +108,6 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     () => availability?.inventory.find((inv) => inv.inventory_id === Number(selectedInventoryId)),
     [availability, selectedInventoryId]
   );
-  // const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
   const [view, setView] = useState<AvailabilityDetailsView>('date');
 
   const [creatorProfile, setCreatorProfile] = useState<any>(null);

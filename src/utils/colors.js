@@ -1,6 +1,8 @@
 import { clamp } from 'utils/math';
 import { isInIframeWidget, isWidgetUrl } from './widgets';
 
+export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
+
 export const convertHSLToHex = (hslString) => {
   const regexString = /hsl\(\s*(\d+)\s*,\s*(\d+(?:\.\d+)?%)\s*,\s*(\d+(?:\.\d+)?%)\)/g;
 
@@ -109,3 +111,44 @@ export const getNewProfileUIMaxWidth = () => {
     '--passion-profile-max-width': '992px',
   };
 };
+
+// TODO: Currently it's only for hex colors, adjust when implementing other styling (fonts, etc)
+export const generateWidgetCSSVarsFromJSON = (objData) => {
+  const stylesData = Object.entries(objData).filter(([key, val]) => val);
+
+  return '* { ' + stylesData.map(([key, val]) => `${key} : #${val}`).join('; ') + '}';
+};
+
+export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+export const convertHexToRGB = (hexColor) => {
+  const color = +('0x' + hexColor.slice(1).replace(hexColor.length < 5 && /./g, '$&$&'));
+
+  const r = color >> 16;
+  const g = (color >> 8) & 255;
+  const b = color & 255;
+
+  return [r, g, b];
+};
+
+// NOTE: make sure the scale and value is inversely proportional
+// e.g. if we want big scale numbers, value should be small
+export const getShadeForHexColor = (hexColor, scale = 1, value = 44, darker = true) => {
+  const rgbColor = convertHexToRGB(hexColor);
+
+  const scaleMultiplier = darker ? -1 : 1;
+
+  const colorShade = rgbColor.map((color) => Math.min(Math.max(color + scaleMultiplier * scale * value, 0), 255));
+  return `#${colorShade.map((color) => color.toString(16).padStart(2, '0')).join('')}`;
+};
+
+export const isBrightColorShade = ([r, g, b]) => {
+  // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+  const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+
+  // Using the HSP value, determine whether the color is light or dark
+  // return hsp > 127.5;
+  return hsp > 180.5;
+};
+
+export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];

@@ -22,25 +22,15 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
 import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
-import { showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import { showErrorModal, showAlreadyBookedModal, showPurchaseSingleCourseSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile } from 'utils/colors';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
-import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
-import {
-  isAPISuccess,
-  orderType,
-  productType,
-  videoSourceType,
-  paymentSource,
-  isUnapprovedUserError,
-  preventDefaults,
-  deepCloneObject,
-  isBrightColorShade,
-  convertHexToRGB,
-} from 'utils/helper';
+import { orderType, productType, videoSourceType, paymentSource } from 'utils/constants';
+import { generateColorPalletteForProfile, isBrightColorShade, convertHexToRGB } from 'utils/colors';
+import { isAPISuccess, preventDefaults, deepCloneObject, isUnapprovedUserError } from 'utils/helper';
+import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -290,10 +280,10 @@ const CourseDetails = ({ match }) => {
             payment_order_id: data.course_order_id,
           };
         } else {
-          // showPurchaseSingleCourseSuccessModal();
+          showPurchaseSingleCourseSuccessModal();
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

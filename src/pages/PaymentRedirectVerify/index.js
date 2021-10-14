@@ -9,18 +9,18 @@ import config from 'config';
 
 import Loader from 'components/Loader';
 import {
-  showBookSingleSessionSuccessModal,
   showErrorModal,
   showPurchasePassSuccessModal,
-  showPurchaseSingleCourseSuccessModal,
+  showBookSingleSessionSuccessModal,
   showPurchaseSingleVideoSuccessModal,
+  showPurchaseSingleCourseSuccessModal,
   showPurchaseSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
 import { verifyPaymentForOrder } from 'utils/payment';
-import { orderType, productType, paymentSource } from 'utils/helper';
+import { orderType, productType, paymentSource } from 'utils/constants';
 import { followUpBookSession, followUpGetVideo } from 'utils/orderHelper';
 
 // Taken from the link below

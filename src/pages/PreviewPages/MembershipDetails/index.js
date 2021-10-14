@@ -13,22 +13,17 @@ import apis from 'apis';
 import Routes from 'routes';
 import dummy from 'data/dummy';
 
+import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
-import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
-import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
-import { deepCloneObject } from 'utils/helper';
-import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
-import {
-  getShadeForHexColor,
-  preventDefaults,
-  isAPISuccess,
-  getUsernameFromUrl,
-  reservedDomainName,
-} from 'utils/helper';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth, getShadeForHexColor } from 'utils/colors';
+import { isAPISuccess, preventDefaults, deepCloneObject } from 'utils/helper';
 
 import styles from './style.module.scss';
 

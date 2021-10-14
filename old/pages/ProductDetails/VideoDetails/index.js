@@ -32,6 +32,7 @@ import SubscriptionsListView from 'components/DynamicProfileComponents/Subscript
 
 import dateUtil from 'utils/date';
 import { getLocalUserDetails } from 'utils/storage';
+import { getUsernameFromUrl } from 'utils/url';
 import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import {
   isAPISuccess,
@@ -41,7 +42,6 @@ import {
   productType,
   videoSourceType,
   isUnapprovedUserError,
-  getUsernameFromUrl,
   reservedDomainName,
   isBrightColorShade,
   convertHexToRGB,

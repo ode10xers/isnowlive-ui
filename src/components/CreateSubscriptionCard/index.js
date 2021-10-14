@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
+import { TwitterPicker } from 'react-color';
 import classNames from 'classnames';
 
 import {
@@ -21,8 +22,6 @@ import {
 } from 'antd';
 import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
 
-import { TwitterPicker } from 'react-color';
-
 import apis from 'apis';
 import Routes from 'routes';
 
@@ -31,9 +30,10 @@ import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
+import { isAPISuccess } from 'utils/helper';
+import { generateRandomColor } from 'utils/colors';
 import { fetchCreatorCurrency } from 'utils/payment';
 import { defaultPlatformFeePercentage } from 'utils/constants';
-import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
 

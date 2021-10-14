@@ -44,7 +44,7 @@ const Routes = {
   },
   sessionUpdate: '/creator/session/:id/edit',
   sessionReschedule: '/reschedule',
-  profilePreview: '/profile/preview',
+  // profilePreview: '/profile/preview',
   stripeAccountValidate: '/stripe/account/validate',
   stripePaymentSuccess: '/stripe/payment/success',
   paymentRetry: '/payment/retry/:retry_token',

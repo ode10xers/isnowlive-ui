@@ -8,12 +8,12 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
 import SubscriptionCards from 'components/SubscriptionCards';
+import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
-import { defaultPlatformFeePercentage, paymentProvider } from 'utils/constants';
+import { isAPISuccess } from 'utils/helper';
+import { StripeAccountStatus, defaultPlatformFeePercentage, paymentProvider } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';

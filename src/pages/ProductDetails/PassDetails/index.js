@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
+import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, Grid, message } from 'antd';
 import {
   CaretDownOutlined,
   CheckCircleFilled,
@@ -16,26 +16,16 @@ import apis from 'apis';
 
 import AuthModal from 'components/AuthModal';
 import { generateCardHeadingStyle } from 'components/ContainerCard';
-import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { getExternalLink } from 'utils/url';
-import { isMobileDevice } from 'utils/device';
-import { socialMediaIcons } from 'utils/constants';
-import { generateColorPalletteForProfile } from 'utils/colors';
-import {
-  orderType,
-  productType,
-  isAPISuccess,
-  convertHexToRGB,
-  reservedDomainName,
-  getUsernameFromUrl,
-  isBrightColorShade,
-  isUnapprovedUserError,
-} from 'utils/helper';
+import { getExternalLink, getUsernameFromUrl } from 'utils/url';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { socialMediaIcons, orderType, productType, reservedDomainName } from 'utils/constants';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -46,9 +36,11 @@ const {
 } = dateUtil;
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const PassDetails = ({ match }) => {
   const { showPaymentPopup } = useGlobalContext();
+  const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -194,7 +186,7 @@ const PassDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -636,7 +628,7 @@ const PassDetails = ({ match }) => {
             {creatorPasses
               .filter((pass) => pass.external_id !== initialPassDetails?.external_id)
               .sort((a, b) => b.total_price - a.total_price)
-              .slice(0, isMobileDevice ? 2 : 5)
+              .slice(0, !lg ? 2 : 5)
               .map(renderBuyablePassItem)}
           </>
         ) : null}

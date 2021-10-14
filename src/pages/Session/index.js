@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import classNames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { BlockPicker } from 'react-color';
+import moment from 'moment';
+import classNames from 'classnames';
+
 import {
   Form,
   Typography,
@@ -9,13 +11,14 @@ import {
   Space,
   Row,
   Col,
+  Grid,
   Input,
   Radio,
   InputNumber,
   Select,
-  message,
   DatePicker,
   Modal,
+  message,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -24,33 +27,26 @@ import {
   TagOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
-import moment from 'moment';
 
-import config from 'config';
 import apis from 'apis';
+import config from 'config';
 import Routes from 'routes';
-import Section from 'components/Section';
+
 import Loader from 'components/Loader';
-import ImageUpload from 'components/ImageUpload';
-import OnboardSteps from 'components/OnboardSteps';
+import Section from 'components/Section';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
+import ImageUpload from 'components/ImageUpload';
+import OnboardSteps from 'components/OnboardSteps';
 import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showCourseOptionsHelperModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
-import {
-  getCurrencyList,
-  convertSchedulesToUTC,
-  isAPISuccess,
-  generateRandomColor,
-  isValidFile,
-  ZoomAuthType,
-} from 'utils/helper';
+import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, isValidFile } from 'utils/helper';
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import validationRules from 'utils/validation';
+import { generateRandomColor } from 'utils/colors';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { defaultPlatformFeePercentage, sessionMeetingTypes } from 'utils/constants';
+import { defaultPlatformFeePercentage, sessionMeetingTypes, ZoomAuthType } from 'utils/constants';
 
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
@@ -69,8 +65,9 @@ import styles from './style.module.scss';
 const maxInventoryLimitPerRequest = 1000;
 
 const { Title, Text, Paragraph, Link } = Typography;
-const { Option } = Select;
 const { RangePicker } = DatePicker;
+const { useBreakpoint } = Grid;
+const { Option } = Select;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
   timeCalculation: { createWeekRange, getRangeDiff, createRange },
@@ -139,6 +136,7 @@ const initialSession = {
 };
 
 const Session = ({ match, history }) => {
+  const { lg } = useBreakpoint();
   const location = useLocation();
   const isAvailability = location.pathname.includes(Routes.creatorDashboard.createAvailabilities);
   const [form] = Form.useForm();
@@ -832,7 +830,7 @@ const Session = ({ match, history }) => {
   };
 
   const handleCalenderPop = () => {
-    if (isMobileDevice && document.getElementsByClassName('ant-picker-panels')[0]) {
+    if (!lg && document.getElementsByClassName('ant-picker-panels')[0]) {
       document.getElementsByClassName('ant-picker-panels')[0].style.display = 'block';
       document.getElementsByClassName('ant-picker-panels')[0].style['text-align'] = 'center';
     }
@@ -871,7 +869,7 @@ const Session = ({ match, history }) => {
       )}
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
-          <Title level={isMobileDevice ? 3 : 1} className={styles.titleText}>
+          <Title level={!lg ? 3 : 1} className={styles.titleText}>
             {session.session_id ? 'Update' : 'Create'} {isAvailability ? 'Availability' : 'Session'}
           </Title>
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
@@ -889,7 +887,7 @@ const Session = ({ match, history }) => {
         scrollToFirstError={true}
         {...profileFormItemLayout}
         onFinish={onFinish}
-        labelAlign={isMobileDevice ? 'left' : 'right'}
+        labelAlign={!lg ? 'left' : 'right'}
       >
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
@@ -1138,7 +1136,7 @@ const Session = ({ match, history }) => {
                 name="selected_member_tags"
                 id="selected_member_tags"
                 hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
               >
                 <Select
                   showArrow
@@ -1181,7 +1179,7 @@ const Session = ({ match, history }) => {
               </Form.Item>
 
               <Form.Item
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
                 name="max_participants"
                 extra="Maximum 100 supported"
                 rules={validationRules.requiredValidation}
@@ -1218,7 +1216,7 @@ const Session = ({ match, history }) => {
               </Form.Item>
               {/* NOTE : Currently the minimum for PWYW is 5, adjust when necessary */}
               <Form.Item
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
                 name="price"
                 extra={
                   sessionPaymentType === priceTypes.FLEXIBLE
@@ -1266,7 +1264,7 @@ const Session = ({ match, history }) => {
               {sessionPaymentType !== priceTypes.FREE && sessionRefundable && (
                 <>
                   <Form.Item
-                    {...(!isMobileDevice && profileFormItemLayout)}
+                    {...(!!lg && profileFormItemLayout)}
                     label="Cancellable Before"
                     name="refund_before_hours"
                     extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputted above"
@@ -1320,11 +1318,11 @@ const Session = ({ match, history }) => {
               <Form.Item
                 rules={isSessionRecurring ? validationRules.requiredValidation : null}
                 name="recurring_dates_range"
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
                 layout="vertical"
               >
                 <Text>First {isAvailability ? 'Availability' : 'Session'} Date: </Text>
-                <Text className={isMobileDevice ? styles.ml5 : styles.ml30}>
+                <Text className={!lg ? styles.ml5 : styles.ml30}>
                   {' '}
                   Last {isAvailability ? 'Availability' : 'Session'} Date:
                 </Text>{' '}
@@ -1365,7 +1363,7 @@ const Session = ({ match, history }) => {
                   </Text>
                 )}
               </Col>
-              <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
+              <Col className={styles.publishBtnWrapper} flex={!lg ? 'auto' : 1}>
                 <Form.Item>
                   <Button htmlType="submit" type="primary">
                     Publish
