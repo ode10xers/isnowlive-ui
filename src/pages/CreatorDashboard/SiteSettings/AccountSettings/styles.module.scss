@@ -1,11 +1,5 @@
 @import '../../../../styles/variables.scss';
 
 .settingsWrapper {
-  padding-left: 70px;
-}
-
-@media screen and (max-width: 768px) {
-  .settingsWrapper {
-    padding-left: 20px;
-  }
+  padding-left: 15px;
 }

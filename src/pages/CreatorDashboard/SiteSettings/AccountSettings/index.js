@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Tabs } from 'antd';
-import { BellOutlined, DollarOutlined } from '@ant-design/icons';
+import { Tabs, Spin } from 'antd';
+import { BellOutlined, DollarOutlined, MoneyCollectOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import NotificationSettings from './NotificationSettings';
 import PlatformFeesSettings from './PlatformFeesSettings';
-import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import PlatformSubscriptionSettings from './PlatformSubscriptionSettings';
 
 const { TabPane } = Tabs;
 
@@ -42,7 +42,7 @@ const AccountSettings = () => {
 
   return (
     <div className={classNames(styles.box, styles.settingsWrapper)}>
-      <Loader size="large" text="Fetching user account settings" loading={isLoading}>
+      <Spin size="large" tip="Fetching user account settings" spinning={isLoading}>
         {accountSettings && (
           <Tabs size="large" defaultActiveKey="fees">
             <TabPane
@@ -67,9 +67,19 @@ const AccountSettings = () => {
             >
               <NotificationSettings fetchUserSettings={getCreatorUserSettings} checkedUserSettings={accountSettings} />
             </TabPane>
+            <TabPane
+              key="platform_subscription"
+              tab={
+                <div className={styles.largeTabHeader}>
+                  <MoneyCollectOutlined /> My Plan
+                </div>
+              }
+            >
+              <PlatformSubscriptionSettings />
+            </TabPane>
           </Tabs>
         )}
-      </Loader>
+      </Spin>
     </div>
   );
 };

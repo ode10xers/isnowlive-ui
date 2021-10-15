@@ -1,0 +1,52 @@
+@import '../../../../../styles/variables.scss';
+
+.platformSubscriptionItem {
+  padding: 12px;
+  position: relative;
+
+  background-color: map-get($colors, 'White');
+  border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
+  border-radius: 12px;
+  padding: 12px;
+  padding-top: 20px;
+
+  width: 100%;
+
+  .statusTag {
+    position:absolute;
+
+    top: -32px;
+    z-index: 1;
+
+    border-radius: 4px;
+    padding: 3px 6px;
+    color: map-get($map: $colors, $key: 'Zeus');
+    font-size: 11px;
+    font-weight: 500;
+
+    background-color: map-get($map: $colors, $key: 'ColumbiaBlue');
+
+    &.active {
+      background-color: map-get($map: $colors, $key: 'KellyGreen');
+      color: map-get($map: $colors, $key: 'White');
+    }
+
+    &.inactive {
+      background-color: map-get($map: $colors, $key: 'SunsetOrange');
+      color: map-get($map: $colors, $key: 'White');
+    }
+  }
+
+  .itemName {
+    font-size: 18px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .itemHelpText {
+    font-size: 9px;
+  }
+
+  .itemDurationText {
+    font-size: 15px;
+  }
+}
