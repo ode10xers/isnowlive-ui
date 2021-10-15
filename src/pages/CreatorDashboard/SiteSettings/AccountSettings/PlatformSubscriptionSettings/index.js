@@ -130,6 +130,15 @@ const PlatformSubscriptionSettings = () => {
     fetchCreatorPlatformSubscription();
   }, [fetchCreatorPlatformSubscription]);
 
+  const handleChoosePlanClicked = useCallback(() => {
+    const isStage =
+      window.location.hostname.includes('.stage.passion.do') || window.location.hostname.includes('localhost');
+    const pagePath = '/features-pricing';
+
+    const targetUrl = `https://${isStage ? 'passion-do.webflow.io' : 'passion.do'}${pagePath}`;
+    window.open(targetUrl, '_blank');
+  }, []);
+
   // TODO: Confirm what to show if no subscription
   return (
     <div>
@@ -143,7 +152,11 @@ const PlatformSubscriptionSettings = () => {
             ))
           ) : (
             <Col xs={24}>
-              <Empty description="You currently have no active plan" />
+              <Empty description="You currently have no active plan">
+                <Button type="primary" onClick={handleChoosePlanClicked}>
+                  Choose a plan
+                </Button>
+              </Empty>
             </Col>
           )}
         </Row>
