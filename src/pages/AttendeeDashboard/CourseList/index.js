@@ -53,7 +53,7 @@ const CourseList = () => {
   }, [fetchUserCourseOrders]);
 
   const redirectToCourseOrderDetails = (courseOrder) => {
-    if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
+    if (courseOrder?.course_order_id) {
       history.push(
         Routes.attendeeDashboard.rootPath +
           generatePath(Routes.attendeeDashboard.courseDetails, { course_order_id: courseOrder.course_order_id })
