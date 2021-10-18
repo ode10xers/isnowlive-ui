@@ -1,5 +1,5 @@
 const TerserPlugin = require('terser-webpack-plugin');
-
+const rewireUglifyjs = require('react-app-rewire-uglifyjs');
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 
 const smp = new SpeedMeasurePlugin();
@@ -66,10 +66,10 @@ module.exports = function override(config, env) {
     pathinfo: false,
   };
 
-  const returnTarget = {
+  const returnTarget = rewireUglifyjs({
     ...config,
     ...(isEnvProduction ? getBabelLoader(config).options.plugins.push('react-remove-properties') : {}),
-  };
+  });
 
   return isEnvProduction ? smp.wrap(returnTarget) : returnTarget;
 };

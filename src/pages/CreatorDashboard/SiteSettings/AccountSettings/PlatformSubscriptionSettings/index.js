@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
-import { Row, Col, Spin, Radio, Typography, Badge } from 'antd';
+import { Row, Col, Spin, Radio, Typography, Empty, Badge } from 'antd';
 
 import apis from 'apis';
 import internalSubscriptionsData from './data.js';
@@ -73,12 +73,17 @@ const PlatformSubscriptionSettings = () => {
     <div>
       <Spin spinning={isLoading} size="large">
         <Row gutter={[8, 8]}>
-          {creatorPlatformSubscriptions.length > 0 &&
+          {creatorPlatformSubscriptions.length > 0 ? (
             creatorPlatformSubscriptions.map((subs) => (
               <Col xs={24} md={12} xl={8} key={subs.subscription_id}>
                 <PlatformSubscriptionItem platformSubscription={subs} />
               </Col>
-            ))}
+            ))
+          ) : (
+            <Col xs={24}>
+              <Empty description="You currently don't have any active paid subscription plan" />
+            </Col>
+          )}
         </Row>
         {(creatorPlatformSubscriptions.length === 0 || !anyActiveSubscriptions) && (
           <>
