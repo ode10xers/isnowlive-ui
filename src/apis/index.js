@@ -171,7 +171,7 @@ export default {
     deleteCourse: (courseId) => http.delete(`/secure/creator/courses/${courseId}`),
     getCoursesByUsername: () => http.get(`/courses`),
     getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
-    getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
+    getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}`),
     getDetailsByInternalId: (courseInternalId) => http.get(`/courses/internal/${courseInternalId}`),
     getDetailsByExternalId: (courseExternalId) => http.get(`/courses/external/${courseExternalId}`),
     getCreatorCourses: () => http.get('/secure/creator/courses'),

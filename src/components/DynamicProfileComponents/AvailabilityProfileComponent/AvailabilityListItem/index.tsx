@@ -54,8 +54,6 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
             <div className={styles.availabilityImageContainer}>
               <Image
                 loading="lazy"
-                // shape="square"
-                // size={(avatarContainer.current?.offsetWidth ?? 0) - 20}
                 preview={false}
                 src={availability.session_image_url}
                 className={styles.availabilityImage}

@@ -10,6 +10,12 @@ export const paymentProvider = {
   PAYPAL: 'PAYPAL',
 };
 
+export const platformSubscriptionStatuses = {
+  ACTIVE: 'ACTIVE',
+  CANCELLED: 'CANCELLED',
+  TRIAL: 'TRIALING',
+};
+
 export const couponTypes = {
   ABSOLUTE: 'ABSOLUTE',
   PERCENTAGE: 'PERCENTAGE',
