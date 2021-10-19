@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
+
 import { Tabs, Spin } from 'antd';
-import { BellOutlined, DollarOutlined, MoneyCollectOutlined } from '@ant-design/icons';
+import { SettingOutlined, MoneyCollectOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
-import NotificationSettings from './NotificationSettings';
-import PlatformFeesSettings from './PlatformFeesSettings';
+import PlatformSettings from './PlatformSettings';
 import PlatformSubscriptionSettings from './PlatformSubscriptionSettings';
 import { showErrorModal } from 'components/Modals/modals';
 
@@ -46,26 +46,15 @@ const AccountSettings = () => {
         {accountSettings && (
           <Tabs size="large" defaultActiveKey="fees">
             <TabPane
-              key="fees"
+              key="platform_settings"
               tab={
                 <div className={styles.largeTabHeader}>
-                  <DollarOutlined />
-                  Platform Fees
+                  <SettingOutlined />
+                  Platform Settings
                 </div>
               }
             >
-              <PlatformFeesSettings fetchUserSettings={getCreatorUserSettings} accountSettings={accountSettings} />
-            </TabPane>
-            <TabPane
-              key="notifications"
-              tab={
-                <div className={styles.largeTabHeader}>
-                  <BellOutlined />
-                  Email Alerts
-                </div>
-              }
-            >
-              <NotificationSettings fetchUserSettings={getCreatorUserSettings} checkedUserSettings={accountSettings} />
+              <PlatformSettings fetchAccountSettings={getCreatorUserSettings} accountSettings={accountSettings} />
             </TabPane>
             <TabPane
               key="platform_subscription"
