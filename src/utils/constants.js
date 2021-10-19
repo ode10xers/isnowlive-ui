@@ -11,6 +11,7 @@ export const paymentProvider = {
 };
 
 export const platformSubscriptionStatuses = {
+  SUCCESS: 'SUCCESS',
   ACTIVE: 'ACTIVE',
   CANCELLED: 'CANCELLED',
   TRIAL: 'TRIALING',

@@ -58,6 +58,7 @@ const PlatformSubscriptionItem = ({ platformSubscription = null }) => {
   const getSubscriptionStatus = (status) => {
     switch (status) {
       case platformSubscriptionStatuses.ACTIVE:
+      case platformSubscriptionStatuses.SUCCESS:
         return 'Active';
       case platformSubscriptionStatuses.CANCELLED:
         return 'Cancelled';
@@ -85,32 +86,43 @@ const PlatformSubscriptionItem = ({ platformSubscription = null }) => {
                 </Title>
               </Col>
               <Col flex="0 0 140px" className={styles.textAlignRight}>
+                <Text className={styles.itemHelpText}>{platformSubscription?.currency?.toUpperCase() ?? ''} </Text>
+                <Text strong className={styles.itemPriceText}>
+                  {platformSubscription?.total_price ?? ''}
+                </Text>
+                <Text className={styles.itemHelpText}> /{platformSubscription?.duration ?? ''}</Text>
+              </Col>
+            </Row>
+          </Col>
+          <Col xs={24}>
+            <Row gutter={[8, 8]} align="middle">
+              <Col flex="1 1 auto">
+                <Space>
+                  {platformSubscription?.status !== platformSubscriptionStatuses.CANCELLED ? (
+                    <Popconfirm
+                      title="Are you sure about cancelling the plan?"
+                      okText="Yes, I'm sure"
+                      okType="danger"
+                      onConfirm={handleCancelSubscriptionClicked}
+                    >
+                      <Button danger size="small" type="link">
+                        Cancel Plan
+                      </Button>
+                    </Popconfirm>
+                  ) : platformSubscription?.cancelled_at ? (
+                    <Button disabled={true} size="small" type="text">
+                      Cancelled at : {toLocaleDate(platformSubscription?.cancelled_at)}
+                    </Button>
+                  ) : null}
+                </Space>
+              </Col>
+              <Col flex="0 0 140px" className={styles.textAlignRight}>
                 <Text className={styles.itemHelpText}>Valid up to </Text>
                 <Text strong className={styles.itemDurationText}>
                   {toLocaleDate(platformSubscription.end_date)}
                 </Text>
               </Col>
             </Row>
-          </Col>
-          <Col xs={24}>
-            <Space>
-              {platformSubscription?.status !== platformSubscriptionStatuses.CANCELLED ? (
-                <Popconfirm
-                  title="Are you sure about cancelling the plan?"
-                  okText="Yes, I'm sure"
-                  okType="danger"
-                  onConfirm={handleCancelSubscriptionClicked}
-                >
-                  <Button danger size="small" type="link">
-                    Cancel Plan
-                  </Button>
-                </Popconfirm>
-              ) : platformSubscription?.cancelled_at ? (
-                <Button disabled={true} size="small" type="text">
-                  Cancelled at : {toLocaleDate(platformSubscription?.cancelled_at)}
-                </Button>
-              ) : null}
-            </Space>
           </Col>
         </Row>
       </Spin>
