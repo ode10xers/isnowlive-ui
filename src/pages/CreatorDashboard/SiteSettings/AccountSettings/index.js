@@ -7,12 +7,12 @@ import apis from 'apis';
 
 import NotificationSettings from './NotificationSettings';
 import PlatformFeesSettings from './PlatformFeesSettings';
+import PlatformSubscriptionSettings from './PlatformSubscriptionSettings';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
-import PlatformSubscriptionSettings from './PlatformSubscriptionSettings';
 
 const { TabPane } = Tabs;
 

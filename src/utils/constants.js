@@ -14,6 +14,7 @@ export const platformSubscriptionStatuses = {
   ACTIVE: 'ACTIVE',
   CANCELLED: 'CANCELLED',
   TRIAL: 'TRIALING',
+  PENDING: 'AWAITING_ACTION',
 };
 
 export const couponTypes = {

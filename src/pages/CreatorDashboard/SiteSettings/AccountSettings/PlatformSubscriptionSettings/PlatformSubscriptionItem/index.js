@@ -55,11 +55,26 @@ const PlatformSubscriptionItem = ({ platformSubscription = null }) => {
     }
   };
 
+  const getSubscriptionStatus = (status) => {
+    switch (status) {
+      case platformSubscriptionStatuses.ACTIVE:
+        return 'Active';
+      case platformSubscriptionStatuses.CANCELLED:
+        return 'Cancelled';
+      case platformSubscriptionStatuses.TRIAL:
+        return 'In Trial';
+      case platformSubscriptionStatuses.PENDING:
+        return 'Payment Pending';
+      default:
+        return '';
+    }
+  };
+
   return platformSubscription ? (
     <div className={styles.platformSubscriptionItem}>
       <Spin spinning={isSubmitting}>
         <div className={classNames(styles.statusTag, getStatusClass(platformSubscription.status))}>
-          {platformSubscription.status?.toUpperCase() ?? ''}
+          {getSubscriptionStatus(platformSubscription.status)}
         </div>
         <Row gutter={[8, 12]}>
           <Col xs={24}>

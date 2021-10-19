@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
-import { Row, Col, Spin, Radio, Typography, Empty, Badge } from 'antd';
+import { Row, Col, Spin, Radio, Typography, Empty, Modal, Badge } from 'antd';
 
 import apis from 'apis';
 import internalSubscriptionsData from './data.js';
@@ -19,7 +19,7 @@ const {
   timeCalculation: { isBeforeDate },
 } = dateUtil;
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const { Ribbon } = Badge;
 
 const PlatformSubscriptionSettings = () => {
@@ -35,6 +35,24 @@ const PlatformSubscriptionSettings = () => {
 
       if (isAPISuccess(status) && data) {
         setCreatorPlatformSubscriptions(data);
+
+        if (data.length > 0) {
+          const pendingSubscription = data.find((subs) => subs.status === platformSubscriptionStatuses.PENDING);
+
+          if (pendingSubscription) {
+            Modal.info({
+              centered: true,
+              closable: true,
+              title: 'Pending Paid Plan',
+              content: (
+                <Paragraph>
+                  There was an issue in renewing your paid plan. Please check your email for instructions to renew, from
+                  Stripe.
+                </Paragraph>
+              ),
+            });
+          }
+        }
       }
     } catch (error) {
       console.error(error);
@@ -63,23 +81,26 @@ const PlatformSubscriptionSettings = () => {
       ) ?? [];
 
     if (activeSubscription.length > 0) {
-      return true;
+      return activeSubscription[0];
     }
 
-    return false;
+    return null;
   }, [creatorPlatformSubscriptions]);
 
   return (
     <div>
       <Spin spinning={isLoading} size="large">
         <Row gutter={[8, 8]}>
-          {creatorPlatformSubscriptions.length > 0 ? (
-            creatorPlatformSubscriptions.map((subs) => (
-              <Col xs={24} md={12} xl={8} key={subs.subscription_id}>
-                <PlatformSubscriptionItem platformSubscription={subs} />
-              </Col>
-            ))
+          {anyActiveSubscriptions ? (
+            <Col xs={24} md={12} xl={8}>
+              <PlatformSubscriptionItem platformSubscription={anyActiveSubscriptions} />
+            </Col>
           ) : (
+            // creatorPlatformSubscriptions.map((subs) => (
+            //   <Col xs={24} md={12} xl={8} key={subs.subscription_id}>
+            //     <PlatformSubscriptionItem platformSubscription={subs} />
+            //   </Col>
+            // ))
             <Col xs={24}>
               <Empty description="You currently don't have any active paid subscription plan" />
             </Col>
