@@ -45,6 +45,7 @@ const PlatformSubscriptionItem = ({ platformSubscription = null }) => {
   const getStatusClass = (status) => {
     switch (status) {
       case platformSubscriptionStatuses.ACTIVE:
+      case platformSubscriptionStatuses.SUCCESS:
         return styles.active;
       case platformSubscriptionStatuses.CANCELLED:
         return styles.inactive;
@@ -90,7 +91,7 @@ const PlatformSubscriptionItem = ({ platformSubscription = null }) => {
                 <Text strong className={styles.itemPriceText}>
                   {platformSubscription?.total_price ?? ''}
                 </Text>
-                <Text className={styles.itemHelpText}> /{platformSubscription?.duration ?? ''}</Text>
+                <Text className={styles.itemHelpText}>/{platformSubscription?.interval ?? ''}</Text>
               </Col>
             </Row>
           </Col>
@@ -117,7 +118,7 @@ const PlatformSubscriptionItem = ({ platformSubscription = null }) => {
                 </Space>
               </Col>
               <Col flex="0 0 140px" className={styles.textAlignRight}>
-                <Text className={styles.itemHelpText}>Valid up to </Text>
+                <Text className={styles.itemHelpText}>Valid till </Text>
                 <Text strong className={styles.itemDurationText}>
                   {toLocaleDate(platformSubscription.end_date)}
                 </Text>
