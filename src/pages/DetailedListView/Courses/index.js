@@ -10,10 +10,16 @@ import dummy from 'data/dummy';
 
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 
-import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
-import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
 import { isInIframeWidget } from 'utils/widgets';
-import { getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
+import { reservedDomainName } from 'utils/constants';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
+import {
+  getLiveCoursesFromCourses,
+  getMixedCoursesFromCourses,
+  getVideoCoursesFromCourses,
+} from 'utils/productsHelper';
 
 import styles from './style.module.scss';
 
@@ -23,12 +29,16 @@ const filterOptions = [
     value: 'all',
   },
   {
-    label: 'Video Courses',
+    label: 'Video only courses',
     value: 'video',
   },
   {
-    label: 'Live Session Courses',
+    label: 'Live sessions only courses',
     value: 'live',
+  },
+  {
+    label: 'Mixed courses',
+    value: 'mixed',
   },
 ];
 
@@ -132,6 +142,8 @@ const CourseDetailedListView = () => {
         return getVideoCoursesFromCourses(courses);
       case 'live':
         return getLiveCoursesFromCourses(courses);
+      case 'mixed':
+        return getMixedCoursesFromCourses(courses);
       default:
         return courses;
     }

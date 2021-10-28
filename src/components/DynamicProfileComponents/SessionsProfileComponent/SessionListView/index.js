@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+
 import { Row, Col } from 'antd';
 import { BarsOutlined } from '@ant-design/icons';
 
@@ -7,8 +8,9 @@ import Routes from 'routes';
 
 import SessionListCard from '../SessionListCard';
 
+import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from 'utils/helper';
+import { isInCreatorDashboard, preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 

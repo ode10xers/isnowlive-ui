@@ -1,4 +1,4 @@
-import { isInCustomDomain } from 'utils/helper';
+import { isInCustomDomain } from 'utils/url';
 
 const AUTH_COOKIE = {
   NAME: '__passion_auth_code__',

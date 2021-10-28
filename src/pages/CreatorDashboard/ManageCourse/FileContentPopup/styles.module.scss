@@ -1,0 +1,15 @@
+@import '../../../../styles/variables.scss';
+
+.formContentWrapper {
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.formLabelWrapper {
+  text-align: right;
+  margin-bottom: 12px;
+
+  @media screen and (max-width: 768px) {
+    text-align: left;
+  }
+}

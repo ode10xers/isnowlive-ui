@@ -1,5 +1,9 @@
 @import '../../styles/variables.scss';
 
+.productTag {
+  cursor: pointer;
+}
+
 .sessionRegistrationWrapper {
   // background: var(--passion-profile-light-color, #{map-get($colors, 'White1')});
   background: map-get($colors, 'White1');
@@ -7,16 +11,16 @@
   border-radius: 6px;
   padding: 15px;
 
-  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
+  color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
 }
 
 .registrationTitle {
-  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+  color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
 }
 
 .formContainer {
-  margin-top : 20px;
-  
+  margin-top: 20px;
+
   // :global {
   //   .ant-form-item-label {
   //     label {
@@ -91,8 +95,8 @@
 }
 
 .bookingHelpText {
-  margin-top : 10px;
-  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+  margin-top: 10px;
+  color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
 }
 
 .bookBtn {
@@ -100,7 +104,7 @@
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
 
   &:disabled {
-    opacity : 0.7;
+    opacity: 0.7;
   }
 }
 

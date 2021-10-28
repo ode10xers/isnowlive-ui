@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, Collapse } from 'antd';
-import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useHistory, useLocation } from 'react-router-dom';
+
+import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, Collapse, Grid } from 'antd';
+import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -12,9 +13,9 @@ import TagListPopup from 'components/TagListPopup';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrlFromUsername, copyToClipboard, isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
+import { copyToClipboard, isAPISuccess } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -27,14 +28,17 @@ import styles from './styles.module.scss';
 
 const {
   formatDate: { toLongDateWithDay },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
 const { creator } = mixPanelEventTags;
+const { useBreakpoint } = Grid;
 
 const ManageSessions = () => {
   const history = useHistory();
   const location = useLocation();
+  const { md, xl } = useBreakpoint();
   const isAvailability = location.pathname.includes(Routes.creatorDashboard.manageAvailabilities);
   const [isLoading, setIsLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
@@ -210,29 +214,32 @@ const ManageSessions = () => {
         title: `${isAvailability ? 'Availability' : 'Session'} Date`,
         dataIndex: 'session_date',
         key: 'session_date',
-        width: '275px',
+        width: xl ? '200px' : '120px',
         render: (text, record) => (
-          <>
-            {record.recurring ? (
-              <Text>
-                {toLongDateWithDay(record.beginning)} - {toLongDateWithDay(record.expiry)}
-              </Text>
-            ) : (
-              <Text>
-                {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.start_time)}
-              </Text>
-            )}
-          </>
+          <Text>
+            {toLongDateWithDay(record.beginning)} - {toLongDateWithDay(record.expiry)}
+          </Text>
+          // <>
+          //   {record.recurring ? (
+          //     <Text>
+          //       {toLongDateWithDay(record.beginning)} - {toLongDateWithDay(record.expiry)}
+          //     </Text>
+          //   ) : (
+          //     <Text>
+          //       {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.start_time)}
+          //     </Text>
+          //   )}
+          // </>
         ),
       },
       {
         title: 'Actions',
         align: 'right',
-        width: '200px',
+        width: xl ? '200px' : '130px',
         render: (text, record) => {
           return (
             <Row justify="end" gutter={8}>
-              <Col xs={24} md={5}>
+              <Col xs={24} md={12} xl={5}>
                 <Tooltip title="Edit">
                   <Button
                     className={styles.detailsButton}
@@ -252,7 +259,7 @@ const ManageSessions = () => {
                   />
                 </Tooltip>
               </Col>
-              <Col xs={24} md={5}>
+              <Col xs={24} md={12} xl={5}>
                 <Tooltip title={`Copy ${isAvailability ? 'Availability' : 'Session'} Link`}>
                   <Button
                     type="text"
@@ -262,7 +269,7 @@ const ManageSessions = () => {
                   />
                 </Tooltip>
               </Col>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={12} xl={8}>
                 <Tooltip
                   title={`${record.is_active ? 'Hide' : 'Unhide'} ${isAvailability ? 'Availability' : 'Session'}`}
                 >
@@ -281,7 +288,7 @@ const ManageSessions = () => {
                   )}
                 </Tooltip>
               </Col>
-              <Col xs={24} md={5}>
+              <Col xs={24} md={12} xl={6}>
                 <Tooltip title={`Delete ${isAvailability ? 'Availability' : 'Session'}`} placement="bottom">
                   <Popconfirm
                     title={`Do you want to delete ${isAvailability ? 'availability' : 'session'}?`}
@@ -424,37 +431,63 @@ const ManageSessions = () => {
       <Title level={4}>Manage {isAvailability ? 'Availabilities' : 'Sessions'}</Title>
       <Collapse defaultActiveKey="Normal">
         <Panel header={<Title level={5}> Normal {isAvailability ? 'Availabilities' : 'Sessions'} </Title>} key="Normal">
-          {isMobileDevice ? (
+          {md ? (
+            <Table
+              columns={generateSessionColumns()}
+              data={sessions?.filter((session) => !session.is_course && isBeforeDate(session.expiry))}
+              loading={isLoading}
+            />
+          ) : (
             <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}>
-              {sessions?.filter((session) => !session.is_course).length > 0 ? (
-                sessions?.filter((session) => !session.is_course).map(renderSessionItem)
+              {sessions?.filter((session) => !session.is_course && isBeforeDate(session.expiry)).length > 0 ? (
+                sessions?.filter((session) => !session.is_course && isBeforeDate(session.expiry)).map(renderSessionItem)
               ) : (
                 <div className="text-empty"> No Normal {isAvailability ? 'Availabilities' : 'Sessions'} Found </div>
               )}
             </Loader>
-          ) : (
-            <Table
-              columns={generateSessionColumns()}
-              data={sessions?.filter((session) => !session.is_course)}
-              loading={isLoading}
-            />
           )}
         </Panel>
-        <Panel header={<Title level={5}> Course {isAvailability ? 'Availabilities' : 'Sessions'} </Title>} key="Course">
-          {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availability' : 'session'}`}>
-              {sessions?.filter((session) => session.is_course).length > 0 ? (
-                sessions?.filter((session) => session.is_course).map(renderSessionItem)
-              ) : (
-                <div className="text-empty"> No Course {isAvailability ? 'Availabilities' : 'Sessions'} Found </div>
-              )}
-            </Loader>
-          ) : (
+        <Panel
+          header={<Title level={5}>{isAvailability ? 'Bundled Availabilities' : 'Course Sessions'}</Title>}
+          key="Course"
+        >
+          {md ? (
             <Table
               columns={generateSessionColumns()}
-              data={sessions?.filter((session) => session.is_course)}
+              data={sessions?.filter((session) => session.is_course && isBeforeDate(session.expiry))}
               loading={isLoading}
             />
+          ) : (
+            <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availability' : 'session'}`}>
+              {sessions?.filter((session) => session.is_course && isBeforeDate(session.expiry)).length > 0 ? (
+                sessions?.filter((session) => session.is_course && isBeforeDate(session.expiry)).map(renderSessionItem)
+              ) : (
+                <div className="text-empty">
+                  No {isAvailability ? 'Bundled Availabilities' : 'Course Sessions'} Found
+                </div>
+              )}
+            </Loader>
+          )}
+        </Panel>
+        <Panel header={<Title level={5}>Expired {isAvailability ? 'Availabilities' : 'Sessions'}</Title>} key="Expired">
+          {md ? (
+            <Table
+              columns={generateSessionColumns()}
+              data={sessions?.filter((session) => !isBeforeDate(session.expiry))}
+              loading={isLoading}
+            />
+          ) : (
+            <Loader
+              loading={isLoading}
+              size="large"
+              text={`Loading expired ${isAvailability ? 'availability' : 'session'}`}
+            >
+              {sessions?.filter((session) => !isBeforeDate(session.expiry)).length > 0 ? (
+                sessions?.filter((session) => !isBeforeDate(session.expiry)).map(renderSessionItem)
+              ) : (
+                <div className="text-empty">No Expired {isAvailability ? 'Availabilities' : 'Sessions'} Found</div>
+              )}
+            </Loader>
           )}
         </Panel>
       </Collapse>

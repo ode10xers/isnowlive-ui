@@ -58,6 +58,7 @@
       border-radius: 8px;
       border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
       box-shadow: inset 0px -1px 0px map-get($map: $colors, $key: 'WhiteSmoke1');
+      cursor: grab;
     }
   }
 }

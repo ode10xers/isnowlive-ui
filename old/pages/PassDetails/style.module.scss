@@ -1,0 +1,107 @@
+@import '../../styles/variables.scss';
+
+.imageWrapper {
+  position: relative;
+  margin-top: 96px !important;
+  background-color: map-get($map: $colors, $key: 'White1');
+}
+.coverImageWrapper {
+  background-color: map-get($colors, $key: 'WhiteSmoke');
+  text-align: center;
+  border-radius: 8px;
+  margin: -20px;
+}
+.coverImage img {
+  border-radius: 8px;
+  max-height: 300px;
+}
+.profileImageWrapper {
+  max-height: 80px;
+}
+.profileImage {
+  position: relative;
+  border-radius: 4px;
+  bottom: 80px;
+  left: 50px;
+  width: 100%;
+}
+.profileImage img {
+  border: 2px solid map-get($colors, $key: 'White');
+  max-width: 120px;
+  border-radius: 4px;
+}
+.userName {
+  position: absolute;
+  bottom: -15px;
+  left: 150px;
+}
+.shareButton {
+  position: absolute;
+  bottom: 0px;
+  right: 100px;
+}
+
+.bio * {
+  // p,
+  // span {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+  background-color: transparent !important;
+  // }
+}
+
+.passCard {
+  margin: 10px 32px !important;
+  border: 2px dashed map-get($map: $colors, $key: 'DodgerBlue') !important;
+
+  .blueText {
+    color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .profilePreviewContainer {
+    margin: 5px;
+  }
+  .passCard {
+    margin: 16px !important;
+  }
+  .imageWrapper {
+    position: relative;
+    margin-bottom: 20px;
+    margin-top: 16px !important;
+  }
+  .profileImage {
+    border-radius: 4px;
+    bottom: 20px;
+    width: 100%;
+    left: 0px;
+  }
+  .profileImage img {
+    max-width: 70px;
+    border: 2px solid map-get($colors, $key: 'White');
+    border-radius: 4px;
+  }
+  .userName {
+    position: absolute;
+    bottom: -15px;
+    left: 75px;
+  }
+  .shareButton {
+    position: absolute;
+    bottom: 0px;
+    right: -15px;
+  }
+}
+
+@media (max-width: 526px) {
+  .passCard {
+    margin: 0px !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1400px) {
+  .imageWrapper {
+    margin-bottom: 0px;
+  }
+}

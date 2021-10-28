@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, generatePath } from 'react-router-dom';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, Popconfirm } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Grid, Image, Collapse, Empty, Popconfirm } from 'antd';
 import {
   EditTwoTone,
   CloudUploadOutlined,
@@ -17,6 +17,7 @@ import {
 } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
@@ -26,9 +27,10 @@ import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType, videoSourceType } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
+import { isAPISuccess, copyToClipboard } from 'utils/helper';
+import { defaultPlatformFeePercentage, productType, videoSourceType } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -36,12 +38,14 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+const { useBreakpoint } = Grid;
 const {
   formatDate: { toDateAndTime },
 } = dateUtil;
 
 const Videos = () => {
   const { showSendEmailPopup } = useGlobalContext();
+  const { lg } = useBreakpoint();
   const location = useLocation();
 
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -54,16 +58,20 @@ const Videos = () => {
   const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [expandedCollapseKeys, setExpandedCollapseKeys] = useState(['Published']);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const isOnboarding = location.state ? location.state.onboarding || false : false;
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -185,7 +193,7 @@ const Videos = () => {
       showUploadVideoModal();
     }
 
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     getVideosForCreator();
     //eslint-disable-next-line
   }, [isOnboarding]);
@@ -260,7 +268,7 @@ const Videos = () => {
 
   const copyVideoPageLink = (videoId) => {
     const username = getLocalUserDetails().username;
-    const pageLink = `${generateUrlFromUsername(username)}/v/${videoId}`;
+    const pageLink = `${generateUrlFromUsername(username)}${generatePath(Routes.videoDetails, { video_id: videoId })}`;
 
     copyToClipboard(pageLink);
   };
@@ -317,6 +325,7 @@ const Videos = () => {
             },
             children: (
               <Image
+                loading="lazy"
                 src={record.thumbnail_url || 'error'}
                 alt={record.title}
                 height={100}
@@ -395,17 +404,17 @@ const Videos = () => {
                     {record.status === 'UPLOAD_SUCCESS' ? (
                       <Tooltip title="Video uploaded">
                         <Button
-                          className={classNames(styles.detailsButton, styles.checkIcon)}
                           type="text"
                           icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                          className={classNames(styles.detailsButton, styles.checkIcon)}
                         />
                       </Tooltip>
                     ) : (
                       // Here we also use the UID to determine whether the video has been completely processed or not
                       <Tooltip title={record.video_uid?.length > 0 ? 'Video is being processed' : 'Upload Video'}>
                         <Button
-                          className={styles.detailsButton}
                           type="text"
+                          className={styles.detailsButton}
                           disabled={record.video_uid?.length > 0 ? true : false}
                           onClick={() => showUploadVideoModal(record, 2)}
                           icon={<CloudUploadOutlined />}
@@ -796,6 +805,7 @@ const Videos = () => {
   return (
     <div className={styles.box}>
       <UploadVideoModal
+        key={selectedVideo?.external_id ?? 'new'}
         formPart={formPart}
         setFormPart={setFormPart}
         visible={createModalVisible}
@@ -805,6 +815,8 @@ const Videos = () => {
         shouldClone={shouldCloneVideo}
         creatorMemberTags={creatorMemberTags}
         refetchVideos={getVideosForCreator}
+        creatorAbsorbsFees={creatorAbsorbsFees}
+        creatorFeePercentage={creatorFeePercentage}
       />
       <Row gutter={[8, 24]}>
         <Col xs={24} md={14} lg={18}>
@@ -820,7 +832,7 @@ const Videos = () => {
             <Panel header={<Title level={5}> Published </Title>} key="Published">
               {videos?.filter((video) => video.is_published).length > 0 ? (
                 <>
-                  {isMobileDevice ? (
+                  {!lg ? (
                     <Loader loading={isLoading} size="large" text="Loading Videos">
                       <Row gutter={[8, 16]}>{videos?.filter((video) => video?.is_published)?.map(renderVideoItem)}</Row>
                     </Loader>
@@ -855,7 +867,7 @@ const Videos = () => {
             >
               {videos?.filter((video) => !video.is_published).length > 0 ? (
                 <>
-                  {isMobileDevice ? (
+                  {!lg ? (
                     <Loader loading={isLoading} size="large" text="Loading Videos">
                       <Row gutter={[8, 16]}>
                         {videos?.filter((video) => !video?.is_published)?.map(renderVideoItem)}

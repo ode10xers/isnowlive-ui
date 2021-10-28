@@ -14,12 +14,15 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import SessionRegistration from 'components/SessionRegistration';
+import { showErrorModal } from 'components/Modals/modals';
 
 import type { Session, SessionInventory } from 'types/models/session';
 
 import dateUtil from 'utils/date';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 import { generateColorPalletteForProfile } from 'utils/colors';
-import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import useQueryParamState from 'hooks/useQueryParamState';
 
@@ -39,6 +42,7 @@ type AvailabilityDetailsView = 'all' | 'date' | 'form';
 const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [availability, setAvailability] = useState<Session>();
+  const [availabilityPasses, setAvailabilityPasses] = useState([]);
   const [showLongDescription, setShowLongDescription] = useState(false);
   const inventoriesByDates = useMemo<Record<string, Record<string, SessionInventory[]>>>(
     () =>
@@ -54,8 +58,15 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   const months = useMemo<string[]>(() => Object.keys(inventoriesByDates), [inventoriesByDates]);
   const [selectedMonth, setSelectedMonth] = useQueryParamState('monthYear');
   useEffect(() => {
-    if (selectedMonth === undefined) setSelectedMonth(months[0]);
-  }, [months, selectedMonth, setSelectedMonth]);
+    if (selectedMonth === undefined) {
+      const availInv = availability?.inventory.find((inv) => !(inv.num_participants > 0));
+      if (availInv) {
+        setSelectedMonth(moment(availInv.start_time).format('MMMM YYYY'));
+      } else {
+        setSelectedMonth(months[0]);
+      }
+    }
+  }, [availability, months, selectedMonth, setSelectedMonth]);
   const dates = useMemo<string[]>(
     () =>
       selectedMonth && inventoriesByDates[selectedMonth] !== undefined
@@ -67,10 +78,18 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   useEffect(() => {
     if (selectedMonth) {
       if (selectedDate === undefined) {
-        setSelectedDate(dates[0]);
+        const availInv = availability?.inventory
+          .filter((inv) => moment(inv.start_time).format('MMMM YYYY') === selectedMonth)
+          .find((inv) => !(inv.num_participants > 0));
+
+        if (availInv) {
+          setSelectedDate(moment(availInv.start_time).format('YYYY-MM-DD'));
+        } else {
+          setSelectedDate(dates[0]);
+        }
       }
     }
-  }, [selectedMonth, selectedDate, dates, setSelectedDate]);
+  }, [availability, selectedMonth, selectedDate, dates, setSelectedDate]);
 
   const inventories = inventoriesByDates[selectedMonth ?? '']?.[selectedDate ?? ''] ?? [];
   const [selectedInventoryId, setSelectedInventoryId] = useQueryParamState('inventory');
@@ -89,7 +108,6 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     () => availability?.inventory.find((inv) => inv.inventory_id === Number(selectedInventoryId)),
     [availability, selectedInventoryId]
   );
-  // const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
   const [view, setView] = useState<AvailabilityDetailsView>('date');
 
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
@@ -97,10 +115,34 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   const fetchAvailabilityDetail = useCallback(async (session_id: string) => {
     setIsLoading(true);
 
-    const { data, status } = (await apis.availabilities.getAvailabilityDetails(session_id)) ?? {};
+    try {
+      const { data, status } = await apis.availabilities.getAvailabilityDetails(session_id);
 
-    if (isAPISuccess(status) && data) {
-      setAvailability(data);
+      if (isAPISuccess(status) && data) {
+        setAvailability(data);
+      }
+    } catch (error) {
+      console.error(error);
+      // @ts-ignore
+      showErrorModal('Failed to fetch availability details', error?.response?.data?.message || 'Something went wrong');
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  const fetchAvailabilityPasses = useCallback(async (session_id: string) => {
+    setIsLoading(true);
+
+    try {
+      const { data, status } = await apis.passes.getPassesBySessionId(session_id);
+
+      if (isAPISuccess(status) && data) {
+        setAvailabilityPasses(data);
+      }
+    } catch (error) {
+      console.error(error);
+      // @ts-ignore
+      message.error(error?.response?.data?.message || 'Failed to fetch passes for availability');
     }
 
     setIsLoading(false);
@@ -120,12 +162,13 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         fetchAvailabilityDetail(match.params.session_id);
+        fetchAvailabilityPasses(match.params.session_id);
         fetchCreatorProfile(domainUsername);
       }
     } else {
       message.error('Session details not found.');
     }
-  }, [fetchAvailabilityDetail, match, fetchCreatorProfile]);
+  }, [match, fetchCreatorProfile, fetchAvailabilityPasses, fetchAvailabilityDetail]);
 
   useEffect(() => {
     let profileColorObject: Record<string, string> | null = null;
@@ -229,6 +272,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       {/* @ts-ignore */}
       <Loader loading={isLoading} size="large" text="Loading availability">
         <Image
+          loading="lazy"
           className={styles.availabilityHeaderImage}
           preview={false}
           src={availability?.session_image_url}
@@ -399,6 +443,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               {availability && (
                 <SessionRegistration
                   fullWidth
+                  availablePasses={availabilityPasses}
                   classDetails={{ ...selectedInventory, ...availability }}
                   isInventoryDetails={true}
                 />

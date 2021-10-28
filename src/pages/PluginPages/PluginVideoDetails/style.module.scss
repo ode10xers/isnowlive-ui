@@ -1,0 +1,16 @@
+@import '../../../styles/variables.scss';
+
+.pageContainer {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+.backButtonContainer {
+  padding-top: 12px;
+  padding-left: 20px;
+
+  .backButton {
+    color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    border-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  }
+}

@@ -7,10 +7,12 @@ import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone, EditOutlined } fro
 
 import TagListPopup from 'components/TagListPopup';
 
-import styles from './styles.module.scss';
 import { generateSubscriptionDuration } from 'utils/subscriptions';
-import { copyToClipboard, generateUrlFromUsername, preventDefaults } from 'utils/helper';
+import { copyToClipboard, preventDefaults } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
+
+import styles from './styles.module.scss';
 
 const { Text } = Typography;
 const defaultBorderColor = '#eeeeee';
@@ -50,7 +52,8 @@ const SubscriptionCards = ({
   );
 
   const getBaseCreditsCount = () => {
-    return (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+    // return (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+    return subscription?.product_credits;
   };
 
   const cardData = [

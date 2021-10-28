@@ -22,19 +22,17 @@ import {
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { paymentProvider } from 'utils/constants';
+import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
+import { isAPISuccess, isInCreatorDashboard, isUnapprovedUserError } from 'utils/helper';
 import {
   orderType,
   productType as productTypeConstants,
   paymentSource,
-  isAPISuccess,
-  isUnapprovedUserError,
-  getUsernameFromUrl,
+  paymentProvider,
   reservedDomainName,
-  isInCreatorDashboard,
-} from 'utils/helper';
+} from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -75,6 +73,8 @@ const {
     or Subscription Order Object (for type 'SUBSCRIPTION')
 */
 
+// TODO: Tidy things up here, context data doesn't need to be passed down since
+// child components can access directly
 const PaymentPopup = () => {
   const [form] = Form.useForm();
   const {
@@ -311,6 +311,7 @@ const PaymentPopup = () => {
   };
 
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
+    // NOTE : is_successful_order can also be false if the product is a free product
     if (orderResponse && orderResponse?.is_successful_order) {
       if (verifyOrderRes === orderType.PASS) {
         /*
@@ -347,6 +348,40 @@ const PaymentPopup = () => {
           // If no followup booking info is attached, then it's only a simple pass purchase
           showPurchasePassSuccessModal(orderResponse.payment_order_id);
         }
+      } else if (verifyOrderRes === orderType.SUBSCRIPTION) {
+        /*
+          In pass order, there can be follow up bookings
+          If a follow up booking is required, orderResponse 
+          will contain the required info in follow_up_booking_info
+        */
+        const followUpBookingInfo = orderResponse.follow_up_booking_info;
+
+        if (followUpBookingInfo) {
+          if (followUpBookingInfo.productType === productTypeConstants.VIDEO) {
+            const payload = {
+              video_id: followUpBookingInfo.productId,
+              payment_source: paymentSource.SUBSCRIPTION,
+              source_id: orderResponse.payment_order_id,
+              user_timezone_location: getTimezoneLocation(),
+            };
+
+            await followUpGetVideo(payload);
+          } else if (followUpBookingInfo.productType === productTypeConstants.CLASS) {
+            const payload = {
+              inventory_id: followUpBookingInfo.productId,
+              user_timezone_offset: new Date().getTimezoneOffset(),
+              user_timezone_location: getTimezoneLocation(),
+              user_timezone: getCurrentLongTimezone(),
+              payment_source: paymentSource.SUBSCRIPTION,
+              source_id: orderResponse.payment_order_id,
+            };
+
+            await followUpBookSession(payload);
+          }
+        } else {
+          // If no followup booking info is attached, then it's only a simple subscription purchase
+          showPurchaseSubscriptionSuccessModal();
+        }
       } else if (verifyOrderRes === orderType.COURSE) {
         showPurchaseSingleCourseSuccessModal();
       } else if (verifyOrderRes === orderType.CLASS) {
@@ -356,8 +391,6 @@ const PaymentPopup = () => {
       } else if (verifyOrderRes === orderType.VIDEO) {
         // Showing confirmation for Single Session Booking
         showPurchaseSingleVideoSuccessModal(orderResponse.payment_order_id);
-      } else if (verifyOrderRes === orderType.SUBSCRIPTION) {
-        showPurchaseSubscriptionSuccessModal();
       }
     }
 
@@ -386,8 +419,7 @@ const PaymentPopup = () => {
       const subscriptionDetails = paymentInstrumentDetails;
 
       textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${
-        subscriptionDetails.products[productType.toUpperCase()].credits -
-        subscriptionDetails.products[productType.toUpperCase()].credits_used
+        subscriptionDetails.product_credits - subscriptionDetails.product_credits_used
       } credits left`;
     }
 
@@ -398,9 +430,25 @@ const PaymentPopup = () => {
     );
   };
 
+  const getProductOrderType = () => {
+    switch (productType) {
+      case productTypeConstants.COURSE:
+        return orderType.COURSE;
+      case productTypeConstants.CLASS:
+        return orderType.CLASS;
+      case productTypeConstants.PASS:
+        return orderType.PASS;
+      case productTypeConstants.VIDEO:
+        return orderType.VIDEO;
+      default:
+        return null;
+    }
+  };
+
   const handlePurchaseFreeProduct = async () => {
     const orderResponse = await handleBeforePayment();
-    await handleAfterPayment(orderResponse, null);
+    const orderType = getProductOrderType();
+    await handleAfterPayment(orderResponse, orderType);
   };
 
   const isFree = () =>
@@ -436,7 +484,7 @@ const PaymentPopup = () => {
       centered={true}
       footer={null}
       title={<Title level={4}> Confirm your purchase </Title>}
-      onCancel={() => closePaymentPopup()}
+      onCancel={closePaymentPopup}
     >
       <Row gutter={[8, 32]} justify="center">
         <Col xs={24}>

@@ -4,10 +4,6 @@ import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd'
 
 import apis from 'apis';
 
-import validationRules from 'utils/validation';
-import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess } from 'utils/helper';
-
 import Loader from 'components/Loader';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
@@ -17,12 +13,17 @@ import {
   resetBodyStyle,
 } from 'components/Modals/modals';
 
+import validationRules from 'utils/validation';
+import { getLocalUserDetails } from 'utils/storage';
+import { isAPISuccess } from 'utils/helper';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import dateUtil from 'utils/date';
+
 import { useGlobalContext } from 'services/globalContext';
 
 import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
-import { isWidgetUrl } from 'utils/widgets';
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -30,6 +31,10 @@ const { Text, Paragraph, Title } = Typography;
 // These cases are for when there are multiple object that
 // can trigger the Modal and we need to 'reset' the value
 // of the object in the parent component (see SessionDetails)
+
+const {
+  timezoneUtils: { getTimezoneLocation },
+} = dateUtil;
 
 //TODO: Might want to refactor this to be generic modal (like PaymentPopup)
 const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallback }) => {
@@ -90,7 +95,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
 
   const signupUser = async (values) => {
     setIsLoading(true);
-    const referenceCode = JSON.parse(localStorage.getItem('ref'));
+    const referenceCode = JSON.parse(localStorage.getItem('invite'));
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -98,12 +103,13 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         email: values.email,
         is_creator: false,
         referrer: referenceCode,
+        timezone_info: getTimezoneLocation(),
       });
       if (data) {
-        logIn(data, true, isWidgetUrl());
+        logIn(data, true, isWidgetUrl() || isInIframeWidget());
         closeModal();
         onLoggedInCallback();
-        localStorage.removeItem('ref');
+        localStorage.removeItem('invite');
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
@@ -142,7 +148,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
             password: values.password,
           });
           if (data) {
-            logIn(data, true, isWidgetUrl());
+            logIn(data, true, isWidgetUrl() || isInIframeWidget());
             closeModal();
             onLoggedInCallback();
           }

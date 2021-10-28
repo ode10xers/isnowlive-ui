@@ -9,8 +9,9 @@ import Routes from 'routes';
 import Loader from 'components/Loader';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, ZoomAuthType, copyToClipboard } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { ZoomAuthType } from 'utils/constants';
+import { isAPISuccess, copyToClipboard } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -178,12 +179,12 @@ const MeetingDetailsModal = ({ visible, selectedInventory = null, closeModal }) 
                   <Row gutter={[8, 16]}>
                     <Col xs={24} md={12}>
                       <Form.Item id="meetingId" name="meetingId" label="Meeting ID (optional)">
-                        <Input placeholder="Add meeting ID" />
+                        <Input placeholder="Add meeting ID" autoComplete="off" />
                       </Form.Item>
                     </Col>
                     <Col xs={24} md={{ span: 11, offset: 1 }}>
                       <Form.Item id="password" name="password" label="Meeting Password (optional)">
-                        <Input.Password placeholder="Add meeting password" />
+                        <Input.Password placeholder="Add meeting password" autoComplete="off" />
                       </Form.Item>
                     </Col>
                   </Row>

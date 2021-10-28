@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Modal, Button, Form, Input, InputNumber, Select, Typography, message } from 'antd';
+import {
+  Row,
+  Col,
+  Modal,
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Checkbox,
+  Typography,
+  Divider,
+  message,
+  Radio,
+} from 'antd';
 
 import apis from 'apis';
 
@@ -9,16 +23,13 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { couponTypes } from 'utils/constants';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
 const { Text } = Typography;
-
-const formInitialValues = {
-  discountAmount: 1,
-};
 
 // Just add the products here as necessary
 const creatorProductInfo = [
@@ -44,6 +55,22 @@ const creatorProductInfo = [
   },
 ];
 
+const formCouponTypes = {
+  ABSOLUTE: {
+    value: couponTypes.ABSOLUTE,
+    label: 'Flat value coupons',
+  },
+  PERCENTAGE: {
+    value: couponTypes.PERCENTAGE,
+    label: 'Percent based coupons',
+  },
+};
+
+const formInitialValues = {
+  discountAmount: 1,
+  couponType: formCouponTypes.ABSOLUTE.value,
+};
+
 // ! Coupons API will use external IDs, so for SESSION and PASS need to use external_id
 const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   const [form] = Form.useForm();
@@ -51,7 +78,10 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [products, setProducts] = useState({});
-  const [selectedProductTypes, setSelectedProductTypes] = useState([]);
+  const [selectedProductType, setSelectedProductType] = useState(null);
+  const [selectedProductIds, setSelectedProductIds] = useState([]);
+
+  const [selectedCouponType, setSelectedCouponType] = useState(formCouponTypes.ABSOLUTE.value);
 
   // For products that have different keys for names/id
   const getProductId = (productType, productData) => {
@@ -114,23 +144,55 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
       if (editedCoupon) {
         form.setFieldsValue({
           discountCode: editedCoupon.code,
-          discountPercent: editedCoupon.value,
-          selectedProductTypes: editedCoupon.product_type.toLowerCase(),
-          selectedProducts: editedCoupon.product_ids,
+          couponType: editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value,
+          couponValue: editedCoupon.value ?? 1,
+          selectedProductType: editedCoupon.product_type?.toLowerCase() ?? null,
+          selectedProducts: editedCoupon.product_ids ?? [],
         });
 
-        setSelectedProductTypes(editedCoupon.product_type.toLowerCase());
+        setSelectedCouponType(editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value);
+        setSelectedProductType(editedCoupon.product_type?.toLowerCase() ?? null);
+        setSelectedProductIds(editedCoupon.product_ids);
       } else {
         form.resetFields();
       }
 
       fetchCreatorProducts();
+    } else {
+      setSelectedCouponType(formCouponTypes.ABSOLUTE.value);
+      setSelectedProductType([]);
+      setSelectedProductIds([]);
+      form.resetFields();
     }
   }, [form, editedCoupon, visible, fetchCreatorProducts]);
 
   const handleSelectedProductTypesChanged = (values) => {
-    setSelectedProductTypes(values);
+    setSelectedProductType(values);
+    setSelectedProductIds([]);
     form.setFieldsValue({ ...form.getFieldsValue(), selectedProducts: [] });
+  };
+
+  const handleSelectedProductIdsChanged = (values) => {
+    setSelectedProductIds(values);
+    form.setFieldsValue({ ...form.getFieldsValue(), selectedProducts: values });
+  };
+
+  const handleSelectAllProduct = (e) => {
+    if (e.target.checked) {
+      const selectedProducts = products[selectedProductType];
+      handleSelectedProductIdsChanged(selectedProducts.map((product) => getProductId(selectedProductType, product)));
+    } else {
+      handleSelectedProductIdsChanged([]);
+    }
+  };
+
+  const handleCouponTypeChanged = (e) => {
+    setSelectedCouponType(e.target.value);
+
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      couponType: e.target.value,
+    });
   };
 
   const handleFinish = async (values) => {
@@ -139,9 +201,10 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
     try {
       const payload = {
         code: values.discountCode,
-        value: values.discountPercent,
-        product_type: selectedProductTypes.toUpperCase() || values.selectedProductTypes.toUpperCase(),
-        product_ids: values.selectedProducts,
+        coupon_type: selectedCouponType ?? formCouponTypes.ABSOLUTE.value,
+        value: values.couponValue ?? 1,
+        product_type: selectedProductType?.toUpperCase() ?? values.selectedProductType?.toUpperCase() ?? '',
+        product_ids: selectedProductIds ?? values.selectedProducts ?? [],
       };
 
       const { status } = editedCoupon
@@ -198,35 +261,69 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item {...couponModalFormLayout} label="Discount Amount (%)" required={true}>
-                <Row gutter={4}>
-                  <Col xs={20}>
-                    <Form.Item
-                      noStyle
-                      id="discountPercent"
-                      name="discountPercent"
-                      rules={validationRules.numberValidation('Please Input valid discount amount', 1, true, 100)}
-                    >
-                      <InputNumber
-                        min={1}
-                        max={100}
-                        precision={0}
-                        placeholder="Discount amount"
-                        className={styles.numericInput}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={4} className={styles.helpTextWrapper}>
-                    <Text strong> % </Text>
-                  </Col>
-                </Row>
+              <Form.Item
+                {...couponModalFormLayout}
+                id="couponType"
+                name="couponType"
+                label="Coupon Type"
+                rules={validationRules.requiredValidation}
+              >
+                <Radio.Group onChange={handleCouponTypeChanged}>
+                  {Object.values(formCouponTypes).map((cType) => (
+                    <Radio key={cType.value} value={cType.value}>
+                      {cType.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
               </Form.Item>
+            </Col>
+            <Col xs={24}>
+              {selectedCouponType === formCouponTypes.PERCENTAGE.value ? (
+                <Form.Item {...couponModalFormLayout} label="Discount Amount (%)" required={true}>
+                  <Row gutter={4}>
+                    <Col xs={20}>
+                      <Form.Item
+                        noStyle
+                        id="couponValue"
+                        name="couponValue"
+                        rules={validationRules.numberValidation('Please Input valid discount percentage', 1, true, 100)}
+                      >
+                        <InputNumber
+                          min={1}
+                          max={100}
+                          precision={0}
+                          placeholder="Discount amount (in percent)"
+                          className={styles.numericInput}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={4} className={styles.helpTextWrapper}>
+                      <Text strong> % </Text>
+                    </Col>
+                  </Row>
+                </Form.Item>
+              ) : (
+                <Form.Item
+                  {...couponModalFormLayout}
+                  id="couponValue"
+                  name="couponValue"
+                  label="Discount Amount (flat)"
+                  rules={validationRules.numberValidation('Please Input valid discount amount', 1)}
+                >
+                  <InputNumber
+                    min={1}
+                    precision={2}
+                    placeholder="Discount amount (flat amount)"
+                    className={styles.numericInput}
+                  />
+                </Form.Item>
+              )}
             </Col>
             <Col xs={24}>
               <Form.Item
                 {...couponModalFormLayout}
-                id="selectedProductTypes"
-                name="selectedProductTypes"
+                id="selectedProductType"
+                name="selectedProductType"
                 label="Applicable Product Types"
                 rules={validationRules.requiredValidation}
               >
@@ -239,7 +336,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                     value: key,
                     label: key.charAt(0).toUpperCase() + key.slice(1),
                   }))}
-                  value={selectedProductTypes}
+                  value={selectedProductType}
                   onChange={handleSelectedProductTypesChanged}
                 />
               </Form.Item>
@@ -258,13 +355,34 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                   placeholder="Select the products applicable with this code"
                   mode="multiple"
                   maxTagCount={2}
+                  onChange={handleSelectedProductIdsChanged}
+                  value={selectedProductIds}
+                  dropdownRender={(menu) => (
+                    <div>
+                      {menu}
+                      <Divider style={{ margin: '4px 0' }} />
+                      {selectedProductType && products[selectedProductType]?.length > 0 && (
+                        <Checkbox
+                          className={styles.ml10}
+                          onChange={handleSelectAllProduct}
+                          indeterminate={
+                            0 < selectedProductIds.length &&
+                            selectedProductIds.length < products[selectedProductType]?.length
+                          }
+                          checked={products[selectedProductType]?.length === selectedProductIds.length}
+                        >
+                          Select All
+                        </Checkbox>
+                      )}
+                    </div>
+                  )}
                 >
                   {Object.entries(products)
-                    .filter(([key, value]) => selectedProductTypes.includes(key.toLowerCase()))
+                    .filter(([key, value]) => selectedProductType === key.toLowerCase())
                     .map(([key, value]) => (
                       <Select.OptGroup label={`${key.charAt(0).toUpperCase()}${key.slice(1)}`} key={key}>
                         {value?.map((product) => (
-                          <Select.Option key={product.id} value={getProductId(key, product)}>
+                          <Select.Option key={getProductId(key, product)} value={getProductId(key, product)}>
                             {getProductName(key, product)}
                           </Select.Option>
                         ))}

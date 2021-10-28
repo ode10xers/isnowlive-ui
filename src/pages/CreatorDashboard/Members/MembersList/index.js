@@ -1,6 +1,24 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Row, Col, Button, Form, Select, Input, Radio, Typography, Card, Empty, Tooltip, Modal } from 'antd';
-import { FilterFilled, CheckCircleTwoTone } from '@ant-design/icons';
+import moment from 'moment';
+
+import {
+  Row,
+  Col,
+  Button,
+  Form,
+  Select,
+  Space,
+  Input,
+  Grid,
+  Radio,
+  Typography,
+  DatePicker,
+  Card,
+  Empty,
+  Tag,
+  Modal,
+} from 'antd';
+import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -9,11 +27,13 @@ import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
+import { tagColors } from 'utils/colors';
 
 import styles from './styles.module.scss';
 
 const { Text, Title, Paragraph } = Typography;
+const { RangePicker } = DatePicker;
+const { useBreakpoint } = Grid;
 const { Search } = Input;
 
 const memberViews = {
@@ -27,7 +47,27 @@ const memberViews = {
   },
 };
 
+const memberActivityFilterOptions = {
+  ALL: {
+    label: 'Show All',
+    value: 'all',
+  },
+  ALL_INACTIVE: {
+    label: 'Inactive for',
+    value: 'all_inactive',
+  },
+  VIDEO_INACTIVE: {
+    label: 'No videos bought since',
+    value: 'video_inactive',
+  },
+  SESSION_INACTIVE: {
+    label: 'No sessions bought since',
+    value: 'session_inactive',
+  },
+};
+
 const MembersList = () => {
+  const { lg } = useBreakpoint();
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +84,15 @@ const MembersList = () => {
   // isPrivateCommunity will be true when the user settings 'member_requires_invite' is true
   const [isPrivateCommunity, setIsPrivateCommunity] = useState(false);
 
+  const [selectedMemberActivityFilter, setSelectedMemberActivityFilter] = useState(
+    memberActivityFilterOptions.ALL.value
+  );
+  const [selectedTagFilters, setSelectedTagFilters] = useState([]);
+  const [selectedFilterDuration, setSelectedFilterDuration] = useState([
+    moment().startOf('day').subtract(7, 'days'),
+    moment().endOf('day'),
+  ]);
+
   const fetchCreatorMemberTags = useCallback(async () => {
     setIsLoading(true);
 
@@ -51,7 +100,7 @@ const MembersList = () => {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags.map((tag, idx) => ({ ...tag, color: tagColors[idx % tagColors.length] })));
       }
     } catch (error) {
       showErrorModal('Failed fetching creator members tags', error?.response?.data?.message || 'Something went wrong.');
@@ -60,33 +109,37 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorMembersList = useCallback(
-    async (pageNumber, itemsPerPage, searchString = null, fetchArchived = false) => {
-      setIsLoading(true);
+  const fetchCreatorMembersList = useCallback(async (pageNo, perPage, filters = {}) => {
+    setIsLoading(true);
+    try {
+      const { searchText = null } = filters;
 
-      try {
-        const { status, data } =
-          searchString && searchString.length > 0
-            ? await apis.audiences.searchCreatorMembers(pageNumber, itemsPerPage, fetchArchived, searchString)
-            : await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage, fetchArchived);
+      const queryData = {
+        pageNo,
+        perPage,
+        ...filters,
+      };
 
-        if (isAPISuccess(status) && data) {
-          setMembersList((memberList) => [...memberList, ...data.data]);
-          setCanShowMore(data.next_page);
-        }
-      } catch (error) {
-        if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
-          showErrorModal(
-            'Failed fetching creator members list',
-            error?.response?.data?.message || 'Something went wrong.'
-          );
-        }
+      const { status, data } =
+        searchText && searchText.length > 0
+          ? await apis.audiences.searchCreatorMembers(queryData)
+          : await apis.audiences.getCreatorMembers(queryData);
+
+      if (isAPISuccess(status) && data) {
+        setMembersList((memberList) => [...memberList, ...data.data]);
+        setCanShowMore(data.next_page);
       }
+    } catch (error) {
+      if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
+        showErrorModal(
+          'Failed fetching creator members list',
+          error?.response?.data?.message || 'Something went wrong.'
+        );
+      }
+    }
 
-      setIsLoading(false);
-    },
-    []
-  );
+    setIsLoading(false);
+  }, []);
 
   const fetchCreatorPrivateCommunityFlag = useCallback(async () => {
     setIsLoading(false);
@@ -141,8 +194,39 @@ const MembersList = () => {
   }, [fetchCreatorMemberTags, fetchCreatorPrivateCommunityFlag]);
 
   useEffect(() => {
-    fetchCreatorMembersList(pageNumber, totalItemsPerPage, searchString, archiveView === memberViews.ARCHIVED.value);
-  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage, searchString, archiveView]);
+    const dateFormat = 'YYYY-MM-DD';
+    const activityFilter =
+      selectedMemberActivityFilter === memberActivityFilterOptions.ALL.value
+        ? {}
+        : {
+            productType:
+              selectedMemberActivityFilter === memberActivityFilterOptions.VIDEO_INACTIVE.value
+                ? 'VIDEO'
+                : selectedMemberActivityFilter === memberActivityFilterOptions.SESSION_INACTIVE.value
+                ? 'SESSION'
+                : '',
+            startDate: (selectedFilterDuration[0] ?? moment().startOf('day').subtract(7, 'days'))
+              ?.utc()
+              .format(dateFormat),
+            endDate: (selectedFilterDuration[1] ?? moment().endOf()).utc().format(dateFormat),
+          };
+
+    const filters = {
+      searchText: searchString,
+      fetchArchived: archiveView === memberViews.ARCHIVED.value,
+      ...activityFilter,
+    };
+
+    fetchCreatorMembersList(pageNumber, totalItemsPerPage, filters);
+  }, [
+    fetchCreatorMembersList,
+    pageNumber,
+    totalItemsPerPage,
+    searchString,
+    archiveView,
+    selectedMemberActivityFilter,
+    selectedFilterDuration,
+  ]);
 
   const updateSelectedMemberTag = async () => {
     if (!selectedMember) {
@@ -216,6 +300,7 @@ const MembersList = () => {
 
   const reactivateMember = async (memberId) => {
     setIsLoading(true);
+    setSelectedMember(null);
 
     try {
       const payload = {
@@ -236,6 +321,7 @@ const MembersList = () => {
   };
 
   const handleBanMemberClicked = (memberId) => {
+    setSelectedMember(null);
     Modal.confirm({
       title: 'Remove member?',
       content: (
@@ -263,24 +349,79 @@ const MembersList = () => {
     setArchiveView(e.target.value);
   };
 
+  const renderMemberInteractionDetails = useCallback((memberDetails) => {
+    const noActivityTag = (
+      <Text type="secondary" className={styles.activityText}>
+        No Activity
+      </Text>
+    );
+
+    const interactionDetails = memberDetails?.interaction_details ?? null;
+
+    if (!interactionDetails) {
+      return noActivityTag;
+    }
+
+    const isInactive = !interactionDetails['session'].external_id && !interactionDetails['video'].external_id;
+
+    if (isInactive) {
+      return noActivityTag;
+    }
+
+    const activityTags = Object.entries(interactionDetails)
+      .map(([productName, activityDetails]) => {
+        const activityMoment = moment(activityDetails.last_interaction);
+
+        // Check if it's before 1970-01-01, if it is we consider it invalid
+        if (activityMoment.isBefore(moment(0))) {
+          return null;
+        }
+
+        return (
+          <Text key={productName} className={styles.activityText}>
+            Last bought a {productName} {activityMoment.fromNow()}
+          </Text>
+        );
+      })
+      .filter((tag) => tag);
+
+    return activityTags.length > 0 ? (
+      <Space direction="vertical">{activityTags.map((tag) => tag)}</Space>
+    ) : (
+      noActivityTag
+    );
+  }, []);
+
+  const handleMemberActivityFilterChanged = (value) => {
+    resetUIState();
+    setSelectedMemberActivityFilter(value);
+  };
+
+  const handleFilterDurationChanged = (value) => {
+    resetUIState();
+    setSelectedFilterDuration(value);
+  };
+
   const generateMembersListColumns = useCallback(
     () => {
       const initialColumns = [
         {
-          title: 'First Name',
+          title: 'Full Name',
           dataIndex: 'first_name',
           key: 'first_name',
+          render: (text, record) => `${record.first_name ?? ''} ${record.last_name ?? '-'}`,
         },
         {
-          title: 'Last Name',
-          dataIndex: 'last_name',
-          key: 'last_name',
-          render: (text, record) => record.last_name || '-',
+          title: 'Activity',
+          dataIndex: 'interaction_details',
+          key: 'interaction_details',
+          width: '220px',
+          render: (text, record) => renderMemberInteractionDetails(record),
         },
       ];
 
       if (creatorMemberTags.length > 0) {
-        const tagColumnPosition = 2;
+        const tagColumnPosition = 3;
 
         const tagColumnObject = {
           title: 'Tag',
@@ -298,36 +439,24 @@ const MembersList = () => {
                   }))}
                 />
               </Form.Item>
+            ) : record.tag.external_id ? (
+              <Tag
+                color={creatorMemberTags?.find((tag) => tag.external_id === record.tag?.external_id)?.color ?? 'blue'}
+              >
+                {record.tag?.name ?? ''}
+              </Tag>
             ) : (
-              <Text> {record.tag.name} </Text>
+              '-'
             ),
-          filterIcon: (filtered) => (
-            <Tooltip defaultVisible={true} title="Click here to filter">
-              <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />
-            </Tooltip>
-          ),
-          filters: [
-            {
-              text: 'Empty',
-              value: 'empty',
-            },
-            ...creatorMemberTags.map((tag) => ({
-              text: tag.name,
-              value: tag.external_id,
-            })),
-          ],
-          onFilter: (value, record) =>
-            value === 'empty' ? record.tag.external_id === '' : record.tag.external_id === value,
         };
 
         // Since currently actions are only related to tags, we will also show/hide
         // it based on whether or not creator has tags
         const actionsColumnObject = {
-          title: 'Actions',
-          width: '220px',
-          align: 'center',
+          title: '',
+          width: '100px',
           render: (record) => (
-            <Row gutter={[8, 8]} justify="end">
+            <Row gutter={[8, 8]}>
               {record.id === selectedMember?.id ? (
                 <>
                   <Col xs={12}>
@@ -341,29 +470,12 @@ const MembersList = () => {
                     </Button>
                   </Col>
                 </>
-              ) : archiveView === memberViews.ARCHIVED.value ? (
-                <Col xs={24} className={styles.textAlignCenter}>
-                  <Button type="primary" onClick={() => reactivateMember(record.id)}>
-                    Reactivate
+              ) : (
+                <Col xs={24}>
+                  <Button block type="link" onClick={() => setSelectedMember(record)}>
+                    Edit Tag
                   </Button>
                 </Col>
-              ) : (
-                <>
-                  <Col xs={12}>
-                    <Button block type="link" onClick={() => setSelectedMember(record)}>
-                      Edit Tag
-                    </Button>
-                  </Col>
-                  <Col xs={12}>
-                    <Button
-                      className={styles.orangeBtn}
-                      type="primary"
-                      onClick={() => handleBanMemberClicked(record.id)}
-                    >
-                      Remove
-                    </Button>
-                  </Col>
-                </>
               )}
             </Row>
           ),
@@ -371,6 +483,23 @@ const MembersList = () => {
 
         initialColumns.splice(tagColumnPosition, 0, tagColumnObject, actionsColumnObject);
       }
+
+      const banMemberActions = {
+        title: '',
+        width: '80px',
+        render: (record) =>
+          archiveView === memberViews.ARCHIVED.value ? (
+            <Button type="primary" onClick={() => reactivateMember(record.id)}>
+              Reactivate
+            </Button>
+          ) : (
+            <Button className={styles.orangeBtn} type="primary" onClick={() => handleBanMemberClicked(record.id)}>
+              Remove
+            </Button>
+          ),
+      };
+
+      initialColumns.push(banMemberActions);
 
       if (isPrivateCommunity && archiveView === memberViews.ACTIVE.value) {
         // For this column we will put it in the last column, so we can use push()
@@ -397,7 +526,7 @@ const MembersList = () => {
 
       return initialColumns;
     }, //eslint-disable-next-line
-    [creatorMemberTags, isPrivateCommunity, selectedMember, archiveView]
+    [creatorMemberTags, isPrivateCommunity, selectedMember, archiveView, renderMemberInteractionDetails]
   );
 
   const renderMobileMembersCard = (member) => {
@@ -429,50 +558,73 @@ const MembersList = () => {
                   <Button block type="link" onClick={() => setSelectedMember(member)}>
                     Edit Tag
                   </Button>,
-                  <Button className={styles.orangeBtn} type="primary" onClick={() => handleBanMemberClicked(member.id)}>
+                  <Button
+                    block
+                    className={styles.orangeBtn}
+                    type="primary"
+                    onClick={() => handleBanMemberClicked(member.id)}
+                  >
                     Remove
                   </Button>,
                 ]
           }
         >
-          {isPrivateCommunity && (
-            <Row gutter={[8, 8]}>
-              <Col xs={12}>Member Request:</Col>
-              <Col xs={12}>
-                {member.is_approved ? (
-                  <>
-                    <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
-                  </>
-                ) : (
-                  <Button block type="primary" onClick={() => approveMemberRequest(member.id)}>
-                    Allow
-                  </Button>
-                )}
+          <Row gutter={[8, 8]} align="middle">
+            {isPrivateCommunity && (
+              <Col xs={24}>
+                <Space align="middle">
+                  <Text>Member Request:</Text>
+                  {member.is_approved ? (
+                    <>
+                      <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
+                    </>
+                  ) : (
+                    <Button type="primary" onClick={() => approveMemberRequest(member.id)}>
+                      Allow
+                    </Button>
+                  )}
+                </Space>
               </Col>
-            </Row>
-          )}
-          {creatorMemberTags.length > 0 && (
-            <Row gutter={[8, 8]}>
-              <Col xs={4}>Tag :</Col>
-              <Col xs={20}>
-                {member.id === selectedMember?.id ? (
-                  <Form.Item noStyle name={member.id}>
-                    <Select
-                      className={styles.tagDropdownContainer}
-                      placeholder="Select the member tag"
-                      defaultValue={member.tag.external_id || null}
-                      options={creatorMemberTags.map((tag) => ({
-                        label: tag.name,
-                        value: tag.external_id,
-                      }))}
-                    />
-                  </Form.Item>
-                ) : (
-                  <Text> {member.tag.name} </Text>
-                )}
+            )}
+            {creatorMemberTags.length > 0 && (
+              <Col xs={24}>
+                <Space align="middle">
+                  <Text>Tag :</Text>
+                  <div>
+                    {member.id === selectedMember?.id ? (
+                      <Form.Item noStyle name={member.id}>
+                        <Select
+                          className={styles.tagDropdownContainer}
+                          placeholder="Select the member tag"
+                          defaultValue={member.tag?.external_id || null}
+                          options={creatorMemberTags.map((tag) => ({
+                            label: tag.name,
+                            value: tag.external_id,
+                          }))}
+                        />
+                      </Form.Item>
+                    ) : member.tag?.external_id ? (
+                      <Tag
+                        color={
+                          creatorMemberTags?.find((tag) => tag.external_id === member.tag?.external_id)?.color ?? 'blue'
+                        }
+                      >
+                        {member.tag?.name ?? ''}
+                      </Tag>
+                    ) : (
+                      '-'
+                    )}
+                  </div>
+                </Space>
               </Col>
-            </Row>
-          )}
+            )}
+            <Col xs={24}>
+              <Space direction="vertical">
+                <Text> Activities: </Text>
+                {renderMemberInteractionDetails(member)}
+              </Space>
+            </Col>
+          </Row>
         </Card>
       </Col>
     );
@@ -482,38 +634,106 @@ const MembersList = () => {
     <div className={styles.box}>
       <Row gutter={[16, 16]}>
         <Col xs={24}>
-          <Title level={4}> Members List </Title>
-        </Col>
-        <Col xs={24}>
-          <Row gutter={[8, 8]} align="middle">
-            <Col>
-              <Text> Search members : </Text>
+          <Row gutter={[8, 12]}>
+            <Col xs={24} lg={12}>
+              <Row gutter={[8, 8]}>
+                <Col xs={24}>
+                  <Title level={4}> Members List </Title>
+                </Col>
+                <Col xs={24}>
+                  <Row gutter={[8, 8]} align="middle">
+                    <Col>
+                      <Text> Search members : </Text>
+                    </Col>
+                    <Col>
+                      <Search
+                        enterButton="Search"
+                        placeholder="Member first/last name"
+                        onSearch={handleMemberSearch}
+                        className={styles.searchInput}
+                      />
+                    </Col>
+                  </Row>
+                  <Paragraph type="secondary" className={styles.mt10}>
+                    To see all members, empty the search bar and hit Search again
+                  </Paragraph>
+                </Col>
+                <Col xs={24}>
+                  <Radio.Group value={archiveView} onChange={handleArchiveViewChanged}>
+                    {Object.values(memberViews).map((view) => (
+                      <Radio.Button key={view.value} value={view.value}>
+                        {view.label}
+                      </Radio.Button>
+                    ))}
+                  </Radio.Group>
+                </Col>
+              </Row>
             </Col>
-            <Col>
-              <Search
-                enterButton="Search"
-                placeholder="Member first/last name"
-                onSearch={handleMemberSearch}
-                className={styles.searchInput}
-              />
+            <Col xs={24} lg={12}>
+              <Row gutter={[8, 12]}>
+                {creatorMemberTags.length > 0 && (
+                  <Col xs={24} md={12}>
+                    <Title level={5} className={styles.filterTitle}>
+                      Tags
+                    </Title>
+                    <Select
+                      showArrow
+                      allowClear
+                      mode="multiple"
+                      placeholder="Tags to show (empty = all)"
+                      maxTagCount={3}
+                      value={selectedTagFilters}
+                      onChange={setSelectedTagFilters}
+                      options={Object.entries(creatorMemberTags).map(([key, val]) => ({
+                        label: val.name,
+                        value: val.external_id,
+                      }))}
+                      className={styles.filterDropdown}
+                    />
+                  </Col>
+                )}
+                <Col xs={24} md={12}>
+                  <Title level={5} className={styles.filterTitle}>
+                    Activity
+                  </Title>
+                  <Select
+                    value={selectedMemberActivityFilter}
+                    onChange={handleMemberActivityFilterChanged}
+                    options={Object.values(memberActivityFilterOptions)}
+                    className={styles.filterDropdown}
+                  />
+                </Col>
+                {selectedMemberActivityFilter !== memberActivityFilterOptions.ALL.value && (
+                  <Col xs={24}>
+                    <Title level={5} className={styles.filterTitle}>
+                      Time Period
+                    </Title>
+                    <RangePicker
+                      className={styles.w100}
+                      value={selectedFilterDuration}
+                      allowEmpty={[false, false]}
+                      onChange={handleFilterDurationChanged}
+                      disabledDate={(current) => current && current > moment().endOf('day')}
+                      ranges={{
+                        'Last 7 Days': [moment().startOf('day').subtract(7, 'days'), moment().endOf('day')],
+                        'Last 14 Days': [moment().startOf('day').subtract(14, 'days'), moment().endOf('day')],
+                        'Last 30 Days': [moment().startOf('day').subtract(30, 'days'), moment().endOf('day')],
+                        'Last Month': [
+                          moment().subtract(1, 'month').startOf('month'),
+                          moment().subtract(1, 'month').endOf('month'),
+                        ],
+                      }}
+                    />
+                  </Col>
+                )}
+              </Row>
             </Col>
           </Row>
-          <Paragraph type="secondary" className={styles.mt10}>
-            To see all members, empty the search bar and hit Search again
-          </Paragraph>
         </Col>
-        <Col xs={24}>
-          <Radio.Group value={archiveView} onChange={handleArchiveViewChanged}>
-            {Object.values(memberViews).map((view) => (
-              <Radio.Button key={view.value} value={view.value}>
-                {view.label}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
-        </Col>
+
         <Col xs={24}>
           <Form form={form} scrollToFirstError={true}>
-            {isMobileDevice ? (
+            {!lg ? (
               <Loader loading={isLoading} size="large" text="Fetching members list...">
                 {membersList.length > 0 ? (
                   <Row gutter={[8, 8]} justify="center">
@@ -540,7 +760,9 @@ const MembersList = () => {
                   <Table
                     size="small"
                     loading={isLoading}
-                    data={membersList}
+                    data={membersList.filter(
+                      (member) => !selectedTagFilters.length || selectedTagFilters.includes(member.tag?.external_id)
+                    )}
                     columns={generateMembersListColumns()}
                     rowKey={(record) => record.id}
                   />

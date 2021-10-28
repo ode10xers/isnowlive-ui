@@ -1,47 +1,41 @@
-import React, { useCallback } from 'react'
-import { Col, Row } from 'antd'
-// import { Swiper, SwiperSlide } from 'swiper/react'
+import React, { useCallback } from 'react';
+import { Col, Row } from 'antd';
 
-import AvailabilityListItem from '../AvailabilityListItem'
+import AvailabilityListItem from '../AvailabilityListItem';
 
-import type { Session } from 'types/models/session'
-// import { isMobileDevice } from 'utils/device'
+import type { Session } from 'types/models/session';
 
 import styles from './style.module.scss';
 
 export interface AvailabilityListViewProps {
-  availabilities?: Session[]
-  isContained?: boolean
+  availabilities?: Session[];
+  isContained?: boolean;
 }
 
-const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({
-  availabilities = [],
-  isContained = false
-}) => {
-  const renderAvailabilityListItem = useCallback((availability: Session) => (
-    // <SwiperSlide key={availability.session_id}>
-    <Col xs={isContained ? 24 : 18} md={12} lg={isContained ? 12 : 8} key={availability.session_external_id ?? availability.session_id}>
-      <AvailabilityListItem availability={availability} />
-    </Col>
-    // </SwiperSlide>
-  ), [isContained])
+const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({ availabilities = [], isContained = false }) => {
+  const renderAvailabilityListItem = useCallback(
+    (availability: Session) => (
+      <Col
+        xs={isContained ? 24 : 20}
+        md={12}
+        lg={isContained ? 12 : 8}
+        key={availability.session_external_id ?? availability.session_id}
+      >
+        <AvailabilityListItem availability={availability} />
+      </Col>
+    ),
+    [isContained]
+  );
 
   return (
     <div>
       {availabilities.length > 0 ? (
-        // <Row>
-        //   <Col span={24}>
-        //     <Swiper slidesPerView={isMobileDevice ? 1.2 : 2.2}>
-        //       {availabilities.map(renderAvailabilityListItem)}
-        //     </Swiper>
-        //   </Col>
-        // </Row>
         <Row gutter={[12, 4]} className={isContained ? undefined : styles.availabilitiesContainer}>
           {availabilities.map(renderAvailabilityListItem)}
         </Row>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-export default AvailabilityListView
+export default AvailabilityListView;

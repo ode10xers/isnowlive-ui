@@ -25,6 +25,13 @@ const Routes = {
   inventoryDetails: '/e/:inventory_id',
   sessionDetails: '/s/:session_id',
   membershipDetails: '/m/:membership_id',
+  plugins: {
+    root: '/plugins',
+    details: {
+      video: '/details/video/:video_id',
+      subscriptions: '/details/membership/:membership_id',
+    },
+  },
   previewPages: {
     root: '/demo-preview',
     passes: '/demo-preview/p/:pass_id',
@@ -37,7 +44,7 @@ const Routes = {
   },
   sessionUpdate: '/creator/session/:id/edit',
   sessionReschedule: '/reschedule',
-  profilePreview: '/profile/preview',
+  // profilePreview: '/profile/preview',
   stripeAccountValidate: '/stripe/account/validate',
   stripePaymentSuccess: '/stripe/payment/success',
   paymentRetry: '/payment/retry/:retry_token',
@@ -103,10 +110,11 @@ const Routes = {
     videos: '/videos',
     videoDetails: '/videos/:video_id/:video_order_id',
     courses: '/courses',
-    courseDetails: '/course/:course_id',
+    courseDetails: '/course/:course_order_id',
     subscriptions: '/subscriptions',
     referrals: '/referrals',
     dashboardPage: '/products',
+    documentDetails: '/:product_type/:product_order_id/document/:document_id',
   },
 };
 

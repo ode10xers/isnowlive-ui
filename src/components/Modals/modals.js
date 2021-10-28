@@ -6,22 +6,18 @@ import Routes from 'routes';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import { getLocalUserDetails } from 'utils/storage';
-import {
-  productType,
-  generateUrlFromUsername,
-  getUsernameFromUrl,
-  reservedDomainName,
-  generateMailToLink,
-} from 'utils/helper';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import { productType, reservedDomainName } from 'utils/constants';
+import { generateUrlFromUsername, getUsernameFromUrl, generateMailToLink } from 'utils/url';
 import {
   getUserPassOrderDetails,
   getUserVideoOrderDetails,
   getSessionInventoryDetails,
   getCreatorProfileByUsername,
 } from 'utils/orderHelper';
-import { isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 import { getAuthCookie } from 'services/authCookie';
 
 import styles from './style.modules.scss';
@@ -29,13 +25,13 @@ import styles from './style.modules.scss';
 const { Text, Paragraph } = Typography;
 
 const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPath) => {
-  if (!isWidgetUrl()) {
+  if (!isWidgetUrl() && !isInIframeWidget()) {
     return generateUrlFromUsername(userName) + targetPath;
   } else {
     let completeUrl = generateUrlFromUsername(userName) + targetPath;
 
     let authCode = null;
-    const authCodeFromCookie = getAuthCookie();
+    const authCodeFromCookie = getAuthCookie() || getAuthTokenFromLS();
     if (authCodeFromCookie && authCodeFromCookie !== '') {
       authCode = authCodeFromCookie;
     } else {
@@ -45,8 +41,8 @@ const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPat
 
     completeUrl =
       completeUrl +
-      '?isWidget=true&widgetType=dashboard' +
-      `${authCode && authCode !== '' ? `&authCode=${authCode}` : ''}`;
+      // '?isWidget=true&widgetType=dashboard' +
+      `${authCode && authCode !== '' ? `?signupAuthToken=${authCode}` : ''}`;
 
     return completeUrl;
   }
@@ -56,7 +52,7 @@ const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPat
 // issue that sometimes happens after closing a modal
 export const resetBodyStyle = () => {
   document.body.classList.remove(['ant-scrolling-effect']);
-  document.body.removeAttribute('style');
+  document.body.style.overflow = '';
 };
 
 export const showErrorModal = (title, message = '') => {
@@ -138,12 +134,17 @@ const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
         <Button
           type="primary"
           block
-          onClick={() =>
-            (window.location.href = getDashboardUrl(
+          onClick={() => {
+            const targetUrl = getDashboardUrl(
               username,
               Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
-            ))
-          }
+            );
+            if (isInIframeWidget() || isWidgetUrl()) {
+              window.open(targetUrl, '_blank');
+            } else {
+              window.location.href = targetUrl;
+            }
+          }}
         >
           Go to dashboard
         </Button>
@@ -164,11 +165,14 @@ export const showPurchasePassSuccessModal = async (passOrderId) => {
     maskClosable: false,
     okText: 'Go To Dashboard',
     title: 'Purchase Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        username,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes
-      )),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
@@ -196,16 +200,63 @@ export const showPurchasePassAndBookSessionSuccessModal = async (passOrderId, in
     maskClosable: false,
     okButtonProps: { style: { display: 'none' } },
     title: 'Registration Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
-      )),
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
           You have purchased the pass <Text strong> {userPass?.pass_name || ''} </Text>
         </Paragraph>
+        <Paragraph>
+          We have <Text strong> used 1 credit </Text> to book this class for you.
+        </Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        {generateCustomButtonsForSessionModals(username, inventoryDetails)}
+      </>
+    ),
+    afterClose: resetBodyStyle,
+  });
+};
+
+export const showPurchaseSubscriptionAndBookSessionSuccessModal = async (inventoryId) => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  const inventoryDetails = await getSessionInventoryDetails(inventoryId);
+
+  Modal.success({
+    width: 480,
+    closable: true,
+    maskClosable: false,
+    okButtonProps: { style: { display: 'none' } },
+    title: 'Registration Successful',
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
+    content: (
+      <>
+        <Paragraph>You have successfully purchased this membership.</Paragraph>
         <Paragraph>
           We have <Text strong> used 1 credit </Text> to book this class for you.
         </Paragraph>
@@ -234,11 +285,17 @@ export const showBookSessionWithPassSuccessModal = async (passOrderId, inventory
     maskClosable: false,
     okButtonProps: { style: { display: 'none' } },
     title: 'Registration Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
-      )),
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
@@ -269,11 +326,17 @@ export const showBookSingleSessionSuccessModal = async (inventoryId) => {
     maskClosable: false,
     okButtonProps: { style: { display: 'none' } },
     title: 'Registration Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
-      )),
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
@@ -300,11 +363,14 @@ export const showPurchasePassAndGetVideoSuccessModal = async (passOrderId) => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        username,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
-      )),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
@@ -337,11 +403,14 @@ export const showGetVideoWithPassSuccessModal = async (passOrderId) => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        username,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
-      )),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
@@ -372,11 +441,14 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
     maskClosable: false,
     title: 'Video Purchased',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        username,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
-      )),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
@@ -404,11 +476,14 @@ export const showPurchaseSingleCourseSuccessModal = () => {
     maskClosable: false,
     title: 'Course purchased',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        username,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
-      )),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>
@@ -429,16 +504,55 @@ export const showPurchaseSubscriptionSuccessModal = () => {
     center: true,
     closable: true,
     maskClosable: false,
-    title: 'Subscription purchased',
+    title: 'Membership purchased',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions
-      )),
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
-        <Paragraph>You have successfully purchased this subscription.</Paragraph>
+        <Paragraph>You have successfully purchased this membership.</Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+    afterClose: resetBodyStyle,
+  });
+};
+
+export const showPurchaseSubscriptionAndGetVideoSuccessModal = () => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Purchase successful',
+    okText: 'Go To Dashboard',
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
+    content: (
+      <>
+        <Paragraph>You have successfully purchased this membership.</Paragraph>
+        <Paragraph>We have also purchased this video for you using 1 credit from this membership</Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
@@ -456,14 +570,17 @@ export const showGetVideoWithSubscriptionSuccessModal = () => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        username,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
-      )),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
-        <Paragraph>We have purchased this video using 1 credit from your subscription</Paragraph>
+        <Paragraph>We have purchased this video using 1 credit from your membership</Paragraph>
         <Paragraph>
           You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
@@ -488,14 +605,20 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
     title: 'Registration successful',
     okButtonProps: { style: { display: 'none' } },
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
-      )),
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
-        <Paragraph>We have booked this session using 1 credit from your subscription</Paragraph>
+        <Paragraph>We have booked this session using 1 credit from your membership</Paragraph>
         <Paragraph>
           You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
@@ -508,6 +631,7 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
   });
 };
 
+// NOTE : currently unused since we don't support course in subs
 export const showGetCourseWithSubscriptionSuccessModal = () => {
   const userEmail = getLocalUserDetails().email;
   const username = getUsernameFromUrl();
@@ -518,11 +642,14 @@ export const showGetCourseWithSubscriptionSuccessModal = () => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        username,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
-      )),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     content: (
       <>
         <Paragraph>We have purchased this course using 1 credit from your subscription</Paragraph>
@@ -576,7 +703,14 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + targetSection)),
+    onOk: () => {
+      const targetUrl = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + targetSection);
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
     afterClose: resetBodyStyle,
   });
 };
@@ -589,7 +723,6 @@ export const showMemberUnapprovedJoinModal = async () => {
     if (reservedDomainName.includes(creatorUsername)) {
       showErrorModal('Something went wrong');
     } else {
-      // TODO: later change this to get creator details from LS
       const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
 
       if (creatorProfileData) {
@@ -627,12 +760,13 @@ export const showMemberUnapprovedJoinModal = async () => {
   }
 };
 
+//NOTE : We are kind of reusing the course flag and calling it another name for availability
 export const showCourseOptionsHelperModal = (productName = 'session') => {
   Modal.info({
     centered: true,
     closable: true,
     maskClosable: true,
-    title: 'Understanding the course options',
+    title: `Understanding the ${productName === 'availability' ? 'bundle' : 'course'} options`,
     width: 640,
     content: (
       <>
@@ -641,8 +775,9 @@ export const showCourseOptionsHelperModal = (productName = 'session') => {
           one off purchase.
         </Paragraph>
         <Paragraph>
-          Marking a {productName} as a Course {productName} prevents a customer from buying this {productName} alone,
-          they can only get it if they buy the whole course you add this {productName} to.
+          Marking a {productName} as a {productName === 'availability' ? 'Bundled' : 'Course'} {productName} prevents a
+          customer from buying this {productName} alone, they can only get it if they buy the{' '}
+          {productName === 'availability' ? 'pass' : 'whole course'} you add this {productName} to.
         </Paragraph>
         <Paragraph>If you are in doubt, choose normal for now. You can always change this later.</Paragraph>
       </>
@@ -668,5 +803,63 @@ export const showTagOptionsHelperModal = (productName = 'session') => {
       </>
     ),
     afterClose: resetBodyStyle,
+  });
+};
+
+export const showWaitlistHelperModal = (productName = 'course') => {
+  Modal.info({
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'What is wait-list?',
+    width: 640,
+    content: (
+      <>
+        <Paragraph>
+          The wait-list feature helps you measure the interest of your customers in this {productName}. You will be able
+          to see how many people are committed to buying this {productName} under the wait-list.
+        </Paragraph>
+        <Paragraph>
+          Once you've decided that enough people have joined the wait-list, you can open the {productName} registrations
+          (and close the wait-list) and the wait-listed users will be notified about this so they can come and purchase
+          the {productName}.
+        </Paragraph>
+        <Paragraph>You cannot re-open the wait-list once you close it</Paragraph>
+      </>
+    ),
+    okText: 'Got it',
+  });
+};
+
+export const showWaitlistJoinedModal = (productName = 'course') => {
+  const username = getUsernameFromUrl();
+
+  Modal.success({
+    mask: true,
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'Spot reserved',
+    content: (
+      <>
+        <Paragraph>You have successfully joined the wait-list for this {productName}.</Paragraph>
+        <Paragraph>
+          We will notify you via email when the creator opens the {productName}, and then you can purchase this{' '}
+          {productName}.
+        </Paragraph>
+      </>
+    ),
+    okText: 'Go to dashboard',
+    onOk: () => {
+      const targetUrl = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage
+      );
+      if (isInIframeWidget() || isWidgetUrl()) {
+        window.open(targetUrl, '_blank');
+      } else {
+        window.location.href = targetUrl;
+      }
+    },
   });
 };

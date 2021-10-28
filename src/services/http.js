@@ -8,15 +8,15 @@ import { setAuthCookie, getAuthCookie, deleteAuthCookie } from './authCookie';
 import { showMemberUnapprovedJoinModal } from 'components/Modals/modals';
 
 import { clearGTMUserAttributes } from './integrations/googleTagManager';
-import { isInIframeWidget } from 'utils/widgets';
-import { deleteAuthTokenFromLS } from './localAuthToken';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import { deleteAuthTokenFromLS, getAuthTokenFromLS } from './localAuthToken';
 
 const UNAUTHORIZED = 401;
 
 class HttpService {
   constructor() {
     this.baseURL = config.server.baseURL;
-    this.authToken = getAuthCookie() || '';
+    this.authToken = getAuthCookie() || getAuthTokenFromLS() || '';
 
     const creatorUsername = getCreatorUsernameForHeader() || '';
 
@@ -38,7 +38,7 @@ class HttpService {
           deleteAuthCookie();
           clearGTMUserAttributes();
           deleteAuthTokenFromLS();
-          if (!isInIframeWidget()) {
+          if (!isInIframeWidget() && !isWidgetUrl()) {
             window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
           } else {
             window.location.reload();

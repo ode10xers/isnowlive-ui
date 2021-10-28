@@ -64,7 +64,9 @@ const Videos = () => {
       >
         <Row gutter={[12, 12]}>
           <Col xs={24} md={10} lg={14} xl={12}>
-            <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
+            <div className={styles.coverImageContainer}>
+              <Image loading="lazy" className={styles.coverImage} src={video.thumbnail_url} preview={false} />
+            </div>
           </Col>
           <Col xs={24} md={14} lg={10} xl={12}>
             <Row>

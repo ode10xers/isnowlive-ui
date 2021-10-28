@@ -1,7 +1,11 @@
+import { generatePath } from 'react-router';
+
 import Routes from 'routes';
-import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 'utils/helper';
-// import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+
 import { getLocalUserDetails } from 'utils/storage';
+import { reservedDomainName } from 'utils/constants';
+import { getUsernameFromUrl, generateUrlFromUsername } from 'utils/url';
+// import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 export const redirectToInventoryPage = (inventory) => {
   let urlUsername = getUsernameFromUrl();
@@ -61,6 +65,21 @@ export const redirectToVideosPage = (video) => {
   // }
 };
 
+export const redirectToPluginVideoDetailsPage = (video) => {
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
+
+  const baseUrl = generateUrlFromUsername(video.creator_username || urlUsername);
+
+  const targetUrl = `${baseUrl}${Routes.plugins.root}${generatePath(Routes.plugins.details.video, {
+    video_id: video.external_id,
+  })}`;
+  window.open(targetUrl, '_self');
+};
+
 export const redirectToCoursesPage = (course) => {
   let urlUsername = getUsernameFromUrl();
 
@@ -69,7 +88,9 @@ export const redirectToCoursesPage = (course) => {
   }
 
   const baseUrl = generateUrlFromUsername(course.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}${course.is_dummy ? Routes.previewPages.root : ''}/c/${course.id}`;
+  const targetUrl = `${baseUrl}${course.is_dummy ? Routes.previewPages.root : ''}${generatePath(Routes.courseDetails, {
+    course_id: course.internal_id,
+  })}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
@@ -119,4 +140,19 @@ export const redirectToMembershipPage = (subscription) => {
   // } else {
   //   window.open(targetUrl);
   // }
+};
+
+export const redirectToPluginMembershipDetailsPage = (subs) => {
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
+
+  const baseUrl = generateUrlFromUsername(subs.creator_username || urlUsername);
+
+  const targetUrl = `${baseUrl}${Routes.plugins.root}${generatePath(Routes.plugins.details.subscriptions, {
+    membership_id: subs.external_id,
+  })}`;
+  window.open(targetUrl, '_self');
 };

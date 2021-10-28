@@ -14,7 +14,7 @@ import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
@@ -41,6 +41,7 @@ const formInitialValues = {
 
 // NOTE : Mostly similar to SessionRegistration Component
 // The difference is buy logic is removed, and no fetching user passes/subscriptions
+// TODO: Update this later to match new design
 const SessionRegistrationPreview = ({
   availablePasses = [],
   classDetails,
@@ -434,19 +435,26 @@ const SessionRegistrationPreview = ({
                   </Title>
                 </Col>
                 <Col xs={24}>
-                  <Text className={styles.registrationHelpText}>
-                    <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are always
-                    available in your
-                    <a
-                      href={`${generateUrlFromUsername(
-                        classDetails?.creator_username ?? classDetails?.username ?? getUsernameFromUrl()
-                      )}${Routes.attendeeDashboard.rootPath}${Routes.attendeeDashboard.defaultPath}`}
-                    >
-                      {' '}
-                      dashboard
-                    </a>
-                    .
-                  </Text>
+                  {classDetails?.is_offline ? (
+                    <Text>
+                      This is an in-person event happening at the location mentioned above, please RSVP below and reach
+                      there 10 mins before the start time
+                    </Text>
+                  ) : (
+                    <Text>
+                      <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are
+                      always available in your
+                      <a
+                        href={`${generateUrlFromUsername(
+                          classDetails?.creator_username ?? classDetails?.username ?? getUsernameFromUrl()
+                        )}${Routes.attendeeDashboard.rootPath}${Routes.attendeeDashboard.defaultPath}`}
+                      >
+                        {' '}
+                        dashboard
+                      </a>
+                      .
+                    </Text>
+                  )}
                 </Col>
                 <Col xs={24} className={styles.formContainer}>
                   {/* Form used to handle both Sign Up and Session Booking */}

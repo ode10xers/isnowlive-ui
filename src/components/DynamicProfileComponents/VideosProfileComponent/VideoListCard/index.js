@@ -1,32 +1,38 @@
 import React from 'react';
 
-import { Card, Typography, Image, Row, Col } from 'antd';
+import { Card, Typography, Image, Row, Space, Col } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
 
-import { isValidFile, preventDefaults } from 'utils/helper';
+import dateUtil from 'utils/date';
+import { videoSourceType } from 'utils/constants';
 import { redirectToVideosPage } from 'utils/redirect';
+import { isValidFile, preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 
 const DefaultImage = require('assets/images/greybg.jpg');
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
-// const {
-//   formatDate: { getVideoDuration },
-// } = dateUtil;
+const {
+  formatDate: { getVideoDuration },
+} = dateUtil;
 
-const VideoListCard = ({ video }) => {
-  // const videoDuration = (
-  //   <Space size={4} align="middle">
-  //     <PlayCircleOutlined className={styles.textIcons} />
-  //     <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>
-  //   </Space>
-  // );
+const VideoListCard = ({ video, handleClick = null }) => {
+  const videoDuration = (
+    <Space size={4} align="middle">
+      <PlayCircleOutlined className={styles.textIcons} />
+      {video.source === videoSourceType.CLOUDFLARE ? (
+        <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>
+      ) : null}
+    </Space>
+  );
 
   const videoImage = (
     <div className={styles.videoCoverContainer}>
       <div className={styles.videoImageContainer}>
         <Image
+          loading="lazy"
           preview={false}
           className={
             video?.thumbnail_url?.endsWith('.gif')
@@ -38,7 +44,7 @@ const VideoListCard = ({ video }) => {
           src={isValidFile(video?.thumbnail_url) ? video?.thumbnail_url : DefaultImage}
         />
       </div>
-      {/* <div className={styles.videoDurationContainer}>{videoDuration}</div> */}
+      <div className={styles.videoDurationContainer}>{videoDuration}</div>
     </div>
   );
 
@@ -80,7 +86,7 @@ const VideoListCard = ({ video }) => {
       className={styles.videoListCard}
       cover={videoImage}
       bodyStyle={{ padding: 0 }}
-      onClick={handleCardClicked}
+      onClick={handleClick ?? handleCardClicked}
     >
       <Row>
         <Col xs={24}>{videoTitle}</Col>

@@ -10,31 +10,36 @@
   }
 }
 
+.siteButton {
+  margin-left: auto;
+  margin-right: 0;
+  float: right;
+}
 
 .logo {
   height: 40px;
   margin-left: 5px;
 
   @media screen and (max-width: 992px) and (min-width: 525px) {
-    margin-left : 64px;
+    margin-left: 64px;
   }
 }
 
 .logoWrapper {
   flex: 0 0 240px;
-  @media screen and (max-width: 525px) {
+  @media screen and (max-width: 600px) {
     flex: 1 1 auto;
     display: none;
   }
 }
 
 .navItemWrapper {
-  flex : 1 1 auto;
+  flex: 1 1 auto;
   text-align: left;
-  
-  @media screen and (max-width: 525px) {
+
+  @media screen and (max-width: 600px) {
     flex: 1 1 100%;
     text-align: center;
-    align-self:center
+    align-self: center;
   }
 }

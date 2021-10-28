@@ -1,6 +1,6 @@
 import React, { MouseEvent, useCallback, useState } from 'react';
 import { Modal, Row, Col, Input, Button, Form } from 'antd';
-import {  EditOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
 

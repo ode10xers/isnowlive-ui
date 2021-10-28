@@ -14,9 +14,11 @@ import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistrationPreview from '../SessionRegistrationPreview';
 
-import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
 import dateUtil from 'utils/date';
+import { isAPISuccess } from 'utils/helper';
+import { isMobileDevice } from 'utils/device';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 
 import styles from './style.module.scss';
 
@@ -90,6 +92,7 @@ const InventoryDetailsPreview = ({ match, history }) => {
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24} className={classNames(styles.imageWrapper, styles.mb20)}>
           <img
+            loading="lazy"
             className={styles.coverImage}
             src={session?.session_image_url || DefaultImage()}
             alt="Session Detail"
@@ -113,7 +116,9 @@ const InventoryDetailsPreview = ({ match, history }) => {
           <Row>
             {session?.is_offline && (
               <Col xs={24}>
-                <Title level={5}> Session Location </Title>
+                <Title type="danger" level={5}>
+                  This is an in-person event happening at :
+                </Title>
                 <Text> {session?.offline_event_address} </Text>
               </Col>
             )}

@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import parse from 'emailjs-addressparser';
 
-import { Row, Col, Form, Input, Button, Typography, Popconfirm, Upload, Card, message } from 'antd';
+import { Row, Col, Form, Input, Button, Typography, Popconfirm, Upload, Card, Grid, message } from 'antd';
 import { CloseOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
-import Loader from 'components/Loader';
 import Table from 'components/Table';
+import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
 import validationRules from 'utils/validation';
 
 import styles from './styles.module.scss';
@@ -19,6 +18,7 @@ import styles from './styles.module.scss';
 const CSVFileTemplateLink = 'https://tinyurl.com/passionCSVTemplate';
 
 const { Title, Paragraph, Text, Link } = Typography;
+const { useBreakpoint } = Grid;
 
 const AudienceCSVFileUpload = ({ handleUploadSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +70,7 @@ const AudienceCSVFileUpload = ({ handleUploadSuccess }) => {
 
 const AudienceImport = () => {
   const [form] = Form.useForm();
+  const { lg } = useBreakpoint();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailListText, setEmailListText] = useState('');
@@ -197,7 +198,7 @@ const AudienceImport = () => {
       ),
       dataIndex: 'email',
       key: 'email',
-      width: isMobileDevice ? '180px' : '35%',
+      width: !lg ? '180px' : '35%',
       render: (text, record) => (
         <Form.Item name={[record.idx, 'email']} initialValue={record.email} rules={validationRules.requiredValidation}>
           <Input />
@@ -212,7 +213,7 @@ const AudienceImport = () => {
         </>
       ),
       key: 'first_name',
-      width: isMobileDevice ? '120px' : '30%',
+      width: !lg ? '120px' : '30%',
       render: (text, record) => (
         <Form.Item name={[record.idx, 'first_name']} rules={validationRules.requiredValidation}>
           <Input />
@@ -222,7 +223,7 @@ const AudienceImport = () => {
     {
       title: 'Last Name',
       key: 'last_name',
-      width: isMobileDevice ? '120px' : '30%',
+      width: !lg ? '120px' : '30%',
       render: (text, record) => (
         <Form.Item name={[record.idx, 'last_name']}>
           <Input />
@@ -269,8 +270,6 @@ const AudienceImport = () => {
       </Col>
     );
   };
-
-  // TODO: Add filter and select for mobile
 
   return (
     <div>
@@ -335,7 +334,7 @@ const AudienceImport = () => {
               <Form form={form} onFinish={saveAudiences} scrollToFirstError={true}>
                 <Row gutter={[16, 16]} justify="center">
                   <Col xs={24}>
-                    {isMobileDevice ? (
+                    {!lg ? (
                       <Row gutter={[8, 8]} justify="center">
                         {editableEmailList.length > 0 && editableEmailList.map(renderMobileEditableAudienceCards)}
                       </Row>

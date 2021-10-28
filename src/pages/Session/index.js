@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import classNames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { BlockPicker } from 'react-color';
+import moment from 'moment';
+import classNames from 'classnames';
+
 import {
   Form,
   Typography,
@@ -9,13 +11,14 @@ import {
   Space,
   Row,
   Col,
+  Grid,
   Input,
   Radio,
   InputNumber,
   Select,
-  message,
   DatePicker,
   Modal,
+  message,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -24,32 +27,26 @@ import {
   TagOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
-import moment from 'moment';
 
-import config from 'config';
 import apis from 'apis';
+import config from 'config';
 import Routes from 'routes';
-import Section from 'components/Section';
+
 import Loader from 'components/Loader';
-import ImageUpload from 'components/ImageUpload';
-import OnboardSteps from 'components/OnboardSteps';
+import Section from 'components/Section';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
+import ImageUpload from 'components/ImageUpload';
+import OnboardSteps from 'components/OnboardSteps';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showCourseOptionsHelperModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
-import {
-  getCurrencyList,
-  convertSchedulesToUTC,
-  isAPISuccess,
-  generateRandomColor,
-  isValidFile,
-  ZoomAuthType,
-} from 'utils/helper';
+import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, isValidFile } from 'utils/helper';
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import validationRules from 'utils/validation';
+import { generateRandomColor } from 'utils/colors';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { sessionMeetingTypes } from 'utils/constants';
+import { defaultPlatformFeePercentage, sessionMeetingTypes, ZoomAuthType } from 'utils/constants';
 
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
@@ -65,9 +62,12 @@ import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/int
 
 import styles from './style.module.scss';
 
+const maxInventoryLimitPerRequest = 1000;
+
 const { Title, Text, Paragraph, Link } = Typography;
-const { Option } = Select;
 const { RangePicker } = DatePicker;
+const { useBreakpoint } = Grid;
+const { Option } = Select;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
   timeCalculation: { createWeekRange, getRangeDiff, createRange },
@@ -136,6 +136,7 @@ const initialSession = {
 };
 
 const Session = ({ match, history }) => {
+  const { lg } = useBreakpoint();
   const location = useLocation();
   const isAvailability = location.pathname.includes(Routes.creatorDashboard.createAvailabilities);
   const [form] = Form.useForm();
@@ -159,6 +160,8 @@ const Session = ({ match, history }) => {
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [isOfflineSession, setIsOfflineSession] = useState(false);
   const [onlineMeetingType, setOnlineMeetingType] = useState(meetingTypes.ZOOM.value);
+  const [creatorAbsorbsFees, setCreatorAbsorbsFees] = useState(true);
+  const [creatorFeePercentage, setCreatorFeePercentage] = useState(defaultPlatformFeePercentage);
 
   const {
     state: {
@@ -168,12 +171,14 @@ const Session = ({ match, history }) => {
     },
   } = useGlobalContext();
 
-  const fetchCreatorMemberTags = useCallback(async () => {
+  const fetchCreatorSettings = useCallback(async () => {
     try {
       const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
+        setCreatorMemberTags(data.tags ?? []);
+        setCreatorAbsorbsFees(data.creator_owns_fee ?? true);
+        setCreatorFeePercentage(data.platform_fee_percentage ?? defaultPlatformFeePercentage);
       }
     } catch (error) {
       showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
@@ -283,9 +288,13 @@ const Session = ({ match, history }) => {
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
         if (isOnboarding) {
+          // TODO: Check with what to do here
           history.push(Routes.sessionCreate);
         } else {
-          history.push('/creator/dashboard' + Routes.creatorDashboard.createSessions);
+          history.push(
+            '/creator/dashboard' +
+              (isAvailability ? Routes.creatorDashboard.manageAvailabilities : Routes.creatorDashboard.manageSessions)
+          );
         }
       }
     },
@@ -308,7 +317,7 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-    fetchCreatorMemberTags();
+    fetchCreatorSettings();
     fetchCreatorDocuments();
 
     if (match.path.includes('manage')) {
@@ -323,7 +332,8 @@ const Session = ({ match, history }) => {
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
-      getCreatorCurrencyDetails();
+      // TODO: Prepare initial form values and
+      // change this to form.resetFields()
       form.setFieldsValue({
         ...form.getFieldsValue(),
         type: 'Group',
@@ -339,7 +349,19 @@ const Session = ({ match, history }) => {
         offline_event_address: '',
         meeting_provider: meetingTypes.ZOOM.value,
       });
+      setSession(initialSession);
+      setIsOfflineSession(false);
+      setOnlineMeetingType(meetingTypes.ZOOM.value);
+      setSessionImageUrl(null);
+      setIsSessionTypeGroup(true);
+      setIsSessionRecurring(true);
+      setSessionRefundable(true);
+      setRefundBeforeHours(24);
+      setRecurringDatesRanges([]);
+      setIsCourseSession(false);
+      setSelectedTagType('anyone');
       setColorCode(initialColor || whiteColor);
+      getCreatorCurrencyDetails();
       setIsLoading(false);
     }
   }, [
@@ -350,7 +372,7 @@ const Session = ({ match, history }) => {
     match.path,
     getCreatorCurrencyDetails,
     fetchCreatorDocuments,
-    fetchCreatorMemberTags,
+    fetchCreatorSettings,
   ]);
 
   const onSessionImageUpload = (imageUrl) => {
@@ -363,8 +385,18 @@ const Session = ({ match, history }) => {
     setIsCourseSession(e.target.value === 'course');
 
     if (e.target.value === 'course') {
-      form.setFieldsValue({ ...form.getFieldsValue(), type: 'Group', max_participants: 2 });
-      setSession({ ...session, max_participants: 2 });
+      if (!isSessionTypeGroup) {
+        form.setFieldsValue({
+          ...form.getFieldsValue(),
+          session_course_type: 'course',
+          type: 'Group',
+          max_participants: 2,
+        });
+        setSession({ ...session, is_course: true, max_participants: 2 });
+      } else {
+        form.setFieldsValue({ ...form.getFieldsValue(), session_course_type: 'course', type: 'Group' });
+        setSession({ ...session, is_course: true });
+      }
       setIsSessionTypeGroup(true);
     }
   };
@@ -678,7 +710,7 @@ const Session = ({ match, history }) => {
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
-        is_course: isAvailability ? false : isCourseSession,
+        is_course: isCourseSession,
         tag_ids:
           selectedTagType === 'anyone'
             ? []
@@ -688,23 +720,27 @@ const Session = ({ match, history }) => {
         type: isAvailability ? 'AVAILABILITY' : null,
       };
 
-      if (isSessionRecurring) {
-        data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
-        data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
-      } else {
-        data.beginning = moment().startOf('day').utc().format();
-        data.expiry = moment().endOf('day').utc().format();
-      }
-
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         // NOTE : Investigate why we filter out booked inventories here
-        data.inventory = allInventoryList.filter(
-          (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
-        );
+        data.inventory = allInventoryList
+          .filter((slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0)
+          .slice(0, maxInventoryLimitPerRequest);
         if (deleteSlot && deleteSlot.length) {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
+
+        if (isSessionRecurring) {
+          data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
+          data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
+        } else {
+          data.beginning = moment(allInventoryList[0].start_time).startOf('day').utc().format();
+          data.expiry = moment(allInventoryList[allInventoryList.length - 1].end_time)
+            .endOf('day')
+            .utc()
+            .format();
+        }
+
         if (session.session_id) {
           const updatedSessionResponse = isAvailability
             ? await apis.availabilities.update(session.session_id, data)
@@ -713,23 +749,20 @@ const Session = ({ match, history }) => {
           if (isAPISuccess(updatedSessionResponse.status)) {
             trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
 
-            Modal.confirm({
+            Modal.success({
               icon: <CheckCircleOutlined />,
-              title: `${data.name} session successfully updated`,
+              title: `${data.name} ${isAvailability ? 'availability' : 'session'} successfully updated`,
               className: styles.confirmModal,
               okText: 'Done',
-              cancelText: 'Add New',
-              onCancel: () => {
-                trackSimpleEvent(eventTagObject.addNewInModal);
-                const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
-                const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
-                getSessionDetails(match.params.id, startDate, endDate);
-                window.location.reload();
-                window.scrollTo(0, 0);
-              },
               onOk: () => {
                 trackSimpleEvent(eventTagObject.doneInModal);
-                history.push(`${Routes.creatorDashboard.rootPath}/${Routes.creatorDashboard.createSessions}`);
+                history.push(
+                  `${Routes.creatorDashboard.rootPath}${
+                    isAvailability
+                      ? Routes.creatorDashboard.manageAvailabilities
+                      : Routes.creatorDashboard.manageSessions
+                  }`
+                );
                 window.scrollTo(0, 0);
               },
             });
@@ -757,7 +790,9 @@ const Session = ({ match, history }) => {
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
-              title: `${newSessionResponse.data.name} session successfully created`,
+              title: `${newSessionResponse.data.name} ${
+                isAvailability ? 'availability' : 'session'
+              } successfully created`,
               className: styles.confirmModal,
               okText: 'Done',
               cancelText: 'Add New',
@@ -768,7 +803,13 @@ const Session = ({ match, history }) => {
               },
               onOk: () => {
                 trackSimpleEvent(eventTagObject.doneInModal);
-                history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`);
+                history.push(
+                  `${Routes.creatorDashboard.rootPath}${
+                    isAvailability
+                      ? Routes.creatorDashboard.manageAvailabilities
+                      : Routes.creatorDashboard.manageSessions
+                  }`
+                );
               },
             });
           }
@@ -776,7 +817,7 @@ const Session = ({ match, history }) => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        message.error('Need at least 1 session to publish');
+        message.error('Need at least 1 schedule to publish');
       }
     } catch (error) {
       setIsLoading(false);
@@ -789,7 +830,7 @@ const Session = ({ match, history }) => {
   };
 
   const handleCalenderPop = () => {
-    if (isMobileDevice && document.getElementsByClassName('ant-picker-panels')[0]) {
+    if (!lg && document.getElementsByClassName('ant-picker-panels')[0]) {
       document.getElementsByClassName('ant-picker-panels')[0].style.display = 'block';
       document.getElementsByClassName('ant-picker-panels')[0].style['text-align'] = 'center';
     }
@@ -811,7 +852,11 @@ const Session = ({ match, history }) => {
               className={styles.headButton}
               onClick={() =>
                 trackAndNavigate(
-                  '/creator/dashboard/manage/sessions',
+                  // '/creator/dashboard/manage/sessions',
+                  Routes.creatorDashboard.rootPath +
+                    (isAvailability
+                      ? Routes.creatorDashboard.manageAvailabilities
+                      : Routes.creatorDashboard.manageSessions),
                   creator.click.sessions.manage.backToManageSessionsList
                 )
               }
@@ -824,7 +869,7 @@ const Session = ({ match, history }) => {
       )}
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
-          <Title level={isMobileDevice ? 3 : 1} className={styles.titleText}>
+          <Title level={!lg ? 3 : 1} className={styles.titleText}>
             {session.session_id ? 'Update' : 'Create'} {isAvailability ? 'Availability' : 'Session'}
           </Title>
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
@@ -842,7 +887,7 @@ const Session = ({ match, history }) => {
         scrollToFirstError={true}
         {...profileFormItemLayout}
         onFinish={onFinish}
-        labelAlign={isMobileDevice ? 'left' : 'right'}
+        labelAlign={!lg ? 'left' : 'right'}
       >
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
@@ -877,12 +922,10 @@ const Session = ({ match, history }) => {
             >
               <Radio.Group>
                 <Radio className={styles.radioOption} value="false">
-                  {' '}
-                  Online{' '}
+                  Online
                 </Radio>
                 <Radio className={styles.radioOption} value="true">
-                  {' '}
-                  Offline{' '}
+                  Offline
                 </Radio>
               </Radio.Group>
             </Form.Item>
@@ -1038,32 +1081,30 @@ const Session = ({ match, history }) => {
             </Form.Item>
 
             {/* ---- Session Course Type ---- */}
-            {!isAvailability && (
-              <Form.Item label={`${isAvailability ? 'Availability' : 'Session'} Type`} required>
-                <Form.Item
-                  name="session_course_type"
-                  id="session_course_type"
-                  rules={validationRules.requiredValidation}
-                  onChange={handleSessionCourseType}
-                  className={styles.inlineFormItem}
-                >
-                  <Radio.Group>
-                    <Radio value="normal">Normal {isAvailability ? 'Availability' : 'Session'}</Radio>
-                    <Radio value="course">Course {isAvailability ? 'Availability' : 'Session'}</Radio>
-                  </Radio.Group>
-                </Form.Item>
-                <Form.Item className={styles.inlineFormItem}>
-                  <Button
-                    size="small"
-                    type="link"
-                    onClick={() => showCourseOptionsHelperModal('session')}
-                    icon={<InfoCircleOutlined />}
-                  >
-                    Understanding the options
-                  </Button>
-                </Form.Item>
+            <Form.Item label={`${isAvailability ? 'Bundle' : 'Session'} Type`} required>
+              <Form.Item
+                name="session_course_type"
+                id="session_course_type"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionCourseType}
+                className={styles.inlineFormItem}
+              >
+                <Radio.Group>
+                  <Radio value="normal">Normal {isAvailability ? 'Availability' : 'Session'}</Radio>
+                  <Radio value="course">{isAvailability ? ' Bundled Availability' : 'Course Session'}</Radio>
+                </Radio.Group>
               </Form.Item>
-            )}
+              <Form.Item className={styles.inlineFormItem}>
+                <Button
+                  size="small"
+                  type="link"
+                  onClick={() => showCourseOptionsHelperModal(isAvailability ? 'availability' : 'session')}
+                  icon={<InfoCircleOutlined />}
+                >
+                  Understanding the options
+                </Button>
+              </Form.Item>
+            </Form.Item>
 
             {/* ---- Session Tag Type ---- */}
             <>
@@ -1095,7 +1136,7 @@ const Session = ({ match, history }) => {
                 name="selected_member_tags"
                 id="selected_member_tags"
                 hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
               >
                 <Select
                   showArrow
@@ -1138,7 +1179,7 @@ const Session = ({ match, history }) => {
               </Form.Item>
 
               <Form.Item
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
                 name="max_participants"
                 extra="Maximum 100 supported"
                 rules={validationRules.requiredValidation}
@@ -1175,14 +1216,16 @@ const Session = ({ match, history }) => {
               </Form.Item>
               {/* NOTE : Currently the minimum for PWYW is 5, adjust when necessary */}
               <Form.Item
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
                 name="price"
                 extra={
                   sessionPaymentType === priceTypes.FLEXIBLE
                     ? `Choose your minimum price. We default to 5 ${form
                         .getFieldsValue()
                         .currency.toUpperCase()} as default`
-                    : 'Set your price'
+                    : creatorAbsorbsFees
+                    ? 'Set your price'
+                    : ''
                 }
                 rules={validationRules.numberValidation(
                   `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,
@@ -1191,7 +1234,17 @@ const Session = ({ match, history }) => {
                 )}
                 hidden={sessionPaymentType === priceTypes.FREE}
               >
-                <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
+                {creatorAbsorbsFees || sessionPaymentType === priceTypes.FLEXIBLE ? (
+                  <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
+                ) : (
+                  <PriceInputCalculator
+                    name="price"
+                    form={form}
+                    minimalPrice={1}
+                    initialValue={1}
+                    feePercentage={creatorFeePercentage}
+                  />
+                )}
               </Form.Item>
 
               {sessionPaymentType !== priceTypes.FREE && (
@@ -1211,7 +1264,7 @@ const Session = ({ match, history }) => {
               {sessionPaymentType !== priceTypes.FREE && sessionRefundable && (
                 <>
                   <Form.Item
-                    {...(!isMobileDevice && profileFormItemLayout)}
+                    {...(!!lg && profileFormItemLayout)}
                     label="Cancellable Before"
                     name="refund_before_hours"
                     extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputted above"
@@ -1265,11 +1318,11 @@ const Session = ({ match, history }) => {
               <Form.Item
                 rules={isSessionRecurring ? validationRules.requiredValidation : null}
                 name="recurring_dates_range"
-                {...(!isMobileDevice && profileFormTailLayout)}
+                {...(!!lg && profileFormTailLayout)}
                 layout="vertical"
               >
                 <Text>First {isAvailability ? 'Availability' : 'Session'} Date: </Text>
-                <Text className={isMobileDevice ? styles.ml5 : styles.ml30}>
+                <Text className={!lg ? styles.ml5 : styles.ml30}>
                   {' '}
                   Last {isAvailability ? 'Availability' : 'Session'} Date:
                 </Text>{' '}
@@ -1298,10 +1351,19 @@ const Session = ({ match, history }) => {
             <Row justify="center">
               <Col flex={4}>
                 <Title level={4} className={styles.scheduleCount}>
-                  {session?.inventory?.length || 0} Schedules will be created
+                  {session?.inventory?.length > maxInventoryLimitPerRequest
+                    ? maxInventoryLimitPerRequest
+                    : session?.inventory?.length || 0}{' '}
+                  Schedules will be created
                 </Title>
+                {session?.inventory?.length > maxInventoryLimitPerRequest && (
+                  <Text type="danger">
+                    For safety reasons, we limit the number of schedules you can set at one time to{' '}
+                    {maxInventoryLimitPerRequest} schedules.
+                  </Text>
+                )}
               </Col>
-              <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
+              <Col className={styles.publishBtnWrapper} flex={!lg ? 'auto' : 1}>
                 <Form.Item>
                   <Button htmlType="submit" type="primary">
                     Publish

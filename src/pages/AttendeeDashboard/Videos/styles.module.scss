@@ -8,21 +8,29 @@
   min-height: 48px;
 }
 
-.coverImage {
-  object-fit: cover;
-  border-radius: 8px;
-  height: 140px !important;
+.coverImageContainer {
+  :global {
+    .ant-image {
+      width: 100%;
+    }
+  }
 
-  @media screen and (max-width: 993px) {
+  .coverImage {
+    object-fit: cover;
+    border-radius: 8px;
     height: 140px !important;
-  }
 
-  @media screen and (max-width: 768px) {
-    height: 200px !important;
-  }
+    @media screen and (max-width: 993px) {
+      height: 140px !important;
+    }
 
-  @media screen and (max-width: 569px) {
-    height: 150px !important;
+    @media screen and (max-width: 768px) {
+      height: 200px !important;
+    }
+
+    @media screen and (max-width: 569px) {
+      height: 150px !important;
+    }
   }
 }
 

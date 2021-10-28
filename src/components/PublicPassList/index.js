@@ -1,31 +1,33 @@
 import React, { useState } from 'react';
 
-import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Tag, Space, Grid, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-// import SessionCards from 'components/SessionCards';
-import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import AuthModal from 'components/AuthModal';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, isUnapprovedUserError, orderType, productType } from 'utils/helper';
+import { orderType, productType } from 'utils/constants';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
-import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
+import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const PublicPassList = ({ passes }) => {
   const { showPaymentPopup } = useGlobalContext();
+  const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
@@ -96,7 +98,7 @@ const PublicPassList = ({ passes }) => {
           showPurchasePassSuccessModal(data.pass_order_id);
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -200,18 +202,20 @@ const PublicPassList = ({ passes }) => {
 
   const renderPassDetails = (record) => (
     <Row className={styles.passDetailsExpansion}>
-      {record?.sessions?.length > 0 && (
+      {record?.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
         <>
           <Col xs={24}>
             <Text className={styles.expandableSectionHeader}>Sessions bookable with this pass</Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
             <Row gutter={[8, 8]}>
-              {record?.sessions?.map((session) => (
-                <Col xs={24} sm={12} key={session.session_external_id}>
-                  <SessionListCard session={session} />
-                </Col>
-              ))}
+              {record?.sessions
+                ?.filter((session) => session.type === 'NORMAL')
+                .map((session) => (
+                  <Col xs={24} sm={12} key={session.session_external_id}>
+                    <SessionListCard session={session} />
+                  </Col>
+                ))}
             </Row>
           </Col>
         </>
@@ -223,6 +227,24 @@ const PublicPassList = ({ passes }) => {
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
             <SimpleVideoCardsList passDetails={record} videos={record.videos} />
+          </Col>
+        </>
+      )}
+      {record?.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text className={styles.expandableSectionHeader}>Availabilities bookable with this pass</Text>
+          </Col>
+          <Col xs={24} className={styles.passDetailsContainer}>
+            <Row gutter={[8, 8]}>
+              {record?.sessions
+                ?.filter((session) => session.type === 'AVAILABILITY')
+                .map((session) => (
+                  <Col xs={24} md={12} key={session.session_external_id}>
+                    <AvailabilityListItem availability={session} />
+                  </Col>
+                ))}
+            </Row>
           </Col>
         </>
       )}
@@ -284,18 +306,20 @@ const PublicPassList = ({ passes }) => {
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
-            {pass.sessions?.length > 0 && (
+            {pass.sessions?.filter((session) => session.type === 'NORMAL').length > 0 && (
               <>
                 <Col xs={24}>
                   <Text> Sessions bookable with this pass </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
-                    {pass.sessions?.map((session) => (
-                      <Tag key={session?.key} color="blue" onClick={() => redirectToSessionsPage(session)}>
-                        {session?.name}
-                      </Tag>
-                    ))}
+                    {pass.sessions
+                      ?.filter((session) => session.type === 'NORMAL')
+                      .map((session) => (
+                        <Tag key={session?.key} color="blue" onClick={() => redirectToSessionsPage(session)}>
+                          {session?.name}
+                        </Tag>
+                      ))}
                   </div>
                 </Col>
               </>
@@ -316,6 +340,24 @@ const PublicPassList = ({ passes }) => {
                 </Col>
               </>
             )}
+            {pass.sessions?.filter((session) => session.type === 'AVAILABILITY').length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text> Availabilities bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.sessions
+                      ?.filter((session) => session.type === 'AVAILABILITY')
+                      .map((session) => (
+                        <Tag key={session?.key} color="purple" onClick={() => redirectToSessionsPage(session)}>
+                          {session?.name}
+                        </Tag>
+                      ))}
+                  </div>
+                </Col>
+              </>
+            )}
           </Row>
         )}
       </div>
@@ -328,16 +370,7 @@ const PublicPassList = ({ passes }) => {
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
           <Col xs={24}>
-            <Paragraph className={styles.descText}>
-              Passes enable you to make a single payment and forget the hassle of paying for each product seperately.
-            </Paragraph>
-            <Paragraph className={styles.descText}>
-              Depending on the pass you buy, you can use the credits and book the class or video products made available
-              in that pass for free. A Pass is valid from the date you buy it until the validity period.
-            </Paragraph>
-          </Col>
-          <Col xs={24}>
-            {isMobileDevice ? (
+            {!lg ? (
               passes.length > 0 ? (
                 passes.map(renderPassItem)
               ) : (

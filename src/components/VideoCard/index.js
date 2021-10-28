@@ -2,22 +2,22 @@ import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
+import { Row, Col, Card, Button, Typography, Image, Space, Grid, Divider } from 'antd';
 import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
-import { videoSourceType } from 'utils/helper';
+import { videoSourceType } from 'utils/constants';
 import { redirectToVideosPage } from 'utils/redirect';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const {
-  formatDate: { toLongDateWithDayTime },
+  formatDate: { toShortDateWithYear },
 } = dateUtil;
 
 const noop = () => {};
@@ -38,13 +38,14 @@ const VideoCard = ({
   showDesc = false,
   showDetailsBtn = true,
 }) => {
+  const { lg } = useBreakpoint();
+
   const renderVideoOrderDetails = () => {
-    if (isMobileDevice) {
+    if (!lg) {
       return video.source === videoSourceType.CLOUDFLARE ? (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-            {toLongDateWithDayTime(orderDetails.expiry)}
+            Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
           </Text>
           <Divider className={classNames(styles.divider, styles.horizontal)} />
           <Text strong className={styles.blueText}>
@@ -58,8 +59,7 @@ const VideoCard = ({
       ) : (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-            {toLongDateWithDayTime(orderDetails.expiry)}
+            Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
           </Text>
         </Space>
       );
@@ -68,8 +68,7 @@ const VideoCard = ({
     return video.source === videoSourceType.CLOUDFLARE ? (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-          {toLongDateWithDayTime(orderDetails.expiry)}
+          Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
         </Title>
         <Title level={5} className={styles.blueText}>
           Allowed Watches : {orderDetails.watch_limit}
@@ -81,8 +80,7 @@ const VideoCard = ({
     ) : (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
-          {toLongDateWithDayTime(orderDetails.expiry)}
+          Available From : {toShortDateWithYear(orderDetails.beginning)} - {toShortDateWithYear(orderDetails.expiry)}
         </Title>
       </Space>
     );
@@ -101,6 +99,7 @@ const VideoCard = ({
       cover={
         cover || (
           <Image
+            loading="lazy"
             className={videoThumbnailUrl.endsWith('.gif') ? styles.videoThumbnail : styles.staticVideoThumbnail}
             src={videoThumbnailUrl}
             alt={video?.title || orderDetails?.title}
@@ -147,11 +146,14 @@ const VideoCard = ({
               )}
             </Col>
             {showDesc && (
-              <Col xs={24} className={styles.descWrapper}>
-                <div className={styles.videoDesc}>
-                  {ReactHtmlParser(video?.description || orderDetails?.description)}
-                </div>
-              </Col>
+              <>
+                <Col xs={24} className={styles.descWrapper}>
+                  <Title level={5}> Description </Title>
+                  <div className={styles.videoDesc}>
+                    {ReactHtmlParser((video?.description || orderDetails?.description)?.split('!~!~!~')[0] ?? '')}
+                  </div>
+                </Col>
+              </>
             )}
             {!showOrderDetails && (showDetailsBtn || buyable) && (
               <Col span={24} className={styles.buttonWrapper}>

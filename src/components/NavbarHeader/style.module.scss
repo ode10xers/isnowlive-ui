@@ -19,7 +19,7 @@
 }
 
 .loggedInUsername {
-  color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
+  color: var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
 }
 
 .domainNameWrapper {
@@ -59,10 +59,10 @@
 
   :global {
     .ant-menu-item {
-      color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
+      color: var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
     }
 
-    .ant-menu-item-active {
+    .ant-menu-item-active, .ant-menu-item-selected {
       color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
       border-bottom: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
     }
@@ -71,6 +71,7 @@
 
 .menuContainer {
   text-align: right !important;
+  line-height: 64px !important;
   background-color: var(--passion-profile-navbar-bg, #{map-get($colors, 'White')}) !important;
 
   & > li {
@@ -127,7 +128,7 @@
 
   .mobileSignUpBtn {
     color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
-  border: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
+    border: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
   }
 
   ul.menuLinks {
@@ -135,7 +136,7 @@
     padding: 0;
 
     & li {
-      color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')});
+      color: var(--passion-profile-navbar-text, #{map-get($colors, 'Black')});
       font-size: 16px;
       border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
       width: 100%;

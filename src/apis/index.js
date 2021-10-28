@@ -1,4 +1,5 @@
 import http from 'services/http';
+import { generateQueryString } from 'utils/url';
 
 export default {
   admin: {
@@ -31,6 +32,10 @@ export default {
     updateCustomDomainForCreator: (payload) => http.post('/secure/creator/profile/custom-domain', payload),
     updateCreatorFeeSettings: (payload) => http.post('/secure/creator/settings/platform-fee', payload),
   },
+  waitlist: {
+    joinCourseWaitlist: (courseId) => http.post(`/secure/customer/waitlist/courses/${courseId}`),
+    closeCourseWaitlist: (courseId) => http.post(`/secure/creator/courses/${courseId}/close-waitlist`),
+  },
   payment: {
     stripe: {
       onboardUser: (payload) => http.post('/secure/creator/profile/stripe', payload),
@@ -45,6 +50,8 @@ export default {
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
+    setupUserCard: () => http.post('/secure/customer/payment/setup-card'),
+    saveCustomerCard: (payload) => http.post('/secure/customer/payment/save-card', payload),
     retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
     paypal: {
       initiateCreatorPayPalAccount: (payload) => http.post('/secure/creator/profile/paypal', payload),
@@ -59,8 +66,18 @@ export default {
       http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
     create: (payload) => http.post('/secure/creator/sessions', payload),
     update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
-    getPastAvailability: () => http.get('/secure/creator/inventories/past?type=AVAILABILITY'),
-    getUpcomingAvailability: () => http.get('/secure/creator/inventories/upcoming?type=AVAILABILITY'),
+    getPastAvailability: (bookingType = undefined) =>
+      http.get(
+        `/secure/creator/inventories/past?type=AVAILABILITY${
+          typeof bookingType === typeof true ? `&booked=${bookingType}` : ''
+        }`
+      ),
+    getUpcomingAvailability: (bookingType = undefined) =>
+      http.get(
+        `/secure/creator/inventories/upcoming?type=AVAILABILITY${
+          typeof bookingType === typeof true ? `&booked=${bookingType}` : ''
+        }`
+      ),
     publishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
     unpublishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
   },
@@ -71,8 +88,12 @@ export default {
     update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
     getSession: () => http.get('/secure/creator/sessions'),
     delete: (payload) => http.delete('secure/creator/inventories/bulk', payload),
-    getPastSession: () => http.get('/secure/creator/inventories/past'),
-    getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
+    getPastSession: (bookingType = undefined) =>
+      http.get(`/secure/creator/inventories/past${typeof bookingType === typeof true ? `?booked=${bookingType}` : ''}`),
+    getUpcomingSession: (bookingType = undefined) =>
+      http.get(
+        `/secure/creator/inventories/upcoming${typeof bookingType === typeof true ? `?booked=${bookingType}` : ''}`
+      ),
     getAttendeePastSession: () => http.get('/secure/customer/orders/past'),
     getAttendeeUpcomingSession: () => http.get('/secure/customer/orders/upcoming'),
     getSessionDetails: (sessionId) => http.get(`/session/${sessionId}`),
@@ -142,10 +163,12 @@ export default {
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
   },
   courses: {
+    deleteCourse: (courseId) => http.delete(`/secure/creator/courses/${courseId}`),
     getCoursesByUsername: () => http.get(`/courses`),
     getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
     getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
-    getDetails: (courseId) => http.get(`/courses/${courseId}`),
+    getDetailsByInternalId: (courseInternalId) => http.get(`/courses/internal/${courseInternalId}`),
+    getDetailsByExternalId: (courseExternalId) => http.get(`/courses/external/${courseExternalId}`),
     getCreatorCourses: () => http.get('/secure/creator/courses'),
     getCreatorCourseDetailsById: (courseId) => http.get(`/secure/creator/courses/${courseId}`),
     createCourse: (payload) => http.post('/secure/creator/courses', payload),
@@ -183,6 +206,7 @@ export default {
       http.get(`/secure/creator/payments/earnings/subscriptions?page_no=${pageNo}&per_page${perPage}`),
     getEarningsBySubscriptionId: (subscriptionId) =>
       http.get(`/secure/creator/payments/earnings/subscriptions/id/${subscriptionId}`),
+    getSubscriptionById: (subscriptionId) => http.get(`/subscriptions/${subscriptionId}`),
     getSubscriptionsByUsername: () => http.get(`/subscriptions`),
     getSubscriptionsForSession: (sessionId) => http.get(`/subscriptions?session_id=${sessionId}`),
     getSubscriptionsForVideo: (videoId) => http.get(`/subscriptions?video_id=${videoId}`),
@@ -203,23 +227,67 @@ export default {
   },
   audiences: {
     reactivateCreatorMembers: (payload) => http.post('/secure/creator/audience/archive/reset', payload),
-    searchCreatorMembers: (pageNo, perPage, fetchArchived = false, searchString) =>
+    searchCreatorMembers: ({
+      pageNo,
+      perPage,
+      fetchArchived = false,
+      searchText,
+      productType = null,
+      startDate = null,
+      endDate = null,
+    }) => {
+      const queryData = Object.fromEntries(
+        Object.entries({
+          user_type: 'MEMBER',
+          show_details: true,
+          page_no: pageNo,
+          per_page: perPage,
+          archived: fetchArchived,
+          text: searchText,
+          product_type: productType,
+          inactivity_start: startDate,
+          inactivity_end: endDate,
+        }).filter(([_, v]) => v != null)
+      );
+
+      return http.get(`/secure/creator/audience?${generateQueryString(queryData)}`);
+    },
+    getCreatorMembers: ({
+      pageNo,
+      perPage,
+      fetchArchived = false,
+      productType = null,
+      startDate = null,
+      endDate = null,
+    }) => {
+      const queryData = Object.fromEntries(
+        Object.entries({
+          user_type: 'MEMBER',
+          show_details: true,
+          page_no: pageNo,
+          per_page: perPage,
+          archived: fetchArchived,
+          product_type: productType,
+          inactivity_start: startDate,
+          inactivity_end: endDate,
+        }).filter(([_, v]) => v != null)
+      );
+
+      return http.get(`/secure/creator/audience?${generateQueryString(queryData)}`);
+    },
+    getCreatorAudiences: (pageNo, perPage, userType = null, emailList = null) =>
       http.get(
-        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}&text=${searchString}`
+        `/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}${userType ? `&user_type=${userType}` : ''}${
+          emailList ? `&mailing_list=${emailList}` : ''
+        }`
       ),
-    getCreatorMembers: (pageNo, perPage, fetchArchived = false) =>
-      http.get(
-        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
-      ),
-    getCreatorAudiences: (pageNo, perPage) =>
-      http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
     updateMemberTag: (payload) => http.put('secure/creator/audience', payload),
     setCreatorMemberRequestApproval: (payload) => http.put('/secure/creator/audience', payload),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
-    sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),
+    sendNewsletterSignupDetails: (payload) => http.post('/audience/signup', payload),
   },
   newsletter: {
     getCreatorEmailTemplates: () => http.get('/secure/creator/newsletter/templates'),
@@ -229,8 +297,8 @@ export default {
       http.patch(`/secure/creator/newsletter/templates/${templateId}`, payload),
     deleteEmailTemplate: (templateId) => http.delete(`/secure/creator/newsletter/templates/${templateId}`),
     getCreatorEmailList: () => http.get('/secure/creator/mailing-lists'),
-    getEmailListDetails: (emailListId, pageNo, perPage) =>
-      http.get(`/secure/creator/mailing-lists/${emailListId}/audience?page_no=${pageNo}&per_page=${perPage}`),
+    // getEmailListDetails: (emailListId, pageNo, perPage) =>
+    // http.get(`/secure/creator/mailing-lists/${emailListId}/audience?page_no=${pageNo}&per_page=${perPage}`),
     deleteEmailList: (emailListId) => http.delete(`/secure/creator/mailing-lists/${emailListId}`),
     createEmailList: (payload) => http.post('/secure/creator/mailing-lists', payload),
     updateEmailList: (emailListId, payload) =>
@@ -243,6 +311,10 @@ export default {
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),
+    updateDocument: (documentId, payload) => http.patch(`/secure/creator/documents/${documentId}`, payload),
+    deleteDocument: (documentId) => http.delete(`/secure/creator/documents/${documentId}`),
+    getAttendeeDocumentDetailsForCourse: (courseOrderId, documentId) =>
+      http.get(`/secure/customer/courses/orders/${courseOrderId}/documents/${documentId}`),
   },
   legals: {
     createLegals: (payload) => http.post('/secure/creator/legal', payload),

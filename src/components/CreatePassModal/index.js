@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Row, Col, Tooltip, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
 import { TwitterPicker } from 'react-color';
 
+import { Row, Col, Tooltip, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, message } from 'antd';
 import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, generateRandomColor } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
+import { generateRandomColor } from 'utils/colors';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 import styles from './styles.module.scss';
 
@@ -36,6 +39,7 @@ const formInitialValues = {
   passName: '',
   classList: [],
   videoList: [],
+  availabilityList: [],
   passType: passTypes.LIMITED.name,
   colorCode: initialColor,
   passTagType: 'anyone',
@@ -64,17 +68,26 @@ const colorPickerChoices = [
   '#5030fd',
 ];
 
-const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMemberTags = [] }) => {
+const CreatePassModal = ({
+  visible,
+  closeModal,
+  editedPass = null,
+  creatorMemberTags = [],
+  creatorAbsorbsFees = true,
+  creatorFeePercentage = defaultPlatformFeePercentage,
+}) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
   const [classes, setClasses] = useState([]);
+  const [availabilities, setAvailabilities] = useState([]);
   const [videos, setVideos] = useState([]);
   const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState([]);
   const [selectedVideos, setSelectedVideos] = useState([]);
+  const [selectedAvailabilities, setSelectedAvailabilities] = useState([]);
   const [passType, setPassType] = useState(passTypes.LIMITED.name);
   const [colorCode, setColorCode] = useState(initialColor);
 
@@ -91,9 +104,25 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         setClasses(data);
       }
     } catch (error) {
-      showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
+      console.error(error);
+      message.error(error?.response?.data?.message || 'Failed to fetch sessions');
     }
 
+    setIsLoading(false);
+  }, []);
+
+  const fetchCreatorAvailabilities = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.availabilities.getAvailabilities();
+
+      if (isAPISuccess(status) && data) {
+        setAvailabilities(data);
+      }
+    } catch (error) {
+      console.error(error);
+      message.error(error?.response?.data?.message || 'Failed to fetch availabilities');
+    }
     setIsLoading(false);
   }, []);
 
@@ -107,7 +136,8 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         setVideos(data);
       }
     } catch (error) {
-      showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
+      console.error(error);
+      message.error(error?.response?.data?.message || 'Failed to fetch videos');
     }
 
     setIsLoading(false);
@@ -133,35 +163,30 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         });
       }
     } catch (error) {
-      // if (error.response?.data?.message === 'unable to fetch user payment details') {
-      //   Modal.confirm({
-      //     title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid pass`,
-      //     okText: 'Setup payment account',
-      //     cancelText: 'Keep it free',
-      //     onOk: () => {
-      //       history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
-      //     },
-      //   });
-      // } else {
-      //   showErrorModal(
-      //     'Failed to fetch creator currency details',
-      //     error?.response?.data?.message || 'Something went wrong'
-      //   );
-      // }
-      showErrorModal(
-        'Failed to fetch creator currency details',
-        error?.response?.data?.message || 'Something went wrong'
-      );
+      console.error(error);
+      message.error(error?.response?.data?.message || 'Failed to fetch creator currency details');
     }
     setIsLoading(false);
   }, [history, form]);
+
+  useEffect(() => {
+    getCreatorCurrencyDetails();
+    fetchAllClassesForCreator();
+    fetchAllVideosForCreator();
+    fetchCreatorAvailabilities();
+  }, [getCreatorCurrencyDetails, fetchAllClassesForCreator, fetchAllVideosForCreator, fetchCreatorAvailabilities]);
 
   useEffect(() => {
     if (visible) {
       if (editedPass) {
         form.setFieldsValue({
           passName: editedPass.name,
-          classList: editedPass.sessions.map((session) => session.session_id),
+          classList: editedPass.sessions
+            .filter((session) => session.type === 'NORMAL')
+            .map((session) => session.session_id),
+          availabilityList: editedPass.sessions
+            .filter((session) => session.type === 'AVAILABILITY')
+            .map((session) => session.session_id),
           videoList: editedPass.videos.map((video) => video.external_id),
           passType: editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
           classCount: editedPass.class_count,
@@ -173,27 +198,30 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         });
         setSelectedTagType(editedPass.tag?.external_id ? 'selected' : 'anyone');
         setSelectedTag(editedPass.tag?.external_id || null);
-        setCurrency(editedPass.currency.toUpperCase() || '');
+        setCurrency(editedPass.currency?.toUpperCase() || '');
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
-        setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
+        setSelectedClasses(
+          editedPass.sessions.filter((session) => session.type === 'NORMAL').map((session) => session.session_id) ?? []
+        );
+        setSelectedAvailabilities(
+          editedPass.sessions
+            .filter((session) => session.type === 'AVAILABILITY')
+            .map((session) => session.session_id) ?? []
+        );
         setSelectedVideos(editedPass.videos.map((video) => video.external_id));
         setColorCode(editedPass.color_code || whiteColor);
-      } else {
-        form.resetFields();
-        setPassType(passTypes.LIMITED.name);
-        setSelectedClasses([]);
-        setSelectedVideos([]);
-        setColorCode(initialColor);
-        setCurrency('');
-        setSelectedTag(null);
-        setSelectedTagType('anyone');
       }
-
-      getCreatorCurrencyDetails();
-      fetchAllClassesForCreator();
-      fetchAllVideosForCreator();
+    } else {
+      form.resetFields();
+      setPassType(passTypes.LIMITED.name);
+      setSelectedClasses([]);
+      setSelectedVideos([]);
+      setSelectedAvailabilities([]);
+      setColorCode(initialColor);
+      setSelectedTag(null);
+      setSelectedTagType('anyone');
     }
-  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, getCreatorCurrencyDetails, form]);
+  }, [visible, editedPass, form]);
 
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
@@ -251,13 +279,21 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
           .filter((video) => video.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
           .map((video) => video.external_id) || [];
 
+      const refilteredAvailabilities =
+        availabilities
+          .filter((session) => tempFormValues.classList.includes(session.session_id))
+          .filter((session) => session.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
+          .map((session) => session.session_id) || [];
+
       setSelectedClasses(refilteredClasses);
       setSelectedVideos(refilteredVideos);
+      setSelectedAvailabilities(refilteredAvailabilities);
 
       form.setFieldsValue({
         ...tempFormValues,
         classList: refilteredClasses,
         videoList: refilteredVideos,
+        availabilityList: refilteredAvailabilities,
       });
     }
   };
@@ -268,9 +304,13 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
     try {
       const noClassesSelected = selectedClasses.length <= 0 && values.classList.length <= 0;
       const noVideosSelected = selectedVideos.length <= 0 && values.videoList.length <= 0;
+      const noAvailabilitiesSelected = selectedAvailabilities.length <= 0 && values.availabilityList.length <= 0;
 
-      if (noClassesSelected && noVideosSelected) {
-        showErrorModal('Select Class/Video', 'Please select some class or videos to include in the pass');
+      if (noClassesSelected && noVideosSelected && noAvailabilitiesSelected) {
+        showErrorModal(
+          'Select Session/Video/Availability',
+          'Please select some sessions, videos, or availabilities to include in the pass'
+        );
         form.setFieldsValue(values);
         setIsSubmitting(false);
         return;
@@ -288,7 +328,10 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         price: currency ? values.price : 0, // Will be forced to 0 if currency is missing
         name: values.passName,
         validity: values.validity,
-        session_ids: selectedClasses || values.classList || [],
+        session_ids: [
+          ...(selectedClasses || values.classList || []),
+          ...(selectedAvailabilities || values.availabilityList || []),
+        ],
         video_ids: selectedVideos || values.videoList || [],
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
         limited: passTypes.LIMITED.name === passType,
@@ -305,6 +348,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         closeModal(true);
       }
     } catch (error) {
+      console.error(error);
       showErrorModal(
         `Failed to ${editedPass ? 'update' : 'create'} pass`,
         error?.response?.data?.message || 'Something went wrong'
@@ -313,6 +357,56 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
 
     setIsSubmitting(false);
   };
+
+  const renderSessionOptionItem = (session) => (
+    <Select.Option
+      value={session.session_id}
+      key={session.session_id}
+      label={
+        <>
+          {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+        </>
+      }
+    >
+      <Row gutter={[8, 8]}>
+        <Col xs={17} className={styles.productName}>
+          {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+        </Col>
+        <Col xs={7} className={styles.textAlignRight}>
+          {session.pay_what_you_want
+            ? `min. ${session.price}`
+            : session.price > 0
+            ? `${session.currency?.toUpperCase()} ${session.price}`
+            : 'Free'}
+        </Col>
+      </Row>
+    </Select.Option>
+  );
+
+  const renderVideoOptionItem = (video) => (
+    <Select.Option
+      value={video.external_id}
+      key={video.external_id}
+      label={
+        <>
+          {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+        </>
+      }
+    >
+      <Row gutter={[8, 8]}>
+        <Col xs={17} className={styles.productName}>
+          {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+        </Col>
+        <Col xs={7} className={styles.textAlignRight}>
+          {video.pay_what_you_want
+            ? `min. ${video.price}`
+            : video.price > 0
+            ? `${video.currency?.toUpperCase()} ${video.price}`
+            : 'Free'}
+        </Col>
+      </Row>
+    </Select.Option>
+  );
 
   return (
     <Modal
@@ -378,8 +472,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                   options={creatorMemberTags.map((tag) => ({
                     label: (
                       <>
-                        {' '}
-                        {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                        {tag.name} {tag.is_default ? <TagOutlined /> : null}
                       </>
                     ),
                     value: tag.external_id,
@@ -411,18 +504,18 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
               <Form.Item
                 id="classList"
                 name="classList"
-                label="Apply to Class(es)"
-                extra={<Text className={styles.helpText}> The classes that will be bookable using this pass </Text>}
+                label="Apply to session(s)"
+                extra={<Text className={styles.helpText}> The sessions that will be bookable using this pass </Text>}
               >
                 <Select
                   showArrow
                   allowClear
                   showSearch={false}
-                  placeholder="Select your Class(es)"
+                  placeholder="Select your session(s)"
                   mode="multiple"
                   maxTagCount={2}
                   value={selectedClasses}
-                  onChange={(val) => setSelectedClasses(val)}
+                  onChange={setSelectedClasses}
                   optionLabelProp="label"
                 >
                   <Select.OptGroup
@@ -434,30 +527,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                       .filter((session) =>
                         !selectedTag ? true : session.tags?.map((tag) => tag.external_id).includes(selectedTag)
                       )
-                      .map((session) => (
-                        <Select.Option
-                          value={session.session_id}
-                          key={session.session_id}
-                          label={
-                            <>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {session.pay_what_you_want
-                                ? `min. ${session.price}`
-                                : session.price > 0
-                                ? `${session.currency?.toUpperCase()} ${session.price}`
-                                : 'Free'}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
+                      .map(renderSessionOptionItem)}
                     {classes
                       ?.filter((session) => session.is_active)
                       .filter((session) =>
@@ -477,30 +547,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                       .filter((session) =>
                         !selectedTag ? true : session.tags?.map((tag) => tag.external_id).includes(selectedTag)
                       )
-                      .map((session) => (
-                        <Select.Option
-                          value={session.session_id}
-                          key={session.session_id}
-                          label={
-                            <>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {session.pay_what_you_want
-                                ? `min. ${session.price}`
-                                : session.price > 0
-                                ? `${session.currency?.toUpperCase()} ${session.price}`
-                                : 'Free'}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
+                      .map(renderSessionOptionItem)}
                     {classes
                       ?.filter((session) => !session.is_active)
                       .filter((session) =>
@@ -522,7 +569,9 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                 name="validity"
                 label="Pass Validity (days)"
                 extra={
-                  <Text className={styles.helpText}>The duration in days this pass will be usable after purchase</Text>
+                  <Text className={styles.helpText}>
+                    The duration in days this pass will be usable after purchase date
+                  </Text>
                 }
                 rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
               >
@@ -540,11 +589,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                   showArrow
                   allowClear
                   showSearch={false}
-                  placeholder="Select your Video(s)"
+                  placeholder="Select your video(s)"
                   mode="multiple"
                   maxTagCount={2}
                   value={selectedVideos}
-                  onChange={(val) => setSelectedVideos(val)}
+                  onChange={setSelectedVideos}
                   optionLabelProp="label"
                 >
                   <Select.OptGroup
@@ -556,30 +605,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                       .filter((video) =>
                         !selectedTag ? true : video.tags?.map((tag) => tag.external_id).includes(selectedTag)
                       )
-                      .map((video) => (
-                        <Select.Option
-                          value={video.external_id}
-                          key={video.external_id}
-                          label={
-                            <>
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {video.pay_what_you_want
-                                ? `min. ${video.price}`
-                                : video.price > 0
-                                ? `${video.currency?.toUpperCase()} ${video.price}`
-                                : 'Free'}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
+                      .map(renderVideoOptionItem)}
                     {videos
                       ?.filter((video) => video.is_published)
                       .filter((video) =>
@@ -599,30 +625,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                       .filter((video) =>
                         !selectedTag ? true : video.tags?.map((tag) => tag.external_id).includes(selectedTag)
                       )
-                      .map((video) => (
-                        <Select.Option
-                          value={video.external_id}
-                          key={video.external_id}
-                          label={
-                            <>
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {video.pay_what_you_want
-                                ? `min. ${video.price}`
-                                : video.price > 0
-                                ? `${video.currency?.toUpperCase()} ${video.price}`
-                                : 'Free'}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
+                      .map(renderVideoOptionItem)}
                     {videos
                       ?.filter((video) => !video.is_published)
                       .filter((video) =>
@@ -639,53 +642,121 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
           </Row>
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
-              <Row>
-                <Col xs={24}>
-                  <Form.Item
-                    id="price"
+              <Form.Item
+                id="price"
+                name="price"
+                label={`Pass Price${currency ? ` (${currency?.toUpperCase()})` : ''}`}
+                rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
+              >
+                {currency !== '' && !creatorAbsorbsFees ? (
+                  <PriceInputCalculator
                     name="price"
-                    label="Pass Price"
-                    rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
+                    form={form}
+                    minimalPrice={0}
+                    initialValue={0}
+                    feePercentage={creatorFeePercentage}
+                  />
+                ) : (
+                  <InputNumber
+                    min={0}
+                    disabled={currency === ''}
+                    placeholder="Pass Price"
+                    className={styles.numericInput}
+                  />
+                )}
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={{ span: 11, offset: 1 }}>
+              <Form.Item
+                id="availabilityList"
+                name="availabilityList"
+                label="Apply to Availability"
+                extra={
+                  <Text className={styles.helpText}> The availabilities that will be bookable using this pass </Text>
+                }
+              >
+                <Select
+                  showArrow
+                  allowClear
+                  showSearch={false}
+                  placeholder="Select your availabilities"
+                  mode="multiple"
+                  maxTagCount={2}
+                  value={selectedAvailabilities}
+                  onChange={setSelectedAvailabilities}
+                  optionLabelProp="label"
+                >
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    key="Published Availabilities"
                   >
-                    <InputNumber
-                      min={0}
-                      disabled={currency === ''}
-                      placeholder="Pass Price"
-                      className={styles.numericInput}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24}>
-                  <Form.Item
-                    id="classCount"
-                    name="classCount"
-                    label="Pass Credits"
-                    extra={
-                      <Text className={styles.helpText}>
-                        The maximum amount of live classes and videos bookable with this pass
-                      </Text>
-                    }
-                    rules={[
-                      {
-                        required: true,
-                        validator: (_, value) => {
-                          if (passType === passTypes.LIMITED.name && !value) {
-                            return Promise.reject('Please select the amount of classes');
-                          }
-                          return Promise.resolve();
-                        },
-                      },
-                    ]}
+                    {availabilities
+                      ?.filter((availability) => availability.is_active)
+                      .filter((availability) =>
+                        !selectedTag ? true : availability.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      )
+                      .map(renderSessionOptionItem)}
+                    {availabilities
+                      ?.filter((availability) => availability.is_active)
+                      .filter((availability) =>
+                        !selectedTag ? true : availability.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_published_availability">
+                        <Text disabled> No published availabilities </Text>
+                      </Select.Option>
+                    )}
+                  </Select.OptGroup>
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                    key="Unpublished Availabiities"
                   >
-                    <InputNumber
-                      disabled={passType === passTypes.UNLIMITED.name}
-                      min={1}
-                      placeholder="Amount of Credits"
-                      className={styles.numericInput}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
+                    {availabilities
+                      ?.filter((availability) => !availability.is_active)
+                      .filter((availability) =>
+                        !selectedTag ? true : availability.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      )
+                      .map(renderSessionOptionItem)}
+                    {availabilities
+                      ?.filter((availability) => !availability.is_active)
+                      .filter((availability) =>
+                        !selectedTag ? true : availability.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_unpublished_availability">
+                        <Text disabled> No unpublished availabilities </Text>
+                      </Select.Option>
+                    )}
+                  </Select.OptGroup>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row className={styles.classPassRow} gutter={[8, 16]}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                id="classCount"
+                name="classCount"
+                label="Pass Credits"
+                extra={<Text className={styles.helpText}>The no of sessions or videos bookable with this pass</Text>}
+                rules={[
+                  {
+                    required: true,
+                    validator: (_, value) => {
+                      if (passType === passTypes.LIMITED.name && !value) {
+                        return Promise.reject('Please select the amount of credits');
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
+              >
+                <InputNumber
+                  disabled={passType === passTypes.UNLIMITED.name}
+                  min={1}
+                  // addonAfter={<Text>{currency?.toUpperCase()}</Text>}
+                  placeholder="Amount of Credits"
+                  className={styles.numericInput}
+                />
+              </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
               <Form.Item name="colorCode" label="Color Tag">

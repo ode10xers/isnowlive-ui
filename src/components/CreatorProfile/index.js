@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { useLocation } from 'react-router-dom';
 
-import { Row, Col, Button, Image, Space, Typography, Switch } from 'antd';
+import { Row, Col, Button, Image, Space, Typography, Grid, Switch } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -19,18 +19,20 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import NewsletterModal from 'components/NewsletterModal';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { getExternalLink } from 'utils/url';
-import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
+import { getExternalLink, generateUrlFromUsername } from 'utils/url';
+import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+  const { lg } = useBreakpoint();
+
   let { search } = useLocation();
   const query = new URLSearchParams(search);
-  localStorage.setItem('ref', JSON.stringify(query.get('ref')));
+  localStorage.setItem('invite', JSON.stringify(query.get('invite')));
 
   const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
   const [creatorProfile, setCreatorProfile] = useState(profile || null);
@@ -53,7 +55,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
 
     let headingLevel = 2;
 
-    if (isMobileDevice) {
+    if (!lg) {
       headingLevel = 4;
 
       if (creatorName.length > 15) {
@@ -111,6 +113,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
       {showCoverImage && (
         <Col xs={24} className={styles.coverImageWrapper}>
           <Image
+            loading="lazy"
             preview={false}
             width={coverImage ? '100%' : 200}
             className={styles.coverImage}
@@ -124,7 +127,13 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
         className={classNames(styles.profileImageWrapper, showCoverImage && coverImage ? styles.withCover : undefined)}
       >
         <div className={styles.profileImage}>
-          <Image preview={false} width={'100%'} src={profileImage || 'error'} fallback={DefaultImage()} />
+          <Image
+            loading="lazy"
+            preview={false}
+            width={'100%'}
+            src={profileImage || 'error'}
+            fallback={DefaultImage()}
+          />
           <div className={styles.userName}>{renderCreatorName()}</div>
           <div className={styles.shareButton}>
             <Share

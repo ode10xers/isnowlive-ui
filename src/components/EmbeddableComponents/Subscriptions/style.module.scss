@@ -1,10 +1,75 @@
 @import '../../../styles/variables.scss';
 
 .subscriptionPluginContainer {
-  padding: 20px;
+  padding: 10px;
+  width: 100%;
 }
 
-.passionLogo {
-  height: 30px;
-  float: right;
+.signupButton {
+  background-color: var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--membership-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--membership-plugin-cta-font-color, #{map-get($colors, 'White')}) !important;
+}
+
+.subscriptionItem {
+  height: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: var(--primary-color-lightest, #{map-get($colors, 'AliceBlue')});
+  border: 1px solid var(--primary-color-lightest, #{map-get($colors, 'AliceBlue')});
+  border-top: 8px solid var(--primary-color-lighter, #{map-get($colors, 'ColumbiaBlue')});
+
+  .subscriptionName {
+    text-align: center !important;
+    color: var(--primary-color-darkest, #{map-get($colors, 'PrussianBlue')}) !important;
+    font-weight: 700 !important;
+    font-size: 20px;
+  }
+
+  .subscriptionDivider {
+    margin: 0 0 8px !important;
+    border-top-color: var(--primary-color-lighter, rgba(0, 0, 0, 0.6)) !important;
+  }
+
+  .subscriptionIcon {
+    color: var(--primary-color-light, #{map-get($colors, 'DodgerBlue')});
+    margin-right: 8px;
+  }
+
+  .subscriptionDetailsContainer {
+    margin-left: 24px !important;
+    color: var(--primary-color-darkest, #{map-get($colors, 'PrussianBlue')});
+    // font-weight: 600;
+    font-size: 15px;
+  }
+
+  .subscriptionBuyButton {
+    margin-top: 12px !important;
+    background-color: var(--primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    border-color: var(--primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    font-size: 13px !important;
+    font-weight: 500;
+
+    &.darkText {
+      --text-color: var(--primary-color-dark, #{map-get($colors, 'Zeus')}) !important;
+    }
+
+    &.lightText {
+      --text-color: var(--primary-color-lightest, #{map-get($colors, 'White')}) !important;
+    }
+
+    color: var(--text-color);
+
+    .subscriptionBuyDivider {
+      margin: 0 16px;
+      border-left-color: var(--text-color, rgba(0, 0, 0, 0.6)) !important;
+      height: 1.5em;
+    }
+  }
+
+  .subscriptionDetailsButton {
+    color: var(--primary-color-dark, #{map-get($colors, 'PrussianBlue')});
+    font-weight: 500;
+    font-size: 13px !important;
+  }
 }

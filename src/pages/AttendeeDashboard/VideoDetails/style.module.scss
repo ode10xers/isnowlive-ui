@@ -1,5 +1,17 @@
 @import '../../../styles/variables.scss';
 
+.headerButtons {
+  margin: 20px 0;
+}
+
+.courseButtonsContainer {
+  text-align: right;
+
+  @media screen and (max-width: 576px) {
+    text-align: center;
+  }
+}
+
 .showcaseCardContainer {
   padding: 20px 64px !important;
   margin-bottom: 16px;
@@ -8,6 +20,16 @@
 .youtubeVideoPlayer {
   aspect-ratio: 16 / 9;
   width: 100%;
+}
+
+.fileAttachmentContainer {
+  padding: 10px 64px;
+}
+
+.documentPreviewContainer {
+  max-width: 1080px;
+  padding: 10px;
+  margin: auto;
 }
 
 .imageWrapper {
@@ -53,12 +75,9 @@
 }
 
 .bio * {
-  // p,
-  // span {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: transparent !important;
-  // }
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+  background-color: transparent !important;
 }
 
 .sessionListWrapper {
@@ -66,7 +85,8 @@
 }
 
 @media (max-width: 768px) {
-  .showcaseCardContainer {
+  .showcaseCardContainer,
+  .fileAttachmentContainer {
     padding: 10px !important;
   }
   .profilePreviewContainer {

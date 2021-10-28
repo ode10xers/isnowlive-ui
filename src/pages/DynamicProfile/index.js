@@ -31,13 +31,8 @@ import Routes from 'routes';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
 
-import {
-  deepCloneObject,
-  isAPISuccess,
-  preventDefaults,
-  isInCreatorDashboard,
-  generateUrlFromUsername,
-} from 'utils/helper';
+import { deepCloneObject, isAPISuccess, preventDefaults, isInCreatorDashboard } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 
@@ -305,9 +300,10 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
     (urlPath) => {
       const scrollToElement = (elementId) => {
         const targetElement = document.getElementById(elementId);
+        console.log(targetElement);
         if (targetElement) {
-          targetElement.scrollIntoView();
-          window.scrollBy(0, -70);
+          targetElement.scrollIntoView({ block: 'center', inline: 'nearest' });
+          // window.scrollBy(0, -70);
         }
       };
 
@@ -775,6 +771,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
             {...provided.draggableProps}
             ref={provided.innerRef}
             id={targetComponent.elementId ?? component.key}
+            style={{ padding: 0 }}
           >
             <Suspense fallback={<Spin spinning={true} tip="Loading..." />}>
               <RenderedComponent
@@ -855,7 +852,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
                     Edit
                   </Button>
                   <Button ghost type="primary" icon={<GlobalOutlined />} onClick={handleNavigateToPublicPage}>
-                    Public Page
+                    My Website
                   </Button>
                 </>
               )}
@@ -907,7 +904,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
                   droppableId={creatorProfileData?.external_id || 'creator-profile-column'}
                 >
                   {(provided) => (
-                    <Row gutter={[8, 24]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
+                    <Row gutter={[8, 4]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
                       {editingMode
                         ? tempCreatorUIConfig?.map(renderDraggableCustomComponents)
                         : creatorUIConfig.map(renderDraggableCustomComponents)}
@@ -921,7 +918,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
               <div className={styles.passionBranding} onClick={handlePassionBrandingClicked}>
                 Build your site with
                 <span className={styles.passionLogoContainer}>
-                  <img src={PassionLogo} alt="Passion.do" className={styles.passionLogo} />
+                  <img loading="lazy" src={PassionLogo} alt="Passion.do" className={styles.passionLogo} />
                 </span>
               </div>
             </Col>

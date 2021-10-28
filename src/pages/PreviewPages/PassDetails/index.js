@@ -14,18 +14,10 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { getExternalLink } from 'utils/url';
-import { socialMediaIcons } from 'utils/constants';
-import { generateColorPalletteForProfile } from 'utils/colors';
-
-import {
-  isAPISuccess,
-  reservedDomainName,
-  getUsernameFromUrl,
-  convertHexToRGB,
-  isBrightColorShade,
-  deepCloneObject,
-} from 'utils/helper';
+import { isAPISuccess, deepCloneObject } from 'utils/helper';
+import { getExternalLink, getUsernameFromUrl } from 'utils/url';
+import { socialMediaIcons, reservedDomainName } from 'utils/constants';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import styles from './style.module.scss';
 

@@ -21,7 +21,7 @@ const NewsletterModal = ({ visible, closeModal }) => {
         email: values.email,
       };
 
-      const { status } = await apis.audiences.sendNewletterSignupDetails(payload);
+      const { status } = await apis.audiences.sendNewsletterSignupDetails(payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal(

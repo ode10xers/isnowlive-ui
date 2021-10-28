@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 import {
   Row,
   Col,
   Modal,
+  Grid,
   Form,
+  Collapse,
   Typography,
   Radio,
   Image,
@@ -18,6 +21,8 @@ import {
   Tabs,
   message,
   Popconfirm,
+  Switch,
+  Space,
 } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
@@ -32,6 +37,7 @@ import Routes from 'routes';
 import Loader from 'components/Loader';
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import {
   showErrorModal,
   showSuccessModal,
@@ -40,20 +46,22 @@ import {
   resetBodyStyle,
 } from 'components/Modals/modals';
 
-import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
+import validationRules from 'utils/validation';
+import { getLocalUserDetails } from 'utils/storage';
 import { fetchCreatorCurrency } from 'utils/payment';
 import { generateYoutubeThumbnailURL } from 'utils/video';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
-import styles from './styles.module.scss';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
-import { getLocalUserDetails } from 'utils/storage';
-import moment from 'moment';
+
+import styles from './styles.module.scss';
 
 const { Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
+const { Panel } = Collapse;
 
 const videoPriceTypes = {
   FREE: {
@@ -107,8 +115,11 @@ const UploadVideoModal = ({
   updateEditedVideo,
   shouldClone,
   creatorMemberTags = [],
+  creatorAbsorbsFees = true,
+  creatorFeePercentage = defaultPlatformFeePercentage,
   refetchVideos,
 }) => {
+  const { lg } = useBreakpoint();
   const [form] = Form.useForm();
   const [uploadForm] = Form.useForm();
 
@@ -135,6 +146,10 @@ const UploadVideoModal = ({
   const [selectedPassIds, setSelectedPassIds] = useState([]);
   const [creatorMemberships, setCreatorMemberships] = useState([]);
   const [selectedMembershipIds, setSelectedMembershipIds] = useState([]);
+
+  const [creatorDocuments, setCreatorDocuments] = useState([]);
+  const [accessibleBeforePurchase, setAccessibleBeforePurchase] = useState(false);
+  const [isDocumentDownloadable, setIsDocumentDownloadable] = useState(false);
 
   //#region Start of Uppy Related Methods
 
@@ -268,7 +283,7 @@ const UploadVideoModal = ({
       const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 25);
 
       if (isAPISuccess(status) && data) {
-        setCreatorMemberships(data.Data);
+        setCreatorMemberships(data.Data ?? []);
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed to fetch memberships');
@@ -276,6 +291,18 @@ const UploadVideoModal = ({
     }
 
     setIsLoading(false);
+  }, []);
+
+  const fetchCreatorDocuments = useCallback(async () => {
+    try {
+      const { status, data } = await apis.documents.getCreatorDocuments();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorDocuments(data.data ?? []);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch user documents');
+    }
   }, []);
 
   const getCreatorCurrencyDetails = useCallback(async () => {
@@ -306,17 +333,19 @@ const UploadVideoModal = ({
   //#region Start of Use Effects
 
   useEffect(() => {
+    fetchCreatorDocuments();
     fetchAllClassesForCreator();
     fetchPassesForCreator();
     fetchSubscriptionsForCreator();
-  }, [fetchAllClassesForCreator, fetchPassesForCreator, fetchSubscriptionsForCreator]);
+  }, [fetchAllClassesForCreator, fetchPassesForCreator, fetchSubscriptionsForCreator, fetchCreatorDocuments]);
 
   useEffect(() => {
     if (visible) {
       if (editedVideo) {
-        // TODO: Handle edit flow here later
         form.setFieldsValue({
           ...editedVideo,
+          description: editedVideo.description.split('!~!~!~')[0],
+          document_id: editedVideo.document?.id,
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
@@ -331,6 +360,8 @@ const UploadVideoModal = ({
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
+        setAccessibleBeforePurchase(editedVideo.is_public_document ?? false);
+        setIsDocumentDownloadable(editedVideo.is_document_downloadable ?? false);
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(
@@ -374,6 +405,8 @@ const UploadVideoModal = ({
       setSelectedSessionIds([]);
       setSelectedPassIds([]);
       setSelectedMembershipIds([]);
+      setAccessibleBeforePurchase(false);
+      setIsDocumentDownloadable(false);
       setVideoType(videoPriceTypes.FREE.name);
       setVideoPreviewTime('');
       setIsCourseVideo(false);
@@ -479,10 +512,14 @@ const UploadVideoModal = ({
               source: videoSourceTypes.CLOUDFLARE.value,
             };
 
+      // without involving BE
       let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
-        description: values.description,
+        description: values.description ?? '',
+        document_id: values.document_id ?? '',
+        is_public_document: accessibleBeforePurchase ?? false,
+        is_document_downloadable: isDocumentDownloadable ?? false,
         price:
           videoType === videoPriceTypes.FREE.name
             ? 0
@@ -541,24 +578,19 @@ const UploadVideoModal = ({
           }
 
           const targetMembershipIds = selectedMembershipIds || values.membership_ids || [];
-          const targetMemberships = creatorMemberships.filter((cSubs) =>
+          const targetMemberships = creatorMemberships?.filter((cSubs) =>
             targetMembershipIds.includes(cSubs.external_id)
           );
 
           try {
             await Promise.all(
               targetMemberships.map(async (subs) => {
-                let sessionsProductInfo = subs.products['SESSION'] ?? null;
                 let videosProductInfo = subs.products['VIDEO'] ?? null;
 
                 if (videosProductInfo) {
                   videosProductInfo.product_ids = [...new Set([...videosProductInfo.product_ids, data.external_id])];
-                } else if (sessionsProductInfo) {
-                  const totalCredits = sessionsProductInfo.credits;
-
-                  sessionsProductInfo.credits = Math.floor(totalCredits / 2) + (totalCredits % 2);
+                } else {
                   videosProductInfo = {
-                    credits: Math.floor(totalCredits / 2),
                     product_ids: [data.external_id],
                   };
                 }
@@ -567,6 +599,7 @@ const UploadVideoModal = ({
                   VIDEO: videosProductInfo,
                 };
 
+                let sessionsProductInfo = subs.products['SESSION'] ?? null;
                 if (sessionsProductInfo) {
                   productsData.SESSION = sessionsProductInfo;
                 }
@@ -577,6 +610,7 @@ const UploadVideoModal = ({
                   validity: subs.validity,
                   tag_id: subs.tag.external_id,
                   color_code: subs.color_code,
+                  product_credits: subs.product_credits,
                   products: productsData,
                 };
 
@@ -621,6 +655,7 @@ const UploadVideoModal = ({
         }
       }
     } catch (error) {
+      console.error(error);
       showErrorModal(
         `Failed to ${editedVideo ? 'update' : 'create'} video`,
         error?.response?.data?.message || 'Something went wrong.'
@@ -666,6 +701,9 @@ const UploadVideoModal = ({
         currency: currency.toLowerCase(),
         title: editedVideo.title,
         description: editedVideo.description,
+        document_id: editedVideo.document?.id ?? '',
+        is_public_document: editedVideo.is_public_document ?? false,
+        is_document_downloadable: editedVideo.is_document_downloadable ?? false,
         price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
         validity: editedVideo.validity,
         session_ids: selectedSessionIds || editedVideo.session_ids || [],
@@ -755,6 +793,9 @@ const UploadVideoModal = ({
         currency: currency.toLowerCase(),
         title: editedVideo.title,
         description: editedVideo.description,
+        document_id: editedVideo.document?.id ?? '',
+        is_public_document: editedVideo.is_public_document ?? false,
+        is_document_downloadable: editedVideo.is_document_downloadable ?? false,
         price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
         validity: editedVideo.validity,
         session_ids: selectedSessionIds || editedVideo.session_ids || [],
@@ -916,227 +957,6 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item
-                  id="session_ids"
-                  name="session_ids"
-                  label="Related class(es) [for upselling]"
-                  extra={
-                    <Text className={styles.helpText}>
-                      This is an optional field. You can select any of your existing live sessions here to link this
-                      video to that live session. This helps you upsell this video on that live session’s page so that
-                      customers who can’t find a suitable time for your live session can instead buy your video and
-                      still learn while you still make a sale.
-                    </Text>
-                  }
-                >
-                  <Select
-                    showArrow
-                    showSearch={false}
-                    placeholder="Select your Class(es)"
-                    mode="multiple"
-                    maxTagCount={2}
-                    value={selectedSessionIds}
-                    onChange={setSelectedSessionIds}
-                    optionLabelProp="label"
-                  >
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                      key="Published Sessions"
-                    >
-                      {classes
-                        ?.filter((session) => session.is_active)
-                        .map((session) => (
-                          <Select.Option
-                            value={session.session_id}
-                            key={session.session_id}
-                            label={
-                              <>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </>
-                            }
-                          >
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17} className={styles.productName}>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </Col>
-                              <Col xs={7} className={styles.textAlignRight}>
-                                <Text strong>
-                                  {session.pay_what_you_want
-                                    ? `min. ${session.price}`
-                                    : session.price > 0
-                                    ? `${session.currency?.toUpperCase()} ${session.price}`
-                                    : 'Free'}
-                                </Text>
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {classes?.filter((session) => session.is_active).length <= 0 && (
-                        <Select.Option disabled value="no_published_session">
-                          <Text disabled> No published sessions </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-                      key="Unpublished Sessions"
-                    >
-                      {classes
-                        ?.filter((session) => !session.is_active)
-                        .map((session) => (
-                          <Select.Option
-                            value={session.session_id}
-                            key={session.session_id}
-                            label={
-                              <>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </>
-                            }
-                          >
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17} className={styles.productName}>
-                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                              </Col>
-                              <Col xs={7} className={styles.textAlignRight}>
-                                <Text strong>
-                                  {session.pay_what_you_want
-                                    ? `min. ${session.price}`
-                                    : session.price > 0
-                                    ? `${session.currency?.toUpperCase()} ${session.price}`
-                                    : 'Free'}
-                                </Text>
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {classes?.filter((session) => !session.is_active).length <= 0 && (
-                        <Select.Option disabled value="no_unpublished_session">
-                          <Text disabled> No unpublished sessions </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={editedVideo ? 0 : 24}>
-                <Form.Item id="pass_ids" name="pass_ids" label="Related Pass(es)">
-                  <Select
-                    showArrow
-                    showSearch={false}
-                    mode="multiple"
-                    value={selectedPassIds}
-                    onChange={setSelectedPassIds}
-                    placeholder="Select the passes usable for this video"
-                    maxTagCount={2}
-                    optionLabelProp="label"
-                  >
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                      key="Published Passes"
-                    >
-                      {creatorPasses
-                        ?.filter((pass) => pass.is_published)
-                        .map((pass) => (
-                          <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{pass.name}</Col>
-                              <Col xs={7}>
-                                {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorPasses?.filter((pass) => pass.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_published_pass">
-                          <Text disabled> No published passes </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-                      key="Unpublished Passes"
-                    >
-                      {creatorPasses
-                        ?.filter((pass) => !pass.is_published)
-                        .map((pass) => (
-                          <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{pass.name}</Col>
-                              <Col xs={7}>
-                                {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorPasses?.filter((pass) => !pass.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_unpublished_pass">
-                          <Text disabled> No unpublished passes </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={editedVideo ? 0 : 24}>
-                <Form.Item id="membership_ids" name="membership_ods" label="Related Memberships(s)">
-                  <Select
-                    showArrow
-                    showSearch={false}
-                    mode="multiple"
-                    value={selectedMembershipIds}
-                    onChange={setSelectedMembershipIds}
-                    placeholder="Select the memberships usable for this video"
-                    maxTagCount={2}
-                    optionLabelProp="label"
-                  >
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                      key="Published Memberships"
-                    >
-                      {creatorMemberships
-                        ?.filter((subs) => subs.is_published)
-                        .map((subs) => (
-                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{subs.name}</Col>
-                              <Col xs={7}>
-                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorMemberships?.filter((subs) => subs.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_published_subs">
-                          <Text disabled> No published memberships </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                    <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-                      key="Unpublished Memberships"
-                    >
-                      {creatorMemberships
-                        ?.filter((subs) => !subs.is_published)
-                        .map((subs) => (
-                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
-                            <Row gutter={[8, 8]}>
-                              <Col xs={17}>{subs.name}</Col>
-                              <Col xs={7}>
-                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
-                              </Col>
-                            </Row>
-                          </Select.Option>
-                        ))}
-                      {creatorMemberships?.filter((subs) => !subs.is_published).length <= 0 && (
-                        <Select.Option disabled value="no_unpublished_subs">
-                          <Text disabled> No unpublished memberships </Text>
-                        </Select.Option>
-                      )}
-                    </Select.OptGroup>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24}>
                 <Form.Item label="Video Course Type" required>
                   <Form.Item
                     id="video_course_type"
@@ -1184,7 +1004,11 @@ const UploadVideoModal = ({
                   id="price"
                   name="price"
                   label={`Price (${currency.toUpperCase()})`}
-                  extra={`Set your ${videoType === videoPriceTypes.FLEXIBLE.name ? 'minimum' : ''} price`}
+                  extra={
+                    currency !== '' && !creatorAbsorbsFees && videoType === videoPriceTypes.PAID.name
+                      ? ''
+                      : `Set your ${videoType === videoPriceTypes.FLEXIBLE.name ? 'minimum' : ''} price`
+                  }
                   hidden={videoType === videoPriceTypes.FREE.name}
                   rules={validationRules.numberValidation(
                     `Please input the price ${videoType === videoPriceTypes.FLEXIBLE.name ? '(min. 5)' : ''}`,
@@ -1192,12 +1016,22 @@ const UploadVideoModal = ({
                     false
                   )}
                 >
-                  <InputNumber
-                    min={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
-                    disabled={currency === ''}
-                    placeholder="Price"
-                    className={styles.numericInput}
-                  />
+                  {currency !== '' && !creatorAbsorbsFees && videoType === videoPriceTypes.PAID.name ? (
+                    <PriceInputCalculator
+                      name="price"
+                      form={form}
+                      minimalPrice={0}
+                      initialValue={0}
+                      feePercentage={creatorFeePercentage}
+                    />
+                  ) : (
+                    <InputNumber
+                      min={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
+                      disabled={currency === ''}
+                      placeholder="Price"
+                      className={styles.numericInput}
+                    />
+                  )}
                 </Form.Item>
               </Col>
 
@@ -1243,8 +1077,7 @@ const UploadVideoModal = ({
                     options={creatorMemberTags.map((tag) => ({
                       label: (
                         <>
-                          {' '}
-                          {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                          {tag.name} {tag.is_default ? <TagOutlined /> : null}
                         </>
                       ),
                       value: tag.external_id,
@@ -1283,8 +1116,267 @@ const UploadVideoModal = ({
                   <InputNumber min={1} placeholder="Watch Count" className={styles.numericInput} />
                 </Form.Item>
               </Col>
+              <Col xs={24} className={styles.mb20}>
+                <Collapse>
+                  <Panel header={<Text strong>Advanced Options</Text>}>
+                    <Row gutter={[8, 16]}>
+                      <Col xs={24}>
+                        <Form.Item id="document_id" name="document_id" label="Attached File">
+                          <Select
+                            showArrow
+                            placeholder="Select document you want to include"
+                            options={creatorDocuments.map((document) => ({
+                              label: document.name,
+                              value: document.id,
+                            }))}
+                          />
+                        </Form.Item>
+                        <Form.Item label="File accessible by customers">
+                          <Space>
+                            <Text> After buying </Text>
+                            <Switch checked={accessibleBeforePurchase} onChange={setAccessibleBeforePurchase} />
+                            <Text> Before buying </Text>
+                          </Space>
+                        </Form.Item>
+                        <Form.Item label="File downloadable">
+                          <Space>
+                            <Text> Not Downloadable </Text>
+                            <Switch checked={isDocumentDownloadable} onChange={setIsDocumentDownloadable} />
+                            <Text> Downloadable </Text>
+                          </Space>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24}>
+                        <Form.Item
+                          id="session_ids"
+                          name="session_ids"
+                          label="Related class(es) [for upselling]"
+                          extra={
+                            <Text className={styles.helpText}>
+                              This is an optional field. You can select any of your existing live sessions here to link
+                              this video to that live session. This helps you upsell this video on that live session’s
+                              page so that customers who can’t find a suitable time for your live session can instead
+                              buy your video and still learn while you still make a sale.
+                            </Text>
+                          }
+                        >
+                          <Select
+                            showArrow
+                            showSearch={false}
+                            placeholder="Select your Class(es)"
+                            mode="multiple"
+                            maxTagCount={2}
+                            value={selectedSessionIds}
+                            onChange={setSelectedSessionIds}
+                            optionLabelProp="label"
+                          >
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                              key="Published Sessions"
+                            >
+                              {classes
+                                ?.filter((session) => session.is_active)
+                                .map((session) => (
+                                  <Select.Option
+                                    value={session.session_id}
+                                    key={session.session_id}
+                                    label={
+                                      <>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </>
+                                    }
+                                  >
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17} className={styles.productName}>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </Col>
+                                      <Col xs={7} className={styles.textAlignRight}>
+                                        <Text strong>
+                                          {session.pay_what_you_want
+                                            ? `min. ${session.price}`
+                                            : session.price > 0
+                                            ? `${session.currency?.toUpperCase()} ${session.price}`
+                                            : 'Free'}
+                                        </Text>
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {classes?.filter((session) => session.is_active).length <= 0 && (
+                                <Select.Option disabled value="no_published_session">
+                                  <Text disabled> No published sessions </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                              key="Unpublished Sessions"
+                            >
+                              {classes
+                                ?.filter((session) => !session.is_active)
+                                .map((session) => (
+                                  <Select.Option
+                                    value={session.session_id}
+                                    key={session.session_id}
+                                    label={
+                                      <>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </>
+                                    }
+                                  >
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17} className={styles.productName}>
+                                        {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                                        {session.name}
+                                      </Col>
+                                      <Col xs={7} className={styles.textAlignRight}>
+                                        <Text strong>
+                                          {session.pay_what_you_want
+                                            ? `min. ${session.price}`
+                                            : session.price > 0
+                                            ? `${session.currency?.toUpperCase()} ${session.price}`
+                                            : 'Free'}
+                                        </Text>
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {classes?.filter((session) => !session.is_active).length <= 0 && (
+                                <Select.Option disabled value="no_unpublished_session">
+                                  <Text disabled> No unpublished sessions </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={editedVideo ? 0 : 24}>
+                        <Form.Item id="pass_ids" name="pass_ids" label="Related Pass(es)">
+                          <Select
+                            showArrow
+                            showSearch={false}
+                            mode="multiple"
+                            value={selectedPassIds}
+                            onChange={setSelectedPassIds}
+                            placeholder="Select the passes usable for this video"
+                            maxTagCount={2}
+                            optionLabelProp="label"
+                          >
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                              key="Published Passes"
+                            >
+                              {creatorPasses
+                                ?.filter((pass) => pass.is_published)
+                                .map((pass) => (
+                                  <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{pass.name}</Col>
+                                      <Col xs={7}>
+                                        {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorPasses?.filter((pass) => pass.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_published_pass">
+                                  <Text disabled> No published passes </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                              key="Unpublished Passes"
+                            >
+                              {creatorPasses
+                                ?.filter((pass) => !pass.is_published)
+                                .map((pass) => (
+                                  <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{pass.name}</Col>
+                                      <Col xs={7}>
+                                        {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorPasses?.filter((pass) => !pass.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_unpublished_pass">
+                                  <Text disabled> No unpublished passes </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={editedVideo ? 0 : 24}>
+                        <Form.Item id="membership_ids" name="membership_ids" label="Related Memberships(s)">
+                          <Select
+                            showArrow
+                            showSearch={false}
+                            mode="multiple"
+                            value={selectedMembershipIds}
+                            onChange={setSelectedMembershipIds}
+                            placeholder="Select the memberships usable for this video"
+                            maxTagCount={2}
+                            optionLabelProp="label"
+                          >
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                              key="Published Memberships"
+                            >
+                              {creatorMemberships
+                                ?.filter((subs) => subs.is_published)
+                                .map((subs) => (
+                                  <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{subs.name}</Col>
+                                      <Col xs={7}>
+                                        {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorMemberships?.filter((subs) => subs.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_published_subs">
+                                  <Text disabled> No published memberships </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                              key="Unpublished Memberships"
+                            >
+                              {creatorMemberships
+                                ?.filter((subs) => !subs.is_published)
+                                .map((subs) => (
+                                  <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{subs.name}</Col>
+                                      <Col xs={7}>
+                                        {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorMemberships?.filter((subs) => !subs.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_unpublished_subs">
+                                  <Text disabled> No unpublished memberships </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </Panel>
+                </Collapse>
+              </Col>
             </Row>
-            <Form.Item {...(!isMobileDevice && formTailLayout)}>
+            <Form.Item {...(lg && formTailLayout)}>
               <Row>
                 <Col xs={12}>
                   <Button block type="default" onClick={() => closeModal(false)}>
@@ -1399,6 +1491,7 @@ const UploadVideoModal = ({
                           </Col>
                           <Col xs={24}>
                             <Image
+                              loading="lazy"
                               preview={false}
                               src={editedVideo?.thumbnail_url}
                               className={styles.centeredPreview}

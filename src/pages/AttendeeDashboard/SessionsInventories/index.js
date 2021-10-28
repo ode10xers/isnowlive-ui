@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 
-import { Row, Col, Typography, Button, Card, Popconfirm, message, Modal, Popover, Radio, Empty } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, Modal, Popover, Radio, Empty, Grid, message } from 'antd';
 import { BookTwoTone, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -13,10 +13,10 @@ import AddToCalendarButton from 'components/AddToCalendarButton';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { isInIframeWidget } from 'utils/widgets';
 import { redirectToInventoryPage } from 'utils/redirect';
-import { getDuration, generateUrlFromUsername, generateQueryString, isUnapprovedUserError } from 'utils/helper';
+import { getDuration, isUnapprovedUserError } from 'utils/helper';
+import { generateUrlFromUsername, generateQueryString } from 'utils/url';
 
 import {
   mixPanelEventTags,
@@ -32,17 +32,20 @@ const {
   timeCalculation: { isBeforeLimitHours, isBeforeDate },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { useBreakpoint } = Grid;
 const { attendee } = mixPanelEventTags;
 
 const whiteColor = '#FFF';
 
 const SessionsInventories = ({ match }) => {
+  const { lg } = useBreakpoint();
+
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
   const [view, setView] = useState('list');
   const [filteredByDateSession, setFilteredByDateSession] = useState([]);
-  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
+  const [calendarView, setCalendarView] = useState(!lg ? 'day' : 'month');
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const getStaffSession = useCallback(async (sessionType) => {
@@ -131,14 +134,14 @@ const SessionsInventories = ({ match }) => {
   }, [match.params.session_type, getStaffSession]);
 
   const trackAndJoinSession = (data) => {
-    const eventTag = isMobileDevice ? attendee.click.sessions.mobile.joinSession : attendee.click.sessions.joinSession;
+    const eventTag = !lg ? attendee.click.sessions.mobile.joinSession : attendee.click.sessions.joinSession;
 
     trackSimpleEvent(eventTag, { session_data: data });
     window.open(data.join_url);
   };
 
   const openSessionInventoryDetails = (item) => {
-    const eventTag = isMobileDevice
+    const eventTag = !lg
       ? attendee.click.sessions.mobile.sessionDetails
       : isPast
       ? attendee.click.sessions.pastSessionDetails
@@ -573,7 +576,7 @@ const SessionsInventories = ({ match }) => {
             </Loader>
           ) : (
             <>
-              {isMobileDevice ? (
+              {!lg ? (
                 <>
                   <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
                     Click on the card to show session details

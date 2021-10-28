@@ -2,12 +2,13 @@
 
 .widgetSelect {
   width: 100%;
-  max-width: 300px;
+  min-width: 180px;
+  max-width: 400px;
 }
 
-.colorPicker {
-  width: 100% !important;
-}
+// .colorPicker {
+//   width: 100% !important;
+// }
 
 .codeSnippetContainer {
   position: relative;

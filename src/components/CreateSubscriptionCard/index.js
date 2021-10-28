@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
+import { TwitterPicker } from 'react-color';
 import classNames from 'classnames';
 
 import {
@@ -21,17 +22,18 @@ import {
 } from 'antd';
 import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
 
-import { TwitterPicker } from 'react-color';
-
 import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
+import PriceInputCalculator from 'components/PriceInputCalculator';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, generateRandomColor } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
+import { generateRandomColor } from 'utils/colors';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { defaultPlatformFeePercentage } from 'utils/constants';
 
 import styles from './styles.module.scss';
 
@@ -69,7 +71,14 @@ const includedProductsList = [
   },
 ];
 
-const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription = null, creatorMemberTags = [] }) => {
+const CreateSubscriptionCard = ({
+  cancelChanges,
+  saveChanges,
+  editedSubscription = null,
+  creatorMemberTags = [],
+  creatorAbsorbsFees = true,
+  creatorFeePercentage = defaultPlatformFeePercentage,
+}) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -159,9 +168,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
         subscriptionTagType: editedSubscription?.tag?.external_id ? 'selected' : 'anyone',
         selectedMemberTag: editedSubscription?.tag?.external_id || null,
         subscriptionPeriod: editedSubscription?.validity || 30,
-        subscriptionCredits:
-          (editedSubscription?.products['SESSION']?.credits || 0) +
-          (editedSubscription?.products['VIDEO']?.credits || 0),
+        subscriptionCredits: editedSubscription?.product_credits ?? 1,
         includedProducts: Object.entries(editedSubscription?.products)
           .map(([key, val]) => key)
           .filter((key) => key !== 'COURSE'),
@@ -330,9 +337,10 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
 
     values.includedProducts.forEach((product) => {
       productsData[product] = {
-        credits:
-          Math.floor(values.subscriptionCredits / values.includedProducts.length) +
-          (product === 'SESSION' ? values.subscriptionCredits % values.includedProducts.length : 0),
+        // NOTE : Previously we split the credits, now we don't
+        // credits:
+        //   Math.floor(values.subscriptionCredits / values.includedProducts.length) +
+        //   (product === 'SESSION' ? values.subscriptionCredits % values.includedProducts.length : 0),
         product_ids: product === 'SESSION' ? selectedSessions : selectedVideos,
       };
     });
@@ -351,6 +359,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
         validity: values.subscriptionPeriod,
         tag_id: selectedTagType === 'anyone' ? '' : values.selectedMemberTag || selectedMemberTag || '',
         color_code: values.colorCode || colorCode || defaultBorderColor,
+        product_credits: values.subscriptionCredits,
         products: productsData,
       };
 
@@ -412,26 +421,29 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
           <List itemLayout="vertical">
             <List.Item>
               <Form.Item className={styles.compactFormItem}>
-                <Row gutter={4}>
-                  <Col xs={16}>
-                    <Form.Item
-                      id="price"
+                <Form.Item
+                  id="price"
+                  name="price"
+                  rules={validationRules.numberValidation('Please Input Subscription Price', 0, false)}
+                  noStyle
+                >
+                  {currency !== '' && !creatorAbsorbsFees ? (
+                    <PriceInputCalculator
                       name="price"
-                      rules={validationRules.numberValidation('Please Input Subscription Price', 0, false)}
-                      noStyle
-                    >
-                      <InputNumber
-                        min={0}
-                        placeholder="Enter Price"
-                        className={styles.numericInput}
-                        disabled={currency === ''}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={8} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
-                    <Text strong>{currency?.toUpperCase()}</Text>
-                  </Col>
-                </Row>
+                      form={form}
+                      minimalPrice={1}
+                      initialValue={1}
+                      feePercentage={creatorFeePercentage}
+                    />
+                  ) : (
+                    <InputNumber
+                      min={1}
+                      placeholder="Enter Price"
+                      className={styles.numericInput}
+                      disabled={currency === ''}
+                    />
+                  )}
+                </Form.Item>
               </Form.Item>
             </List.Item>
             <List.Item>

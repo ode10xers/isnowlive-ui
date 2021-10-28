@@ -1,0 +1,356 @@
+@import '../../../styles/variables.scss';
+
+.filePreviewContainer {
+  text-align: center;
+  margin: 12px auto;
+}
+
+.filePreviewButton {
+  background-color: var(
+    --passion-profile-primary-color,
+    var(--video-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+  ) !important;
+  border-color: var(
+    --passion-profile-primary-color,
+    var(--video-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+  ) !important;
+
+  &.darkText {
+    --video-button-text-color: var(
+      --passion-profile-darker-color,
+      var(--video-plugin-cta-font-color, #{map-get($colors, 'Zeus')})
+    ) !important;
+  }
+
+  &.lightText {
+    --video-button-text-color: var(--video-plugin-cta-font-color, map-get($map: $colors, $key: 'White')) !important;
+  }
+
+  color: var(--video-button-text-color, #{map-get($map: $colors, $key: 'White')}) !important;
+}
+
+.fileDownloadButton {
+  border-color: var(
+    --passion-profile-primary-color,
+    var(--video-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+  ) !important;
+  color: var(
+    --passion-profile-primary-color,
+    var(--video-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+  ) !important;
+}
+
+.fileContainer {
+  text-align: center;
+  width: fit-content;
+  padding: 8px;
+  border: 1px solid
+    var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'PrussianBlue')}));
+  background-color: var(
+    --passion-profile-light-color,
+    var(--video-plugin-light-color, #{map-get($map: $colors, $key: 'AliceBlue')})
+  );
+
+  .fileName {
+    color: var(
+      --passion-profile-darker-color,
+      var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+    );
+    font-weight: 500;
+    opacity: 0.7;
+    padding: 8px;
+  }
+}
+
+.horizontalVideoList {
+  flex-flow: row nowrap !important;
+  overflow-x: scroll;
+  padding-bottom: 6px !important;
+
+  &::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+  }
+}
+
+.similarVideosHeading,
+.sectionHeading,
+.usablePaymentInstrumentText {
+  color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')})) !important;
+}
+
+.videoDetailsPage {
+  min-height: calc(100vh - 66px);
+
+  padding: 20px;
+  @media screen and (max-width: 768px) {
+    padding: 10px;
+  }
+
+  @media screen and (max-width: 526px) {
+    padding: 8px;
+  }
+
+  .videoTitle {
+    margin-bottom: 0 !important;
+    font-size: 28px !important;
+    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')}));
+
+    @media screen and (max-width: 768px) {
+      font-size: 20px !important;
+    }
+
+    @media screen and (max-width: 526px) {
+      font-size: 24px !important;
+    }
+  }
+
+  .videoDetailsSection {
+    padding: 12px 20px !important;
+  }
+
+  .videoDetailsContainer {
+    .videoDetailItem {
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')}));
+
+      .detailIcons {
+        margin-right: 6px;
+        color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'Smalt')}));
+      }
+    }
+  }
+
+  .videoDescContainer {
+    min-width: 100%;
+
+    .videoDesc {
+      margin-top: 12px;
+    }
+
+    .videoDesc * {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background: transparent !important;
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+    }
+  }
+
+  .videoImageContainer {
+    padding: 8px;
+
+    .videoImage {
+      border-radius: 12px;
+      width: 100%;
+    }
+  }
+}
+
+.videoBuyBtn {
+  padding: 8px 16px;
+  height: 100%;
+  background-color: var(
+    --passion-profile-primary-color,
+    var(--video-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+  ) !important;
+  border-color: var(
+    --passion-profile-primary-color,
+    var(--video-plugin-cta-background-color, #{map-get($map: $colors, $key: 'DodgerBlue')})
+  ) !important;
+
+  &.disabled {
+    opacity: 0.7;
+  }
+
+  &.darkText {
+    .buyBtnText {
+      color: var(
+        --passion-profile-darker-color,
+        var(--video-plugin-cta-font-color, #{map-get($colors, 'Zeus')})
+      ) !important;
+    }
+
+    .buyBtnDivider {
+      border-left-color: var(
+        --passion-profile-darker-color,
+        var(--video-plugin-cta-font-color, #{map-get($colors, 'Zeus')})
+      ) !important;
+    }
+  }
+
+  &.lightText {
+    .buyBtnText {
+      color: var(--video-plugin-cta-font-color, map-get($map: $colors, $key: 'White')) !important;
+    }
+
+    .buyBtnDivider {
+      border-left-color: var(--video-plugin-cta-font-color, map-get($map: $colors, $key: 'White')) !important;
+    }
+  }
+
+  .buyBtnTextContainer {
+    height: 100%;
+  }
+
+  .buyBtnText {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .buyBtnDivider {
+    height: 1.5em;
+    margin: 0 2px !important;
+  }
+}
+
+.buyUsingPassContainer,
+.buyUsingMembershipContainer {
+  background-color: var(
+    --passion-profile-light-color,
+    var(--video-plugin-light-color, #{map-get($map: $colors, $key: 'AliceBlue')})
+  );
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.paymentInstrumentsContainer {
+  padding: 20px;
+
+  .paymentInstrumentHeadingText {
+    color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+
+    @media screen and (max-width: 769px) {
+      font-size: 20px !important;
+    }
+  }
+
+  // .paymentInstrumentHeadingContainer {
+  //   .paymentInstrumentHeadingText {
+  //     color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+
+  //     @media screen and (max-width: 769px) {
+  //       font-size: 20px !important;
+  //     }
+  //   }
+
+  //   .paymentInstrumentHeadingDivider {
+  //     height: 3em;
+  //     border-left-color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+  //     border-top-color:  var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+  //     @media screen and (max-width: 993px) {
+  //       height: 4px !important;
+  //       margin: 8px 0 !important;
+  //     }
+  //   }
+  // }
+
+  .paymentInstrumentSelectContainer {
+    border: 1px solid
+      var(--passion-profile-primary-color, var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}));
+    border-radius: 8px;
+    padding: 12px;
+
+    .paymentInstrumentSelectHeading {
+      text-align: center;
+      margin-bottom: 0 !important;
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+
+      @media screen and (max-width: 769px) {
+        font-size: 18px !important;
+      }
+
+      @media screen and (max-width: 576px) {
+        font-size: 16px !important;
+      }
+    }
+
+    .paymentInstrumentSelectDescription {
+      text-align: center;
+      color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+    }
+
+    .smallProductPreview {
+      position: relative;
+
+      .smallProductPreviewOverlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        margin-top: -16px;
+        margin-left: -104px;
+        padding: 6px 12px;
+        width: 220px;
+        background: rgba(0, 0, 0, 0.4);
+        color: #ffffff;
+        font-size: 12px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .smallProductPreviewImage {
+        border-radius: 8px;
+      }
+    }
+
+    .bundleSummaryIcon {
+      font-size: 32px;
+      color: var(--passion-profile-primary-color, var(--video-plugin-text-color, #{map-get($colors, 'DodgerBlue')}));
+    }
+
+    .paymentInstrumentOutlineContainer {
+      .paymentInstrumentOutline {
+        border: 1px dashed map-get($map: $colors, $key: 'Silver');
+        background-color: var(--video-plugin-light-color, map-get($map: $colors, $key: 'WhiteSmoke2'));
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+        min-height: 120px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+      }
+
+      .paymentInstrumentOutlineHelpText {
+        text-align: center;
+        margin: 4px auto;
+        font-size: 12px;
+        color: var(--passion-profile-darker-color, var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')}));
+      }
+    }
+
+    .bundleSummaryContainer {
+      padding: 8px !important;
+      background-color: var(
+        --passion-profile-light-color,
+        var(--video-plugin-light-color, #{map-get($map: $colors, $key: 'AliceBlue')})
+      );
+      border-radius: 6px;
+
+      .bundleSummaryTextContainer {
+        text-align: center;
+
+        .bundleSummaryDivider {
+          font-size: 12px;
+          margin: auto 4px;
+          color: var(
+            --passion-profile-darker-color,
+            var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')})
+          );
+        }
+
+        .bundleSummaryText {
+          font-size: 14px;
+          color: var(
+            --passion-profile-darker-color,
+            var(--video-plugin-text-color, #{map-get($colors, 'PrussianBlue')})
+          );
+        }
+      }
+    }
+  }
+}

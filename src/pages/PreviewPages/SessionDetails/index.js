@@ -12,8 +12,10 @@ import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistrationPreview from '../SessionRegistrationPreview';
 
+import { isAPISuccess } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 
 import styles from './style.module.scss';
 
@@ -80,8 +82,9 @@ const SessionDetailsPreview = ({ match, history }) => {
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24}>
           <Image
+            loading="lazy"
             preview={false}
-            width={'100%'}
+            width="100%"
             className={classNames(styles.coverImage, styles.mb20)}
             src={session?.session_image_url || 'error'}
             fallback={DefaultImage()}
@@ -101,7 +104,9 @@ const SessionDetailsPreview = ({ match, history }) => {
           <Row>
             {session?.is_offline && (
               <Col xs={24}>
-                <Title level={5}> Session Location </Title>
+                <Title type="danger" level={5}>
+                  This is an in-person event happening at :
+                </Title>
                 <Text> {session?.offline_event_address} </Text>
               </Col>
             )}

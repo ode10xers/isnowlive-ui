@@ -4,15 +4,15 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 
-import validationRules from 'utils/validation';
-
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
+
+import validationRules from 'utils/validation';
+import { generateUrlFromUsername } from 'utils/url';
 
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
-import { generateUrlFromUsername } from 'utils/helper';
 
 const { Item } = Form;
 const { Password } = Input;

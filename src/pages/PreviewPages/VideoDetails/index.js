@@ -14,16 +14,15 @@ import PassesListItem from 'components/DynamicProfileComponents/PassesProfileCom
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
+import { getUsernameFromUrl } from 'utils/url';
+import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { videoSourceType, reservedDomainName } from 'utils/constants';
 import {
-  isAPISuccess,
-  preventDefaults,
-  videoSourceType,
-  getUsernameFromUrl,
-  reservedDomainName,
+  generateColorPalletteForProfile,
+  getNewProfileUIMaxWidth,
   isBrightColorShade,
   convertHexToRGB,
-} from 'utils/helper';
+} from 'utils/colors';
 
 import styles from './style.module.scss';
 
@@ -33,6 +32,7 @@ const {
   formatDate: { getVideoMinutesDuration },
 } = dateUtil;
 
+// TODO: This is an old version of UI. Change this to use new version
 const VideoDetailPreview = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [videoData, setVideoData] = useState(null);
@@ -215,7 +215,7 @@ const VideoDetailPreview = ({ match, history }) => {
                 {/* Video Thumbnail */}
                 <Col xs={24}>
                   <div className={styles.videoImageContainer}>
-                    <Image preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
+                    <Image loading="lazy" preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
                   </div>
                 </Col>
 

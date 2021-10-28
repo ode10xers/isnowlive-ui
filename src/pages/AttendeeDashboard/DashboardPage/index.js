@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { generatePath } from 'react-router-dom';
 import moment from 'moment';
 
 import {
@@ -16,6 +17,7 @@ import {
   Modal,
   Popover,
   Popconfirm,
+  Grid,
   message,
 } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
@@ -29,18 +31,15 @@ import { showErrorModal } from 'components/Modals/modals';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { isInIframeWidget } from 'utils/widgets';
 import { redirectToInventoryPage } from 'utils/redirect';
-import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { generateUrlFromUsername, generateQueryString } from 'utils/url';
 import {
-  getDuration,
-  isAPISuccess,
-  isUnapprovedUserError,
-  generateQueryString,
-  preventDefaults,
-  generateUrlFromUsername,
-} from 'utils/helper';
+  getCourseDocumentContentCount,
+  getCourseOrderSessionContentCount,
+  getCourseOrderVideoContentCount,
+} from 'utils/course';
+import { getDuration, isAPISuccess, preventDefaults, isUnapprovedUserError } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -50,10 +49,13 @@ const {
 } = dateUtil;
 
 const { Text, Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const whiteColor = '#ffffff';
 
 const DashboardPage = ({ history }) => {
+  const { md } = useBreakpoint();
+
   const [isSessionLoading, setIsSessionLoading] = useState(false);
   const [upcomingSessions, setUpcomingSessions] = useState([]);
 
@@ -251,7 +253,10 @@ const DashboardPage = ({ history }) => {
 
   const redirectToCourseOrderDetails = (courseOrder) => {
     if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
-      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`);
+      history.push(
+        Routes.attendeeDashboard.rootPath +
+          generatePath(Routes.attendeeDashboard.courseDetails, { course_order_id: courseOrder.course_order_id })
+      );
     }
   };
 
@@ -268,14 +273,16 @@ const DashboardPage = ({ history }) => {
       onClick={() =>
         history.push(
           Routes.attendeeDashboard.rootPath +
-            Routes.attendeeDashboard.videos +
-            `/${video.video_id}/${video.video_order_id}`
+            generatePath(Routes.attendeeDashboard.videoDetails, {
+              video_id: video.video_id,
+              video_order_id: video.video_order_id,
+            })
         )
       }
     >
       <Row gutter={[12, 12]}>
         <Col xs={24} md={10} lg={14} xl={12}>
-          <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
+          <Image loading="lazy" className={styles.coverImage} src={video.thumbnail_url} preview={false} />
         </Col>
         <Col xs={24} md={14} lg={10} xl={12}>
           <Row>
@@ -310,16 +317,16 @@ const DashboardPage = ({ history }) => {
   );
 
   const renderCourseContents = (courseOrder) => {
-    const sessionCount = getCourseSessionContentCount(courseOrder.course?.modules ?? []);
-    const videoCount = getCourseVideoContentCount(courseOrder.course?.modules ?? []);
+    const sessionCount = getCourseOrderSessionContentCount(courseOrder.course?.modules ?? []);
+    const videoCount = getCourseOrderVideoContentCount(courseOrder.course?.modules ?? []);
+    const docCount = getCourseDocumentContentCount(courseOrder.course?.modules ?? []);
 
     return (
-      <Tag color="blue">
-        <Space split={<Divider type="vertical" />}>
-          {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
-          {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
-        </Space>
-      </Tag>
+      <Space size={1} wrap={true}>
+        {sessionCount > 0 ? <Tag color="blue" className={styles.mb5}>{`${sessionCount} sessions`}</Tag> : null}
+        {videoCount > 0 ? <Tag color="purple" className={styles.mb5}>{`${videoCount} videos`}</Tag> : null}
+        {docCount > 0 ? <Tag color="magenta" className={styles.mb5}>{`${docCount} files`}</Tag> : null}
+      </Space>
     );
   };
 
@@ -358,14 +365,14 @@ const DashboardPage = ({ history }) => {
       title: 'Type',
       dataIndex: 'max_participants',
       key: 'max_participants',
-      width: '72px',
+      width: '76px',
       render: (text, record) => (record?.max_participants > 1 ? 'Group' : '1-on-1'),
     },
     {
       title: 'Day',
       dataIndex: 'inventory_external_id',
       key: 'inventory_external_id',
-      width: '100px',
+      width: '120px',
       render: (text, record) => (record?.start_time ? toLongDateWithDay(record?.start_time) : '-'),
     },
     {
@@ -461,9 +468,10 @@ const DashboardPage = ({ history }) => {
       title: '',
       dataIndex: ['course', 'course_image_url'],
       align: 'center',
-      width: '180px',
+      width: md ? '150px' : '180px',
       render: (text, record) => (
         <Image
+          loading="lazy"
           src={text || 'error'}
           alt={record.course?.name}
           fallback={DefaultImage()}
@@ -477,30 +485,29 @@ const DashboardPage = ({ history }) => {
     },
     {
       title: 'Course Content',
-      width: '150px',
+      width: '165px',
       render: renderCourseContents,
     },
     {
       title: 'Duration',
-      width: '90px',
+      width: '98px',
       render: (text, record) => renderCourseDuration(record.course),
     },
     {
       title: 'Price',
       key: 'price',
       dataIndex: 'price',
-      width: '100px',
+      width: '90px',
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: '',
-      align: 'right',
       width: '100px',
       render: (text, record) => (
         <Row gutter={[8, 8]} justify="end">
           <Col>
             <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(record)}>
-              Details
+              View Content
             </Button>
           </Col>
         </Row>
@@ -650,7 +657,7 @@ const DashboardPage = ({ history }) => {
         <Space direction="vertical" align="middle" className={styles.w100}>
           <Title level={4}> Your Purchased Sessions </Title>
           <div className={styles.sessionsContainer}>
-            {isMobileDevice ? (
+            {!md ? (
               <Spin spinning={isSessionLoading}>
                 {upcomingSessions.length > 0 ? (
                   <Row gutter={[10, 10]}>{upcomingSessions.map(renderMobileSessionItem)}</Row>
@@ -701,7 +708,7 @@ const DashboardPage = ({ history }) => {
         <Space direction="vertical" className={styles.w100}>
           <Title level={4}> Your Purchased Courses </Title>
           <div className={styles.coursesContainer}>
-            {isMobileDevice ? (
+            {!md ? (
               <Spin spinning={isCourseLoading}>
                 {courses.length > 0 ? (
                   <Row gutter={[8, 8]}>{courses.map(renderMobileCourseItem)}</Row>
@@ -711,6 +718,7 @@ const DashboardPage = ({ history }) => {
               </Spin>
             ) : (
               <Table
+                size="small"
                 columns={courseTableColumns}
                 data={courses}
                 loading={isCourseLoading}

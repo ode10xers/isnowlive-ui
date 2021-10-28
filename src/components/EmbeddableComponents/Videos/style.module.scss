@@ -1,13 +1,67 @@
 @import '../../../styles/variables.scss';
 
 .videoPluginContainer {
-  background-color: var(--video-widget-background-color);
+  background-color: var(--video-widget-background-color, transparent);
   width: 100%;
 
+  .signupButton {
+    background-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    border-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    color: var(--video-plugin-cta-font-color, #{map-get($colors, 'White')}) !important;
+  }
+
+  .filterSection {
+    margin-bottom: 30px;
+
+    .filterButton {
+      background-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      border-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      color: var(--video-plugin-cta-font-color, #{map-get($colors, 'White')}) !important;
+    }
+
+    .filterContainer {
+      .filterLabel {
+        color: var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}) !important;
+      }
+      .filterDropdown {
+        min-width: 300px;
+      }
+    }
+  }
+
   .videoListContainer {
-    max-width: var(--passion-profile-max-width, 767px);
-    min-height: 700px;
     margin: 0 auto;
-    padding: 8px 0;
+    padding: 12px;
+
+    .videoGroupName {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--video-plugin-text-color, #{map-get($map: $colors, $key: 'ResolutionBlue')}) !important;
+    }
+
+    .linkButton {
+      color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      font-weight: 500;
+    }
+
+    .backButton {
+      color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      border-color: var(--video-plugin-cta-background-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    }
+
+    .horizontalVideoList {
+      flex-flow: row nowrap !important;
+      overflow-x: scroll;
+      padding-bottom: 2px !important;
+      scroll-behavior: smooth;
+
+      &::-webkit-scrollbar {
+        height: 10px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        border-radius: 20px;
+      }
+    }
   }
 }
