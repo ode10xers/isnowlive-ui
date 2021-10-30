@@ -4,6 +4,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
 
+import definedBlocks from './blocks.js';
+import stylePanelSectors from './style_panel.js';
+
 //eslint-disable-next-line
 import styles from './style.module.scss';
 
@@ -14,67 +17,6 @@ const PageBuilder = ({ match, history }) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
-    const subscriptionListComponentType = (editorInstance) => {
-      editorInstance.DomComponents.addType('subscription-list', {
-        // Make the editor understand when to bind `my-input-type`
-        isComponent: (el) => el.tagName === 'subscription-list-test',
-
-        // Model definition
-        model: {
-          // Default properties
-          defaults: {
-            tagName: 'subscription-list-test',
-            name: 'Passion Membership List',
-            copyable: false,
-            draggable: true,
-            droppable: false, // Can't drop other elements inside
-            attributes: {
-              // Default attributes
-              componentTitle: 'My Memberships',
-            },
-            traits: ['componentTitle'],
-          },
-        },
-      });
-    };
-
-    // NOTE: Configuration object examples can be seen here
-    // https://github.com/artf/grapesjs/blob/master/src/editor/config/config.js
-
-    const definedBlocks = [
-      {
-        id: 'section', // id is mandatory
-        label: '<b>Section</b>', // You can use HTML/SVG inside labels
-        attributes: { class: 'gjs-block-section' },
-        content: `<section>
-          <h1>This is a simple title</h1>
-          <div>This is just a Lorem text: Lorem ipsum dolor sit amet</div>
-        </section>`,
-      },
-      {
-        id: 'text',
-        label: 'Text',
-        content: '<div data-gjs-type="text">Insert your text here</div>',
-      },
-      {
-        id: 'image',
-        label: 'Image',
-        // Select the component once it's dropped
-        select: true,
-        // You can pass components as a JSON instead of a simple HTML string,
-        // in this case we also use a defined component type `image`
-        content: { type: 'image' },
-        // This triggers `active` event on dropped components and the `image`
-        // reacts by opening the AssetManager
-        activate: true,
-      },
-      {
-        id: 'subscription-list',
-        label: 'Passion Subs List',
-        content: { type: 'subscription-list' },
-      },
-    ];
-
     const editor = grapesjs.init({
       // Indicate where to init the editor. You can also pass an HTMLElement
       container: '#builder-editor',
@@ -82,22 +24,22 @@ const PageBuilder = ({ match, history }) => {
       // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
       fromElement: true,
       // Size of the editor
-      height: '700px',
+      height: '100vh',
       width: 'auto',
       // Disable the storage manager for the moment
       storageManager: false,
       keepUnusedStyles: false,
       // Avoid any default panel
       // panels: { defaults: [] },
+      // Built-in props for styles
+      // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
+      styleManager: {
+        sectors: stylePanelSectors,
+      },
       blockManager: {
-        appendTo: '#builder-blocks',
         blocks: definedBlocks,
       },
-      plugins: [subscriptionListComponentType],
     });
-
-    // Prevent links
-    // editor.RichTextEditor.remove('link');
 
     // editor.Panels.addPanel({
     //   id: 'panel-top',
