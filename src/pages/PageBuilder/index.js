@@ -10,16 +10,9 @@ import definedPanels from './panels.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-
-const DummyTemplate = {
-  html:
-    '<div layout="left" class="text-section-container"><h1>Section Title</h1><p>Section Content</p></div><div layout="right" id="ibyq" class="text-section-container"><h1>Section Title</h1><p>Section Content</p></div><div layout="center" id="iwt8" class="text-section-container"><h1>Section Title</h1><p>Section Content</p></div>',
-  components:
-    '[{"type":"text-section","classes":["text-section-container"],"attributes":{"layout":"left"},"components":[{"tagName":"h1","type":"text","name":"Section Title","removable":false,"draggable":false,"badgable":false,"highlightable":false,"hoverable":false,"content":"Section Title"},{"tagName":"p","type":"text","name":"Section Content","removable":false,"draggable":false,"badgable":false,"highlightable":false,"hoverable":false,"content":"Section Content"}]},{"type":"text-section","classes":["text-section-container"],"attributes":{"layout":"right","id":"ibyq"},"components":[{"tagName":"h1","type":"text","name":"Section Title","removable":false,"draggable":false,"badgable":false,"highlightable":false,"hoverable":false,"content":"Section Title"},{"tagName":"p","type":"text","name":"Section Content","removable":false,"draggable":false,"badgable":false,"highlightable":false,"hoverable":false,"content":"Section Content"}]},{"type":"text-section","classes":["text-section-container"],"attributes":{"layout":"center","id":"iwt8"},"components":[{"tagName":"h1","type":"text","name":"Section Title","removable":false,"draggable":false,"badgable":false,"highlightable":false,"hoverable":false,"content":"Section Title"},{"tagName":"p","type":"text","name":"Section Content","removable":false,"draggable":false,"badgable":false,"highlightable":false,"hoverable":false,"content":"Section Content"}]}]',
-  css: '* { box-sizing: border-box; } body {margin: 0;}#ibyq{text-align:right;}#iwt8{text-align:center;}',
-  styles:
-    '[{"selectors":["#ibyq"],"style":{"text-align":"right"}},{"selectors":["#iwt8"],"style":{"text-align":"center"}}]',
-};
+import config from 'config/index.js';
+import { getLocalUserDetails } from 'utils/storage.js';
+import http from 'services/http.js';
 
 const PageBuilder = ({ match, history }) => {
   const [gjsEditor, setGjsEditor] = useState(null);
@@ -28,58 +21,8 @@ const PageBuilder = ({ match, history }) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
+    //#region Start of Custom Components Definition
     const TextSectionComponent = (editor) => {
-      // TODO: Modify this according to the requirements
-      editor.TraitManager.addType('text-section-layout', {
-        // Expects as return a simple HTML string or an HTML element
-        noLabel: true,
-        templateInput: `<div class="custom-trait-layout">
-        <div class="custom-trait-label">
-          Layout
-        </div>
-        <div class="custom-trait-input" data-input>
-        </div>
-      </div>`,
-        createInput({ trait }) {
-          // Here we can decide to use properties from the trait
-          const options = [
-            { id: 'left', name: 'Left' },
-            { id: 'right', name: 'Right' },
-            { id: 'center', name: 'Centered' },
-          ];
-
-          // Create a new element container and add some content
-          const el = document.createElement('div');
-          el.innerHTML = `
-          <select class="text-section-layout-select" style="color: 'black'">
-            ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
-          </select>
-        `;
-
-          return el;
-        },
-        // Update the component based on element changes
-        // `elInput` is the result HTMLElement you get from `createInput`
-        onEvent({ elInput, component, event }) {
-          const inputType = elInput.querySelector('.text-section-layout-select');
-          component.setStyle({
-            'text-align': inputType.value ?? 'left',
-          });
-          component.addAttributes({
-            layout: inputType.value,
-            // style : `text-align:${inputType.value ?? 'left'}; padding: 20px; display:block;`
-          });
-        },
-        // Update elements on the component change
-        onUpdate({ elInput, component }) {
-          const layout = component.getAttributes()['layout'] || 'left';
-          const inputType = elInput.querySelector('.text-section-layout-select');
-          inputType.value = layout;
-
-          inputType.dispatchEvent(new CustomEvent('change'));
-        },
-      });
-
       editor.DomComponents.addType('text-section', {
         model: {
           defaults: {
@@ -95,6 +38,9 @@ const PageBuilder = ({ match, history }) => {
               {
                 type: 'text-section-layout',
                 name: 'layout',
+              },
+              {
+                type: 'padding-slider',
               },
             ],
             // components: `
@@ -118,6 +64,7 @@ const PageBuilder = ({ match, history }) => {
                 highlightable: false,
                 editable: true,
                 hoverable: false,
+                copyable: false,
                 toolbar: [],
               },
               {
@@ -134,19 +81,114 @@ const PageBuilder = ({ match, history }) => {
                 highlightable: false,
                 editable: true,
                 hoverable: false,
+                copyable: false,
                 toolbar: [],
               },
             ],
             styles: `
               .text-section-container {
                 display: block;
-                padding: 20px;
+                padding: 8px;
               }
             `,
           },
         },
       });
     };
+
+    const TextWithImageSectionComponent = (editor) => {
+      editor.DomComponents.addType('text-with-image-section', {
+        model: {
+          defaults: {
+            tagName: 'div',
+            name: 'Text with Image',
+            droppable: false,
+            attributes: {
+              layout: 'left',
+              'image-layout': 'right',
+              class: 'text-image-section-container image-right',
+            },
+            traits: [
+              {
+                type: 'text-section-layout',
+                name: 'layout',
+              },
+              {
+                type: 'padding-slider',
+              },
+              {
+                type: 'image-position-layout',
+                name: 'image-layout',
+              },
+              {
+                type: 'button',
+                text: 'Click to set image',
+                full: true,
+                label: 'Image',
+                command: 'set-image-url',
+              },
+            ],
+            // TODO: Adjust the components
+            components: [
+              {
+                type: 'text-section',
+              },
+              {
+                type: 'image',
+                attributes: {
+                  loading: 'lazy',
+                },
+                removable: false,
+                draggable: false,
+                badgable: false,
+                droppable: false,
+                highlightable: false,
+                hoverable: false,
+                copyable: false,
+                resizable: true,
+                toolbar: [],
+              },
+            ],
+            styles: `
+              .text-image-section-container {
+                display: flex;
+                flex: 0 1 auto;
+                justify-content: space-between;
+                width: 100%;
+                padding: 8px;
+              }
+
+              .text-image-section-container.image-left {
+                flex-direction: row-reverse;
+              }
+
+              .text-image-section-container.image-right {
+                flex-direction: row;
+              }
+
+              .text-image-section-container.image-top {
+                flex-direction: column-reverse;
+                flex: 1 1 100%;
+              }
+
+              .text-image-section-container.image-bottom {
+                flex-direction: column;
+                flex: 1 1 100%;
+              }
+
+              .text-image-section-container.image-bottom > img {
+                align-self: center;
+              }
+
+              .text-image-section-container.image-top > img {
+                align-self: center;
+              }
+            `,
+          },
+        },
+      });
+    };
+    //#region End of Custom Components Definition
 
     const editor = grapesjs.init({
       // Indicate where to init the editor. You can also pass an HTMLElement
@@ -163,6 +205,16 @@ const PageBuilder = ({ match, history }) => {
         autosave: true, // Store data automatically
         autoload: false, // Autoload stored data on init
         stepsBeforeSave: 1, // If autosave enabled, indicates how many changes are necessary before store method is triggered
+      },
+      assetManager: {
+        customFetch: (url, options) => http.post(url, options.body),
+        upload: config.server.baseURL + '/secure/upload',
+        uploadName: 'file',
+        headers: {
+          'auth-token': getLocalUserDetails()?.auth_token ?? '',
+        },
+        multiUpload: false,
+        autoAdd: true,
       },
       keepUnusedStyles: false,
       // Avoid any default panel
@@ -193,9 +245,193 @@ const PageBuilder = ({ match, history }) => {
           },
         ],
       },
-      plugins: [TextSectionComponent],
+      plugins: [TextSectionComponent, TextWithImageSectionComponent],
     });
 
+    //#region Start of Custom Traits Definition
+    editor.TraitManager.addType('padding-slider', {
+      // Expects as return a simple HTML string or an HTML element
+      noLabel: true,
+      templateInput: `
+      <div class="custom-trait-layout">
+        <div class="custom-trait-label">
+          Padding
+        </div>
+        <div class="custom-trait-input" data-input>
+        </div>
+      </div>
+      `,
+      createInput({ trait }) {
+        // Create a new element container and add some content
+        const minValue = 0;
+        const maxValue = 100;
+        const el = document.createElement('div');
+        el.innerHTML = `
+        <div class="padding-slider-container">
+          <span class="padding-slider-text">${minValue}px</span>
+          <input type="range" min="${minValue}" max="${maxValue}" class="padding-slider" />
+          <span class="padding-slider-text">${maxValue}px</span>
+        </div>
+        <div class="padding-slider-value-container">
+          Current Value: <span class="padding-slider-value"></span>
+        </div>
+        `;
+        return el;
+      },
+      // Update the component based on element changes
+      // `elInput` is the result HTMLElement you get from `createInput`
+      onEvent({ elInput, component, event }) {
+        const sliderInput = elInput.querySelector('.padding-slider');
+        const valueText = elInput.querySelector('.padding-slider-value');
+        valueText.innerHTML = sliderInput.value + 'px';
+        component.setStyle({
+          ...component.getStyle(),
+          padding: sliderInput.value ?? 0,
+        });
+      },
+      // Update elements on the component change
+      onUpdate({ elInput, component }) {
+        const componentStyle = component.getStyle();
+        const padding = componentStyle['padding'] ?? 20;
+        const sliderInput = elInput.querySelector('.padding-slider');
+        sliderInput.value = padding;
+        const valueText = elInput.querySelector('.padding-slider-value');
+        valueText.innerHTML = padding + 'px';
+        sliderInput.dispatchEvent(new CustomEvent('change'));
+      },
+    });
+
+    editor.TraitManager.addType('text-section-layout', {
+      // Expects as return a simple HTML string or an HTML element
+      noLabel: true,
+      templateInput: `<div class="custom-trait-layout">
+      <div class="custom-trait-label">
+        Text Layout
+      </div>
+      <div class="custom-trait-input" data-input>
+      </div>
+    </div>`,
+      createInput({ trait }) {
+        // Here we can decide to use properties from the trait
+        const options = [
+          { id: 'left', name: 'Left', class: 'fa fa-align-left' },
+          { id: 'center', name: 'Centered', class: 'fa fa-align-center' },
+          { id: 'right', name: 'Right', class: 'fa fa-align-right' },
+        ];
+
+        // Create a new element container and add some content
+        const el = document.createElement('div');
+        // el.classList.add(['trait-radio-button-container']);
+        // el.innerHTML = `
+        //   ${options.map((opt) => `
+        //     <input type="radio" class="trait-radio-button ${opt.class}" name="${opt.name}" value="${opt.value}" />
+        //   `)}
+        // `;
+        el.innerHTML = `
+          <select class="text-section-layout-select">
+            ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
+          </select>
+        `;
+
+        return el;
+      },
+      // Update the component based on element changes
+      // `elInput` is the result HTMLElement you get from `createInput`
+      onEvent({ elInput, component, event }) {
+        const inputType = elInput.querySelector('.text-section-layout-select');
+        component.setStyle({
+          'text-align': inputType.value ?? 'left',
+        });
+        component.addAttributes({
+          layout: inputType.value,
+          // style : `text-align:${inputType.value ?? 'left'}; padding: 20px; display:block;`
+        });
+      },
+      // Update elements on the component change
+      onUpdate({ elInput, component }) {
+        const layout = component.getAttributes()['layout'] || 'left';
+        const inputType = elInput.querySelector('.text-section-layout-select');
+        inputType.value = layout;
+
+        inputType.dispatchEvent(new CustomEvent('change'));
+      },
+    });
+
+    editor.TraitManager.addType('image-position-layout', {
+      // Expects as return a simple HTML string or an HTML element
+      noLabel: true,
+      templateInput: `<div class="custom-trait-layout">
+      <div class="custom-trait-label">
+        Image Layout
+      </div>
+      <div class="custom-trait-input" data-input>
+      </div>
+    </div>`,
+      createInput({ trait }) {
+        // Here we can decide to use properties from the trait
+        const options = [
+          { id: 'left', name: 'Left', class: 'fa fa-align-left' },
+          { id: 'top', name: 'Top', class: 'fa fa-align-center' },
+          { id: 'right', name: 'Right', class: 'fa fa-align-right' },
+          { id: 'bottom', name: 'Bottom', class: 'fa fa-align-center' },
+        ];
+
+        // Create a new element container and add some content
+        const el = document.createElement('div');
+        el.innerHTML = `
+          <select class="image-position-select">
+            ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
+          </select>
+        `;
+
+        return el;
+      },
+      // Update the component based on element changes
+      // `elInput` is the result HTMLElement you get from `createInput`
+      onEvent({ elInput, component, event }) {
+        const inputType = elInput.querySelector('.image-position-select');
+        let classes = ['text-image-section-container'];
+
+        if (inputType.value) {
+          classes.push(`image-${inputType.value}`);
+        }
+
+        component.setClass(classes);
+      },
+      // Update elements on the component change
+      onUpdate({ elInput, component }) {
+        const layout = component.getAttributes()['image-layout'] || 'right';
+        const inputType = elInput.querySelector('.image-position-select');
+        inputType.value = layout;
+
+        inputType.dispatchEvent(new CustomEvent('change'));
+      },
+    });
+    //#endregion End of Custom Traits Definition
+
+    //#region Start of Asset Listener Definition
+    // The upload is started
+    editor.on('asset:upload:start', () => {
+      console.log('Upload started');
+    });
+
+    // The upload is ended (completed or not)
+    editor.on('asset:upload:end', () => {
+      console.log('Upload ended');
+    });
+
+    // Error handling
+    editor.on('asset:upload:error', (err) => {
+      console.error(err);
+    });
+
+    // Do something on response
+    editor.on('asset:upload:response', (response) => {
+      console.log(response);
+    });
+    //#endregion Start of Asset Listener Definition
+
+    //#region Start of Custom Commands Definition
     editor.Commands.add('set-device-desktop', {
       run: (editor) => editor.setDevice('Desktop'),
     });
@@ -205,9 +441,45 @@ const PageBuilder = ({ match, history }) => {
     editor.Commands.add('set-device-mobile', {
       run: (editor) => editor.setDevice('Mobile'),
     });
+    // TODO: Currently this only saves components without styling
+    // Make use of StoreManagerAPI to actually store things
     editor.Commands.add('save-as-json', {
       run: (editor) => console.log(JSON.stringify(editor.getComponents())),
     });
+
+    editor.Commands.add('set-image-url', {
+      run: (editor) => {
+        editor.AssetManager.open({
+          types: ['image'],
+          select(asset, complete) {
+            let isSet = false;
+            const selected = editor.getSelected();
+            if (selected && selected.is('image')) {
+              selected.addAttributes({ src: asset.getSrc() });
+              isSet = true;
+            } else {
+              const closestImage = selected.find('img')[0] ?? null;
+              if (closestImage && closestImage.is('image')) {
+                closestImage.addAttributes({ src: asset.getSrc() });
+                isSet = true;
+              }
+            }
+
+            // The default AssetManager UI will trigger `select(asset, false)` on asset click
+            // and `select(asset, true)` on double-click
+            if (isSet) {
+              complete && editor.AssetManager.close();
+            } else {
+              editor.log('Failed to set image after Asset Manager Select', {
+                ns: 'asset-manager-close',
+                level: 'debug',
+              });
+            }
+          },
+        });
+      },
+    });
+    //#endregion End of Custom Commands Definition
 
     setGjsEditor(editor);
   }, []);
@@ -217,12 +489,12 @@ const PageBuilder = ({ match, history }) => {
   }, [initializeGrapesJSEditor]);
 
   // Test loading template
-  // useEffect(() => {
-  //   if (gjsEditor) {
-  //     console.log("Loading Template...");
-  //     setTimeout(() => gjsEditor.load(), 2000);
-  //   }
-  // }, [gjsEditor]);
+  useEffect(() => {
+    if (gjsEditor) {
+      console.log('Loading Template...');
+      setTimeout(() => gjsEditor.load(), 2000);
+    }
+  }, [gjsEditor]);
 
   return (
     <div id="builder-page">

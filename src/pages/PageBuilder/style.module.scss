@@ -3,5 +3,49 @@
   .gjs-pn-buttons {
     justify-content: space-around;
   }
+
+  .custom-trait-layout {
+    .custom-trait-label {
+      margin-bottom: 12px;
+    }
+  }
+
+  .padding-slider-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    .padding-slider-text {
+      flex: 0 0 24px;
+      margin: 0 2px;
+    }
+
+    .padding-slider {
+      flex: 1 1 auto;
+    }
+  }
+
+  .padding-slider-value-container {
+    width: 100%;
+    text-align: left;
+  }
+
+  .text-section-layout-select {
+    color: black;
+    width: 100%;
+    min-height: 24px;
+  }
+
+  // Continye this styling later
+  // .trait-radio-button-container {
+  //   display: flex;
+  //   width: 100%;
+  //   justify-content: space-around;
+
+  //   .trait-radio-button {
+  //     flex: 0 0 25%;
+  //   }
+  // }
 }
 

@@ -33,12 +33,21 @@
 
 export default [
   {
-    id: 'Text Block',
-    label: '<b> Text Block </b>',
+    id: 'Text Section',
+    label: '<b> Text Section </b>',
     droppable: false,
     resizable: true,
     content: {
       type: 'text-section',
+    },
+  },
+  {
+    id: 'Text with image',
+    label: '<b> Text with Image </b>',
+    droppable: false,
+    resizable: true,
+    content: {
+      type: 'text-with-image-section',
     },
   },
 ];
