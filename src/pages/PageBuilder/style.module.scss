@@ -1,27 +1,7 @@
 
 :global {
-  .panel__top {
-    padding: 0;
-    width: 100%;
-    display: flex;
-    position: initial;
-    justify-content: center;
-    justify-content: space-between;
-  }
-  .panel__basic-actions {
-    position: initial;
-  }
-
-  // .gjs-cv-canvas {
-  //   top: 32;
-  //   width: 100%;
-  //   height: 100%;
-  // }
-
-  #builder-blocks {
-    width: auto;
-    height: auto;
-    min-height: auto;
+  .gjs-pn-buttons {
+    justify-content: space-around;
   }
 }
 
