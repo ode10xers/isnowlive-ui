@@ -523,12 +523,15 @@ const PageBuilder = ({ match, history }) => {
     // Make use of StoreManagerAPI to actually store things
     editor.Commands.add('save-as-json', {
       run: (editor) => {
-        console.log({
+        const templateData = {
           html: editor.getHtml(),
           css: editor.getCss(),
-          components: editor.getComponents(),
-          styles: editor.getStyle(),
-        });
+          components: JSON.stringify(editor.getComponents()),
+          styles: JSON.stringify(editor.getStyle()),
+        };
+
+        console.log(templateData);
+        editor.StorageManager.store(templateData);
       },
     });
 
