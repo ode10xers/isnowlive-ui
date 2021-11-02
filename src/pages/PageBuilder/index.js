@@ -31,9 +31,10 @@ const PageBuilder = ({ match, history }) => {
             droppable: false,
             attributes: {
               layout: 'left',
-              // style: `text-align:left; padding: 20px; display: block;`,
               class: 'text-section-container',
             },
+            'text-color': '#000',
+            'bg-color': '#fff',
             traits: [
               {
                 type: 'text-section-layout',
@@ -41,6 +42,18 @@ const PageBuilder = ({ match, history }) => {
               },
               {
                 type: 'padding-slider',
+              },
+              {
+                type: 'color',
+                label: 'Text color',
+                name: 'text-color',
+                changeProp: 1,
+              },
+              {
+                type: 'color',
+                label: 'Background color',
+                name: 'bg-color',
+                changeProp: 1,
               },
             ],
             // components: `
@@ -92,6 +105,36 @@ const PageBuilder = ({ match, history }) => {
               }
             `,
           },
+          init() {
+            // We put a listener that triggers when an attribute changes
+            // In this case when text-color attribute changes
+            this.on('change:text-color', this.handleTextColorChange);
+            this.on('change:bg-color', this.handleBGColorChange);
+          },
+          handleTextColorChange() {
+            const textColor = this.props()['text-color'];
+            this.setStyle({
+              color: textColor,
+            });
+          },
+          handleBGColorChange() {
+            const bgColor = this.props()['bg-color'];
+            const componentList = this.components();
+            // Check for child components with the same property
+            const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-color'));
+
+            validChildList.forEach((childComp) => {
+              // NOTE: Right now this only works if the prop name and trait name is same
+              childComp.updateTrait('bg-color', {
+                type: 'color',
+                value: bgColor,
+              });
+            });
+
+            this.setStyle({
+              'background-color': bgColor,
+            });
+          },
         },
       });
     };
@@ -104,15 +147,10 @@ const PageBuilder = ({ match, history }) => {
             name: 'Text with Image',
             droppable: false,
             attributes: {
-              layout: 'left',
-              'image-layout': 'right',
-              class: 'text-image-section-container image-right',
+              class: 'text-image-section-container',
             },
+            'bg-color': '#fff',
             traits: [
-              {
-                type: 'text-section-layout',
-                name: 'layout',
-              },
               {
                 type: 'padding-slider',
               },
@@ -127,11 +165,20 @@ const PageBuilder = ({ match, history }) => {
                 label: 'Image',
                 command: 'set-image-url',
               },
+              {
+                type: 'color',
+                label: 'Background color',
+                name: 'bg-color',
+                changeProp: 1,
+              },
             ],
-            // TODO: Adjust the components
             components: [
               {
                 type: 'text-section',
+                removable: false,
+                draggable: false,
+                droppable: false,
+                copyable: false,
               },
               {
                 type: 'image',
@@ -185,6 +232,31 @@ const PageBuilder = ({ match, history }) => {
               }
             `,
           },
+          init() {
+            // We put a listener that triggers when an attribute changes
+            // In this case when bg-color attribute changes
+            this.on('change:bg-color', this.handleBGColorChange);
+          },
+          // TODO: Make this propagate the changes inside
+          // Seems like the propagation needs to be handled manually
+          handleBGColorChange() {
+            const bgColor = this.props()['bg-color'];
+            const componentList = this.components();
+            // Check for child components with the same property
+            const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-color'));
+
+            validChildList.forEach((childComp) => {
+              // NOTE: Right now this only works if the prop name and trait name is same
+              childComp.updateTrait('bg-color', {
+                type: 'color',
+                value: bgColor,
+              });
+            });
+
+            this.setStyle({
+              'background-color': bgColor,
+            });
+          },
         },
       });
     };
@@ -199,12 +271,13 @@ const PageBuilder = ({ match, history }) => {
       // Size of the editor
       height: '100vh',
       width: 'auto',
+      showOffsetsSelected: true,
       storageManager: {
         id: 'gjs-', // Prefix identifier that will be used on parameters
         type: 'local', // Type of the storage
         autosave: true, // Store data automatically
         autoload: false, // Autoload stored data on init
-        stepsBeforeSave: 1, // If autosave enabled, indicates how many changes are necessary before store method is triggered
+        stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
       },
       assetManager: {
         customFetch: (url, options) => http.post(url, options.body),
@@ -336,7 +409,7 @@ const PageBuilder = ({ match, history }) => {
         return el;
       },
       // Update the component based on element changes
-      // `elInput` is the result HTMLElement you get from `createInput`
+      // elInput` is the result HTMLElement you get from `createInput`
       onEvent({ elInput, component, event }) {
         const inputType = elInput.querySelector('.text-section-layout-select');
         component.setStyle({
@@ -344,7 +417,6 @@ const PageBuilder = ({ match, history }) => {
         });
         component.addAttributes({
           layout: inputType.value,
-          // style : `text-align:${inputType.value ?? 'left'}; padding: 20px; display:block;`
         });
       },
       // Update elements on the component change
@@ -360,13 +432,15 @@ const PageBuilder = ({ match, history }) => {
     editor.TraitManager.addType('image-position-layout', {
       // Expects as return a simple HTML string or an HTML element
       noLabel: true,
-      templateInput: `<div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Image Layout
+      templateInput: `
+      <div class="custom-trait-layout">
+        <div class="custom-trait-label">
+          Image Layout
+        </div>
+        <div class="custom-trait-input" data-input>
+        </div>
       </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>`,
+      `,
       createInput({ trait }) {
         // Here we can decide to use properties from the trait
         const options = [
@@ -400,7 +474,12 @@ const PageBuilder = ({ match, history }) => {
       },
       // Update elements on the component change
       onUpdate({ elInput, component }) {
-        const layout = component.getAttributes()['image-layout'] || 'right';
+        // This is getting the trait value from the set classes
+        const layout =
+          component
+            .getClasses()
+            .find((cls) => cls.startsWith('image-'))
+            ?.split('-')[1] ?? 'right';
         const inputType = elInput.querySelector('.image-position-select');
         inputType.value = layout;
 
@@ -441,10 +520,16 @@ const PageBuilder = ({ match, history }) => {
     editor.Commands.add('set-device-mobile', {
       run: (editor) => editor.setDevice('Mobile'),
     });
-    // TODO: Currently this only saves components without styling
     // Make use of StoreManagerAPI to actually store things
     editor.Commands.add('save-as-json', {
-      run: (editor) => console.log(JSON.stringify(editor.getComponents())),
+      run: (editor) => {
+        console.log({
+          html: editor.getHtml(),
+          css: editor.getCss(),
+          components: editor.getComponents(),
+          styles: editor.getStyle(),
+        });
+      },
     });
 
     editor.Commands.add('set-image-url', {
