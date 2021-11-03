@@ -125,6 +125,18 @@ const PageBuilder = ({ match, history }) => {
     `;
     iframeHead.appendChild(libScript);
 
+    // Hacky way of copying styles to the iframe inside
+    // Not sure if this will work dynamically or not
+    const iframeEl = editor.Canvas.getWindow();
+    console.log(iframeEl);
+    const styleEls = iframeEl.parent.document.querySelectorAll('style');
+    console.log(styleEls.length);
+    if (styleEls.length) {
+      styleEls.forEach((el) => {
+        iframeEl.document.head.appendChild(el.cloneNode(true));
+      });
+    }
+
     //#region Start of Asset Listener Definition
     // The upload is started
     editor.on('asset:upload:start', () => {
