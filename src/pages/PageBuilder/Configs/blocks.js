@@ -39,7 +39,7 @@ const categories = {
 
 export default [
   {
-    id: 'text-secton',
+    id: 'text-section',
     label: '<b> Text Section </b>',
     droppable: false,
     resizable: true,
