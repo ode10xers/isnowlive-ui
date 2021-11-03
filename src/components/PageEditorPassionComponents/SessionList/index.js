@@ -100,7 +100,7 @@ const SessionList = ({ layout = layouts.GRID, padding = 8 }) => {
   return (
     <div
       style={{
-        padding,
+        padding: typeof padding === 'string' ? parseInt(padding) : padding,
       }}
     >
       <Spin spinning={isLoading} tip="Fetching sessions data...">
@@ -131,4 +131,3 @@ const SessionList = ({ layout = layouts.GRID, padding = 8 }) => {
 };
 
 export default SessionList;
-export const componentStyles = styles;

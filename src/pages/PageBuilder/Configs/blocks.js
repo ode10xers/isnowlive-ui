@@ -1,4 +1,10 @@
 // API Doc : https://grapesjs.com/docs/api/block.html#block
+
+const categories = {
+  LAYOUTS: 'Layouts',
+  PASSION_COMPONENTS: 'Passion Components',
+};
+
 // export default [
 //   {
 //     id: 'container', // id is mandatory
@@ -37,6 +43,7 @@ export default [
     label: '<b> Text Section </b>',
     droppable: false,
     resizable: true,
+    category: categories.LAYOUTS,
     content: {
       type: 'text-section',
     },
@@ -46,6 +53,7 @@ export default [
     label: '<b> Text with Image </b>',
     droppable: false,
     resizable: true,
+    category: categories.LAYOUTS,
     content: {
       type: 'text-with-image-section',
     },
@@ -55,8 +63,19 @@ export default [
     label: '<b> Passion Sessions List </b>',
     droppable: false,
     resizable: false,
+    category: categories.PASSION_COMPONENTS,
     content: {
       type: 'PassionSessionList',
+    },
+  },
+  {
+    id: 'PassionPassList',
+    label: '<b> Passion Passes List </b>',
+    droppable: false,
+    resizable: false,
+    category: categories.PASSION_COMPONENTS,
+    content: {
+      type: 'PassionPassList',
     },
   },
 ];

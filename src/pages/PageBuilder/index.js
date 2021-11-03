@@ -17,6 +17,7 @@ import ReactComponentHandler from './ReactComponentHandler';
 import TextSection from './CustomComponents/TextSection.js';
 import TextWithImageSection from './CustomComponents/TextWithImageSection.js';
 import PassionSessionList from './CustomComponents/PassionSessionList.js';
+import PassionPassList from './CustomComponents/PassionPassList.js';
 
 import { googleFonts } from 'utils/constants.js';
 import { getLocalUserDetails } from 'utils/storage.js';
@@ -95,6 +96,7 @@ const PageBuilder = ({ match, history }) => {
       plugins: [
         ReactComponentHandler,
         PassionSessionList,
+        PassionPassList,
         CustomCommands,
         CustomTraits,
         TextSection,

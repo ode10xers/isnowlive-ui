@@ -1,12 +1,12 @@
 import layouts from 'components/PageEditorPassionComponents/layouts';
-import PassionSessionList from 'components/PageEditorPassionComponents/SessionList';
+import PassionPassList from 'components/PageEditorPassionComponents/PassList';
 
 export default (editor) => {
-  editor.Components.addType('PassionSessionList', {
+  editor.Components.addType('PassionPassList', {
     extend: 'react-component',
     model: {
       defaults: {
-        component: PassionSessionList,
+        component: PassionPassList,
         stylable: false,
         resizable: false,
         editable: false,
@@ -23,6 +23,14 @@ export default (editor) => {
         },
         traits: [
           {
+            type: 'select',
+            name: 'layout',
+            options: Object.entries(layouts).map(([key, val]) => ({
+              id: val,
+              name: key,
+            })),
+          },
+          {
             type: 'number',
             label: 'Padding',
             name: 'padding',
@@ -30,6 +38,6 @@ export default (editor) => {
         ],
       },
     },
-    isComponent: (el) => el.tagName === 'PASSIONSESSIONLIST',
+    isComponent: (el) => el.tagName === 'PASSIONPASSLIST',
   });
 };
