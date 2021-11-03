@@ -13,7 +13,7 @@
     "@uppy/tus": "^1.8.4",
     "antd": "^4.14.0",
     "antd-img-crop": "^3.16.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "babel-plugin-react-remove-properties": "^0.3.0",
     "classnames": "^2.2.6",
     "draft-js": "^0.11.7",

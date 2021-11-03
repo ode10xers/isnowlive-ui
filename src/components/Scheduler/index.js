@@ -98,6 +98,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           (item) => toLocaleDate(item.start_time) === toLocaleDate(selecetedCalendarDate)
         );
         const formattedSlots = slotsForSelectedDate.map((obj) => ({
+          ...obj,
           inventory_id: obj.inventory_id,
           session_date: obj.start_time,
           start_time: obj.start_time,
@@ -175,10 +176,21 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   const createOneTimeSchedule = (givenDate, givenSlots) => {
     // filter slots for selected and other days
-    let otherDateSlots = givenSlots?.filter((item) => toLocaleDate(item.start_time) !== toLocaleDate(givenDate));
-    let givenDateSlots = givenSlots?.filter((item) => toLocaleDate(item.start_time) === toLocaleDate(givenDate));
+    let otherDateSlots = givenSlots?.filter((item) => toLocaleDate(item.start_time) !== toLocaleDate(givenDate)) ?? [];
+    let givenDateSlots = givenSlots?.filter((item) => toLocaleDate(item.start_time) === toLocaleDate(givenDate)) ?? [];
+
+    // NOTE : New Flow!
+
+    if (givenDateSlots.some((item) => item.inventory_id) && toLocaleDate(givenDate) !== toLocaleDate(selectedDate)) {
+      console.log('Trying to apply to all, but found existing inventory');
+      console.log(`Skipping applying to this date (${toLocaleDate(givenDate)})`);
+      return givenSlots;
+    }
 
     // Delete the given date slots which match same dates with deleted slot dates
+    // NOTE: This is most likely the logic to "mark for delete" all slots on current date
+
+    // TODO: Need more test case and understanding
     if (givenDateSlots && givenDateSlots.length && formDeletedIndex && formDeletedIndex.length) {
       formDeletedIndex.forEach((deletedSlot) => {
         let deletedGivenDateSlotsList = givenDateSlots.filter(
@@ -202,10 +214,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     // create list of all new slots from form
     let newSlots = [];
     form.forEach((vs) => {
-      if (vs.inventory_id) {
-        delete vs.inventory_id;
-      }
-
       const givenDateMoment = moment(givenDate);
       const startTimeMoment = moment(vs.start_time);
       const newInventoryTime = [
@@ -231,7 +239,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         value.start_time = selected_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
         value.end_time = selected_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
         value.session_date = value.start_time;
-        value.num_participants = 0;
+        if (vs.inventory_id) {
+          delete value.num_participants;
+        }
 
         if (givenDateSlots && givenDateSlots.length) {
           let tempGivenDateSlots = givenDateSlots.filter(
@@ -518,6 +528,17 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       >
         <>
           <Row className={classNames(styles.mt10, styles.mb10)}>
+            {sessionSlots.length > 0 && sessionSlots.some((slot) => slot.inventory_id) && (
+              <Col xs={24}>
+                <Paragraph>
+                  Please note that{' '}
+                  <Text strong>
+                    {' '}
+                    Apply To All will not affect dates with existing schedules (schedules made from previous version).{' '}
+                  </Text>
+                </Paragraph>
+              </Col>
+            )}
             <Col xs={24} md={{ span: 18, offset: 3 }}>
               {form?.map((slot, index) => (
                 <Row className={styles.m10} key={slot.start_time}>
@@ -527,7 +548,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
-                      disabled={!slot.inventory_id && slot.num_participants === 0 ? false : true}
+                      //disabled={!slot.inventory_id && slot.num_participants === 0 ? false : true}
                     >
                       {slotsList?.map((item) => {
                         if (
@@ -548,7 +569,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   <Col xs={11} md={11}>
                     <Select
-                      disabled={!slot.inventory_id && slot.start_time && slot.num_participants === 0 ? false : true}
+                      // disabled={!slot.inventory_id && slot.start_time && slot.num_participants === 0 ? false : true}
                       value={slot.end_time && toShortTimeWithPeriod(slot.end_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
