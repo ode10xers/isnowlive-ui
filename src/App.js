@@ -1,5 +1,6 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import WebFont from 'webfontloader';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -9,6 +10,7 @@ import { isAPISuccess } from 'utils/helper';
 import { isInCustomDomain } from 'utils/url';
 import { storeCreatorDetailsToLS } from 'utils/storage';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
+import { googleFonts } from 'utils/constants';
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
@@ -121,6 +123,15 @@ function App() {
 
     window.location = window.location.origin + window.location.pathname;
   }
+
+  // Load fonts
+  useEffect(() => {
+    WebFont.load({
+      google: {
+        families: Object.values(googleFonts),
+      },
+    });
+  }, []);
 
   // Logic to initially save creator details in LS
   useEffect(() => {

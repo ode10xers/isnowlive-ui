@@ -206,3 +206,8 @@ export const preventDefaults = (e) => {
   e.preventDefault();
   e.stopPropagation();
 };
+
+export const generateFontFamilyStylingText = (fontFamily = '') =>
+  `${
+    fontFamily ? (fontFamily.includes(' ') ? `'${fontFamily}',` : `${fontFamily},`) : ''
+  } "Segoe UI", Arial, sans-serif`;

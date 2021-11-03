@@ -4,7 +4,16 @@ import TwitterLogo from 'assets/icons/twitter/TwitterLogo';
 import InstagramLogo from 'assets/icons/instagram/InstagramLogo';
 import LinkedInLogo from 'assets/icons/linkedin/LinkedInLogo';
 
-// TODO: Move constants in helper.js and other utils file here
+// NOTE : Currently these are from Google Font Families
+// If using WebFontLoader works with others and we want them
+// Need to redefine the format
+export const googleFonts = {
+  MERRIWEATHER: 'Merriweather',
+  INDIEFLOWER: 'Indie Flower',
+  OPENSANS: 'Open Sans',
+  POPPINS: 'Poppins',
+};
+
 export const paymentProvider = {
   STRIPE: 'STRIPE',
   PAYPAL: 'PAYPAL',

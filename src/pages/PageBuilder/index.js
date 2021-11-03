@@ -4,15 +4,19 @@ import React, { useEffect, useState, useCallback } from 'react';
 import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
 
+import config from 'config/index.js';
+
 import definedBlocks from './blocks.js';
 import definedPanels from './panels.js';
-// import stylePanelSectors from './style_panel.js';
+
+import { googleFonts } from 'utils/constants.js';
+import { getLocalUserDetails } from 'utils/storage.js';
+import { generateFontFamilyStylingText } from 'utils/helper.js';
+
+import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-import config from 'config/index.js';
-import { getLocalUserDetails } from 'utils/storage.js';
-import http from 'services/http.js';
 
 const PageBuilder = ({ match, history }) => {
   const [gjsEditor, setGjsEditor] = useState(null);
@@ -33,6 +37,7 @@ const PageBuilder = ({ match, history }) => {
               layout: 'left',
               class: 'text-section-container',
             },
+            'font-family': 'Arial',
             'text-color': '#000',
             'bg-color': '#fff',
             traits: [
@@ -42,6 +47,11 @@ const PageBuilder = ({ match, history }) => {
               },
               {
                 type: 'padding-slider',
+              },
+              {
+                type: 'font-selector',
+                name: 'font-family',
+                changeProp: 1,
               },
               {
                 type: 'color',
@@ -110,10 +120,12 @@ const PageBuilder = ({ match, history }) => {
             // In this case when text-color attribute changes
             this.on('change:text-color', this.handleTextColorChange);
             this.on('change:bg-color', this.handleBGColorChange);
+            this.on('change:font-family', this.handleFontChange);
           },
           handleTextColorChange() {
             const textColor = this.props()['text-color'];
             this.setStyle({
+              ...this.setStyle(),
               color: textColor,
             });
           },
@@ -132,7 +144,16 @@ const PageBuilder = ({ match, history }) => {
             });
 
             this.setStyle({
+              ...this.getStyle(),
               'background-color': bgColor,
+            });
+          },
+          handleFontChange() {
+            const font = this.props()['font-family'];
+
+            this.setStyle({
+              ...this.getStyle(),
+              'font-family': generateFontFamilyStylingText(font),
             });
           },
         },
@@ -254,6 +275,7 @@ const PageBuilder = ({ match, history }) => {
             });
 
             this.setStyle({
+              ...this.getStyle(),
               'background-color': bgColor,
             });
           },
@@ -292,6 +314,9 @@ const PageBuilder = ({ match, history }) => {
       keepUnusedStyles: false,
       // Avoid any default panel
       panels: definedPanels,
+      // selectorManager: {
+      //   componentFirst: true,
+      // },
       // Built-in props for styles
       // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
       // styleManager: {
@@ -321,6 +346,41 @@ const PageBuilder = ({ match, history }) => {
       plugins: [TextSectionComponent, TextWithImageSectionComponent],
     });
 
+    // Loading external script and running certain logic
+    // inside iframe. In this case it's loading the fonts
+    // using WebFontLoader so the fonts are also visible
+    // inside the iframes
+    const iframeDoc = editor.Canvas.getDocument();
+    const iframeHead = iframeDoc.head;
+    const libScript = document.createElement('script');
+    libScript.innerHTML = `
+    WebFontConfig = {
+      google: {
+        families: ${JSON.stringify(Object.values(googleFonts))},
+      }
+    };
+
+    (function(d) {
+      var wf = d.createElement('script'), s = d.scripts[0];
+      wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+      wf.async = true;
+      s.parentNode.insertBefore(wf, s);
+    })(document);
+    `;
+    iframeHead.appendChild(libScript);
+    // libScript.onload = () => {
+    //   console.log("In Iframe!");
+    //   const iframeWebFont = window.WebFont ?? null;
+    //   console.log(iframeWebFont);
+    //   if (iframeWebFont) {
+    //     iframeWebFont.load({ google: { families: Object.values(googleFonts) } });
+    //   }
+    // }
+    // libScript.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
+
+    // const logicScript = document.createElement('script');
+    // logicScript.innerHTML = `console.log("In Iframe!");WebFont.load({ google: { families: ${JSON.stringify(Object.values(googleFonts))} } });`;
+    // iframeHead.appendChild(logicScript);
     //#region Start of Custom Traits Definition
     editor.TraitManager.addType('padding-slider', {
       // Expects as return a simple HTML string or an HTML element
@@ -413,6 +473,7 @@ const PageBuilder = ({ match, history }) => {
       onEvent({ elInput, component, event }) {
         const inputType = elInput.querySelector('.text-section-layout-select');
         component.setStyle({
+          ...component.setStyle(),
           'text-align': inputType.value ?? 'left',
         });
         component.addAttributes({
@@ -482,6 +543,62 @@ const PageBuilder = ({ match, history }) => {
             ?.split('-')[1] ?? 'right';
         const inputType = elInput.querySelector('.image-position-select');
         inputType.value = layout;
+
+        inputType.dispatchEvent(new CustomEvent('change'));
+      },
+    });
+
+    editor.TraitManager.addType('font-selector', {
+      noLabel: true,
+      templateInput: `
+      <div class="custom-trait-layout">
+        <div class="custom-trait-label">
+          Text Font
+        </div>
+        <div class="custom-trait-input" data-input>
+        </div>
+      </div>
+      `,
+      createInput({ trait }) {
+        // Here we can decide to use properties from the trait
+        const options = Object.values(googleFonts).map((font) => ({
+          id: font,
+          name: font,
+        }));
+
+        // Create a new element container and add some content
+        const el = document.createElement('div');
+        el.innerHTML = `
+          <select class="font-select">
+            ${options
+              .map(
+                (opt) =>
+                  `<option style="font-family: ${opt.id.includes(' ') ? `'${opt.id}'` : opt.id};" value="${opt.id}">${
+                    opt.name
+                  }</option>`
+              )
+              .join('')}
+          </select>
+        `;
+
+        return el;
+      },
+      // Update the component based on element changes
+      // `elInput` is the result HTMLElement you get from `createInput`
+      onEvent({ elInput, component, event }) {
+        const inputType = elInput.querySelector('.font-select');
+        component.updateTrait('font-family', {
+          type: 'text',
+          value: inputType.value,
+          changeProp: 1,
+        });
+      },
+      // Update elements on the component change
+      onUpdate({ elInput, component }) {
+        // This is getting the trait value from the set classes
+        const font = component.props()['font-family'] ?? component.getAttributes()['font-family'] ?? '';
+        const inputType = elInput.querySelector('.font-select');
+        inputType.value = font;
 
         inputType.dispatchEvent(new CustomEvent('change'));
       },
