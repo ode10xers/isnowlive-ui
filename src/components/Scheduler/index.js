@@ -234,7 +234,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       }
 
       if (vs.start_time && vs.end_time) {
-        let value = vs;
+        let value = vs.inventory_id
+          ? {
+              session_date: vs.start_time,
+              start_time: vs.start_time,
+              end_time: vs.end_time,
+            }
+          : vs;
         let selected_date = givenDateMoment.format();
         value.start_time = selected_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
         value.end_time = selected_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
