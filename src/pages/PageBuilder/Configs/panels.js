@@ -121,7 +121,6 @@ export default {
         },
         {
           id: obl,
-          active: true,
           className: 'fa fa-th-large',
           command: obl,
           togglable: 0,

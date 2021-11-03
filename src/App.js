@@ -250,7 +250,12 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
-            <RouteWithLayout layout={FullWidthLayout} exact path="/test-editor" component={PageBuilder} />
+            <RouteWithLayout
+              layout={FullWidthLayout}
+              exact
+              path={['/test-editor', '/page-render']}
+              component={PageBuilder}
+            />
             <RouteWithLayout layout={FullWidthLayout} path={Routes.plugins.root} component={PluginPages} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute

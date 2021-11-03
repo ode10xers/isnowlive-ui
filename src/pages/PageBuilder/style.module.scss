@@ -1,5 +1,17 @@
 @import '../../styles/colors';
 
+.hidden {
+  display: none;
+}
+
+.pageRenderer {
+  :global {
+    .gjs-off-prv {
+      display: none !important;
+    }
+  }
+}
+
 :global {
   .gjs-pn-buttons {
     justify-content: space-around;

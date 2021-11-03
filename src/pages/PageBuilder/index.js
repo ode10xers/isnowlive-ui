@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
+import { Spin } from 'antd';
+
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
@@ -28,9 +30,12 @@ import http from 'services/http.js';
 import styles from './style.module.scss';
 
 const PageBuilder = ({ match, history }) => {
+  const isPublicPage = match.path.includes('page');
+
+  const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
 
-  const initializeGrapesJSEditor = useCallback(() => {
+  const initializeGrapesJSEditor = useCallback((previewOn = false) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
@@ -41,13 +46,14 @@ const PageBuilder = ({ match, history }) => {
       // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
       // fromElement: true,
       // Size of the editor
+      noticeOnUnload: !previewOn,
       height: '100vh',
       width: 'auto',
       showOffsetsSelected: true,
       storageManager: {
         id: 'gjs-', // Prefix identifier that will be used on parameters
         type: 'local', // Type of the storage
-        autosave: true, // Store data automatically
+        autosave: !previewOn, // Store data automatically
         autoload: false, // Autoload stored data on init
         stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
       },
@@ -130,9 +136,7 @@ const PageBuilder = ({ match, history }) => {
     // Hacky way of copying styles to the iframe inside
     // Not sure if this will work dynamically or not
     const iframeEl = editor.Canvas.getWindow();
-    console.log(iframeEl);
     const styleEls = iframeEl.parent.document.querySelectorAll('style');
-    console.log(styleEls.length);
     if (styleEls.length) {
       styleEls.forEach((el) => {
         iframeEl.document.head.appendChild(el.cloneNode(true));
@@ -165,21 +169,33 @@ const PageBuilder = ({ match, history }) => {
   }, []);
 
   useEffect(() => {
-    initializeGrapesJSEditor();
-  }, [initializeGrapesJSEditor]);
+    initializeGrapesJSEditor(isPublicPage);
+  }, [initializeGrapesJSEditor, isPublicPage]);
 
   // Test loading template
   useEffect(() => {
     if (gjsEditor) {
-      console.log('Loading Template...');
-      setTimeout(() => gjsEditor.load(), 2000);
+      setTimeout(() => {
+        gjsEditor.load();
+
+        if (isPublicPage) {
+          gjsEditor.runCommand('preview');
+        }
+
+        setIsLoading(false);
+      }, 2000);
     }
-  }, [gjsEditor]);
+  }, [gjsEditor, isPublicPage]);
 
   return (
-    <div id="builder-page">
-      <div id="builder-editor"></div>
-    </div>
+    <Spin spinning={isLoading} tip="Loading template...">
+      <div
+        id="builder-page"
+        className={isPublicPage && isLoading ? styles.hidden : isPublicPage ? styles.pageRenderer : undefined}
+      >
+        <div id="builder-editor"></div>
+      </div>
+    </Spin>
   );
 };
 
