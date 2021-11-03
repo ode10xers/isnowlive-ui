@@ -10,6 +10,7 @@ const obl = 'open-blocks';
 const ful = 'fullscreen';
 const prv = 'preview';
 
+// NOTE: This needs to match the cmd in Plugins/commands.js
 const sdm = 'set-device-mobile';
 const sdt = 'set-device-tablet';
 const sdd = 'set-device-desktop';

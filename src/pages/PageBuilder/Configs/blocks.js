@@ -33,7 +33,7 @@
 
 export default [
   {
-    id: 'Text Section',
+    id: 'text-secton',
     label: '<b> Text Section </b>',
     droppable: false,
     resizable: true,
@@ -42,12 +42,21 @@ export default [
     },
   },
   {
-    id: 'Text with image',
+    id: 'text-with-image',
     label: '<b> Text with Image </b>',
     droppable: false,
     resizable: true,
     content: {
       type: 'text-with-image-section',
+    },
+  },
+  {
+    id: 'PassionSessionList',
+    label: '<b> Passion Sessions List </b>',
+    droppable: false,
+    resizable: false,
+    content: {
+      type: 'PassionSessionList',
     },
   },
 ];

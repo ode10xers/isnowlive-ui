@@ -1,3 +1,4 @@
+@import '../../styles/colors';
 
 :global {
   .gjs-pn-buttons {
@@ -32,9 +33,25 @@
   }
 
   .text-section-layout-select, .image-position-select, .font-select {
-    color: black;
+    color: map-get($map: $colors, $key: 'Black');
     width: 100%;
     min-height: 24px;
+  }
+
+  .gjs-one-bg {
+    background-color : map-get($map: $colors, $key: 'Cyprus');
+  }
+
+  .gjs-two-color {
+    color: map-get($map: $colors, $key: 'White');
+  }
+
+  .gjs-four-color {
+    color: map-get($map: $colors, $key: 'DodgerBlue');
+  }
+  
+  .gjs-four-color-h:hover {
+    color: map-get($map: $colors, $key: 'DodgerBlue');
   }
 
   // Continye this styling later
