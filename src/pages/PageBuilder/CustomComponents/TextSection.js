@@ -98,9 +98,18 @@ export default (editor) => {
       },
       handleTextColorChange() {
         const textColor = this.props()['text-color'];
+
+        //Propagate this inside
+        this.components().forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            color: `${textColor} !important`,
+          });
+        });
+
         this.setStyle({
           ...this.getStyle(),
-          color: textColor,
+          color: `${textColor} !important`,
         });
       },
       handleBGColorChange() {

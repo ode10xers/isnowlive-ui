@@ -92,7 +92,7 @@ export default (editor) => {
     onEvent({ elInput, component, event }) {
       const inputType = elInput.querySelector('.text-section-layout-select');
       component.setStyle({
-        ...component.setStyle(),
+        ...component.getStyle(),
         'text-align': inputType.value ?? 'left',
       });
       component.addAttributes({

@@ -39,6 +39,8 @@ const PageBuilder = ({ match, history }) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
+    // TODO: Might need to modify a little bit of the config (for security)
+    // When rendering in public [age]
     const editor = grapesjs.init({
       // Indicate where to init the editor. You can also pass an HTMLElement
       container: '#builder-editor',
@@ -136,11 +138,13 @@ const PageBuilder = ({ match, history }) => {
     // Hacky way of copying styles to the iframe inside
     // Not sure if this will work dynamically or not
     const iframeEl = editor.Canvas.getWindow();
-    const styleEls = iframeEl.parent.document.querySelectorAll('style');
-    if (styleEls.length) {
-      styleEls.forEach((el) => {
-        iframeEl.document.head.appendChild(el.cloneNode(true));
-      });
+    if (!previewOn) {
+      const styleEls = iframeEl.parent.document.querySelectorAll('style');
+      if (styleEls.length) {
+        styleEls.forEach((el) => {
+          iframeEl.document.head.appendChild(el.cloneNode(true));
+        });
+      }
     }
 
     //#region Start of Asset Listener Definition
@@ -179,7 +183,24 @@ const PageBuilder = ({ match, history }) => {
         gjsEditor.load();
 
         if (isPublicPage) {
-          gjsEditor.runCommand('preview');
+          // Previously what we do is try to render everything inside the iframe
+          // of the editor, but it might cause some issues when integrating
+          // Now we instead take the contents of editor after load and put them
+          // in the actual app (which is contained in #root)
+
+          const iframeElement = gjsEditor.Canvas.getDocument();
+          const editorElements = Array.from(iframeElement.body.children);
+
+          if (editorElements.length > 0) {
+            const reactRootElement = document.getElementById('root');
+            const portalContainer = document.createElement('div');
+
+            editorElements.forEach((el) => {
+              portalContainer.appendChild(el);
+            });
+
+            reactRootElement.appendChild(portalContainer);
+          }
         }
 
         setIsLoading(false);
@@ -189,10 +210,7 @@ const PageBuilder = ({ match, history }) => {
 
   return (
     <Spin spinning={isLoading} tip="Loading template...">
-      <div
-        id="builder-page"
-        className={isPublicPage && isLoading ? styles.hidden : isPublicPage ? styles.pageRenderer : undefined}
-      >
+      <div id="builder-page" className={isPublicPage ? styles.hidden : undefined}>
         <div id="builder-editor"></div>
       </div>
     </Spin>
