@@ -56,13 +56,15 @@ export default (editor) => {
   editor.TraitManager.addType('text-section-layout', {
     // Expects as return a simple HTML string or an HTML element
     noLabel: true,
-    templateInput: `<div class="custom-trait-layout">
-    <div class="custom-trait-label">
-      Text Layout
+    templateInput: `
+    <div class="custom-trait-layout">
+      <div class="custom-trait-label">
+        Text Layout
+      </div>
+      <div class="custom-trait-input" data-input>
+      </div>
     </div>
-    <div class="custom-trait-input" data-input>
-    </div>
-  </div>`,
+    `,
     createInput({ trait }) {
       // Here we can decide to use properties from the trait
       const options = [
@@ -170,13 +172,13 @@ export default (editor) => {
   editor.TraitManager.addType('font-selector', {
     noLabel: true,
     templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Text Font
+      <div class="custom-trait-layout">
+        <div class="custom-trait-label">
+          Text Font
+        </div>
+        <div class="custom-trait-input" data-input>
+        </div>
       </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
     `,
     createInput({ trait }) {
       // Here we can decide to use properties from the trait
@@ -218,6 +220,62 @@ export default (editor) => {
       const font = component.props()['font-family'] ?? component.getAttributes()['font-family'] ?? '';
       const inputType = elInput.querySelector('.font-select');
       inputType.value = font;
+
+      inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('button-types', {
+    noLabel: true,
+    templateInput: `
+      <div class="custom-trait-layout">
+        <div class="custom-trait-label">
+          Text Font
+        </div>
+        <div class="custom-trait-input" data-input>
+        </div>
+      </div>
+    `,
+    createInput({ trait }) {
+      const options = [
+        { id: 'link', name: 'Link' },
+        { id: 'outlined', name: 'Outlined' },
+        { id: 'filled', name: 'Filled' },
+        { id: 'text', name: 'Text' },
+      ];
+
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <select class="button-layout-select">
+          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
+        </select>
+      `;
+
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const inputType = elInput.querySelector('.button-layout-select');
+
+      console.log(component.getClasses());
+      let classes = ['link-btn'];
+
+      if (inputType.value) {
+        classes.push(`btn-type-${inputType.value}`);
+      }
+
+      component.setClass(classes);
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const layout =
+        component
+          .getClasses()
+          .find((cls) => cls.startsWith('button-type-'))
+          ?.split('-')[2] ?? 'link';
+      const inputType = elInput.querySelector('.button-layout-select');
+      inputType.value = layout;
 
       inputType.dispatchEvent(new CustomEvent('change'));
     },

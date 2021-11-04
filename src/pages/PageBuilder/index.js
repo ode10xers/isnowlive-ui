@@ -28,6 +28,7 @@ import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
+import LinkButton from './CustomComponents/LinkButton.js';
 
 const PageBuilder = ({ match, history }) => {
   const isPublicPage = match.path.includes('page');
@@ -109,6 +110,7 @@ const PageBuilder = ({ match, history }) => {
         CustomTraits,
         TextSection,
         TextWithImageSection,
+        LinkButton,
       ],
     });
 

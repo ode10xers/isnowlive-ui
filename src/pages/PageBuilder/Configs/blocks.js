@@ -3,6 +3,7 @@
 const categories = {
   LAYOUTS: 'Layouts',
   PASSION_COMPONENTS: 'Passion Components',
+  SIMPLE_COMPONENTS: 'Simple Components',
 };
 
 // export default [
@@ -76,6 +77,16 @@ export default [
     category: categories.PASSION_COMPONENTS,
     content: {
       type: 'PassionPassList',
+    },
+  },
+  {
+    id: 'link-buttons',
+    label: '<b> Button </b>',
+    droppable: false,
+    resizable: true,
+    category: categories.SIMPLE_COMPONENTS,
+    content: {
+      type: 'link-buttons',
     },
   },
 ];

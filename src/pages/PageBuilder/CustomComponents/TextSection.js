@@ -54,6 +54,7 @@ export default (editor) => {
             name: 'Section Title',
             attributes: {},
             traits: [],
+            toolbar: [],
             removable: false,
             draggable: false,
             badgable: false,
@@ -62,7 +63,6 @@ export default (editor) => {
             editable: true,
             hoverable: false,
             copyable: false,
-            toolbar: [],
           },
           {
             tagName: 'p',
