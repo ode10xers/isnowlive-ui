@@ -1,5 +1,10 @@
 @import './colors.scss';
 
+@font-face {
+  font-family: 'Kruti Dev';
+  src: url('../assets/fonts/KrutiDev/Kruti Dev 010 Regular.ttf') format('truetype');
+}
+
 // Widget CSS Variables Styling
 * {
   // For Course Plugin

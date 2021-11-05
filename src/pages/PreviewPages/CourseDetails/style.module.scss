@@ -25,10 +25,10 @@
 }
 
 .longContentWrapper * {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-  background-color: transparent !important;
-  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+  // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+  // 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+background-color: transparent !important;
+color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
 }
 
 .paddedContent {
@@ -132,10 +132,10 @@
         }
 
         .courseDesc * {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-          background-color: transparent !important;
-          color: map-get($colors, 'White') !important;
+          // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+          // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+        background-color: transparent !important;
+        color: map-get($colors, 'White') !important;
         }
       }
     }
@@ -248,10 +248,10 @@
         }
 
         .personaItemContent * {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-          background-color: map-get($map: $colors, $key: 'White') !important;
-          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+          // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+              // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+            background-color: map-get($map: $colors, $key: 'White') !important;
+            color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
         }
       }
     }
@@ -414,10 +414,10 @@
         }
 
         .faqContentWrapper * {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
-          background-color: transparent !important;
+          // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+              // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+            color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+            background-color: transparent !important;
         }
       }
     }
