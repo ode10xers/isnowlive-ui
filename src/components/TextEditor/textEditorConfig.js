@@ -79,7 +79,7 @@ const toolbar = {
     title: undefined,
   },
   fontFamily: {
-    options: ['Arial', 'Georgia', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
+    options: ['Arial', 'Georgia', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Kruti Dev'],
     className: undefined,
     component: undefined,
     dropdownClassName: undefined,
