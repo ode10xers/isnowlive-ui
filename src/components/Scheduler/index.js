@@ -42,7 +42,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const [dayList, setDayList] = useState(null);
   const [slotsList] = useState(() => generateTimes());
   const [formDeletedIndex, setFormDeletedIndex] = useState([]);
-  const isPannelChanged = useRef(false);
+  const isPanelChanged = useRef(false);
   const [disableDuplicateEndTime, setDisableDuplicateEndTime] = useState([]);
   const [customTimePickerVisible, setCustomTimePickerVisible] = useState(false);
   const [customTime, setCustomTime] = useState({
@@ -90,12 +90,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
   }, [openModal]);
 
-  const onSelect = (selecetedCalendarDate) => {
-    if (!isPannelChanged.current) {
-      if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
+  const onSelect = (selectedCalendarDate) => {
+    if (!isPanelChanged.current) {
+      if (moment(selectedCalendarDate).endOf('day') >= moment().startOf('day')) {
         // check if slots are present for selected date
         const slotsForSelectedDate = slots?.filter(
-          (item) => toLocaleDate(item.start_time) === toLocaleDate(selecetedCalendarDate)
+          (item) => toLocaleDate(item.start_time) === toLocaleDate(selectedCalendarDate)
         );
         const formattedSlots = slotsForSelectedDate.map((obj) => ({
           inventory_id: obj.inventory_id,
@@ -105,25 +105,25 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           num_participants: obj.num_participants,
         }));
         const defaultSlot = {
-          session_date: moment(selecetedCalendarDate).format(),
+          session_date: moment(selectedCalendarDate).format(),
           start_time: null,
           end_time: null,
           num_participants: 0,
         };
 
         setForm(slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot]);
-        setDate(selecetedCalendarDate);
-        setSelectedDate(selecetedCalendarDate);
+        setDate(selectedCalendarDate);
+        setSelectedDate(selectedCalendarDate);
         setOpenModal(true);
       }
     }
   };
 
   const onPanelChange = (calendarDate) => {
-    isPannelChanged.current = true;
+    isPanelChanged.current = true;
     setDate(calendarDate);
     setTimeout(() => {
-      isPannelChanged.current = false;
+      isPanelChanged.current = false;
     }, 500);
   };
 
