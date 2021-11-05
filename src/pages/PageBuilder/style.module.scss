@@ -23,28 +23,28 @@
     }
   }
 
-  .padding-slider-container {
+  .input-slider-container {
     width: 100%;
     display: flex;
     justify-content: space-around;
     align-items: center;
 
-    .padding-slider-text {
+    .input-slider-text {
       flex: 0 0 24px;
       margin: 0 2px;
     }
 
-    .padding-slider {
+    .input-slider {
       flex: 1 1 auto;
     }
   }
 
-  .padding-slider-value-container {
+  .input-slider-value-container {
     width: 100%;
     text-align: left;
   }
 
-  .text-section-layout-select, .image-position-select, .font-select {
+  .input-select {
     color: map-get($map: $colors, $key: 'Black');
     width: 100%;
     min-height: 24px;
@@ -64,6 +64,10 @@
   
   .gjs-four-color-h:hover {
     color: map-get($map: $colors, $key: 'DodgerBlue');
+  }
+
+  .gjs-field {
+    background-color: rgba(0, 0, 0, 0.7);
   }
 
   // Continye this styling later

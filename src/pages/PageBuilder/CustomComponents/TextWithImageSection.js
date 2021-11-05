@@ -96,8 +96,6 @@ export default (editor) => {
         // In this case when bg-color attribute changes
         this.on('change:bg-color', this.handleBGColorChange);
       },
-      // TODO: Make this propagate the changes inside
-      // Seems like the propagation needs to be handled manually
       handleBGColorChange() {
         const bgColor = this.props()['bg-color'];
         const componentList = this.components();
