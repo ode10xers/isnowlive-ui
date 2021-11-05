@@ -1,6 +1,9 @@
 // This is the default value
 // taken from https://github.com/artf/grapesjs/blob/master/src/panels/config/config.js
 
+const undo = 'core:undo';
+const redo = 'core:redo';
+
 // const swv = 'sw-visibility';
 const expt = 'export-template';
 // const osm = 'open-sm';
@@ -55,6 +58,25 @@ export default {
         },
       ],
     },
+    // {
+    //   id: 'history',
+    //   buttons: [
+    //     {
+    //       id: undo,
+    //       className: 'fa fa-undo',
+    //       command: undo,
+    //       context: undo,
+    //       attributes: { title: 'Undo' },
+    //     },
+    //     {
+    //       id: redo,
+    //       className: 'fa fa-repeat',
+    //       command: redo,
+    //       context: redo,
+    //       attributes: { title: 'Redo' },
+    //     },
+    //   ],
+    // },
     {
       id: 'options',
       buttons: [
@@ -66,6 +88,20 @@ export default {
         //   context: swv,
         //   attributes: { title: 'View components' }
         // },
+        {
+          id: undo,
+          className: 'fa fa-undo',
+          command: undo,
+          context: undo,
+          attributes: { title: 'Undo' },
+        },
+        {
+          id: redo,
+          className: 'fa fa-repeat',
+          command: redo,
+          context: redo,
+          attributes: { title: 'Redo' },
+        },
         {
           id: prv,
           className: 'fa fa-eye',
