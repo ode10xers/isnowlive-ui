@@ -60,10 +60,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   }, [slots]);
 
   useEffect(() => {
-    if (sessionSlots && sessionSlots.length) {
-      const sortedSessionSlots = sessionSlots.sort((a, b) =>
-        a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
-      );
+    const sortedSessionSlots = (sessionSlots ?? [])
+      .filter((slot) => isBeforeDate(slot.start_time))
+      .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
+    if (sortedSessionSlots.length > 0) {
       setDate(moment(sortedSessionSlots[0].start_time));
     } else {
       if (recurring && recurringDatesRange && recurringDatesRange.length) {
