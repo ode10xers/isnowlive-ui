@@ -29,6 +29,7 @@ import http from 'services/http.js';
 //eslint-disable-next-line
 import styles from './style.module.scss';
 import LinkButton from './CustomComponents/LinkButton.js';
+import Header from './CustomComponents/Header.js';
 
 const PageBuilder = ({ match, history }) => {
   const isPublicPage = match.path.includes('page');
@@ -103,6 +104,7 @@ const PageBuilder = ({ match, history }) => {
         ],
       },
       plugins: [
+        Header,
         ReactComponentHandler,
         PassionSessionList,
         PassionPassList,
@@ -181,10 +183,32 @@ const PageBuilder = ({ match, history }) => {
   // Test loading template
   useEffect(() => {
     if (gjsEditor) {
-      setTimeout(() => {
-        gjsEditor.load();
+      gjsEditor.load();
 
-        if (isPublicPage) {
+      // // Adding predefined components
+      // gjsEditor.addComponents({
+      //   type: 'navbar-header',
+      // }, {
+      //   at: 0,
+      // });
+
+      // gjsEditor.StorageManager.load(['template-data'], (res) => {
+      //   const components = JSON.parse(res['template-data']);
+      //   console.log(components);
+      //   gjsEditor.loadData(components);
+      // });
+
+      gjsEditor.getWrapper().set({
+        droppable: (srcModel, trgModel) => {
+          console.log(srcModel.index());
+          console.log(trgModel.components().length);
+
+          return true;
+        },
+      });
+
+      if (isPublicPage) {
+        gjsEditor.onReady(() => {
           // Previously what we do is try to render everything inside the iframe
           // of the editor, but it might cause some issues when integrating
           // Now we instead take the contents of editor after load and put them
@@ -203,10 +227,12 @@ const PageBuilder = ({ match, history }) => {
 
             reactRootElement.appendChild(portalContainer);
           }
-        }
 
+          setIsLoading(false);
+        });
+      } else {
         setIsLoading(false);
-      }, 2000);
+      }
     }
   }, [gjsEditor, isPublicPage]);
 
