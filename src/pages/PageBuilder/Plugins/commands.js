@@ -24,7 +24,10 @@ export default (editor) => {
   editor.Commands.add('save-as-json', {
     run: (editor) => {
       const templateData = {
-        'template-data': JSON.stringify(editor.storeData()),
+        html: editor.getHtml(),
+        css: editor.getCss(),
+        components: JSON.stringify(editor.getComponents()),
+        styles: JSON.stringify(editor.getStyle()),
       };
 
       console.log(templateData);

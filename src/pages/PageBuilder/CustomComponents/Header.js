@@ -1,8 +1,173 @@
+// import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
+
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 
 // NOTE: In this case, the header is completely uninteractable (except selecting)
 export default (editor) => {
-  editor.DomComponents.addType('navbar-header', {
+  // editor.Components.addType('SignInButton', {
+  //   extend: 'react-component',
+  //   model: {
+  //     defaults: {
+  //       component: SignInButton,
+  //       stylable: false,
+  //       resizable: false,
+  //       editable: false,
+  //       droppable: false,
+  //       draggable: false,
+  //       removable: false,
+  //       highlightable: false,
+  //       hoverable: false,
+  //       copyable: false,
+  //       attributes: {
+  //         target: 'dashboard',
+  //         buttonType : 'primary',
+  //       },
+  //       traits: [
+  //         {
+  //           type: 'select',
+  //           label: 'After Login',
+  //           name: 'target',
+  //           options: [
+  //             { id : 'dashboard', name: 'Go to Dashboard' },
+  //             { id : 'current', name: 'Stay in page' },
+  //           ],
+  //         },
+  //         {
+  //           type: 'select',
+  //           label: 'Button Type',
+  //           name: 'buttonType',
+  //           options: [
+  //             { id : 'primary', name: 'Filled' },
+  //             { id : 'outline', name: 'Outlined' },
+  //             { id : 'link', name : 'Link Text' },
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //   },
+  //   isComponent: (el) => el.tagName === 'SIGNINBUTTON',
+  // });
+
+  editor.Components.addType('header-brand', {
+    model: {
+      defaults: {
+        tagName: 'div',
+        name: 'Header Brand',
+        droppable: false,
+        draggable: false,
+        removable: false,
+        stylable: false,
+        copyable: false,
+        resizeable: false,
+        layerable: false,
+        highlightable: true,
+        selectable: true,
+        hoverable: true,
+        badgeable: true,
+        toolbar: [],
+        attributes: {
+          class: 'header-brand',
+        },
+        'brand-type': 'text',
+        traits: [
+          {
+            type: 'brand-type-select',
+          },
+        ],
+        components: [
+          {
+            tagName: 'h1',
+            type: 'text',
+            content: 'My Brand',
+            name: 'My Brand',
+            traits: [],
+            toolbar: [],
+            removable: false,
+            draggable: false,
+            badgable: false,
+            droppable: false,
+            highlightable: false,
+            editable: true,
+            hoverable: false,
+            copyable: false,
+          },
+        ],
+        styles: `
+          .header-brand {
+            flex: 1 1 auto;
+            padding: 8px;
+          }
+
+          .header-brand h1 {
+            font-size: 20px;
+            font-weight: 500;
+          }
+
+          .header-brand img {
+            max-height: 48px;
+          }
+        `,
+      },
+      init() {
+        this.on('change:brand-type', this.handleBrandTypeChange);
+      },
+      handleBrandTypeChange() {
+        const brandType = this.props()['brand-type'];
+
+        let childQuery = null;
+        let appendedComponent = null;
+
+        if (brandType === 'text') {
+          childQuery = 'text';
+          appendedComponent = {
+            tagName: 'h1',
+            type: 'text',
+            content: 'My Brand',
+            name: 'My Brand',
+            traits: [],
+            toolbar: [],
+            removable: false,
+            draggable: false,
+            badgable: false,
+            droppable: false,
+            highlightable: false,
+            editable: true,
+            hoverable: false,
+            copyable: false,
+          };
+        } else if (brandType === 'image') {
+          childQuery = 'image';
+          appendedComponent = {
+            type: 'image',
+            attributes: {
+              loading: 'lazy',
+            },
+            removable: false,
+            draggable: false,
+            badgable: false,
+            droppable: false,
+            highlightable: false,
+            hoverable: false,
+            copyable: false,
+            resizable: false,
+            toolbar: [],
+          };
+        }
+
+        if (!childQuery || !appendedComponent) {
+          return;
+        }
+
+        const componentList = this.findType(childQuery);
+
+        if (componentList.length <= 0) {
+          this.components(appendedComponent);
+        }
+      },
+    },
+  });
+
+  editor.Components.addType('navbar-header', {
     model: {
       defaults: {
         tagName: 'header',
@@ -22,25 +187,10 @@ export default (editor) => {
         attributes: {
           class: 'header-container',
         },
+        traits: [],
         components: [
           {
-            tagName: 'h1',
-            type: 'text',
-            content: 'My Brand',
-            name: 'My Brand',
-            attributes: {
-              class: 'header-brand',
-            },
-            traits: [],
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            badgable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            hoverable: false,
-            copyable: false,
+            type: 'header-brand',
           },
         ],
         styles: `
@@ -51,11 +201,8 @@ export default (editor) => {
             width: 100%;
             margin: 0px;
             padding: 12px;
-          }
-
-          .header-container .header-brand {
-            flex: 1 1 auto;
-            padding: 8px;
+            height: 64px;
+            align-items: center;
           }
         `,
       },
@@ -107,6 +254,13 @@ export default (editor) => {
         this.setStyle({
           ...this.getStyle(),
           'font-family': generateFontFamilyStylingText(font),
+        });
+
+        this.components().forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            'font-family': generateFontFamilyStylingText(font),
+          });
         });
       },
     },

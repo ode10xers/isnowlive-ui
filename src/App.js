@@ -59,7 +59,7 @@ const CourseDetailedListView = lazy(() => import('pages/DetailedListView/Courses
 const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
 const Legals = lazy(() => import('pages/Legals'));
 const Onboarding = lazy(() => import('pages/EditProfile'));
-const PageBuilder = lazy(() => import('pages/PageBuilder'));
+const PageEditor = lazy(() => import('pages/PageBuilder/PageEditor'));
 
 const PassDetailPreview = lazy(() => import('pages/PreviewPages/PassDetails'));
 const CourseDetailPreview = lazy(() => import('pages/PreviewPages/CourseDetails'));
@@ -254,7 +254,7 @@ function App() {
               layout={FullWidthLayout}
               exact
               path={['/test-editor', '/page-render']}
-              component={PageBuilder}
+              component={PageEditor}
             />
             <RouteWithLayout layout={FullWidthLayout} path={Routes.plugins.root} component={PluginPages} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />

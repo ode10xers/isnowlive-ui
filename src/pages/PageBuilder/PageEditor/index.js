@@ -9,17 +9,20 @@ import grapesjs from 'grapesjs';
 import config from 'config/index.js';
 
 // These are to be put as part of the config
-import definedBlocks from './Configs/blocks.js';
-import definedPanels from './Configs/panels.js';
+import definedBlocks from '../Configs/blocks.js';
+import definedPanels from '../Configs/panels.js';
 
 // THese are to be put in plugins
-import CustomTraits from './Plugins/traits';
-import CustomCommands from './Plugins/commands';
-import ReactComponentHandler from './ReactComponentHandler';
-import TextSection from './CustomComponents/TextSection.js';
-import TextWithImageSection from './CustomComponents/TextWithImageSection.js';
-import PassionSessionList from './CustomComponents/PassionSessionList.js';
-import PassionPassList from './CustomComponents/PassionPassList.js';
+import CustomTraits from '../Plugins/traits';
+import CustomCommands from '../Plugins/commands';
+import ReactComponentHandler from '../ReactComponentHandler';
+import TextSection from '../CustomComponents/TextSection.js';
+import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
+import PassionSessionList from '../CustomComponents/PassionSessionList.js';
+import PassionPassList from '../CustomComponents/PassionPassList.js';
+import LinkButton from '../CustomComponents/LinkButton.js';
+// import SignInButton from '../CustomComponents/SignInButton.js';
+import Header from '../CustomComponents/Header.js';
 
 import { googleFonts } from 'utils/constants.js';
 import { getLocalUserDetails } from 'utils/storage.js';
@@ -28,10 +31,8 @@ import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-import LinkButton from './CustomComponents/LinkButton.js';
-import Header from './CustomComponents/Header.js';
 
-const PageBuilder = ({ match, history }) => {
+const PageEditor = ({ match, history }) => {
   const isPublicPage = match.path.includes('page');
 
   const [isLoading, setIsLoading] = useState(true);
@@ -104,7 +105,7 @@ const PageBuilder = ({ match, history }) => {
         ],
       },
       plugins: [
-        Header,
+        // SignInButton,
         ReactComponentHandler,
         PassionSessionList,
         PassionPassList,
@@ -113,6 +114,7 @@ const PageBuilder = ({ match, history }) => {
         TextSection,
         TextWithImageSection,
         LinkButton,
+        Header,
       ],
     });
 
@@ -185,26 +187,8 @@ const PageBuilder = ({ match, history }) => {
     if (gjsEditor) {
       gjsEditor.load();
 
-      // // Adding predefined components
-      // gjsEditor.addComponents({
-      //   type: 'navbar-header',
-      // }, {
-      //   at: 0,
-      // });
-
-      // gjsEditor.StorageManager.load(['template-data'], (res) => {
-      //   const components = JSON.parse(res['template-data']);
-      //   console.log(components);
-      //   gjsEditor.loadData(components);
-      // });
-
-      gjsEditor.getWrapper().set({
-        droppable: (srcModel, trgModel) => {
-          console.log(srcModel.index());
-          console.log(trgModel.components().length);
-
-          return true;
-        },
+      gjsEditor.addComponents({
+        type: 'navbar-header',
       });
 
       if (isPublicPage) {
@@ -245,4 +229,4 @@ const PageBuilder = ({ match, history }) => {
   );
 };
 
-export default PageBuilder;
+export default PageEditor;
