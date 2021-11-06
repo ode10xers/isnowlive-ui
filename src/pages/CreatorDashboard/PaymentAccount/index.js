@@ -11,9 +11,9 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 
 import Earnings from 'pages/CreatorDashboard/Earnings';
 
-import { isAPISuccess, preventDefaults, StripeAccountStatus } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { paymentProvider } from 'utils/constants';
+import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { paymentProvider, StripeAccountStatus } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';

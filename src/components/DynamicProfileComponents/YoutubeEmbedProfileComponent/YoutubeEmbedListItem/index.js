@@ -49,6 +49,7 @@ const YoutubeEmbedListItem = ({ url }) => {
             <Col xs={24}>
               <div className={styles.thumbnailContainer}>
                 <Image
+                  loading="lazy"
                   preview={false}
                   className={styles.thumbnailImage}
                   width="100%"

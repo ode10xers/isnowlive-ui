@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 
-import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Tag, Space, Grid, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-// import SessionCards from 'components/SessionCards';
-import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import AuthModal from 'components/AuthModal';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, isUnapprovedUserError, orderType, productType } from 'utils/helper';
+import { orderType, productType } from 'utils/constants';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
-import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -24,9 +23,11 @@ import SessionListCard from 'components/DynamicProfileComponents/SessionsProfile
 import AvailabilityListItem from 'components/DynamicProfileComponents/AvailabilityProfileComponent/AvailabilityListItem';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const PublicPassList = ({ passes }) => {
   const { showPaymentPopup } = useGlobalContext();
+  const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
@@ -97,7 +98,7 @@ const PublicPassList = ({ passes }) => {
           showPurchasePassSuccessModal(data.pass_order_id);
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -369,7 +370,7 @@ const PublicPassList = ({ passes }) => {
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
           <Col xs={24}>
-            {isMobileDevice ? (
+            {!lg ? (
               passes.length > 0 ? (
                 passes.map(renderPassItem)
               ) : (

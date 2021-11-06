@@ -3,9 +3,9 @@ import classNames from 'classnames';
 import AddToCalendar from 'react-add-to-calendar';
 
 import dateUtil from 'utils/date';
+import { generateUrlFromUsername } from 'utils/url';
 
 import styles from './styles.module.scss';
-import { generateUrlFromUsername } from 'utils/helper';
 
 const {
   timeCalculation: { generateCalendarTimeInfo },

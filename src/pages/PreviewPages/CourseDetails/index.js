@@ -21,18 +21,11 @@ import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile } from 'utils/colors';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName, videoSourceType } from 'utils/constants';
+import { isAPISuccess, deepCloneObject, preventDefaults } from 'utils/helper';
 import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
-import {
-  isAPISuccess,
-  deepCloneObject,
-  preventDefaults,
-  reservedDomainName,
-  getUsernameFromUrl,
-  videoSourceType,
-  convertHexToRGB,
-  isBrightColorShade,
-} from 'utils/helper';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import styles from './style.module.scss';
 
@@ -336,7 +329,7 @@ const CourseDetailPreview = ({ match, history }) => {
           <Row gutter={[10, 10]} justify="center" align="middle">
             {carouselItem.map((imageUrl, imageIndex) => (
               <Col xs={12} md={6} key={`${imageIndex}_${imageUrl}`}>
-                <Image width="100%" className={styles.coursePreviewImage} src={imageUrl} />
+                <Image loading="lazy" width="100%" className={styles.coursePreviewImage} src={imageUrl} />
               </Col>
             ))}
           </Row>
@@ -368,6 +361,7 @@ const CourseDetailPreview = ({ match, history }) => {
               <Col xs={24}>
                 <div className={styles.courseImageContainer}>
                   <Image
+                    loading="lazy"
                     width="100%"
                     className={styles.courseCoverImage}
                     src={course?.course_image_url}
@@ -491,7 +485,7 @@ const CourseDetailPreview = ({ match, history }) => {
                 {generateLongDescriptionTemplate('Know your mentor', creatorProfile?.profile?.bio)}
               </Col>
               <Col xs={24} md={6} className={styles.textAlignCenter}>
-                <Image className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
+                <Image loading="lazy" className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
               </Col>
             </Row>
           </Col>

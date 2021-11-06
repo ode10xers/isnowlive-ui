@@ -86,11 +86,11 @@ color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black
           border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
 
           &.lightText {
-            color : map-get($colors, 'White');
+            color: map-get($colors, 'White');
           }
 
           &.darkText {
-            color : map-get($colors, 'Zeus');
+            color: map-get($colors, 'Zeus');
           }
         }
 
@@ -189,7 +189,7 @@ color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black
         text-align: center;
         display: block;
         font-weight: 700;
-        color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
 
         @media screen and (max-width: 1140px) {
           font-size: 24px;
@@ -236,8 +236,7 @@ color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black
           text-align: center;
           font-size: 20px;
           font-weight: 600;
-  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
-
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
         }
 
         .personaItemContent {
@@ -293,7 +292,7 @@ color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black
 
         .moduleContentItems {
           color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
-          
+
           .moduleContentName {
             color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
           }
@@ -325,7 +324,11 @@ color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black
   .coursePreviewImagesSection {
     margin: -50px 0;
     padding: 30px 80px !important;
-    background: linear-gradient(41.18deg, var(--passion-profile-lightest-color, #e6f7ff) 16.22%, var(--passion-profile-light-color, #fff5f6) 82.56%);
+    background: linear-gradient(
+      41.18deg,
+      var(--passion-profile-lightest-color, #e6f7ff) 16.22%,
+      var(--passion-profile-light-color, #fff5f6) 82.56%
+    );
 
     @media screen and (max-width: 769px) {
       padding: 20px !important;

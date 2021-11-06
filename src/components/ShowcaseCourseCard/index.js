@@ -1,40 +1,33 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
+import classNames from 'classnames';
 
-import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
+import { Row, Col, Image, Typography, Button, Tag, Card, Grid, message } from 'antd';
 
 import apis from 'apis';
 
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
+import DefaultImage from 'components/Icons/DefaultImage';
 import {
   showPurchaseSingleCourseSuccessModal,
   showGetCourseWithSubscriptionSuccessModal,
   showErrorModal,
   showAlreadyBookedModal,
 } from 'components/Modals/modals';
-import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import { redirectToCoursesPage } from 'utils/redirect';
-import {
-  isValidFile,
-  isAPISuccess,
-  orderType,
-  courseType,
-  productType,
-  paymentSource,
-  isUnapprovedUserError,
-} from 'utils/helper';
+import { orderType, courseType, productType, paymentSource } from 'utils/constants';
+import { isValidFile, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 const {
   formatDate: { toShortDateWithYear },
   timezoneUtils: { getTimezoneLocation },
@@ -42,6 +35,7 @@ const {
 
 const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPage }) => {
   const history = useHistory();
+  const { lg } = useBreakpoint();
 
   const {
     showPaymentPopup,
@@ -192,7 +186,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
         setSelectedCourse(null);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {
@@ -245,7 +239,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
           showPurchaseSingleCourseSuccessModal();
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -295,8 +289,9 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
                   <Row gutter={[16, 8]}>
                     <Col xs={24} sm={isOnAttendeeDashboard ? 12 : 10} lg={10} className={styles.courseImageWrapper}>
                       <Image
+                        loading="lazy"
                         preview={false}
-                        height={isMobileDevice ? 100 : 130}
+                        height={!lg ? 100 : 130}
                         className={styles.courseImage}
                         src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
                       />

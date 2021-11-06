@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Row, Col, Tooltip, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, message } from 'antd';
 import { TwitterPicker } from 'react-color';
 
+import { Row, Col, Tooltip, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, message } from 'antd';
 import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -13,9 +13,10 @@ import PriceInputCalculator from 'components/PriceInputCalculator';
 import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
+import { isAPISuccess } from 'utils/helper';
+import { generateRandomColor } from 'utils/colors';
 import { fetchCreatorCurrency } from 'utils/payment';
 import { defaultPlatformFeePercentage } from 'utils/constants';
-import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
 

@@ -9,8 +9,9 @@ import Routes from 'routes';
 import Loader from 'components/Loader';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, ZoomAuthType, copyToClipboard } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { ZoomAuthType } from 'utils/constants';
+import { isAPISuccess, copyToClipboard } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 

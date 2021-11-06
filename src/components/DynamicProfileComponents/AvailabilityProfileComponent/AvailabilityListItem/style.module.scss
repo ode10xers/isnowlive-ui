@@ -17,15 +17,14 @@
   }
 
   .availabilityImage {
-    align-self : center;
-    border-radius : 8px !important;
+    align-self: center;
+    border-radius: 8px !important;
     min-width: 100%;
     min-height: 100%;
     overflow: hidden;
     object-fit: cover;
-  }  
+  }
 }
-
 
 .availabilityInfoSeparator {
   color: var(--availability-card-font-color, #c4c4c4) !important;
@@ -45,7 +44,10 @@
 .availabilityTitle {
   font-size: 14px !important;
   margin-bottom: 2px !important;
-  color: var(--passion-profile-darker-color, var(--availability-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})) !important;
+  color: var(
+    --passion-profile-darker-color,
+    var(--availability-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+  ) !important;
 }
 
 .availabilityDescription {
@@ -53,16 +55,16 @@
 
   height: 40px;
   overflow: hidden;
-  margin-bottom : 0 !important;
+  margin-bottom: 0 !important;
 
-    // p,
-    // span {
-    //   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    //     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    //   // background-color: map-get($map: $colors, $key: 'White1') !important;
-    //   background: transparent !important;
-    //   color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
-    // }
+  // p,
+  // span {
+  //   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+  //     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+  //   // background-color: map-get($map: $colors, $key: 'White1') !important;
+  //   background: transparent !important;
+  //   color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+  // }
 }
 
 .availabilityDescription * {
@@ -75,8 +77,14 @@ color: var(--passion-profile-darker-color, var(--availability-card-font-color, #
 
 .ctaButton {
   margin-top: 4px;
-  background-color: var(--passion-profile-dark-color, var(--availability-cta-background-color, #{map-get($colors, 'PrussianBlue')})) !important;
-  border-color: var(--passion-profile-dark-color, var(--availability-cta-background-color, #{map-get($colors, 'PrussianBlue')})) !important;
-  color : var(--availability-cta-font-color, #{map-get($colors, 'White')});
+  background-color: var(
+    --passion-profile-dark-color,
+    var(--availability-cta-background-color, #{map-get($colors, 'PrussianBlue')})
+  ) !important;
+  border-color: var(
+    --passion-profile-dark-color,
+    var(--availability-cta-background-color, #{map-get($colors, 'PrussianBlue')})
+  ) !important;
+  color: var(--availability-cta-font-color, #{map-get($colors, 'White')});
   font-size: 12px;
 }

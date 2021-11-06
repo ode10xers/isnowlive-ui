@@ -19,8 +19,10 @@ import { showErrorModal } from 'components/Modals/modals';
 import type { Session, SessionInventory } from 'types/models/session';
 
 import dateUtil from 'utils/date';
+import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl } from 'utils/url';
+import { reservedDomainName } from 'utils/constants';
 import { generateColorPalletteForProfile } from 'utils/colors';
-import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import useQueryParamState from 'hooks/useQueryParamState';
 
@@ -76,7 +78,9 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   useEffect(() => {
     if (selectedMonth) {
       if (selectedDate === undefined) {
-        const availInv = availability?.inventory.filter((inv) => moment(inv.start_time).format('MMMM YYYY') === selectedMonth).find((inv) => !(inv.num_participants > 0));
+        const availInv = availability?.inventory
+          .filter((inv) => moment(inv.start_time).format('MMMM YYYY') === selectedMonth)
+          .find((inv) => !(inv.num_participants > 0));
 
         if (availInv) {
           setSelectedDate(moment(availInv.start_time).format('YYYY-MM-DD'));
@@ -104,7 +108,6 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     () => availability?.inventory.find((inv) => inv.inventory_id === Number(selectedInventoryId)),
     [availability, selectedInventoryId]
   );
-  // const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
   const [view, setView] = useState<AvailabilityDetailsView>('date');
 
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
@@ -127,7 +130,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     setIsLoading(false);
   }, []);
 
-  const fetchAvailabilityPasses = useCallback(async (session_id : string) => {
+  const fetchAvailabilityPasses = useCallback(async (session_id: string) => {
     setIsLoading(true);
 
     try {
@@ -269,6 +272,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       {/* @ts-ignore */}
       <Loader loading={isLoading} size="large" text="Loading availability">
         <Image
+          loading="lazy"
           className={styles.availabilityHeaderImage}
           preview={false}
           src={availability?.session_image_url}

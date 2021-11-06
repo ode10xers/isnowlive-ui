@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm, Collapse, Modal, Input } from 'antd';
 import { useHistory } from 'react-router-dom';
+
+import { Row, Col, Typography, Button, Card, Empty, Popconfirm, Grid, Collapse, Modal, Input, message } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
-import dateUtil from 'utils/date';
+
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ShowAmount from 'components/ShowAmount';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import { isMobileDevice } from 'utils/device';
-import { paymentProvider } from 'utils/constants';
-import { isAPISuccess, preventDefaults, StripeAccountStatus } from 'utils/helper';
+
+import dateUtil from 'utils/date';
+import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { paymentProvider, StripeAccountStatus } from 'utils/constants';
 
 import {
   mixPanelEventTags,
@@ -31,6 +33,7 @@ const timerIcon = require('assets/images/timer.png');
 const bankIcon = require('assets/images/bank.png');
 
 const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 const {
   formatDate: { toLongDateWithDayTime },
@@ -49,6 +52,7 @@ const getEarningsAPIs = {
 // as it seems to handle more and more business logic
 const Earnings = () => {
   const history = useHistory();
+  const { lg } = useBreakpoint();
   const {
     state: { userDetails },
     setUserDetails,
@@ -329,7 +333,7 @@ const Earnings = () => {
           <ShowAmount amount={amount} currency={balance?.currency.toUpperCase()} />
         </Col>
         <Col xs={6}>
-          <img src={image} height={40} alt="" />
+          <img loading="lazy" src={image} height={40} alt="" />
         </Col>
       </Row>
     </div>
@@ -740,7 +744,7 @@ const Earnings = () => {
               <Panel header={<Title level={5}> Sessions Earnings </Title>} key="Sessions">
                 <Row className={styles.mt10}>
                   <Col span={24}>
-                    {isMobileDevice ? (
+                    {!lg ? (
                       <Loader loading={isLoading} size="large" text="Loading sessions">
                         {earnings['sessions']?.length > 0 ? (
                           earnings['sessions']?.map(renderSessionItem)
@@ -777,7 +781,7 @@ const Earnings = () => {
                 >
                   <Row className={styles.mt10}>
                     <Col span={24}>
-                      {isMobileDevice ? (
+                      {!lg ? (
                         <Loader loading={isLoading} size="large" text={`Loading ${productEarningsItem?.name}`}>
                           {earnings[productEarningsItem?.stateKey]?.length > 0 ? (
                             earnings[productEarningsItem?.stateKey].map((productEarnings) =>

@@ -2,19 +2,19 @@ import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
+import { Row, Col, Card, Button, Typography, Image, Space, Grid, Divider } from 'antd';
 import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+import { videoSourceType } from 'utils/constants';
 import { redirectToVideosPage } from 'utils/redirect';
-import { videoSourceType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const {
   formatDate: { toShortDateWithYear },
@@ -38,8 +38,10 @@ const VideoCard = ({
   showDesc = false,
   showDetailsBtn = true,
 }) => {
+  const { lg } = useBreakpoint();
+
   const renderVideoOrderDetails = () => {
-    if (isMobileDevice) {
+    if (!lg) {
       return video.source === videoSourceType.CLOUDFLARE ? (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
@@ -97,6 +99,7 @@ const VideoCard = ({
       cover={
         cover || (
           <Image
+            loading="lazy"
             className={videoThumbnailUrl.endsWith('.gif') ? styles.videoThumbnail : styles.staticVideoThumbnail}
             src={videoThumbnailUrl}
             alt={video?.title || orderDetails?.title}

@@ -157,7 +157,6 @@ $spacing: (
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
-
 .disabledBuyBtn {
   background: map-get($map: $colors, $key: 'KellyGreenPale') !important;
 }
@@ -183,7 +182,7 @@ $spacing: (
   background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   color: map-get($colors, 'White') !important;
-  
+
   &.lightBg {
     color: map-get($colors, 'Zeus') !important;
   }
@@ -197,7 +196,6 @@ $spacing: (
   z-index: 99;
   width: 100vw;
 }
-
 
 .fadedItemContainer {
   position: relative;

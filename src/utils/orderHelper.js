@@ -1,15 +1,16 @@
 import apis from 'apis';
 
 import {
+  showErrorModal,
+  showAlreadyBookedModal,
   showPurchasePassAndGetVideoSuccessModal,
   showPurchasePassAndBookSessionSuccessModal,
-  showAlreadyBookedModal,
-  showErrorModal,
   showPurchaseSubscriptionAndGetVideoSuccessModal,
   showPurchaseSubscriptionAndBookSessionSuccessModal,
 } from 'components/Modals/modals';
 
-import { isAPISuccess, isUnapprovedUserError, paymentSource, productType } from 'utils/helper';
+import { paymentSource, productType } from 'utils/constants';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 // These functions are for fetching the product details
 // that is required to be shown in the confirmation modals

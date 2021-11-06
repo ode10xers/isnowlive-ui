@@ -10,19 +10,12 @@ import AuthModal from 'components/AuthModal';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import {
-  orderType,
-  productType,
-  isAPISuccess,
-  getUsernameFromUrl,
-  isUnapprovedUserError,
-  generateUrlFromUsername,
-  convertHexToRGB,
-  isBrightColorShade,
-} from 'utils/helper';
-import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
+import { orderType, productType } from 'utils/constants';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { redirectToPluginMembershipDetailsPage } from 'utils/redirect';
-import { convertHexToHSL, formatHSLStyleString } from 'utils/colors';
+import { getUsernameFromUrl, generateUrlFromUsername } from 'utils/url';
+import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
+import { convertHexToHSL, formatHSLStyleString, convertHexToRGB, isBrightColorShade } from 'utils/colors';
 
 import { getAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS } from 'services/localAuthToken';
@@ -259,7 +252,7 @@ const Subscriptions = () => {
           showPurchaseSubscriptionSuccessModal();
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }

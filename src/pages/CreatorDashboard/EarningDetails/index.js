@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Card, Empty, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Empty, Grid, message } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -14,7 +14,6 @@ import ShowAmount from 'components/ShowAmount';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, getPaymentStatus } from 'utils/helper';
 
 import { mixPanelEventTags, trackSimpleEvent } from 'services/integrations/mixpanel';
@@ -23,6 +22,7 @@ import styles from './styles.module.scss';
 
 const { creator } = mixPanelEventTags;
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 const {
   formatDate: { toLongDateWithTime, toLongDateWithDay },
 } = dateUtil;
@@ -52,6 +52,7 @@ const productDetails = {
 
 const EarningDetails = ({ match }) => {
   const history = useHistory();
+  const { lg } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
   const [earnings, setEarnings] = useState(null);
 
@@ -107,14 +108,14 @@ const EarningDetails = ({ match }) => {
       <Col xs={24} md={productType === 'session' ? 8 : 16}>
         {showProductLayout(
           `${productDetails[productType].productName} Name`,
-          <Title level={isMobileDevice ? 5 : 3}> {earnings?.name} </Title>
+          <Title level={!lg ? 5 : 3}> {earnings?.name} </Title>
         )}
       </Col>
       {productType === 'session' && (
         <Col xs={24} md={8}>
           {showProductLayout(
             'Session Day and Date',
-            <Title level={isMobileDevice ? 5 : 3}> {toLongDateWithDay(earnings?.session_date) || '-'} </Title>
+            <Title level={!lg ? 5 : 3}> {toLongDateWithDay(earnings?.session_date) || '-'} </Title>
           )}
         </Col>
       )}
@@ -248,7 +249,7 @@ const EarningDetails = ({ match }) => {
             <Title level={5}>Attendee Details</Title>
           </Col>
           <Col xs={24} md={24}>
-            {isMobileDevice ? (
+            {!lg ? (
               <>
                 {earnings?.details?.length > 0 ? (
                   earnings.details.map(renderMobileDetailsItem)

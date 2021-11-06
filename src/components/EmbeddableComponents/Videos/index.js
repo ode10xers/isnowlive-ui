@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+
 import { Spin, Grid, Row, Col, Button, Typography, Select, message } from 'antd';
 import {
   BarsOutlined,
@@ -15,12 +16,13 @@ import Routes from 'routes';
 import AuthModal from 'components/AuthModal';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
+import { isAPISuccess } from 'utils/helper';
 import { redirectToPluginVideoDetailsPage } from 'utils/redirect';
-import { generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 
 import { getAuthCookie } from 'services/authCookie';
-import { getAuthTokenFromLS } from 'services/localAuthToken';
 import { useGlobalContext } from 'services/globalContext';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
 
 import styles from './style.module.scss';
 

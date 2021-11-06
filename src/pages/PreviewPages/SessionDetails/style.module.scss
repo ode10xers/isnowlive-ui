@@ -25,7 +25,7 @@
     color: map-get($map: $colors, $key: 'Black') !important;
     background-color: transparent !important;
 }
-  .sessionDesc,
+.sessionDesc,
 .sessionPrereq {
   max-height: 200px;
   overflow: hidden;

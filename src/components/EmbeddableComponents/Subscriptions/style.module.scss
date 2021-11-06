@@ -28,7 +28,7 @@
 
   .subscriptionDivider {
     margin: 0 0 8px !important;
-    border-top-color: var(--primary-color-lighter, rgba(0,0,0, 0.6)) !important;
+    border-top-color: var(--primary-color-lighter, rgba(0, 0, 0, 0.6)) !important;
   }
 
   .subscriptionIcon {
@@ -51,18 +51,18 @@
     font-weight: 500;
 
     &.darkText {
-      --text-color : var(--primary-color-dark, #{map-get($colors, 'Zeus')}) !important;
+      --text-color: var(--primary-color-dark, #{map-get($colors, 'Zeus')}) !important;
     }
 
     &.lightText {
-      --text-color : var(--primary-color-lightest, #{map-get($colors, 'White')}) !important;
+      --text-color: var(--primary-color-lightest, #{map-get($colors, 'White')}) !important;
     }
 
-    color : var(--text-color);
+    color: var(--text-color);
 
     .subscriptionBuyDivider {
       margin: 0 16px;
-      border-left-color: var(--text-color, rgba(0,0,0, 0.6)) !important;
+      border-left-color: var(--text-color, rgba(0, 0, 0, 0.6)) !important;
       height: 1.5em;
     }
   }

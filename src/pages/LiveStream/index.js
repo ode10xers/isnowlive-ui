@@ -1,28 +1,34 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+
 import { Form, Typography, Button, Space, Row, Col, Input, Modal, message } from 'antd';
 import { CheckCircleTwoTone, VideoCameraOutlined } from '@ant-design/icons';
 
+import Routes from 'routes';
+import apis from 'apis';
+import config from 'config';
+
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
+
+import { profileFormItemLayout } from 'layouts/FormLayouts';
+
+import validationRules from 'utils/validation';
+import { isAPISuccess } from 'utils/helper';
+import { ZoomAuthType } from 'utils/constants';
+import { getLocalUserDetails } from 'utils/storage';
+import parseQueryString from 'utils/parseQueryString';
+
 import { useGlobalContext } from 'services/globalContext';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 import {
   mixPanelEventTags,
   trackSimpleEvent,
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-import { profileFormItemLayout } from 'layouts/FormLayouts';
-import validationRules from 'utils/validation';
-import { isAPISuccess, ZoomAuthType } from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
-import Routes from 'routes';
-import apis from 'apis';
-import config from 'config';
 
 import styles from './style.module.scss';
-import parseQueryString from 'utils/parseQueryString';
-import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Title, Link } = Typography;
 const { creator } = mixPanelEventTags;

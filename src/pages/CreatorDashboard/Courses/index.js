@@ -43,22 +43,16 @@ import TagListPopup from 'components/TagListPopup';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { paymentProvider } from 'utils/constants';
 import { getLocalUserDetails } from 'utils/storage';
+import { generateUrlFromUsername } from 'utils/url';
 import {
   getCourseSessionContentCount,
   getCourseVideoContentCount,
   getCourseEmptyContentCount,
   getCourseDocumentContentCount,
 } from 'utils/course';
-import {
-  isAPISuccess,
-  productType,
-  copyToClipboard,
-  generateUrlFromUsername,
-  preventDefaults,
-  courseType,
-} from 'utils/helper';
+import { paymentProvider, productType, courseType } from 'utils/constants';
+import { isAPISuccess, copyToClipboard, preventDefaults } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 

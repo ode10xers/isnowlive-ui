@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Tooltip, Typography, Button, Card, Tag, Collapse } from 'antd';
+import { Row, Col, Tooltip, Typography, Button, Card, Grid, Empty, Collapse, Tag } from 'antd';
 import {
   MailOutlined,
   CopyOutlined,
@@ -14,29 +14,31 @@ import Table from 'components/Table';
 import TagListPopup from 'components/TagListPopup';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+import { copyToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { copyToClipboard, generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 
 import styles from './styles.module.scss';
 
 const { Text, Title } = Typography;
+const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 
 const {
-  formatDate: { toShortDateWithYear, toDateAndTime },
+  formatDate: { toDateAndTime },
 } = dateUtil;
 
 // NOTE: Currently unused
 /** @deprecated */
-const LiveCourses = ({
-  liveCourses,
+const VideoCourses = ({
+  videoCourses,
   showEditModal,
   publishCourse,
   unpublishCourse,
   showSendEmailModal,
   creatorMemberTags,
 }) => {
+  const { lg } = useBreakpoint();
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
 
@@ -52,7 +54,7 @@ const LiveCourses = ({
       setExpandedPublishedRowKeys([]);
     } else {
       setExpandedPublishedRowKeys(
-        liveCourses?.filter((liveCourse) => liveCourse.is_published).map((liveCourse) => liveCourse.id)
+        videoCourses?.filter((videoCourse) => videoCourse.is_published).map((videoCourse) => videoCourse.id)
       );
     }
   };
@@ -71,7 +73,7 @@ const LiveCourses = ({
       setExpandedUnpublishedRowKeys([]);
     } else {
       setExpandedUnpublishedRowKeys(
-        liveCourses?.filter((liveCourse) => !liveCourse.is_published).map((liveCourse) => liveCourse.id)
+        videoCourses?.filter((videoCourse) => !videoCourse.is_published).map((videoCourse) => videoCourse.id)
       );
     }
   };
@@ -85,7 +87,7 @@ const LiveCourses = ({
   const collapseRowUnpublished = (rowKey) =>
     setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
-  const generateLiveCourseColumns = (published) => {
+  const generateVideoCourseColumns = (published) => {
     const initialColumns = [
       {
         title: 'Course Name',
@@ -108,23 +110,17 @@ const LiveCourses = ({
         },
       },
       {
-        title: 'Duration',
-        dataIndex: 'start_time',
-        key: 'start_time',
-        // width: '210px',
-        render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
+        title: 'Total Videos',
+        width: '120px',
+        render: (text, record) =>
+          record.videos?.length > 0 ? <Tag color="blue"> {record.videos?.length} videos </Tag> : null,
       },
       {
-        title: 'Course Content',
-        dataIndex: 'inventory_ids',
-        key: 'inventory_ids',
-        // width: '200px',
-        render: (text, record) => (
-          <>
-            {record.inventory_ids?.length > 0 && <Tag color="volcano"> {record.inventory_ids?.length} sessions</Tag>}
-            {record.videos?.length > 0 && <Tag color="blue"> {record.videos?.length} videos </Tag>}
-          </>
-        ),
+        title: 'Duration',
+        dataIndex: 'validity',
+        key: 'validity',
+        width: '100px',
+        render: (text, record) => `${record?.validity} days`,
       },
       {
         title: 'Price',
@@ -146,7 +142,7 @@ const LiveCourses = ({
         width: '250px',
         align: 'right',
         render: (text, record) => (
-          <Row gutter={4} justify="end">
+          <Row gutter={8} justify="end">
             <Col xs={3}>
               <Tooltip title="Send Customer Email">
                 <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
@@ -276,7 +272,7 @@ const LiveCourses = ({
     );
 
     return (
-      <Col xs={24} key={subscriber.date_of_purchase}>
+      <Col xs={24} key={`${subscriber.name}_${subscriber.date_of_purchase}`}>
         <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {subscriber.name} </Title>}>
           {layout('Buy Date', toDateAndTime(subscriber.date_of_purchase))}
           {layout('Price', <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>)}
@@ -289,10 +285,10 @@ const LiveCourses = ({
   const renderCourseItem = (course) => {
     const layout = (label, value) => (
       <Row>
-        <Col span={7}>
+        <Col span={10}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={17}>: {value}</Col>
+        <Col span={14}>: {value}</Col>
       </Row>
     );
 
@@ -302,8 +298,8 @@ const LiveCourses = ({
           className={styles.card}
           bodyStyle={{ padding: '20px 10px' }}
           title={
-            <div style={{ paddingTop: 12, borderTop: `6px solid ${course.color_code || '#FFF'}` }}>
-              <Text>{course.name}</Text>
+            <div style={{ paddingTop: 12, borderTop: `6px solid ${course?.color_code || '#FFF'}` }}>
+              <Text>{course?.name}</Text>
             </div>
           }
           actions={[
@@ -322,7 +318,7 @@ const LiveCourses = ({
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyCourseLink(course.id)}
+                onClick={() => copyCourseLink(course?.id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>,
@@ -352,29 +348,20 @@ const LiveCourses = ({
             ),
           ]}
         >
-          {layout(
-            'Duration',
-            <Text> {`${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`} </Text>
-          )}
-          {layout(
-            'Content',
-            <>
-              {course.inventory_ids?.length > 0 && <Tag color="volcano"> {course.inventory_ids?.length} sessions</Tag>}
-              {course.videos?.length > 0 && <Tag color="blue"> {course.videos?.length} videos </Tag>}
-            </>
-          )}
+          {layout('Total Videos', <Text>{course.videos?.length} videos</Text>)}
+          {layout('Duration', <Text> {course?.validity} days</Text>)}
           {layout(
             'Price',
-            <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
+            <Text>{course?.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}</Text>
           )}
           {creatorMemberTags.length > 0 && <TagListPopup tags={course.tag} mobileView={true} />}
         </Card>
         {course.is_published
-          ? expandedPublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+          ? expandedPublishedRowKeys.includes(course?.id) && (
+              <Row className={styles.cardExpansion}>{course?.buyers?.map(renderMobileSubscriberCards)}</Row>
             )
-          : expandedUnpublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+          : expandedUnpublishedRowKeys.includes(course?.id) && (
+              <Row className={styles.cardExpansion}>{course?.buyers?.map(renderMobileSubscriberCards)}</Row>
             )}
       </Col>
     );
@@ -382,62 +369,66 @@ const LiveCourses = ({
 
   return (
     <div>
-      <Collapse defaultActiveKey="published">
-        <Panel header={<Title level={5}> Published </Title>} key="published">
-          {isMobileDevice ? (
-            <Row gutter={[8, 16]}>
-              <Col xs={24}>
-                <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
-                  {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                </Button>
-              </Col>
-              {liveCourses?.filter((liveCourse) => liveCourse.is_published).map(renderCourseItem)}
-            </Row>
-          ) : (
-            <Table
-              size="small"
-              sticky={true}
-              columns={generateLiveCourseColumns(true)}
-              data={liveCourses?.filter((liveCourse) => liveCourse.is_published)}
-              rowKey={(record) => record.id}
-              expandable={{
-                expandedRowRender: renderBuyersList,
-                expandRowByClick: true,
-                expandIconColumnIndex: -1,
-                expandedRowKeys: expandedPublishedRowKeys,
-              }}
-            />
-          )}
-        </Panel>
-        <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
-          {isMobileDevice ? (
-            <Row gutter={[8, 16]}>
-              <Col xs={24}>
-                <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
-                  {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                </Button>
-              </Col>
-              {liveCourses?.filter((liveCourse) => !liveCourse.is_published).map(renderCourseItem)}
-            </Row>
-          ) : (
-            <Table
-              size="small"
-              sticky={true}
-              columns={generateLiveCourseColumns(false)}
-              data={liveCourses?.filter((liveCourse) => !liveCourse.is_published)}
-              rowKey={(record) => record.id}
-              expandable={{
-                expandedRowRender: renderBuyersList,
-                expandRowByClick: true,
-                expandIconColumnIndex: -1,
-                expandedRowKeys: expandedUnpublishedRowKeys,
-              }}
-            />
-          )}
-        </Panel>
-      </Collapse>
+      {videoCourses?.length > 0 ? (
+        <Collapse defaultActiveKey="published">
+          <Panel header={<Title level={5}> Published </Title>} key="published">
+            {!lg ? (
+              <Row gutter={[8, 16]}>
+                <Col xs={24}>
+                  <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
+                    {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                  </Button>
+                </Col>
+                {videoCourses?.filter((videoCourse) => videoCourse.is_published).map(renderCourseItem)}
+              </Row>
+            ) : (
+              <Table
+                size="small"
+                sticky={true}
+                columns={generateVideoCourseColumns(true)}
+                data={videoCourses?.filter((videoCourse) => videoCourse.is_published)}
+                rowKey={(record) => record.id}
+                expandable={{
+                  expandedRowRender: renderBuyersList,
+                  expandRowByClick: true,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedPublishedRowKeys,
+                }}
+              />
+            )}
+          </Panel>
+          <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
+            {!lg ? (
+              <Row gutter={[8, 16]}>
+                <Col xs={24}>
+                  <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
+                    {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                  </Button>
+                </Col>
+                {videoCourses?.filter((videoCourse) => !videoCourse.is_published).map(renderCourseItem)}
+              </Row>
+            ) : (
+              <Table
+                size="small"
+                sticky={true}
+                columns={generateVideoCourseColumns(false)}
+                data={videoCourses?.filter((videoCourse) => !videoCourse.is_published)}
+                rowKey={(record) => record.id}
+                expandable={{
+                  expandedRowRender: renderBuyersList,
+                  expandRowByClick: true,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedUnpublishedRowKeys,
+                }}
+              />
+            )}
+          </Panel>
+        </Collapse>
+      ) : (
+        <Empty description="No Courses found" />
+      )}
     </div>
   );
 };
 
-export default LiveCourses;
+export default VideoCourses;

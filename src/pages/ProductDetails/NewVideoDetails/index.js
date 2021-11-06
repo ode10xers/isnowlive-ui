@@ -30,25 +30,15 @@ import SelectablePassItem from './SelectablePassItem';
 import SelectableSubscriptionItem from './SelectableSubscriptionItem';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
-import {
-  orderType,
-  productType,
-  isAPISuccess,
-  paymentSource,
-  preventDefaults,
-  videoSourceType,
-  convertHexToRGB,
-  getUsernameFromUrl,
-  reservedDomainName,
-  isBrightColorShade,
-  isUnapprovedUserError,
-} from 'utils/helper';
 import dateUtil from 'utils/date';
-import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import { generateBaseCreditsText } from 'utils/subscriptions';
-import { generateColorPalletteForProfile } from 'utils/colors';
 import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
+import { isAPISuccess, preventDefaults, isUnapprovedUserError } from 'utils/helper';
+import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
+import { orderType, productType, paymentSource, videoSourceType, reservedDomainName } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -364,7 +354,7 @@ const NewVideoDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -425,7 +415,7 @@ const NewVideoDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -461,7 +451,7 @@ const NewVideoDetails = ({ match }) => {
         setIsLoading(false);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {
@@ -521,7 +511,7 @@ const NewVideoDetails = ({ match }) => {
 
           return {
             ...data,
-            is_successful_order: true,
+            is_successful_order: false,
           };
         }
       }
@@ -554,7 +544,7 @@ const NewVideoDetails = ({ match }) => {
         setIsLoading(false);
         return {
           ...data,
-          is_successful_order: true,
+          is_successful_order: false,
         };
       }
     } catch (error) {
@@ -810,7 +800,13 @@ const NewVideoDetails = ({ match }) => {
         <Row gutter={[8, 8]}>
           {videoData?.document?.url?.includes('/image/') ? (
             <Col xs={24} className={styles.textAlignCenter}>
-              <Image width="100%" preview={false} className={styles.mt10} src={videoData?.document?.url} />
+              <Image
+                loading="lazy"
+                width="100%"
+                preview={false}
+                className={styles.mt10}
+                src={videoData?.document?.url}
+              />
             </Col>
           ) : videoData?.document?.url?.includes('.pdf') ? (
             <Col xs={24}>

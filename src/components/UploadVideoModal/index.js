@@ -5,6 +5,7 @@ import {
   Row,
   Col,
   Modal,
+  Grid,
   Form,
   Collapse,
   Typography,
@@ -46,7 +47,6 @@ import {
 } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 import { fetchCreatorCurrency } from 'utils/payment';
@@ -60,6 +60,7 @@ import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/int
 import styles from './styles.module.scss';
 
 const { Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 
 const videoPriceTypes = {
@@ -118,6 +119,7 @@ const UploadVideoModal = ({
   creatorFeePercentage = defaultPlatformFeePercentage,
   refetchVideos,
 }) => {
+  const { lg } = useBreakpoint();
   const [form] = Form.useForm();
   const [uploadForm] = Form.useForm();
 
@@ -1374,7 +1376,7 @@ const UploadVideoModal = ({
                 </Collapse>
               </Col>
             </Row>
-            <Form.Item {...(!isMobileDevice && formTailLayout)}>
+            <Form.Item {...(lg && formTailLayout)}>
               <Row>
                 <Col xs={12}>
                   <Button block type="default" onClick={() => closeModal(false)}>
@@ -1489,6 +1491,7 @@ const UploadVideoModal = ({
                           </Col>
                           <Col xs={24}>
                             <Image
+                              loading="lazy"
                               preview={false}
                               src={editedVideo?.thumbnail_url}
                               className={styles.centeredPreview}

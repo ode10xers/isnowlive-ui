@@ -8,7 +8,7 @@ import Routes from 'routes';
 
 import DashboardToggle from 'components/DashboardToggle';
 
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername } from 'utils/url';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -39,7 +39,7 @@ const DashboardHeader = () => {
   return (
     <Row className={styles.headerContainer} gutter={[20, 8]}>
       <Col className={styles.logoWrapper}>
-        <img src={logo} alt="Passion.do" className={styles.logo} />
+        <img loading="lazy" src={logo} alt="Passion.do" className={styles.logo} />
       </Col>
       <Col className={styles.navItemWrapper}>
         <DashboardToggle />

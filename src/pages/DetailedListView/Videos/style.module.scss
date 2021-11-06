@@ -1,6 +1,6 @@
 @import '../../../styles/variables.scss';
 
 .backButton {
-  color : var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
-  border-color : var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
 }

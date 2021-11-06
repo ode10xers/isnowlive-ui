@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popover, List, Card } from 'antd';
+import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popover, List, Grid, Card } from 'antd';
 import { EditTwoTone, UpOutlined, DownOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -11,7 +11,6 @@ import Table from 'components/Table';
 import CreateCouponModal from 'components/CreateCouponModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
 import { couponTypes } from 'utils/constants';
@@ -20,8 +19,10 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+const { useBreakpoint } = Grid;
 
 const Coupons = () => {
+  const { lg } = useBreakpoint();
   const [isLoading, setIsLoading] = useState([]);
   const [coupons, setCoupons] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -434,7 +435,7 @@ const Coupons = () => {
           <Collapse defaultActiveKey="Published">
             <Panel header={<Title level={5}> Published </Title>} key="Published">
               {coupons?.length ? (
-                isMobileDevice ? (
+                !lg ? (
                   <Loader loading={isLoading} size="large" text="Loading coupons">
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
@@ -467,7 +468,7 @@ const Coupons = () => {
             </Panel>
             <Panel header={<Title level={5}> Unpublished </Title>} key="Unpublished">
               {coupons?.length ? (
-                isMobileDevice ? (
+                !lg ? (
                   <Loader loading={isLoading} size="large" text="Loading coupons">
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>

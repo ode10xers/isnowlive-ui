@@ -14,16 +14,15 @@ import PassesListItem from 'components/DynamicProfileComponents/PassesProfileCom
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
+import { getUsernameFromUrl } from 'utils/url';
+import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { videoSourceType, reservedDomainName } from 'utils/constants';
 import {
-  isAPISuccess,
-  preventDefaults,
-  videoSourceType,
-  getUsernameFromUrl,
-  reservedDomainName,
+  generateColorPalletteForProfile,
+  getNewProfileUIMaxWidth,
   isBrightColorShade,
   convertHexToRGB,
-} from 'utils/helper';
+} from 'utils/colors';
 
 import styles from './style.module.scss';
 
@@ -216,7 +215,7 @@ const VideoDetailPreview = ({ match, history }) => {
                 {/* Video Thumbnail */}
                 <Col xs={24}>
                   <div className={styles.videoImageContainer}>
-                    <Image preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
+                    <Image loading="lazy" preview={false} src={videoData.thumbnail_url} className={styles.videoImage} />
                   </div>
                 </Col>
 

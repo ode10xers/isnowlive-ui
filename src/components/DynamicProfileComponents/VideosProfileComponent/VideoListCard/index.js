@@ -3,9 +3,10 @@ import React from 'react';
 import { Card, Typography, Image, Row, Space, Col } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
 
-import { isValidFile, preventDefaults, videoSourceType } from 'utils/helper';
-import { redirectToVideosPage } from 'utils/redirect';
 import dateUtil from 'utils/date';
+import { videoSourceType } from 'utils/constants';
+import { redirectToVideosPage } from 'utils/redirect';
+import { isValidFile, preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 

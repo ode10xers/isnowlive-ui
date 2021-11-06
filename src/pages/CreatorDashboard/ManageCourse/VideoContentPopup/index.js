@@ -9,7 +9,8 @@ import Routes from 'routes';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal, resetBodyStyle } from 'components/Modals/modals';
 
-import { isAPISuccess, preventDefaults, videoSourceType } from 'utils/helper';
+import { videoSourceType } from 'utils/constants';
+import { isAPISuccess, preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -103,6 +104,7 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
       <Row gutter={[12, 12]} className={styles.contentPopupItem}>
         <Col xs={24} md={10}>
           <Image
+            loading="lazy"
             src={video.thumbnail_url || 'error'}
             alt={video.title}
             fallback={DefaultImage()}

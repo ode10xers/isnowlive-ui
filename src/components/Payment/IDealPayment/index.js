@@ -6,12 +6,12 @@ import { Row, Col, Form, Input, Button, Spin } from 'antd';
 import { showErrorModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
+import { orderType } from 'utils/constants';
 import { createPaymentSessionForOrder, generateRedirectUrlForStripe } from 'utils/payment';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import { orderType } from 'utils/helper';
 
 const useOptions = () => {
   const options = useMemo(

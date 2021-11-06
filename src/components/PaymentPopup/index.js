@@ -22,19 +22,17 @@ import {
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { paymentProvider } from 'utils/constants';
+import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
+import { isAPISuccess, isInCreatorDashboard, isUnapprovedUserError } from 'utils/helper';
 import {
   orderType,
   productType as productTypeConstants,
   paymentSource,
-  isAPISuccess,
-  isUnapprovedUserError,
-  getUsernameFromUrl,
+  paymentProvider,
   reservedDomainName,
-  isInCreatorDashboard,
-} from 'utils/helper';
+} from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -312,8 +310,8 @@ const PaymentPopup = () => {
     return result;
   };
 
-  // TODO: Adjust the popup behavior here to prevent double popup
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
+    // NOTE : is_successful_order can also be false if the product is a free product
     if (orderResponse && orderResponse?.is_successful_order) {
       if (verifyOrderRes === orderType.PASS) {
         /*

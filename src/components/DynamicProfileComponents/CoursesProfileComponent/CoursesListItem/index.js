@@ -4,8 +4,9 @@ import classNames from 'classnames';
 import { Card, Typography, Image, Row, Col } from 'antd';
 
 import dateUtil from 'utils/date';
-import { courseType, isValidFile, preventDefaults } from 'utils/helper';
+import { courseType } from 'utils/constants';
 import { redirectToCoursesPage } from 'utils/redirect';
+import { isValidFile, preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -21,6 +22,7 @@ const CourseListItem = ({ course }) => {
     <div className={styles.courseCoverContainer}>
       <div className={styles.courseImageContainer}>
         <Image
+          loading="lazy"
           preview={false}
           className={styles.courseImage}
           src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
