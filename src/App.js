@@ -74,6 +74,7 @@ const PluginPages = lazy(() => import('pages/PluginPages'));
 const PaymentPopup = lazy(() => import('components/PaymentPopup'));
 const WaitlistRegisterPopup = lazy(() => import('components/WaitlistRegisterPopup'));
 const SendCustomerEmailModal = lazy(() => import('components/SendCustomerEmailModal'));
+const PostMessageHandlers = lazy(() => import('components/PostMessageHandlers'));
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -246,6 +247,7 @@ function App() {
       <WaitlistRegisterPopup />
       {userDetails && userDetails.is_creator && <SendCustomerEmailModal />}
       <Router>
+        <PostMessageHandlers />
         {isWidget && isReadyToLoad && publishedWidgets.includes(widgetType) ? (
           <EmbeddablePage widget={widgetType} />
         ) : (

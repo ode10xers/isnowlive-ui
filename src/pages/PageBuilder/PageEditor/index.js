@@ -205,6 +205,8 @@ const PageEditor = ({ match, history }) => {
             const reactRootElement = document.getElementById('root');
             const portalContainer = document.createElement('div');
 
+            portalContainer.id = 'page-portal';
+
             editorElements.forEach((el) => {
               portalContainer.appendChild(el);
             });

@@ -103,3 +103,15 @@ export const productType = {
 export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export const reservedDomainName = ['app', ...(process.env.NODE_ENV === 'development' ? ['localhost'] : [])];
+
+export const postMessageCommands = {
+  ACTION: {
+    PREFIX: 'action:',
+    LOGIN_DASHBOARD: 'login_dashboard',
+    LOGIN_NOTICE: 'login_notice',
+  },
+  RESPONSE: {
+    PREFIX: 'response:',
+    USER_DETAILS: 'user_details',
+  },
+};

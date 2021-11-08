@@ -1,52 +1,52 @@
-// import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
+import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
 
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 
 // NOTE: In this case, the header is completely uninteractable (except selecting)
 export default (editor) => {
-  // editor.Components.addType('SignInButton', {
-  //   extend: 'react-component',
-  //   model: {
-  //     defaults: {
-  //       component: SignInButton,
-  //       stylable: false,
-  //       resizable: false,
-  //       editable: false,
-  //       droppable: false,
-  //       draggable: false,
-  //       removable: false,
-  //       highlightable: false,
-  //       hoverable: false,
-  //       copyable: false,
-  //       attributes: {
-  //         target: 'dashboard',
-  //         buttonType : 'primary',
-  //       },
-  //       traits: [
-  //         {
-  //           type: 'select',
-  //           label: 'After Login',
-  //           name: 'target',
-  //           options: [
-  //             { id : 'dashboard', name: 'Go to Dashboard' },
-  //             { id : 'current', name: 'Stay in page' },
-  //           ],
-  //         },
-  //         {
-  //           type: 'select',
-  //           label: 'Button Type',
-  //           name: 'buttonType',
-  //           options: [
-  //             { id : 'primary', name: 'Filled' },
-  //             { id : 'outline', name: 'Outlined' },
-  //             { id : 'link', name : 'Link Text' },
-  //           ],
-  //         },
-  //       ],
-  //     },
-  //   },
-  //   isComponent: (el) => el.tagName === 'SIGNINBUTTON',
-  // });
+  editor.Components.addType('SignInButton', {
+    extend: 'react-component',
+    model: {
+      defaults: {
+        component: SignInButton,
+        stylable: false,
+        resizable: false,
+        editable: false,
+        droppable: false,
+        draggable: false,
+        removable: false,
+        highlightable: false,
+        hoverable: false,
+        copyable: false,
+        attributes: {
+          target: 'current',
+          buttonType: 'primary',
+        },
+        traits: [
+          {
+            type: 'select',
+            label: 'After Login',
+            name: 'target',
+            options: [
+              { id: 'dashboard', name: 'Go to Dashboard' },
+              { id: 'current', name: 'Stay in page' },
+            ],
+          },
+          {
+            type: 'select',
+            label: 'Button Type',
+            name: 'buttonType',
+            options: [
+              { id: 'primary', name: 'Filled' },
+              { id: 'outline', name: 'Outlined' },
+              { id: 'link', name: 'Link Text' },
+            ],
+          },
+        ],
+      },
+    },
+    isComponent: (el) => el.tagName === 'SIGNINBUTTON',
+  });
 
   editor.Components.addType('header-brand', {
     model: {
@@ -191,6 +191,9 @@ export default (editor) => {
         components: [
           {
             type: 'header-brand',
+          },
+          {
+            type: 'SignInButton',
           },
         ],
         styles: `

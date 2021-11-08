@@ -1,49 +1,51 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
-import { Button, message } from 'antd';
-
-import Routes from 'routes';
-
-import AuthModal from 'components/AuthModal';
+import { Button } from 'antd';
+import { AppstoreOutlined } from '@ant-design/icons';
 
 import { getLocalUserDetails } from 'utils/storage';
+import { isValidPostMessageEvent, postMessageToWindow } from 'utils/postMessage';
+import { postMessageCommands } from 'utils/constants';
 
 const SignInButton = ({ target = 'dashboard', buttonType = 'primary' }) => {
-  const history = useHistory();
+  const [userDetails, setUserDetails] = useState(null);
 
-  const [authModalVisible, setAuthModalVisible] = useState(false);
+  useEffect(() => {
+    const userCreds = getLocalUserDetails();
 
-  const showAuthModal = () => {
-    setAuthModalVisible(true);
-  };
-
-  const closeAuthModal = () => {
-    setAuthModalVisible(false);
-  };
-
-  const redirectToDashboard = () => {
-    const user_type = getLocalUserDetails()?.is_creator ? 'creatorDashboard' : 'attendeeDashboard';
-    history.push(`${Routes[user_type].rootPath}${Routes[user_type].defaultPath}`);
-  };
-
-  const handleLoggedIn = () => {
-    if (target === 'dashboard') {
-      redirectToDashboard();
+    if (userCreds) {
+      setUserDetails(userCreds);
     } else {
-      message.success('You are now logged in!');
+      window.addEventListener('message', (e) => {
+        if (isValidPostMessageEvent(e)) {
+          const { command = '', details = null } = e.data;
+
+          if (
+            command === `${postMessageCommands.RESPONSE.PREFIX}${postMessageCommands.RESPONSE.USER_DETAILS}` &&
+            details
+          ) {
+            setUserDetails(details);
+          }
+        }
+      });
     }
+  }, []);
+
+  const postLoginMessage = (redirect = false) => {
+    const command =
+      postMessageCommands.ACTION.PREFIX +
+      (redirect ? postMessageCommands.ACTION.LOGIN_DASHBOARD : postMessageCommands.ACTION.LOGIN_NOTICE);
+    postMessageToWindow(command);
   };
 
   return (
     <div>
-      <AuthModal visible={authModalVisible} closeModal={closeAuthModal} onLoggedInCallback={handleLoggedIn} />
-      {getLocalUserDetails() ? (
-        <Button type={buttonType ?? 'primary'} onClick={redirectToDashboard}>
+      {userDetails ? (
+        <Button type={buttonType ?? 'primary'} onClick={() => postLoginMessage(true)} icon={<AppstoreOutlined />}>
           My Dashboard
         </Button>
       ) : (
-        <Button type={buttonType ?? 'primary'} onClick={showAuthModal}>
+        <Button type={buttonType ?? 'primary'} onClick={() => postLoginMessage(target === 'dashboard')}>
           Sign In
         </Button>
       )}
