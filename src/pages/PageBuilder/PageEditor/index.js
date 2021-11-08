@@ -185,13 +185,24 @@ const PageEditor = ({ match, history }) => {
   // Test loading template
   useEffect(() => {
     if (gjsEditor) {
-      gjsEditor.load();
-
-      gjsEditor.addComponents({
-        type: 'navbar-header',
-      });
-
       if (isPublicPage) {
+        const headerComponents = localStorage.getItem('gjs-header-components');
+        const headerStyles = localStorage.getItem('gjs-header-styles');
+        const pageComponents = localStorage.getItem('gjs-components');
+        const pageStyles = localStorage.getItem('gjs-styles');
+
+        console.log({
+          headerComponents,
+          headerStyles,
+          pageComponents,
+          pageStyles,
+        });
+
+        gjsEditor.loadData({
+          components: [...JSON.parse(headerComponents), ...JSON.parse(pageComponents)],
+          styles: [...JSON.parse(headerStyles), ...JSON.parse(pageStyles)],
+        });
+
         gjsEditor.onReady(() => {
           // Previously what we do is try to render everything inside the iframe
           // of the editor, but it might cause some issues when integrating
@@ -217,6 +228,7 @@ const PageEditor = ({ match, history }) => {
           setIsLoading(false);
         });
       } else {
+        gjsEditor.load();
         setIsLoading(false);
       }
     }

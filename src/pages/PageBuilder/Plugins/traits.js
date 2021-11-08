@@ -44,7 +44,7 @@ export default (editor) => {
     // Update elements on the component change
     onUpdate({ elInput, component }) {
       const componentStyle = component.getStyle();
-      const padding = componentStyle['padding'] ?? '20px';
+      const padding = componentStyle['padding'] ?? '8px';
       const sliderInput = elInput.querySelector('#padding-slider');
       sliderInput.value = padding.replace('px', '');
       const valueText = elInput.querySelector('#padding-slider-value');

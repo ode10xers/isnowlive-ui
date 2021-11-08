@@ -9,15 +9,14 @@ import grapesjs from 'grapesjs';
 import config from 'config/index.js';
 
 // These are to be put as part of the config
-import definedBlocks from './Configs/blocks.js';
-import definedPanels from './Configs/panels.js';
+import definedBlocks from '../Configs/blocks.js';
+import definedPanels from '../Configs/panels.js';
 
 // THese are to be put in plugins
-import CustomTraits from './Plugins/traits';
-import CustomCommands from './Plugins/commands';
-import ReactComponentHandler from './ReactComponentHandler';
-import LinkButton from './CustomComponents/LinkButton.js';
-import Header from './CustomComponents/Header.js';
+import CustomTraits from '../Plugins/traits';
+import CustomCommands from '../Plugins/commands';
+import ReactComponentHandler from '../ReactComponentHandler';
+import Header from '../CustomComponents/Header.js';
 
 import { googleFonts } from 'utils/constants.js';
 import { getLocalUserDetails } from 'utils/storage.js';
@@ -35,27 +34,24 @@ const HeaderEditor = ({ match, history }) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
+    // TODO: Might need to modify a little bit of the config (for security)
+    // When rendering in public [age]
     const editor = grapesjs.init({
       // Indicate where to init the editor. You can also pass an HTMLElement
       container: '#builder-editor',
       // Get the content for the canvas directly from the element
       // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
       // fromElement: true,
-      components: [
-        {
-          type: 'navbar-header',
-        },
-      ],
       // Size of the editor
       noticeOnUnload: true,
       height: '100vh',
       width: 'auto',
       showOffsetsSelected: true,
       storageManager: {
-        id: 'gjs-', // Prefix identifier that will be used on parameters
+        id: 'gjs-header-', // Prefix identifier that will be used on parameters
         type: 'local', // Type of the storage
         autosave: true, // Store data automatically
-        autoload: false, // Autoload stored data on init
+        autoload: true, // Autoload stored data on init
         stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
       },
       assetManager: {
@@ -100,7 +96,17 @@ const HeaderEditor = ({ match, history }) => {
           },
         ],
       },
-      plugins: [Header, ReactComponentHandler, CustomCommands, CustomTraits, LinkButton],
+      plugins: [
+        ReactComponentHandler,
+        // PassionSessionList,
+        // PassionPassList,
+        // TextSection,
+        // TextWithImageSection,
+        // LinkButton,
+        Header,
+        CustomCommands,
+        CustomTraits,
+      ],
     });
 
     // Loading external script and running certain logic
@@ -125,6 +131,16 @@ const HeaderEditor = ({ match, history }) => {
       })(document);
     `;
     iframeHead.appendChild(libScript);
+
+    // Hacky way of copying styles to the iframe inside
+    // Not sure if this will work dynamically or not
+    const iframeEl = editor.Canvas.getWindow();
+    const styleEls = iframeEl.parent.document.querySelectorAll('style');
+    if (styleEls.length) {
+      styleEls.forEach((el) => {
+        iframeEl.document.head.appendChild(el.cloneNode(true));
+      });
+    }
 
     //#region Start of Asset Listener Definition
     // The upload is started
@@ -155,10 +171,10 @@ const HeaderEditor = ({ match, history }) => {
     initializeGrapesJSEditor();
   }, [initializeGrapesJSEditor]);
 
-  // Test loading template
   useEffect(() => {
     if (gjsEditor) {
       gjsEditor.load();
+      gjsEditor.addComponents([{ type: 'navbar-header' }]);
       setIsLoading(false);
     }
   }, [gjsEditor]);
