@@ -52,7 +52,6 @@ const PostMessageHandlers = () => {
       }
 
       const { command = '', details = null } = msgEvent.data;
-      console.log(details);
 
       switch (command) {
         case `${postMessageCommands.ACTION.PREFIX}${postMessageCommands.ACTION.LOGIN_DASHBOARD}`:

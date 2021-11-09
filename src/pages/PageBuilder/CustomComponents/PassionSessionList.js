@@ -7,7 +7,7 @@ export default (editor) => {
     model: {
       defaults: {
         component: PassionSessionList,
-        styleable: false,
+        stylable: false,
         resizable: false,
         editable: false,
         droppable: false,
@@ -21,7 +21,16 @@ export default (editor) => {
           layout: layouts.GRID,
           // padding: 20,
         },
-        traits: [],
+        traits: [
+          {
+            type: 'select',
+            name: 'layout',
+            options: Object.entries(layouts).map(([key, val]) => ({
+              id: val,
+              name: key,
+            })),
+          },
+        ],
         // traits: [
         //   {
         //     type: 'number',

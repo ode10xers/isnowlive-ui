@@ -81,9 +81,9 @@ const PageEditor = ({ match, history }) => {
       // },
       // Built-in props for styles
       // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
-      // styleManager: {
-      //   sectors: stylePanelSectors,
-      // },
+      styleManager: {
+        sectors: [],
+      },
       blockManager: {
         blocks: definedBlocks,
       },
