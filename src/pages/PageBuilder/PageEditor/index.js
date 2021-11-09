@@ -11,18 +11,18 @@ import config from 'config/index.js';
 
 // These are to be put as part of the config
 import definedBlocks from '../Configs/blocks.js';
-import definedPanels from '../Configs/panels.js';
+// import definedPanels from '../Configs/panels.js';
 
 // THese are to be put in plugins
-import CustomTraits from '../Plugins/traits';
+// import CustomTraits from '../Plugins/traits';
 import CustomCommands from '../Plugins/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
-import TextSection from '../CustomComponents/TextSection.js';
-import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
+// import TextSection from '../CustomComponents/TextSection.js';
+// import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
+// import LinkButton from '../CustomComponents/LinkButton.js';
+// import SignInButton from '../CustomComponents/SignInButton.js';
 import PassionSessionList from '../CustomComponents/PassionSessionList.js';
 import PassionPassList from '../CustomComponents/PassionPassList.js';
-import LinkButton from '../CustomComponents/LinkButton.js';
-// import SignInButton from '../CustomComponents/SignInButton.js';
 import Header from '../CustomComponents/Header.js';
 
 import { googleFonts } from 'utils/constants.js';
@@ -106,7 +106,6 @@ const PageEditor = ({ match, history }) => {
         ],
       },
       plugins: [
-        // SignInButton,
         'gjs-preset-webpage',
         ReactComponentHandler,
         PassionSessionList,
@@ -116,7 +115,8 @@ const PageEditor = ({ match, history }) => {
         // TextSection,
         // TextWithImageSection,
         // LinkButton,
-        // Header,
+        // SignInButton,
+        Header,
       ],
       pluginOpts: {
         'gjs-preset-webpage': {
@@ -161,7 +161,7 @@ const PageEditor = ({ match, history }) => {
     // Not sure if this will work dynamically or not
     const iframeEl = editor.Canvas.getWindow();
     if (!previewOn) {
-      const styleEls = iframeEl.parent.document.querySelectorAll('style');
+      const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet']");
       if (styleEls.length) {
         styleEls.forEach((el) => {
           iframeEl.document.head.appendChild(el.cloneNode(true));

@@ -21,6 +21,7 @@ export default (editor) => {
           layout: layouts.GRID,
           // padding: 20,
         },
+        traits: [],
         // traits: [
         //   {
         //     type: 'number',
