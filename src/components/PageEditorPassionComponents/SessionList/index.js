@@ -88,9 +88,9 @@ const SessionList = ({ layout = layouts.GRID, padding = 8 }) => {
 
   const renderSessionCards = (session) => (
     <Col
-      xs={isGrid ? 24 : 18}
-      md={isGrid ? 12 : 8}
-      lg={isGrid ? 8 : 5}
+      xs={isGrid ? 24 : 14}
+      md={isGrid ? 12 : 10}
+      lg={isGrid ? 8 : 9}
       key={`${session.session_external_id}_${session?.inventory_id ?? session?.session_id}`}
     >
       <SessionListCard session={session} />
@@ -107,20 +107,6 @@ const SessionList = ({ layout = layouts.GRID, padding = 8 }) => {
         {sessions.length > 0 ? (
           <Row gutter={[8, 8]} className={isGrid ? undefined : styles.sessionListContainer}>
             {sessions.map(renderSessionCards)}
-            {/* {sessions.slice(0, limit).map(renderSessionCards)}
-        {sessions?.length > limit && (
-          <Col xs={isGrid ? 24 : 18} md={isGrid ? 12 : 8} className={styles.fadedItemContainer}>
-            <div className={styles.fadedOverlay}>
-              <div className={styles.seeMoreButton} onClick={handleMoreClicked}>
-                <BarsOutlined className={styles.seeMoreIcon} />
-                SEE MORE
-              </div>
-            </div>
-            <div className={styles.fadedItem}>
-              <SessionListCard session={sessions[limit]} />
-            </div>
-          </Col>
-        )} */}
           </Row>
         ) : (
           <Empty description="No sessions found" />

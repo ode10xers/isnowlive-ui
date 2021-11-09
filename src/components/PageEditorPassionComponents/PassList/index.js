@@ -40,7 +40,7 @@ const PassList = ({ layout = layouts.GRID, padding = 8 }) => {
   }, [fetchCreatorPasses]);
 
   const renderPassListItems = (pass) => (
-    <Col xs={12} md={8} lg={isGrid ? 8 : 5} key={pass.external_id}>
+    <Col xs={isGrid ? 12 : 10} md={isGrid ? 8 : 9} lg={isGrid ? 8 : 5} key={pass.external_id}>
       <PassesListItem pass={pass} />
     </Col>
   );

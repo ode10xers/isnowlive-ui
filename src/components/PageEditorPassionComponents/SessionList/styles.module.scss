@@ -1,11 +1,9 @@
 @import '../../../styles/variables.scss';
 
 .sessionListContainer {
-  @media screen and (max-width: 767px) {
-    flex-flow: row nowrap !important;
-    overflow-x: scroll;
-    padding-bottom: 6px !important;
-  }
+  flex-flow: row nowrap !important;
+  overflow-x: scroll;
+  padding-bottom: 6px !important;
 
   &::-webkit-scrollbar {
     height: 10px;
