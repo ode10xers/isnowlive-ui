@@ -4,6 +4,7 @@ import { Spin } from 'antd';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
+import 'grapesjs-preset-webpage';
 import grapesjs from 'grapesjs';
 
 import config from 'config/index.js';
@@ -74,7 +75,7 @@ const PageEditor = ({ match, history }) => {
       },
       keepUnusedStyles: false,
       // Avoid any default panel
-      panels: definedPanels,
+      // panels: definedPanels,
       // selectorManager: {
       //   componentFirst: true,
       // },
@@ -106,16 +107,31 @@ const PageEditor = ({ match, history }) => {
       },
       plugins: [
         // SignInButton,
+        'gjs-preset-webpage',
         ReactComponentHandler,
         PassionSessionList,
         PassionPassList,
         CustomCommands,
-        CustomTraits,
-        TextSection,
-        TextWithImageSection,
-        LinkButton,
-        Header,
+        // CustomTraits,
+        // TextSection,
+        // TextWithImageSection,
+        // LinkButton,
+        // Header,
       ],
+      pluginOpts: {
+        'gjs-preset-webpage': {
+          modalImportLabel: 'This is the data format that will be saved',
+          modalImportButton: 'Save',
+          modalImportContent: (editor) => {
+            return JSON.stringify({
+              html: editor.getHtml(),
+              css: editor.getCss(),
+              components: editor.getComponents(),
+              styles: editor.getStyle(),
+            });
+          },
+        },
+      },
     });
 
     // Loading external script and running certain logic

@@ -19,7 +19,7 @@ export default (editor) => {
         copyable: true,
         attributes: {
           layout: layouts.GRID,
-          padding: 20,
+          // padding: 20,
         },
         traits: [
           {
@@ -30,11 +30,11 @@ export default (editor) => {
               name: key,
             })),
           },
-          {
-            type: 'number',
-            label: 'Padding',
-            name: 'padding',
-          },
+          // {
+          //   type: 'number',
+          //   label: 'Padding',
+          //   name: 'padding',
+          // },
         ],
       },
     },

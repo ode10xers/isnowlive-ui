@@ -7,7 +7,7 @@ export default (editor) => {
     model: {
       defaults: {
         component: PassionSessionList,
-        stylable: false,
+        styleable: false,
         resizable: false,
         editable: false,
         droppable: false,
@@ -19,15 +19,15 @@ export default (editor) => {
         copyable: true,
         attributes: {
           layout: layouts.GRID,
-          padding: 20,
+          // padding: 20,
         },
-        traits: [
-          {
-            type: 'number',
-            label: 'Padding',
-            name: 'padding',
-          },
-        ],
+        // traits: [
+        //   {
+        //     type: 'number',
+        //     label: 'Padding',
+        //     name: 'padding',
+        //   },
+        // ],
       },
     },
     isComponent: (el) => el.tagName === 'PASSIONSESSIONLIST',

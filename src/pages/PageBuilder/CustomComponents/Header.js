@@ -42,6 +42,9 @@ export default (editor) => {
               { id: 'link', name: 'Link Text' },
             ],
           },
+          // {
+          //   type: 'link-button-list',
+          // }
         ],
       },
     },

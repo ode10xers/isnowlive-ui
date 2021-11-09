@@ -7,6 +7,7 @@ export default (editor) => {
         tagName: 'div',
         name: 'Text Section',
         droppable: false,
+        active: true,
         attributes: {
           layout: 'left',
           class: 'text-section-container',

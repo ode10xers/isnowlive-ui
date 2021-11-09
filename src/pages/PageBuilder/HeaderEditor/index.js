@@ -173,8 +173,13 @@ const HeaderEditor = ({ match, history }) => {
 
   useEffect(() => {
     if (gjsEditor) {
-      gjsEditor.load();
-      gjsEditor.addComponents([{ type: 'navbar-header' }]);
+      const headerData = localStorage.getItem('gjs-header-components');
+
+      if (headerData) {
+        gjsEditor.load();
+      } else {
+        gjsEditor.addComponents([{ type: 'navbar-header' }]);
+      }
       setIsLoading(false);
     }
   }, [gjsEditor]);

@@ -5,13 +5,13 @@ export default (editor) => {
     // Expects as return a simple HTML string or an HTML element
     noLabel: true,
     templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Padding
+      <div class="custom-trait-layout">
+        <div class="custom-trait-label">
+          Padding
+        </div>
+        <div class="custom-trait-input" data-input>
+        </div>
       </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
     `,
     createInput({ trait }) {
       // Create a new element container and add some content
@@ -489,6 +489,41 @@ export default (editor) => {
       inputType.value = brandType;
 
       inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('link-button-list', {
+    noLabel: true,
+    templateInput: `
+    <div class="custom-trait-layout">
+    <div class="custom-trait-label">
+      Navigation Links
+    </div>
+    <div class="custom-trait-input" data-input>
+    </div>
+  </div>
+    `,
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['button-list-container']);
+
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const inputType = elInput.querySelector('.button-list-container');
+
+      component.set({
+        'brand-type': inputType.value ?? 'text',
+      });
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const componentList = component.components() ?? [];
+      const containerEl = elInput.querySelector('.button-list-container');
+
+      // inputType.dispatchEvent(new CustomEvent('change'));
     },
   });
 };

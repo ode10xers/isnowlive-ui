@@ -6,7 +6,7 @@ const redo = 'core:redo';
 
 // const swv = 'sw-visibility';
 const expt = 'export-template';
-// const osm = 'open-sm';
+const osm = 'open-sm';
 const otm = 'open-tm';
 const ola = 'open-layers';
 const obl = 'open-blocks';
@@ -133,21 +133,20 @@ export default {
     {
       id: 'views',
       buttons: [
-        // {
-        //   id: osm,
-        //   className: 'fa fa-paint-brush',
-        //   command: osm,
-        //   active: true,
-        //   togglable: 0,
-        //   attributes: { title: 'Open Style Manager' }
-        // },
         {
-          id: otm,
-          className: 'fa fa-cog',
-          command: otm,
+          id: osm,
+          className: 'fa fa-paint-brush',
+          command: osm,
           togglable: 0,
-          attributes: { title: 'Settings' },
+          attributes: { title: 'Open Style Manager' },
         },
+        // {
+        //   id: otm,
+        //   className: 'fa fa-cog',
+        //   command: otm,
+        //   togglable: 0,
+        //   attributes: { title: 'Settings' },
+        // },
         {
           id: ola,
           className: 'fa fa-bars',
@@ -159,6 +158,7 @@ export default {
           id: obl,
           className: 'fa fa-th-large',
           command: obl,
+          active: true,
           togglable: 0,
           attributes: { title: 'Open Blocks' },
         },

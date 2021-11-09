@@ -21,6 +21,7 @@
     "emailjs-addressparser": "^2.0.2",
     "env-cmd": "^10.1.0",
     "grapesjs": "0.17.27",
+    "grapesjs-preset-webpage": "^0.1.11",
     "history": "^5.0.0",
     "html-react-parser": "^0.14.0",
     "html-to-draftjs": "^1.5.0",

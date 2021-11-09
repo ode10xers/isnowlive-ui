@@ -40,26 +40,6 @@ const categories = {
 
 export default [
   {
-    id: 'text-section',
-    label: '<b> Text Section </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'text-section',
-    },
-  },
-  {
-    id: 'text-with-image',
-    label: '<b> Text with Image </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'text-with-image-section',
-    },
-  },
-  {
     id: 'PassionSessionList',
     label: '<b> Passion Sessions List </b>',
     droppable: false,
@@ -79,14 +59,34 @@ export default [
       type: 'PassionPassList',
     },
   },
-  {
-    id: 'link-buttons',
-    label: '<b> Button </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.SIMPLE_COMPONENTS,
-    content: {
-      type: 'link-buttons',
-    },
-  },
+  // {
+  //   id: 'text-section',
+  //   label: '<b> Text Section </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.LAYOUTS,
+  //   content: {
+  //     type: 'text-section',
+  //   },
+  // },
+  // {
+  //   id: 'text-with-image',
+  //   label: '<b> Text with Image </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.LAYOUTS,
+  //   content: {
+  //     type: 'text-with-image-section',
+  //   },
+  // },
+  // {
+  //   id: 'link-buttons',
+  //   label: '<b> Button </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.SIMPLE_COMPONENTS,
+  //   content: {
+  //     type: 'link-buttons',
+  //   },
+  // },
 ];

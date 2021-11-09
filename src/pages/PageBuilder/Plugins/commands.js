@@ -1,3 +1,5 @@
+import { message } from 'antd';
+
 const supportedDeviceTypes = [
   {
     cmd: 'set-device-desktop',
@@ -14,10 +16,19 @@ const supportedDeviceTypes = [
 ];
 
 export default (editor) => {
-  supportedDeviceTypes.forEach((devType) => {
-    editor.Commands.add(devType.cmd, {
-      run: (editor) => editor.setDevice(devType.name),
-    });
+  // Override import command
+  editor.Commands.add('gjs-open-import-webpage', {
+    run: (editor) => {
+      const templateData = {
+        html: editor.getHtml(),
+        css: editor.getCss(),
+        components: JSON.stringify(editor.getComponents()),
+        styles: JSON.stringify(editor.getStyle()),
+      };
+
+      editor.StorageManager.store(templateData);
+      message.success('Saved successfully!');
+    },
   });
 
   // Make use of StoreManagerAPI to actually store things
@@ -30,9 +41,14 @@ export default (editor) => {
         styles: JSON.stringify(editor.getStyle()),
       };
 
-      console.log(templateData);
       editor.StorageManager.store(templateData);
     },
+  });
+
+  supportedDeviceTypes.forEach((devType) => {
+    editor.Commands.add(devType.cmd, {
+      run: (editor) => editor.setDevice(devType.name),
+    });
   });
 
   editor.Commands.add('set-image-url', {
