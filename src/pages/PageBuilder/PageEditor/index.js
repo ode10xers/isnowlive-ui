@@ -32,6 +32,7 @@ import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
+import PassionVideoList from '../CustomComponents/PassionVideoList.js';
 
 const PageEditor = ({ match, history }) => {
   const isPublicPage = match.path.includes('page');
@@ -100,7 +101,7 @@ const PageEditor = ({ match, history }) => {
           },
           {
             name: 'Mobile',
-            width: '576px', // this value will be used on canvas width
+            width: '426px', // this value will be used on canvas width
             widthMedia: '576px', // this value will be used in CSS @media
           },
         ],
@@ -108,6 +109,7 @@ const PageEditor = ({ match, history }) => {
       plugins: [
         'gjs-preset-webpage',
         ReactComponentHandler,
+        PassionVideoList,
         PassionSessionList,
         PassionPassList,
         CustomCommands,

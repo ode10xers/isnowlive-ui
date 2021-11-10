@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Empty, Spin } from 'antd';
+import { Row, Col, Empty, Spin, message } from 'antd';
 
 import apis from 'apis';
 import layouts from '../layouts';
@@ -30,6 +30,7 @@ const PassList = ({ layout = layouts.GRID, padding = 8 }) => {
       }
     } catch (error) {
       console.error(error);
+      message.error('Failed fetching passes data');
     }
 
     setIsLoading(false);
@@ -53,7 +54,7 @@ const PassList = ({ layout = layouts.GRID, padding = 8 }) => {
     >
       <Spin spinning={isLoading} tip="Fetching passes data...">
         {passes.length > 0 ? (
-          <Row gutter={[8, 8]} className={isGrid ? undefined : styles.passListContainer}>
+          <Row gutter={[8, 8]} className={isGrid ? undefined : styles.horizontalScrollableListContainer}>
             {passes.map(renderPassListItems)}
           </Row>
         ) : (

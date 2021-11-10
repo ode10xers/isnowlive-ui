@@ -20,7 +20,7 @@ const {
 
 const VideoListCard = ({ video, handleClick = null }) => {
   const videoDuration = (
-    <Space size={4} align="middle">
+    <Space size={4} align="center">
       <PlayCircleOutlined className={styles.textIcons} />
       {video.source === videoSourceType.CLOUDFLARE ? (
         <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>

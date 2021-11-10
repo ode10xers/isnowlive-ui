@@ -88,7 +88,7 @@ const SessionList = ({ layout = layouts.GRID, padding = 8 }) => {
 
   const renderSessionCards = (session) => (
     <Col
-      xs={isGrid ? 24 : 14}
+      xs={isGrid ? 24 : 20}
       md={isGrid ? 12 : 10}
       lg={isGrid ? 8 : 9}
       key={`${session.session_external_id}_${session?.inventory_id ?? session?.session_id}`}
@@ -105,7 +105,7 @@ const SessionList = ({ layout = layouts.GRID, padding = 8 }) => {
     >
       <Spin spinning={isLoading} tip="Fetching sessions data...">
         {sessions.length > 0 ? (
-          <Row gutter={[8, 8]} className={isGrid ? undefined : styles.sessionListContainer}>
+          <Row gutter={[8, 8]} className={isGrid ? undefined : styles.horizontalScrollableListContainer}>
             {sessions.map(renderSessionCards)}
           </Row>
         ) : (

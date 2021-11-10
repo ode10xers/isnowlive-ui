@@ -50,6 +50,16 @@ export default [
     },
   },
   {
+    id: 'PassionVideoList',
+    label: '<b> Passion Videos List </b>',
+    droppable: false,
+    resizable: false,
+    category: categories.PASSION_COMPONENTS,
+    content: {
+      type: 'PassionVideoList',
+    },
+  },
+  {
     id: 'PassionPassList',
     label: '<b> Passion Passes List </b>',
     droppable: false,
