@@ -60,6 +60,16 @@ export default [
     },
   },
   {
+    id: 'PassionCourseList',
+    label: '<b> Passion Course List </b>',
+    droppable: false,
+    resizable: false,
+    category: categories.PASSION_COMPONENTS,
+    content: {
+      type: 'PassionCourseList',
+    },
+  },
+  {
     id: 'PassionPassList',
     label: '<b> Passion Passes List </b>',
     droppable: false,
