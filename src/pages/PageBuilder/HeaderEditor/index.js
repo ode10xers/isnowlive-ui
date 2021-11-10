@@ -9,13 +9,14 @@ import grapesjs from 'grapesjs';
 import config from 'config/index.js';
 
 // These are to be put as part of the config
-import definedBlocks from '../Configs/blocks.js';
+// import definedBlocks from '../Configs/blocks.js';
 import definedPanels from '../Configs/panels.js';
 
 // THese are to be put in plugins
 import CustomTraits from '../Plugins/traits';
 import CustomCommands from '../Plugins/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
+import LinkButton from '../CustomComponents/LinkButton.js';
 import Header from '../CustomComponents/Header.js';
 
 import { googleFonts } from 'utils/constants.js';
@@ -25,7 +26,6 @@ import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-import LinkButton from '../CustomComponents/LinkButton.js';
 
 const HeaderEditor = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -126,7 +126,7 @@ const HeaderEditor = ({ match, history }) => {
     // Hacky way of copying styles to the iframe inside
     // Not sure if this will work dynamically or not
     const iframeEl = editor.Canvas.getWindow();
-    const styleEls = iframeEl.parent.document.querySelectorAll('style');
+    const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet']");
     if (styleEls.length) {
       styleEls.forEach((el) => {
         iframeEl.document.head.appendChild(el.cloneNode(true));

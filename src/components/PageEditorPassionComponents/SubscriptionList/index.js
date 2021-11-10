@@ -27,7 +27,8 @@ const SubscriptionList = ({ layout = layouts.GRID, padding = 8 }) => {
         setSubscriptions(data.sort((a, b) => a.total_price - b.total_price));
       }
     } catch (error) {
-      console.error('Failed to load subscription details');
+      console.error(error);
+      message.error('Failed to load subscription details');
     }
 
     setIsLoading(false);
