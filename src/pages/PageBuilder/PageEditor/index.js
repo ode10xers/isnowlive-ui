@@ -5,6 +5,7 @@ import { Spin } from 'antd';
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
 import 'grapesjs-preset-webpage';
+import 'grapesjs-blocks-flexbox';
 import grapesjs from 'grapesjs';
 
 import config from 'config/index.js';
@@ -52,6 +53,33 @@ const PageEditor = ({ match, history }) => {
     const editor = grapesjs.init({
       // Indicate where to init the editor. You can also pass an HTMLElement
       container: '#builder-editor',
+      baseCss: `
+    * {
+      box-sizing: border-box;
+    }
+    html, body, [data-gjs-type=wrapper] {
+      min-height: 100%;
+    }
+    body {
+      margin: 0;
+      height: 100%;
+      background-color: #fff
+    }
+    [data-gjs-type=wrapper] {
+      padding: 12px;
+      overflow: auto;
+      overflow-x: hidden;
+    }
+    * ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1)
+    }
+    * ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2)
+    }
+    * ::-webkit-scrollbar {
+      width: 10px
+    }
+  `,
       // Get the content for the canvas directly from the element
       // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
       // fromElement: true,
@@ -111,6 +139,7 @@ const PageEditor = ({ match, history }) => {
       },
       plugins: [
         'gjs-preset-webpage',
+        'gjs-blocks-flexbox',
         ReactComponentHandler,
         PassionSubscriptionList,
         PassionVideoList,
@@ -139,6 +168,21 @@ const PageEditor = ({ match, history }) => {
           },
         },
       },
+    });
+
+    // Modify Wrapper stylability
+    // Initially we can only modify background, but modifying
+    // padding also makes sense
+    const wrapper = editor.getWrapper();
+    wrapper.set({
+      stylable: [
+        ...wrapper.get('stylable'),
+        'padding',
+        'padding-top',
+        'padding-right',
+        'padding-bottom',
+        'padding-left',
+      ],
     });
 
     // Loading external script and running certain logic
