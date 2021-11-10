@@ -34,6 +34,7 @@ import http from 'services/http.js';
 import styles from './style.module.scss';
 import PassionVideoList from '../CustomComponents/PassionVideoList.js';
 import PassionCourseList from '../CustomComponents/PassionCourseList.js';
+import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
 
 const PageEditor = ({ match, history }) => {
   const isPublicPage = match.path.includes('page');
@@ -110,6 +111,7 @@ const PageEditor = ({ match, history }) => {
       plugins: [
         'gjs-preset-webpage',
         ReactComponentHandler,
+        PassionSubscriptionList,
         PassionVideoList,
         PassionCourseList,
         PassionSessionList,

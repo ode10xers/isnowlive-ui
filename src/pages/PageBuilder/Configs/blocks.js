@@ -79,6 +79,16 @@ export default [
       type: 'PassionPassList',
     },
   },
+  {
+    id: 'PassionSubscriptionList',
+    label: '<b> Passion Membership List </b>',
+    droppable: false,
+    resizable: false,
+    category: categories.PASSION_COMPONENTS,
+    content: {
+      type: 'PassionSubscriptionList',
+    },
+  },
   // {
   //   id: 'text-section',
   //   label: '<b> Text Section </b>',

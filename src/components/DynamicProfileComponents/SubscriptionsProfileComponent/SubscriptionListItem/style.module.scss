@@ -27,11 +27,7 @@
     color: var(--ternary-color);
     font-weight: 500;
     display: block;
-    font-size: 20px;
-
-    @media screen and (min-width: 992px) {
-      font-size: 18px;
-    }
+    font-size: 18px;
   }
 
   .contentText {
