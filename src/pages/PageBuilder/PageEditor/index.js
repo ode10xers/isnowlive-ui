@@ -46,7 +46,8 @@ const PageEditor = ({ match, history }) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
-    // TODO: Might need to modify a little bit of the config (for security)
+    // TODO: Export this config and separate it into parts
+    // Since it's also going to be used in HeaderEditor and FooterEditor
     // When rendering in public [age]
     const editor = grapesjs.init({
       // Indicate where to init the editor. You can also pass an HTMLElement
@@ -122,7 +123,7 @@ const PageEditor = ({ match, history }) => {
         // TextWithImageSection,
         // LinkButton,
         // SignInButton,
-        Header,
+        Header, // Needed for Public page rendering
       ],
       pluginOpts: {
         'gjs-preset-webpage': {

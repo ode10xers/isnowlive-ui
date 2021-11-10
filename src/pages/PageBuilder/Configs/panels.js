@@ -133,20 +133,20 @@ export default {
     {
       id: 'views',
       buttons: [
-        {
-          id: osm,
-          className: 'fa fa-paint-brush',
-          command: osm,
-          togglable: 0,
-          attributes: { title: 'Open Style Manager' },
-        },
         // {
-        //   id: otm,
-        //   className: 'fa fa-cog',
-        //   command: otm,
+        //   id: osm,
+        //   className: 'fa fa-paint-brush',
+        //   command: osm,
         //   togglable: 0,
-        //   attributes: { title: 'Settings' },
+        //   attributes: { title: 'Open Style Manager' },
         // },
+        {
+          id: otm,
+          className: 'fa fa-cog',
+          command: otm,
+          togglable: 0,
+          attributes: { title: 'Settings' },
+        },
         {
           id: ola,
           className: 'fa fa-bars',

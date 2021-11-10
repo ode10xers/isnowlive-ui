@@ -190,7 +190,13 @@ export default (editor) => {
         attributes: {
           class: 'header-container',
         },
-        traits: [],
+        traits: [
+          {
+            type: 'nav-links',
+            id: 'nav-links',
+            value: false,
+          },
+        ],
         components: [
           {
             type: 'header-brand',
@@ -204,6 +210,7 @@ export default (editor) => {
             display: flex;
             flex: 0 1 auto;
             flex-wrap: nowrap;
+            column-gap: 12px;
             width: 100%;
             margin: 0px;
             padding: 12px;
@@ -218,6 +225,10 @@ export default (editor) => {
         this.on('change:text-color', this.handleTextColorChange);
         this.on('change:bg-color', this.handleBGColorChange);
         this.on('change:font-family', this.handleFontChange);
+
+        const componentCollection = this.components();
+
+        this.listenTo(componentCollection, 'add remove', this.handleComponentsChange);
       },
       handleTextColorChange() {
         const textColor = this.props()['text-color'];
@@ -268,6 +279,26 @@ export default (editor) => {
             'font-family': generateFontFamilyStylingText(font),
           });
         });
+      },
+      handleComponentsChange() {
+        const targetTrait = 'nav-links';
+        const prevValue = this.getTrait(targetTrait).get('value');
+
+        this.updateTrait(targetTrait, {
+          value: !prevValue,
+        });
+      },
+      handleAddButtonLink() {
+        this.append(
+          {
+            type: 'link-buttons',
+            toolbar: [],
+            removable: false,
+          },
+          {
+            at: (this.components().length ?? 1) - 1,
+          }
+        );
       },
     },
   });

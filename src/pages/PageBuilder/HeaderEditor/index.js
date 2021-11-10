@@ -25,6 +25,7 @@ import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
+import LinkButton from '../CustomComponents/LinkButton.js';
 
 const HeaderEditor = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -72,11 +73,11 @@ const HeaderEditor = ({ match, history }) => {
       // },
       // Built-in props for styles
       // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
-      // styleManager: {
-      //   sectors: stylePanelSectors,
-      // },
+      styleManager: {
+        sectors: [],
+      },
       blockManager: {
-        blocks: definedBlocks,
+        blocks: [],
       },
       deviceManager: {
         devices: [
@@ -91,22 +92,12 @@ const HeaderEditor = ({ match, history }) => {
           },
           {
             name: 'Mobile',
-            width: '576px', // this value will be used on canvas width
+            width: '426px', // this value will be used on canvas width
             widthMedia: '576px', // this value will be used in CSS @media
           },
         ],
       },
-      plugins: [
-        ReactComponentHandler,
-        // PassionSessionList,
-        // PassionPassList,
-        // TextSection,
-        // TextWithImageSection,
-        // LinkButton,
-        Header,
-        CustomCommands,
-        CustomTraits,
-      ],
+      plugins: [ReactComponentHandler, LinkButton, Header, CustomCommands, CustomTraits],
     });
 
     // Loading external script and running certain logic

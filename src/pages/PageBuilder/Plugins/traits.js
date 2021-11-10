@@ -492,16 +492,16 @@ export default (editor) => {
     },
   });
 
-  editor.TraitManager.addType('link-button-list', {
+  editor.TraitManager.addType('nav-links', {
     noLabel: true,
     templateInput: `
     <div class="custom-trait-layout">
-    <div class="custom-trait-label">
-      Navigation Links
+      <div class="custom-trait-label">
+        Navigation Links
+      </div>
+      <div class="custom-trait-input" data-input>
+      </div>
     </div>
-    <div class="custom-trait-input" data-input>
-    </div>
-  </div>
     `,
     createInput({ trait }) {
       const el = document.createElement('div');
@@ -511,19 +511,60 @@ export default (editor) => {
     },
 
     onEvent({ elInput, component, event }) {
-      const inputType = elInput.querySelector('.button-list-container');
+      console.log(event);
 
-      component.set({
-        'brand-type': inputType.value ?? 'text',
-      });
+      if (event) {
+        return;
+      }
     },
 
     onUpdate({ elInput, component }) {
       // This is getting the trait value from the set classes
-      const componentList = component.components() ?? [];
-      const containerEl = elInput.querySelector('.button-list-container');
+      const linkButtons = component.findType('link-buttons') ?? [];
+      // const elInput = elInput.querySelector('.button-list-container');
 
-      // inputType.dispatchEvent(new CustomEvent('change'));
+      elInput.innerHTML = '';
+
+      linkButtons.forEach((btn) => {
+        const btnTraitContainer = document.createElement('div');
+        btnTraitContainer.classList.add(['button-item-container']);
+
+        const btnTraitContent = document.createElement('p');
+        btnTraitContent.classList.add(['button-trait-content']);
+        btnTraitContent.innerHTML = btn.get('content') ?? 'Link button';
+
+        const selectNavBtn = document.createElement('button');
+        selectNavBtn.classList.add(['button-trait-cta']);
+        selectNavBtn.innerText = 'Select';
+        selectNavBtn.onclick = () => {
+          editor.selectToggle(btn);
+          editor.select(btn);
+        };
+
+        const deleteNavBtn = document.createElement('button');
+        deleteNavBtn.classList.add(['button-trait-cta']);
+        deleteNavBtn.innerText = 'Delete';
+        deleteNavBtn.onclick = () => {
+          btn.remove();
+          component.emitUpdate();
+        };
+
+        btnTraitContainer.appendChild(btnTraitContent);
+        btnTraitContainer.appendChild(selectNavBtn);
+        btnTraitContainer.appendChild(deleteNavBtn);
+
+        elInput.appendChild(btnTraitContainer);
+      });
+
+      const addNavBtn = document.createElement('button');
+      addNavBtn.classList.add(['button-trait-add']);
+      addNavBtn.innerText = 'Add New Link';
+      addNavBtn.onclick = () => {
+        component.handleAddButtonLink();
+        component.emitUpdate();
+      };
+
+      elInput.appendChild(addNavBtn);
     },
   });
 };

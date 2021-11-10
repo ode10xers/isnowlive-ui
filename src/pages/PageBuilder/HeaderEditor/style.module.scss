@@ -23,6 +23,39 @@
     }
   }
 
+  .button-list-container {
+    display: flex;
+    flex: 1 0 100%;
+    row-gap: 8px;
+    flex-direction: column;
+    
+    .button-item-container {
+      display: flex;
+      flex: 1 0 100%;
+      justify-content: space-around;
+      flex-wrap: nowrap;
+      align-items: center;
+      column-gap: 8px;
+
+      .button-trait-content {
+        flex: 1 0 auto;
+      }
+      
+      .button-trait-cta {
+        padding: 2px 4px;
+        background-color: map-get($map: $colors, $key: 'DodgerBlue');
+      }
+    }
+
+    .button-trait-add {
+      display: flex;
+      flex: 1 0 100%;
+      justify-content: center;
+      text-align: center;
+      background-color: map-get($map: $colors, $key: 'DodgerBlue');
+    }
+  }
+
   .input-slider-container {
     width: 100%;
     display: flex;
