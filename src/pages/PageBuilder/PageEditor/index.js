@@ -4,15 +4,16 @@ import { Spin } from 'antd';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
-import 'grapesjs-preset-webpage';
-import 'grapesjs-blocks-flexbox';
+// import 'grapesjs-blocks-flexbox';
 import grapesjs from 'grapesjs';
+import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.js';
 
 import config from 'config/index.js';
 
 // These are to be put as part of the config
 import definedBlocks from '../Configs/blocks.js';
 // import definedPanels from '../Configs/panels.js';
+import definedStylePanels from '../Configs/style_panel.js';
 
 // THese are to be put in plugins
 // import CustomTraits from '../Plugins/traits';
@@ -23,8 +24,12 @@ import ReactComponentHandler from '../ReactComponentHandler';
 // import LinkButton from '../CustomComponents/LinkButton.js';
 // import SignInButton from '../CustomComponents/SignInButton.js';
 import PassionSessionList from '../CustomComponents/PassionSessionList.js';
+import PassionVideoList from '../CustomComponents/PassionVideoList.js';
+import PassionCourseList from '../CustomComponents/PassionCourseList.js';
 import PassionPassList from '../CustomComponents/PassionPassList.js';
+import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
 import Header from '../CustomComponents/Header.js';
+import Container from '../CustomComponents/Container.js';
 
 import { googleFonts } from 'utils/constants.js';
 import { getLocalUserDetails } from 'utils/storage.js';
@@ -33,9 +38,6 @@ import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-import PassionVideoList from '../CustomComponents/PassionVideoList.js';
-import PassionCourseList from '../CustomComponents/PassionCourseList.js';
-import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
 
 const PageEditor = ({ match, history }) => {
   const isPublicPage = match.path.includes('page');
@@ -114,7 +116,7 @@ const PageEditor = ({ match, history }) => {
       // Built-in props for styles
       // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
       styleManager: {
-        sectors: [],
+        clearProperties: true,
       },
       blockManager: {
         blocks: definedBlocks,
@@ -132,14 +134,15 @@ const PageEditor = ({ match, history }) => {
           },
           {
             name: 'Mobile',
-            width: '426px', // this value will be used on canvas width
+            width: '420px', // this value will be used on canvas width
             widthMedia: '576px', // this value will be used in CSS @media
           },
         ],
       },
       plugins: [
+        // 'gjs-blocks-flexbox',
         'gjs-preset-webpage',
-        'gjs-blocks-flexbox',
+        Container,
         ReactComponentHandler,
         PassionSubscriptionList,
         PassionVideoList,
@@ -154,7 +157,7 @@ const PageEditor = ({ match, history }) => {
         // SignInButton,
         Header, // Needed for Public page rendering
       ],
-      pluginOpts: {
+      pluginsOpts: {
         'gjs-preset-webpage': {
           modalImportLabel: 'This is the data format that will be saved',
           modalImportButton: 'Save',
@@ -166,6 +169,13 @@ const PageEditor = ({ match, history }) => {
               styles: editor.getStyle(),
             });
           },
+          blocksBasicOpts: {
+            flexGrid: true,
+            rowHeight: '120px',
+          },
+          countdownOpts: 0,
+          navbarOpts: 0,
+          customStyleManager: definedStylePanels,
         },
       },
     });
@@ -296,6 +306,7 @@ const PageEditor = ({ match, history }) => {
         });
       } else {
         gjsEditor.load();
+        console.log(gjsEditor.BlockManager.getAll().map((blk) => blk.getContent()));
         setIsLoading(false);
       }
     }

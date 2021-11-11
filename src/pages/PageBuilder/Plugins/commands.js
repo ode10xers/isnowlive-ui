@@ -17,18 +17,18 @@ const supportedDeviceTypes = [
 
 export default (editor) => {
   // Override import command
-  editor.Commands.add('gjs-open-import-webpage', {
-    run: (editor) => {
-      const templateData = {
-        html: editor.getHtml(),
-        css: editor.getCss(),
-        components: JSON.stringify(editor.getComponents()),
-        styles: JSON.stringify(editor.getStyle()),
-      };
+  editor.Commands.add('gjs-open-import-webpage', (editor) => {
+    // run: (editor) => {
+    const templateData = {
+      html: editor.getHtml(),
+      css: editor.getCss(),
+      components: JSON.stringify(editor.getComponents()),
+      styles: JSON.stringify(editor.getStyle()),
+    };
 
-      editor.StorageManager.store(templateData);
-      message.success('Saved successfully!');
-    },
+    editor.StorageManager.store(templateData);
+    message.success('Saved successfully!');
+    // },
   });
 
   // Make use of StoreManagerAPI to actually store things

@@ -6,6 +6,8 @@ const categories = {
   SIMPLE_COMPONENTS: 'Simple Components',
 };
 
+const add1ColumnWrapper = (contents) => {};
+
 // export default [
 //   {
 //     id: 'container', // id is mandatory
@@ -46,7 +48,12 @@ export default [
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'PassionSessionList',
+      type: 'container',
+      components: [
+        {
+          type: 'PassionSessionList',
+        },
+      ],
     },
   },
   {
@@ -56,7 +63,12 @@ export default [
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'PassionVideoList',
+      type: 'container',
+      components: [
+        {
+          type: 'PassionVideoList',
+        },
+      ],
     },
   },
   {
@@ -66,7 +78,12 @@ export default [
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'PassionCourseList',
+      type: 'container',
+      components: [
+        {
+          type: 'PassionCourseList',
+        },
+      ],
     },
   },
   {
@@ -76,7 +93,12 @@ export default [
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'PassionPassList',
+      type: 'container',
+      components: [
+        {
+          type: 'PassionPassList',
+        },
+      ],
     },
   },
   {
@@ -86,7 +108,12 @@ export default [
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'PassionSubscriptionList',
+      type: 'container',
+      components: [
+        {
+          type: 'PassionSubscriptionList',
+        },
+      ],
     },
   },
   // {
