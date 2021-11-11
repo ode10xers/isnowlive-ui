@@ -46,7 +46,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   const [showLongDescription, setShowLongDescription] = useState(false);
   const inventoriesByDates = useMemo<Record<string, Record<string, SessionInventory[]>>>(
     () =>
-      (availability?.inventory ?? []).reduce((acc, inv) => {
+      (availability?.inventory ?? []).sort((a, b) => moment(a.start_time).isBefore(moment(b.start_time)) ? -1 : 1).reduce((acc, inv) => {
         const momentStartTime = moment(inv.start_time);
         const monthYear = momentStartTime.format('MMMM YYYY');
         const date = momentStartTime.format('YYYY-MM-DD');
