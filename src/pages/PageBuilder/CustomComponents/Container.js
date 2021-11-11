@@ -1,5 +1,3 @@
-import { generateFontFamilyStylingText } from 'utils/helper.js';
-
 export default (editor) => {
   editor.DomComponents.addType('container', {
     model: {

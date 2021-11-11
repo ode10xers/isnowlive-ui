@@ -6,8 +6,6 @@ const categories = {
   SIMPLE_COMPONENTS: 'Simple Components',
 };
 
-const add1ColumnWrapper = (contents) => {};
-
 // export default [
 //   {
 //     id: 'container', // id is mandatory

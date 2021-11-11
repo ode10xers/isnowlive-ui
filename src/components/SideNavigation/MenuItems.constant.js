@@ -187,6 +187,11 @@ export const creatorMenuItems = [
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
       },
       {
+        title: 'Custom Pages',
+        mixPanelTag: creator.click.dashboard.pagesNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.pages,
+      },
+      {
         title: 'Livestream',
         mixPanelTag: creator.click.dashboard.livestreamNav,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,

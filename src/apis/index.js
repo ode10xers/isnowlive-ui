@@ -59,6 +59,14 @@ export default {
       getCreatorPayPalAccountDetails: () => http.get('/secure/creator/profile/paypal'),
     },
   },
+  custom_pages: {
+    getAllPages: () => http.get('/secure/creator/website/pages'),
+    getPageById: (pageId) => http.get(`/secure/creator/website/pages/${pageId}`),
+    createPage: (payload) => http.post('/secure/creator/website/pages', payload),
+    checkPageSlug: (pageSlug) => http.post(`/secure/creator/website/pages/valid-slug/${pageSlug}`),
+    updatePage: (payload) => http.patch(`/secure/creator/website/pages/`, payload),
+    deletePage: (pageId) => http.delete(`/secure/creator/website/pages/${pageId}`),
+  },
   availabilities: {
     getAvailabilities: () => http.get('/secure/creator/sessions?type=AVAILABILITY'),
     getAvailabilityDetails: (sessionId) => http.get(`/session/${sessionId}`),

@@ -57,6 +57,7 @@ const Routes = {
   creatorDashboard: {
     rootPath: '/creator/dashboard',
     defaultPath: '/sessions/upcoming',
+    customPages: '/pages',
     sessions: '/sessions/:session_type',
     sessionsDetails: '/sessions/e/:inventory_id/details',
     videos: '/videos',

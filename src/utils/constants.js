@@ -14,6 +14,11 @@ export const googleFonts = {
   POPPINS: 'Poppins',
 };
 
+export const pageTypes = {
+  HOME: 'HOME_PAGE',
+  GENERIC: 'GENERIC_PAGE',
+};
+
 export const paymentProvider = {
   STRIPE: 'STRIPE',
   PAYPAL: 'PAYPAL',

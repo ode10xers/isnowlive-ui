@@ -6,7 +6,7 @@ const redo = 'core:redo';
 
 // const swv = 'sw-visibility';
 const expt = 'export-template';
-const osm = 'open-sm';
+// const osm = 'open-sm';
 const otm = 'open-tm';
 const ola = 'open-layers';
 const obl = 'open-blocks';
