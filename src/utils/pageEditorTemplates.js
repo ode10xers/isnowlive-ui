@@ -5,6 +5,13 @@ export const headerTemplate = {
   styles: `[{"selectors":["header-brand"],"style":{"flex-grow":"1","flex-shrink":"1","flex-basis":"auto","padding-top":"8px","padding-right":"8px","padding-bottom":"8px","padding-left":"8px"},"group":"cmp:header-brand"},{"selectors":[],"selectorsAdd":".header-brand h1","style":{"font-size":"20px","font-weight":"500"},"group":"cmp:header-brand"},{"selectors":[],"selectorsAdd":".header-brand img","style":{"max-height":"48px"},"group":"cmp:header-brand"},{"selectors":["header-container"],"style":{"display":"flex","flex-grow":"0","flex-shrink":"1","flex-basis":"auto","flex-wrap":"nowrap","column-gap":"12px","width":"100%","margin-top":"0px","margin-right":"0px","margin-bottom":"0px","margin-left":"0px","padding-top":"12px","padding-right":"12px","padding-bottom":"12px","padding-left":"12px","height":"64px","align-items":"center"},"group":"cmp:navbar-header"}]`,
 };
 
+export const footerTemplate = {
+  html: `<footer><h5 class="footer-text">© 2021 Passion.do | All rights reserved</h5></footer>`,
+  css: `* { box-sizing: border-box; } body {margin: 0;}.footer-text{text-align:center;padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px;font-weight:500;font-size:16px;}`,
+  components: `[{"type":"site-footer","components":[{"tagName":"h5","content":"© 2021 Passion.do | All rights reserved","styles":".footer-text {text-align: center;padding: 20px;font-weight: 500;font-size: 16px;}","classes":["footer-text"]}]}]`,
+  styles: `[{"selectors":["footer-text"],"style":{"text-align":"center","padding-top":"20px","padding-right":"20px","padding-bottom":"20px","padding-left":"20px","font-weight":"500","font-size":"16px"},"group":"cmp:"}]`,
+};
+
 export const blankPageTemplate = {
   external_id: 'blank',
   name: 'Blank Template',
