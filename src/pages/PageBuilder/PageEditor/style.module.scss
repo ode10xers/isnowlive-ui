@@ -12,7 +12,66 @@
   }
 }
 
+.builderPage {
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  height: 100vh;
+
+  .leftSection {
+    flex-grow: 1;
+    flex-basis: 15%;
+    overflow: auto;
+    background-color: map-get($map: $colors, $key: 'Cyprus');
+    color: map-get($map: $colors, $key: 'White');
+  }
+
+  .rightSection {
+    flex-grow: 1;
+    flex-basis: 15%;
+    overflow: auto;
+    background-color: map-get($map: $colors, $key: 'Cyprus');
+    color: map-get($map: $colors, $key: 'White');
+  }
+
+  .middleSection {
+    flex-grow: 1;
+    flex-basis: 75%;
+    overflow: auto;
+  }
+
+  .topPanel {
+    height: 40px;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: nowrap;
+    background-color: map-get($map: $colors, $key: 'Cyprus');
+    color: map-get($map: $colors, $key: 'White');
+
+    button {
+      background: transparent;
+      text-align: center;
+      border: none;
+      font-size: 20px;
+    }
+  }
+}
+
 :global {
+  .gjs-cv-canvas {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .gjs-pn-panels {
+    display: none;
+  }
+
   .gjs-pn-buttons {
     justify-content: space-around;
   }

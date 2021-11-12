@@ -59,8 +59,7 @@ const CustomPagesListing = ({ match, history }) => {
   };
 
   const handleEditPageContent = (pageInfo) => {
-    // TODO: Replace this with actual route for page editor
-    history.push('/test-editor');
+    history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: pageInfo.external_id }));
   };
 
   const handleDeletePage = async (pageInfo, modalRef) => {

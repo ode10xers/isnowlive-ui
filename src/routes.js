@@ -60,8 +60,11 @@ const Routes = {
     customPages: {
       list: '/pages/list',
       create: '/pages/create',
-      editor: '/pages/editor',
       update: '/pages/edit/:page_id',
+      // NOTE: THe paths below is to be used without creatorDashboard rootPath
+      editor: '/pages/editor/:page_id',
+      headerEditor: '/header/editor',
+      footerEditor: '/footer/editor',
     },
     sessions: '/sessions/:session_type',
     sessionsDetails: '/sessions/e/:inventory_id/details',

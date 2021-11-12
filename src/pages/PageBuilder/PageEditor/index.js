@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Spin } from 'antd';
+import { Spin, Row, Col } from 'antd';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
@@ -40,7 +40,7 @@ import http from 'services/http.js';
 import styles from './style.module.scss';
 
 const PageEditor = ({ match, history }) => {
-  const isPublicPage = match.path.includes('page');
+  const isPublicPage = match.path.includes('page-');
 
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
@@ -87,7 +87,7 @@ const PageEditor = ({ match, history }) => {
       // fromElement: true,
       // Size of the editor
       noticeOnUnload: !previewOn,
-      height: '100vh',
+      height: 'calc(100vh - 40px)',
       width: 'auto',
       showOffsetsSelected: true,
       storageManager: {
@@ -116,9 +116,14 @@ const PageEditor = ({ match, history }) => {
       // Built-in props for styles
       // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
       styleManager: {
+        appendTo: '#right-panel',
         clearProperties: true,
       },
+      layerManager: {
+        appendTo: '#left-panel',
+      },
       blockManager: {
+        appendTo: '#left-panel',
         blocks: definedBlocks,
       },
       deviceManager: {
@@ -306,15 +311,57 @@ const PageEditor = ({ match, history }) => {
         });
       } else {
         gjsEditor.load();
+        gjsEditor.onReady(() => {
+          document.querySelector('.gjs-layer').style.display = 'none';
+        });
         setIsLoading(false);
       }
     }
   }, [gjsEditor, isPublicPage]);
 
+  const handleClickBlocks = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('open-blocks');
+      document.querySelector('.gjs-layer').style.display = 'none';
+      document.querySelector('.gjs-blocks-cs').style.display = 'block';
+    }
+  };
+
+  const handleClickLayers = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('open-layers');
+      document.querySelector('.gjs-blocks-cs').style.display = 'none';
+      document.querySelector('.gjs-layer').style.display = 'block';
+
+      // const blocksContainer = gjsEditor.BlockManager?.getConfig();
+
+      // if (blocksContainer.appendTo) {
+      //   document.querySelector(blocksContainer.appendTo).style.display = 'none';
+      // }
+    }
+  };
+
   return (
     <Spin spinning={isLoading} tip="Loading template...">
-      <div id="builder-page" className={isPublicPage ? styles.hidden : undefined}>
-        <div id="builder-editor"></div>
+      <div className={isPublicPage ? styles.hidden : undefined}>
+        <div className={styles.builderPage}>
+          <div className={styles.leftSection}>
+            <div className={styles.topPanel}>
+              <button className="fa fa-th-large" onClick={handleClickBlocks}></button>
+              <button className="fa fa-bars" onClick={handleClickLayers}></button>
+            </div>
+            <div id="left-panel"></div>
+            {/* <div id="left-panel-layers" style={{ display: 'none' }}></div>  */}
+          </div>
+          <div className={styles.middleSection}>
+            <div className={styles.topPanel}></div>
+            <div id="builder-editor"></div>
+          </div>
+          <div className={styles.rightSection}>
+            <div className={styles.topPanel}></div>
+            <div id="right-panel"></div>
+          </div>
+        </div>
       </div>
     </Spin>
   );

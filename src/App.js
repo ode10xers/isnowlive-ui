@@ -257,11 +257,21 @@ function App() {
             <RouteWithLayout
               layout={FullWidthLayout}
               exact
-              path={['/test-editor', '/page-render']}
+              path={['/test-editor', '/page-render', Routes.creatorDashboard.customPages.editor]}
               component={PageEditor}
             />
-            <RouteWithLayout layout={FullWidthLayout} exact path="/footer-editor" component={FooterEditor} />
-            <RouteWithLayout layout={FullWidthLayout} exact path="/header-editor" component={HeaderEditor} />
+            <RouteWithLayout
+              layout={FullWidthLayout}
+              exact
+              path={Routes.creatorDashboard.customPages.headerEditor}
+              component={HeaderEditor}
+            />
+            <RouteWithLayout
+              layout={FullWidthLayout}
+              exact
+              path={Routes.creatorDashboard.customPages.footerEditor}
+              component={FooterEditor}
+            />
             <RouteWithLayout layout={FullWidthLayout} path={Routes.plugins.root} component={PluginPages} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute

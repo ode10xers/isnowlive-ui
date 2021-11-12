@@ -20,6 +20,7 @@ import { blankPageTemplate } from 'utils/pageEditorTemplates';
 import { createValidSlug, generateUrlFromUsername } from 'utils/url';
 
 import styles from './styles.module.scss';
+import { generatePath } from 'react-router-dom';
 
 const DefaultImage = require('assets/images/greybg.jpg');
 
@@ -182,7 +183,7 @@ const CustomPageForm = ({ match, location, history }) => {
       const pageId = await handleFormFinish(form.getFieldsValue(), false);
 
       if (pageId) {
-        history.push(Routes.creatorDashboard.customPages.editor, { targetPage: pageId });
+        history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: pageId }));
       }
     } catch (error) {
       form.scrollToField(error.errorFields[0].name);
