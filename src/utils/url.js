@@ -62,3 +62,10 @@ export const generateUrl = (targetDomain = 'app') => {
   }
   return newUrl;
 };
+
+// src : https://stackoverflow.com/questions/1053902/how-to-convert-a-title-to-a-url-slug-in-jquery
+export const createValidSlug = (text) =>
+  text
+    .toLowerCase()
+    .replace(/[^\w ]+/g, '')
+    .replace(/ +/g, '-');

@@ -129,6 +129,13 @@ export const courseCreatePageLayout = {
 export const coursePageTailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
+export const pageCreateFormLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+export const pageCreateFormTailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
 export const newProfileFormLayout = {
   labelCol: {
     xs: { span: 24 },

@@ -66,6 +66,11 @@ export default {
     checkPageSlug: (pageSlug) => http.post(`/secure/creator/website/pages/valid-slug/${pageSlug}`),
     updatePage: (payload) => http.patch(`/secure/creator/website/pages/`, payload),
     deletePage: (pageId) => http.delete(`/secure/creator/website/pages/${pageId}`),
+    getWebsiteComponent: (componentType) =>
+      http.get(`/secure/creator/website/components?component_type=${componentType}`),
+    createWebsiteComponent: (payload) => http.post('/secure/creator/website/components', payload),
+    updateWebsiteComponent: (componentId, payload) =>
+      http.patch(`/secure/creator/website/components/${componentId}`, payload),
   },
   availabilities: {
     getAvailabilities: () => http.get('/secure/creator/sessions?type=AVAILABILITY'),

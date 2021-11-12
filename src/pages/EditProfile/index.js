@@ -722,6 +722,7 @@ const EditProfile = ({ match, history }) => {
     setIsLoading(false);
   };
 
+  // TODO: Try to use lodash.debounce here
   const handleFormValuesChange = (changedValues, allValues) => {
     if (updateTimeoutID) {
       clearTimeout(updateTimeoutID);

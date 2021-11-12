@@ -7,6 +7,13 @@ const validationRules = {
       message: 'Public URL can only contain lowercase letters',
     },
   ],
+  urlSlugValidation: [
+    { required: true, message: 'Please input a page link' },
+    {
+      pattern: new RegExp('^[a-z0-9](-?[a-z0-9])*$'),
+      message: 'Page URL can only contain lowercase letters, numbers, and dashes (-)',
+    },
+  ],
   urlValidation: [
     {
       required: true,

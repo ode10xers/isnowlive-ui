@@ -19,6 +19,11 @@ export const pageTypes = {
   GENERIC: 'GENERIC_PAGE',
 };
 
+export const websiteComponentTypes = {
+  HEADER: 'HEADER',
+  FOOTER: 'FOOTER',
+};
+
 export const paymentProvider = {
   STRIPE: 'STRIPE',
   PAYPAL: 'PAYPAL',

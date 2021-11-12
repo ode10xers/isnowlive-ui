@@ -11,9 +11,12 @@ import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import { isAPISuccess } from 'utils/helper';
 import { pageTypes } from 'utils/constants';
 
+import styles from './styles.module.scss';
+import { generatePath } from 'react-router-dom';
+
 const { Text, Title } = Typography;
 
-const CustomPages = ({ match, history }) => {
+const CustomPagesListing = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [creatorPages, setCreatorPages] = useState([]);
 
@@ -39,8 +42,20 @@ const CustomPages = ({ match, history }) => {
     fetchCreatorCustomPages();
   }, [fetchCreatorCustomPages]);
 
+  const handleCreateNewPage = () =>
+    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.create, {
+      isHome: creatorPages.every((page) => page.type !== pageTypes.HOME),
+    });
+
   const handleEditPageDetails = (pageInfo) => {
-    console.log('Again, probably show a modal');
+    if (pageInfo && pageInfo.external_id) {
+      history.push(
+        Routes.creatorDashboard.rootPath +
+          generatePath(Routes.creatorDashboard.customPages.update, { page_id: pageInfo.external_id })
+      );
+    } else {
+      handleCreateNewPage();
+    }
   };
 
   const handleEditPageContent = (pageInfo) => {
@@ -89,7 +104,7 @@ const CustomPages = ({ match, history }) => {
       key: 'name',
       render: (text, record) => (
         <Text>
-          {record.name} {record.type === pageTypes.HOME ? <HomeOutlined /> : null}
+          {record.type === pageTypes.HOME ? <HomeOutlined className={styles.blueText} /> : null} {record.name}
         </Text>
       ),
     },
@@ -97,24 +112,25 @@ const CustomPages = ({ match, history }) => {
       title: 'Page Link',
       dataIndex: 'slug',
       key: 'slug',
-      render: (text, record) => <Text>/{record.slug}</Text>,
+      render: (text, record) => <Text strong>/{record.slug}</Text>,
     },
     {
       title: 'Actions',
+      align: 'right',
       render: (text, record) => (
         <Row gutter={[8, 8]} align="middle" justify="end">
-          <Col xs={8}>
+          <Col>
             <Button type="primary" onClick={() => handleEditPageDetails(record)}>
               Edit Page Details
             </Button>
           </Col>
-          <Col xs={8}>
+          <Col>
             <Button type="link" onClick={() => handleEditPageContent(record)}>
               Edit Page UI
             </Button>
           </Col>
           {record.type !== pageTypes.HOME && (
-            <Col xs={8}>
+            <Col>
               <Button danger type="text" onClick={() => handleDeletePageClicked(record)}>
                 Remove page
               </Button>
@@ -125,14 +141,10 @@ const CustomPages = ({ match, history }) => {
     },
   ];
 
-  const handleCreateNewPage = () => {
-    console.log('Probably show modal here');
-  };
-
   return (
-    <div>
+    <div className={styles.pageListContainer}>
       <Spin spinning={isLoading} tip="Fetching custom pages...">
-        <Row gutter={[8, 8]}>
+        <Row gutter={[8, 16]}>
           <Col xs={24} md={16} lg={18}>
             <Title level={4}>Custom Pages</Title>
           </Col>
@@ -144,9 +156,9 @@ const CustomPages = ({ match, history }) => {
           <Col xs={24}>
             {creatorPages.length > 0 ? (
               <Table
-                size="small"
-                data={creatorPages}
+                dataSource={creatorPages}
                 columns={pageTableColumns}
+                pagination={false}
                 rowKey={(record) => record.external_id}
               />
             ) : (
@@ -159,4 +171,4 @@ const CustomPages = ({ match, history }) => {
   );
 };
 
-export default CustomPages;
+export default CustomPagesListing;

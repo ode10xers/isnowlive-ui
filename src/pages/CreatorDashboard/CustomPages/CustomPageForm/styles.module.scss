@@ -1,0 +1,35 @@
+@import '../../../../styles/variables.scss';
+
+.selectedTemplate {
+  :global {
+    .ant-card, .ant-card:hover {
+      border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+    }
+
+    .ant-card-cover {
+      border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+      border-bottom: none;
+    }
+  }
+}
+
+.alignUrl {
+  align-items: baseline !important;
+  margin: -10px 8px 0px !important;
+}
+
+.dot {
+  margin-right: 8px;
+  height: 10px;
+  width: 10px;
+  background-color: map-get($colors, $key: 'White1');
+  border-radius: 50%;
+  display: inline-block;
+
+  &.success {
+    background-color: map-get($colors, $key: 'KellyGreen');
+  }
+  &.danger {
+    background-color: map-get($colors, $key: 'FireBrick');
+  }
+}

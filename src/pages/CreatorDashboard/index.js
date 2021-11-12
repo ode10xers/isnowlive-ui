@@ -32,7 +32,8 @@ const MemberSettings = lazy(() => import('pages/CreatorDashboard/AdvancedFeature
 const Referral = lazy(() => import('pages/CreatorDashboard/Referral'));
 const Affiliates = lazy(() => import('pages/CreatorDashboard/Affiliates'));
 const DynamicProfile = lazy(() => import('pages/DynamicProfile'));
-const CustomPages = lazy(() => import('pages/CreatorDashboard/CustomPages'));
+const CustomPagesList = lazy(() => import('pages/CreatorDashboard/CustomPages/CustomPagesListing'));
+const CustomPagesForm = lazy(() => import('pages/CreatorDashboard/CustomPages/CustomPageForm'));
 
 const CreatorDashboard = ({ match }) => {
   return (
@@ -58,7 +59,15 @@ const CreatorDashboard = ({ match }) => {
             </MobileLayout>
           )}
         />
-        <Route exact path={match.url + Routes.creatorDashboard.customPages} component={CustomPages} />
+        <Route exact path={match.url + Routes.creatorDashboard.customPages.list} component={CustomPagesList} />
+        <Route
+          exact
+          path={[
+            match.url + Routes.creatorDashboard.customPages.create,
+            match.url + Routes.creatorDashboard.customPages.update,
+          ]}
+          component={CustomPagesForm}
+        />
         <Route exact path={match.url + Routes.creatorDashboard.createAvailabilities} component={Session} />
         <Route exact path={match.url + Routes.creatorDashboard.updateAvailabilities} component={Session} />
         <Route exact path={match.url + Routes.creatorDashboard.editProfile} component={Profile} />

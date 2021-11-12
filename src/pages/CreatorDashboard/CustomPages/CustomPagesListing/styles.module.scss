@@ -1,0 +1,6 @@
+@import '../../../../styles/variables.scss';
+
+.pageListContainer {
+  @extend .box;
+  height: 100%;
+}
