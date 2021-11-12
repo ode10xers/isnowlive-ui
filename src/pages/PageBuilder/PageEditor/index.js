@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Spin, Row, Col } from 'antd';
+import { Spin, Row, Col, Space } from 'antd';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
@@ -39,11 +39,14 @@ import http from 'services/http.js';
 //eslint-disable-next-line
 import styles from './style.module.scss';
 
+// TODO: Refactor these into constants and configs of separate files
 const PageEditor = ({ match, history }) => {
   const isPublicPage = match.path.includes('page-');
 
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
+
+  const [isComponentSelected, setIsComponentSelected] = useState(false);
 
   const initializeGrapesJSEditor = useCallback((previewOn = false) => {
     // NOTE: Configuration object examples can be seen here
@@ -110,20 +113,24 @@ const PageEditor = ({ match, history }) => {
       keepUnusedStyles: false,
       // Avoid any default panel
       // panels: definedPanels,
-      // selectorManager: {
-      //   componentFirst: true,
-      // },
       // Built-in props for styles
       // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
+      selectorManager: {
+        appendTo: '#selector-panel',
+        componentFirst: true,
+      },
       styleManager: {
-        appendTo: '#right-panel',
+        appendTo: '#styles-panel',
         clearProperties: true,
       },
+      traitManager: {
+        appendTo: '#traits-panel',
+      },
       layerManager: {
-        appendTo: '#left-panel',
+        appendTo: '#layers-panel',
       },
       blockManager: {
-        appendTo: '#left-panel',
+        appendTo: '#blocks-panel',
         blocks: definedBlocks,
       },
       deviceManager: {
@@ -145,7 +152,6 @@ const PageEditor = ({ match, history }) => {
         ],
       },
       plugins: [
-        // 'gjs-blocks-flexbox',
         'gjs-preset-webpage',
         Container,
         ReactComponentHandler,
@@ -257,6 +263,13 @@ const PageEditor = ({ match, history }) => {
     });
     //#endregion Start of Asset Listener Definition
 
+    editor.on('component:selected', () => {
+      setIsComponentSelected(true);
+    });
+    editor.on('component:deselected', () => {
+      setIsComponentSelected(false);
+    });
+
     setGjsEditor(editor);
   }, []);
 
@@ -264,9 +277,9 @@ const PageEditor = ({ match, history }) => {
     initializeGrapesJSEditor(isPublicPage);
   }, [initializeGrapesJSEditor, isPublicPage]);
 
-  // Test loading template
   useEffect(() => {
     if (gjsEditor) {
+      // TODO: Separate logic for loading template in another file
       if (isPublicPage) {
         const headerComponents = localStorage.getItem('gjs-header-components');
         const headerStyles = localStorage.getItem('gjs-header-styles');
@@ -312,34 +325,127 @@ const PageEditor = ({ match, history }) => {
       } else {
         gjsEditor.load();
         gjsEditor.onReady(() => {
-          document.querySelector('.gjs-layer').style.display = 'none';
+          document.querySelector('#layers-panel').style.display = 'none';
+          document.querySelector('#traits-panel').style.display = 'none';
+          console.log(gjsEditor.getSelectedAll());
         });
         setIsLoading(false);
       }
     }
   }, [gjsEditor, isPublicPage]);
 
+  // Logic to handle rendering right panels
+  useEffect(() => {
+    if (!isComponentSelected) {
+      document.querySelector('#right-panel').style.display = 'none';
+      document.querySelector('#empty-selection').style.display = 'block';
+    } else {
+      document.querySelector('#right-panel').style.display = 'block';
+      document.querySelector('#empty-selection').style.display = 'none';
+    }
+  }, [isComponentSelected]);
+
+  // TODO: Refactor later
+  //#region Start of Editor Button Handlers
   const handleClickBlocks = () => {
     if (gjsEditor) {
       gjsEditor.runCommand('open-blocks');
-      document.querySelector('.gjs-layer').style.display = 'none';
-      document.querySelector('.gjs-blocks-cs').style.display = 'block';
+      document.querySelector('#layers-panel').style.display = 'none';
+      document.querySelector('#blocks-panel').style.display = 'block';
     }
   };
 
   const handleClickLayers = () => {
     if (gjsEditor) {
       gjsEditor.runCommand('open-layers');
-      document.querySelector('.gjs-blocks-cs').style.display = 'none';
-      document.querySelector('.gjs-layer').style.display = 'block';
-
-      // const blocksContainer = gjsEditor.BlockManager?.getConfig();
-
-      // if (blocksContainer.appendTo) {
-      //   document.querySelector(blocksContainer.appendTo).style.display = 'none';
-      // }
+      document.querySelector('#layers-panel').style.display = 'block';
+      document.querySelector('#blocks-panel').style.display = 'none';
     }
   };
+
+  const handleClickStyles = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('open-sm');
+      document.querySelector('#styling-section').style.display = 'block';
+      document.querySelector('#traits-panel').style.display = 'none';
+    }
+  };
+
+  const handleClickTraits = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('open-tm');
+      document.querySelector('#styling-section').style.display = 'none';
+      document.querySelector('#traits-panel').style.display = 'block';
+    }
+  };
+
+  const handleSetDeviceDesktop = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('set-device-desktop');
+    }
+  };
+
+  const handleSetDeviceTablet = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('set-device-tablet');
+    }
+  };
+
+  const handleSetDeviceMobile = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('set-device-mobile');
+    }
+  };
+
+  const handleSwitchVisibility = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('sw-visibility');
+    }
+  };
+
+  const handlePreview = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('preview');
+    }
+  };
+
+  const handleToggleFullscreen = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('fullscreen');
+    }
+  };
+
+  const handleShowCode = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('export-template');
+    }
+  };
+
+  const handleUndo = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('core:undo');
+    }
+  };
+
+  const handleRedo = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('core:redo');
+    }
+  };
+
+  const handleSaveTemplate = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('save-as-json');
+    }
+  };
+
+  const handleCleanCanvas = () => {
+    if (gjsEditor) {
+      gjsEditor.runCommand('canvas-clear');
+    }
+  };
+
+  //#endregion End of Editor Button Handlers
 
   return (
     <Spin spinning={isLoading} tip="Loading template...">
@@ -350,16 +456,51 @@ const PageEditor = ({ match, history }) => {
               <button className="fa fa-th-large" onClick={handleClickBlocks}></button>
               <button className="fa fa-bars" onClick={handleClickLayers}></button>
             </div>
-            <div id="left-panel"></div>
-            {/* <div id="left-panel-layers" style={{ display: 'none' }}></div>  */}
+            <div className={styles.panelContainer}>
+              <div id="blocks-panel"></div>
+              <div id="layers-panel"></div>
+            </div>
           </div>
           <div className={styles.middleSection}>
-            <div className={styles.topPanel}></div>
+            <div className={styles.topPanel}>
+              <Row gutter={8} justify="space-around" className={styles.buttonsContainer}>
+                <Col flex="0 0 45%">Page Selector Here</Col>
+                <Col flex="0 0 120px" className={styles.textAlignCenter}>
+                  <Space align="center">
+                    <button className="fa fa-desktop" onClick={handleSetDeviceDesktop}></button>
+                    <button className="fa fa-tablet" onClick={handleSetDeviceTablet}></button>
+                    <button className="fa fa-mobile" onClick={handleSetDeviceMobile}></button>
+                  </Space>
+                </Col>
+                <Col flex="1 0 auto" className={styles.textAlignRight}>
+                  <Space align="center">
+                    <button className="fa fa-square-o" onClick={handleSwitchVisibility}></button>
+                    <button className="fa fa-eye" onClick={handlePreview}></button>
+                    <button className="fa fa-arrows-alt" onClick={handleToggleFullscreen}></button>
+                    <button className="fa fa-code" onClick={handleShowCode}></button>
+                    <button className="fa fa-undo" onClick={handleUndo}></button>
+                    <button className="fa fa-repeat" onClick={handleRedo}></button>
+                    <button className="fa fa-floppy-o" onClick={handleSaveTemplate}></button>
+                    <button className="fa fa-trash" onClick={handleCleanCanvas}></button>
+                  </Space>
+                </Col>
+              </Row>
+            </div>
             <div id="builder-editor"></div>
           </div>
           <div className={styles.rightSection}>
-            <div className={styles.topPanel}></div>
-            <div id="right-panel"></div>
+            <div className={styles.topPanel}>
+              <button className="fa fa-paint-brush" onClick={handleClickStyles}></button>
+              <button className="fa fa-cog" onClick={handleClickTraits}></button>
+            </div>
+            <div id="empty-selection">Please select a component first.</div>
+            <div id="right-panel" className={styles.panelContainer}>
+              <div id="styling-section">
+                <div id="selector-panel"></div>
+                <div id="styles-panel"></div>
+              </div>
+              <div id="traits-panel"></div>
+            </div>
           </div>
         </div>
       </div>

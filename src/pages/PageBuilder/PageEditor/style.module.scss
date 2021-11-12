@@ -1,4 +1,4 @@
-@import '../../../styles/colors';
+@import '../../../styles/variables';
 
 .hidden {
   display: none;
@@ -22,7 +22,7 @@
   .leftSection {
     flex-grow: 1;
     flex-basis: 15%;
-    overflow: auto;
+    overflow: hidden;
     background-color: map-get($map: $colors, $key: 'Cyprus');
     color: map-get($map: $colors, $key: 'White');
   }
@@ -30,7 +30,7 @@
   .rightSection {
     flex-grow: 1;
     flex-basis: 15%;
-    overflow: auto;
+    overflow: hidden;
     background-color: map-get($map: $colors, $key: 'Cyprus');
     color: map-get($map: $colors, $key: 'White');
   }
@@ -57,10 +57,38 @@
       border: none;
       font-size: 20px;
     }
+
+    .buttonsContainer {
+      width: 100%;
+      flex-basis: 100%;
+      padding: 0 8px;
+    }
+  }
+
+  .panelContainer {
+    overflow: auto;
+    height: 100%;
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
   }
 }
 
 :global {
+  #empty-selection {
+    text-align: center;
+    padding: 12px;
+  }
+
   .gjs-cv-canvas {
     top: 0;
     left: 0;
