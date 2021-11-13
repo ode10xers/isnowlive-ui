@@ -55,10 +55,12 @@ const PostMessageHandlers = () => {
 
       switch (command) {
         case `${postMessageCommands.ACTION.PREFIX}${postMessageCommands.ACTION.LOGIN_DASHBOARD}`:
+          console.log(details);
           setAuthModalCallback(() => redirectToDashboard);
           showAuthModal();
           break;
         case `${postMessageCommands.ACTION.PREFIX}${postMessageCommands.ACTION.LOGIN_NOTICE}`:
+          console.log(details);
           setAuthModalCallback(() => showLoginNotice);
           showAuthModal();
           break;

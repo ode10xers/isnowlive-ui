@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Spin, Row, Col, Space, Select, Typography, message } from 'antd';
+import { Spin, Row, Col, Space, Select, Typography } from 'antd';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
@@ -31,15 +31,14 @@ import PassionVideoList from '../CustomComponents/PassionVideoList.js';
 import PassionCourseList from '../CustomComponents/PassionCourseList.js';
 import PassionPassList from '../CustomComponents/PassionPassList.js';
 import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
+import Header from '../CustomComponents/Header.js';
 import Container from '../CustomComponents/Container.js';
 
 import { googleFonts } from 'utils/constants.js';
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
-import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
 
 import http from 'services/http.js';
-import { useGlobalContext } from 'services/globalContext.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
@@ -48,13 +47,9 @@ const { Text } = Typography;
 
 // TODO: Refactor these into constants and configs of separate files
 const PageEditor = ({ match, history }) => {
+  const isPublicPage = match.path.includes('page-');
   const targetPageId = match.params.page_id;
 
-  const {
-    state: { userDetails },
-  } = useGlobalContext();
-
-  const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
 
@@ -81,8 +76,16 @@ const PageEditor = ({ match, history }) => {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    fetchCreatorCustomPages();
+  }, [fetchCreatorCustomPages]);
+
+  useEffect(() => {
+    // TODO: Load the selected page data here
+  }, [selectedPageId]);
+
   // GrapesJS initialization
-  const initializeGrapesJSEditor = useCallback(() => {
+  const initializeGrapesJSEditor = useCallback((previewOn = false) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
@@ -123,47 +126,23 @@ const PageEditor = ({ match, history }) => {
       // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
       // fromElement: true,
       // Size of the editor
-      noticeOnUnload: true,
+      noticeOnUnload: !previewOn,
       height: 'calc(100vh - 40px)',
       width: 'auto',
       showOffsetsSelected: true,
-      // storageManager: {
-      //   id: 'gjs-', // Prefix identifier that will be used on parameters
-      //   type: 'local', // Type of the storage
-      //   autosave: true, // Store data automatically
-      //   autoload: false, // Autoload stored data on init
-      //   stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
-      // },
       storageManager: {
-        id: '',
-        type: 'passion-backend',
-        autoSave: true,
-        stepsBeforeSave: 15,
-        autoload: false,
+        id: 'gjs-', // Prefix identifier that will be used on parameters
+        type: 'local', // Type of the storage
+        autosave: !previewOn, // Store data automatically
+        autoload: false, // Autoload stored data on init
+        stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
       },
-      // storageManager: {
-      //   id: '', // Prefix identifier that will be used on parameters
-      //   type: 'remote', // Type of the storage
-      //   autosave: true, // Store data automatically
-      //   autoload: false, // Autoload stored data on init
-      //   stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
-      //   urlStore: config.server.baseURL + '/secure/creator/website/pages',
-      //   headers: {
-      //     'auth-token': userDetails?.auth_token ?? getLocalUserDetails()?.auth_token ?? '',
-      //     'creator-username': getUsernameFromUrl() ?? '',
-      //   },
-      //   credentials: 'omit',
-      //   fetchOptions: (currentOptions) => {
-      //     console.log("Current Options: ", currentOptions)
-      //     return currentOptions.method === 'post' ? { method: 'PATCH' } : {};
-      //   }
-      // },
       assetManager: {
         customFetch: (url, options) => http.post(url, options.body),
         upload: config.server.baseURL + '/secure/upload',
         uploadName: 'file',
         headers: {
-          'auth-token': userDetails?.auth_token ?? getLocalUserDetails()?.auth_token ?? '',
+          'auth-token': getLocalUserDetails()?.auth_token ?? '',
         },
         multiUpload: false,
         autoAdd: true,
@@ -224,6 +203,7 @@ const PageEditor = ({ match, history }) => {
         // TextWithImageSection,
         // LinkButton,
         // SignInButton,
+        Header, // Needed for Public page rendering
       ],
       pluginsOpts: {
         'gjs-preset-webpage': {
@@ -247,8 +227,6 @@ const PageEditor = ({ match, history }) => {
         },
       },
     });
-
-    //#region Start of Custom Initialization Logic
 
     // Modify Wrapper stylability
     // Initially we can only modify background, but modifying
@@ -291,133 +269,119 @@ const PageEditor = ({ match, history }) => {
     // Hacky way of copying styles to the iframe inside
     // Not sure if this will work dynamically or not
     const iframeEl = editor.Canvas.getWindow();
-    const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet']");
-    styleEls.forEach((el) => {
-      iframeEl.document.head.appendChild(el.cloneNode(true));
+    if (!previewOn) {
+      const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet']");
+      if (styleEls.length) {
+        styleEls.forEach((el) => {
+          iframeEl.document.head.appendChild(el.cloneNode(true));
+        });
+      }
+    }
+
+    //#region Start of Asset Listener Definition
+    // The upload is started
+    editor.on('asset:upload:start', () => {
+      console.log('Upload started');
     });
 
-    //#endregion End of Custom Initialization Logic
+    // The upload is ended (completed or not)
+    editor.on('asset:upload:end', () => {
+      console.log('Upload ended');
+    });
 
-    //#region Start of event listener hooks
+    // Error handling
+    editor.on('asset:upload:error', (err) => {
+      console.error(err);
+    });
+
+    // Do something on response
+    editor.on('asset:upload:response', (response) => {
+      console.log(response);
+    });
+    //#endregion Start of Asset Listener Definition
 
     editor.on('component:selected', () => {
       setIsComponentSelected(true);
     });
-
     editor.on('component:deselected', () => {
       setIsComponentSelected(false);
     });
-
     editor.on('run:preview', () => {
       document.querySelector('#right-section').style.display = 'none';
       document.querySelector('#left-section').style.display = 'none';
       document.querySelector('#top-section').style.display = 'none';
     });
-
     editor.on('stop:preview', () => {
       document.querySelector('#right-section').style.display = 'block';
       document.querySelector('#left-section').style.display = 'block';
       document.querySelector('#top-section').style.display = 'block';
     });
 
-    editor.onReady(() => {
-      document.querySelector('#layers-panel').style.display = 'none';
-      document.querySelector('#traits-panel').style.display = 'none';
-    });
-
-    //#endregion End of event listener hooks
-
     editor.runCommand('sw-visibility');
 
-    // Initial definition for storage
-    editor.StorageManager.add('passion-backend', {
-      async store(payload, callback, errorCallback) {
-        setIsSaving(true);
-        try {
-          console.log(payload);
-
-          if (!payload.external_id) {
-            console.error('Invalid Data format!');
-            message.error('Something wrong has occurred! Failed to save!');
-            return;
-          }
-
-          const { status, data } = await apis.custom_pages.updatePage(payload);
-
-          if (isAPISuccess(status) && data) {
-            callback(data);
-          }
-        } catch (error) {
-          console.log('Error occured when storing page content to API');
-          console.error(error);
-          errorCallback(error);
-        }
-        setIsSaving(false);
-      },
-      load(keysToLoad, callback, errorCallback) {
-        console.log('FE will handle the loading');
-      },
-    });
-
     setGjsEditor(editor);
-  }, [userDetails]);
+  }, []);
 
   useEffect(() => {
-    fetchCreatorCustomPages();
-    initializeGrapesJSEditor();
-  }, [initializeGrapesJSEditor, fetchCreatorCustomPages]);
+    initializeGrapesJSEditor(isPublicPage);
+  }, [initializeGrapesJSEditor, isPublicPage]);
 
   useEffect(() => {
     if (gjsEditor) {
-      const fallbackAction = () => {
-        gjsEditor.loadData(blankPageTemplate.content);
-      };
+      // TODO: Separate logic for loading template in another file
+      if (isPublicPage) {
+        const headerComponents = localStorage.getItem('gjs-header-components');
+        const headerStyles = localStorage.getItem('gjs-header-styles');
+        const pageComponents = localStorage.getItem('gjs-components');
+        const pageStyles = localStorage.getItem('gjs-styles');
 
-      if (selectedPageId) {
-        const targetPageIndex = creatorPages.findIndex((page) => page.external_id === selectedPageId);
-        const targetPage = creatorPages.find((page) => page.external_id === selectedPageId);
+        console.log({
+          headerComponents,
+          headerStyles,
+          pageComponents,
+          pageStyles,
+        });
 
-        if (targetPage) {
-          gjsEditor.StorageManager.add('passion-backend', {
-            async store(payload, callback, errorCallback) {
-              setIsSaving(true);
+        gjsEditor.loadData({
+          components: [...JSON.parse(headerComponents), ...JSON.parse(pageComponents)],
+          styles: [...JSON.parse(headerStyles), ...JSON.parse(pageStyles)],
+        });
 
-              try {
-                const { status, data } = await apis.custom_pages.updatePage({
-                  ...targetPage,
-                  content: payload,
-                });
+        gjsEditor.onReady(() => {
+          // Previously what we do is try to render everything inside the iframe
+          // of the editor, but it might cause some issues when integrating
+          // Now we instead take the contents of editor after load and put them
+          // in the actual app (which is contained in #root)
 
-                if (isAPISuccess(status) && data) {
-                  setCreatorPages((prevPages) => {
-                    prevPages.splice(targetPageIndex, 1, data);
-                    return prevPages;
-                  });
-                  callback(data);
-                }
-              } catch (error) {
-                console.log('Error occured when storing page content to API');
-                console.error(error);
-                errorCallback(error);
-              }
-              setIsSaving(false);
-            },
-            load(keysToLoad, callback, errorCallback) {
-              console.log('FE will handle the loading');
-            },
-          });
+          const iframeElement = gjsEditor.Canvas.getDocument();
+          const editorElements = Array.from(iframeElement.body.children);
 
-          gjsEditor.loadData(targetPage.content ?? blankPageTemplate.content);
-        } else {
-          fallbackAction();
-        }
+          if (editorElements.length > 0) {
+            const reactRootElement = document.getElementById('root');
+            const portalContainer = document.createElement('div');
+
+            portalContainer.id = 'page-portal';
+
+            editorElements.forEach((el) => {
+              portalContainer.appendChild(el);
+            });
+
+            reactRootElement.appendChild(portalContainer);
+          }
+
+          setIsLoading(false);
+        });
       } else {
-        fallbackAction();
+        gjsEditor.load();
+        gjsEditor.onReady(() => {
+          document.querySelector('#layers-panel').style.display = 'none';
+          document.querySelector('#traits-panel').style.display = 'none';
+          console.log(gjsEditor.getSelectedAll());
+        });
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     }
-  }, [gjsEditor, selectedPageId, creatorPages]);
+  }, [gjsEditor, isPublicPage]);
 
   // Logic to handle rendering right panels
   useEffect(() => {
@@ -435,20 +399,7 @@ const PageEditor = ({ match, history }) => {
     getSiblingElements(targetEl).forEach((el) => el.classList.remove('active'));
   };
 
-  const onSelectedPageChanged = (value) => {
-    if (gjsEditor) {
-      gjsEditor.store(
-        () => {
-          setSelectedPageId(value);
-        },
-        () => {
-          message.error('Failed to save changes to current page!');
-        }
-      );
-    }
-  };
-
-  // TODO: Refactor later
+  // TODO: Refactor later, also manage active classes
   //#region Start of Editor Button Handlers
   const handleClickBlocks = (e) => {
     if (gjsEditor) {
@@ -575,7 +526,7 @@ const PageEditor = ({ match, history }) => {
 
   return (
     <Spin spinning={isLoading} tip="Loading template...">
-      <div>
+      <div className={isPublicPage ? styles.hidden : undefined}>
         <div id="builder-page" className={styles.builderPage}>
           <div id="left-section" className={styles.leftSection}>
             <div className={styles.topPanel}>
@@ -595,7 +546,7 @@ const PageEditor = ({ match, history }) => {
                     <Text className={styles.whiteText}>Page :</Text>
                     <Select
                       value={selectedPageId}
-                      onChange={onSelectedPageChanged}
+                      onChange={setSelectedPageId}
                       loading={isLoading}
                       options={creatorPages.map((page) => ({
                         label: page.name,
@@ -617,11 +568,7 @@ const PageEditor = ({ match, history }) => {
                     <button className="fa fa-code" onClick={handleShowCode}></button>
                     <button className="fa fa-undo" onClick={handleUndo}></button>
                     <button className="fa fa-repeat" onClick={handleRedo}></button>
-                    {isSaving ? (
-                      <button className="fa fa-spinner"></button>
-                    ) : (
-                      <button className="fa fa-floppy-o" onClick={handleSaveTemplate}></button>
-                    )}
+                    <button className="fa fa-floppy-o" onClick={handleSaveTemplate}></button>
                     <button className="fa fa-trash" onClick={handleCleanCanvas}></button>
                   </Space>
                 </Col>

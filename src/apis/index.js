@@ -64,7 +64,7 @@ export default {
     getPageById: (pageId) => http.get(`/secure/creator/website/pages/${pageId}`),
     createPage: (payload) => http.post('/secure/creator/website/pages', payload),
     checkPageSlug: (pageSlug) => http.post(`/secure/creator/website/pages/valid-slug/${pageSlug}`),
-    updatePage: (payload) => http.patch(`/secure/creator/website/pages/`, payload),
+    updatePage: (payload) => http.patch(`/secure/creator/website/pages`, payload),
     deletePage: (pageId) => http.delete(`/secure/creator/website/pages/${pageId}`),
     getWebsiteComponent: (componentType) =>
       http.get(`/secure/creator/website/components?component_type=${componentType}`),

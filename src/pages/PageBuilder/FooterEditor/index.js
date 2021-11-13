@@ -11,7 +11,7 @@ import config from 'config/index.js';
 
 // These are to be put as part of the config
 // import definedBlocks from '../Configs/blocks.js';
-import definedPanels from '../Configs/panels.js';
+// import definedPanels from '../Configs/panels.js';
 import definedStylePanels from '../Configs/style_panel.js';
 
 // THese are to be put in plugins

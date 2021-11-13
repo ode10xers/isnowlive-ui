@@ -47,10 +47,9 @@ const CustomPageForm = ({ match, location, history }) => {
 
   const [isValidSlug, setIsValidSlug] = useState(true);
   const [isValidatingSlug, setIsValidatingSlug] = useState(false);
-  const [slugErrMessage, setSlugErrMessage] = useState(null);
 
   // NOTE: We need to make sure at least there's a default template selected
-  const [templates, setTemplates] = useState([blankPageTemplate]);
+  const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(blankPageTemplate);
 
   const fetchPageDetails = useCallback(async (pageId) => {
@@ -78,6 +77,7 @@ const CustomPageForm = ({ match, location, history }) => {
     }
 
     // TODO: Also fetch templates here
+    setTemplates([blankPageTemplate]);
   }, [targetPageId, fetchPageDetails]);
 
   useEffect(() => {
@@ -271,7 +271,7 @@ const CustomPageForm = ({ match, location, history }) => {
                         ) : (
                           <Text type={isValidSlug ? 'success' : 'danger'}>
                             <span className={classNames(styles.dot, isValidSlug ? styles.success : styles.danger)} />
-                            {isValidSlug ? 'Link Available' : slugErrMessage ?? 'Invalid link'}
+                            {isValidSlug ? 'Link Available' : 'Invalid link'}
                           </Text>
                         )}
                       </Row>

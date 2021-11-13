@@ -1,17 +1,5 @@
 @import '../../../styles/variables';
 
-.hidden {
-  display: none;
-}
-
-.pageRenderer {
-  :global {
-    .gjs-off-prv {
-      display: none !important;
-    }
-  }
-}
-
 .builderPage {
   display: flex;
   justify-content: flex-start;
@@ -72,6 +60,7 @@
       width: 100%;
       flex-basis: 100%;
       padding: 0 8px;
+      align-items: center;
     }
   }
 
@@ -213,15 +202,4 @@
   .icon-al-center {
     background: url('/src/assets/images/flex_icons/flex-al-center.png') no-repeat center;
   }
-
-  // Continye this styling later
-  // .trait-radio-button-container {
-  //   display: flex;
-  //   width: 100%;
-  //   justify-content: space-around;
-
-  //   .trait-radio-button {
-  //     flex: 0 0 25%;
-  //   }
-  // }
 }

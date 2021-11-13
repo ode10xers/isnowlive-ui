@@ -34,14 +34,14 @@ export default (editor) => {
   // Make use of StoreManagerAPI to actually store things
   editor.Commands.add('save-as-json', {
     run: (editor) => {
-      const templateData = {
-        html: editor.getHtml(),
-        css: editor.getCss(),
-        components: JSON.stringify(editor.getComponents()),
-        styles: JSON.stringify(editor.getStyle()),
-      };
-
-      editor.StorageManager.store(templateData);
+      editor.store(
+        (dataResponse) => {
+          message.success('Saved successfully!');
+        },
+        (error) => {
+          message.error('An error has occurred! Please try again in a few moments.');
+        }
+      );
     },
   });
 
