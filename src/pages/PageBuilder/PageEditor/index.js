@@ -38,7 +38,6 @@ import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
 
-import http from 'services/http.js';
 import { useGlobalContext } from 'services/globalContext.js';
 
 //eslint-disable-next-line
@@ -58,6 +57,7 @@ const PageEditor = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
 
+  const [creatorAssets, setCreatorAssets] = useState([]);
   const [creatorPages, setCreatorPages] = useState([]);
   const [selectedPageId, setSelectedPageId] = useState(targetPageId ?? null);
 
@@ -79,6 +79,26 @@ const PageEditor = ({ match, history }) => {
       );
     }
     setIsLoading(false);
+  }, []);
+
+  const fetchCreatorWebsiteAssets = useCallback(async (editor) => {
+    try {
+      const { status, data } = await apis.custom_pages.getAssets();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorAssets(data);
+        editor.AssetManager.load({
+          assets: data.map((assetData) => ({
+            type: assetData.type.toLowerCase(),
+            src: assetData.src,
+            ...assetData.properties,
+            external_id: assetData.external_id,
+          })),
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
   // GrapesJS initialization
@@ -159,14 +179,37 @@ const PageEditor = ({ match, history }) => {
       //   }
       // },
       assetManager: {
-        customFetch: (url, options) => http.post(url, options.body),
+        assets: [],
+        // customFetch: (url, options) => http.post(url, options.body),
+        uploadFile: async function (e) {
+          const { module } = this.options;
+          const formData = new FormData();
+
+          const targetFile = e.target.files[0] ?? null;
+
+          if (!targetFile) {
+            console.log('No valid file found, ', e.target);
+            return;
+          }
+
+          formData.append('file', targetFile);
+          try {
+            module && module.__propEv('asset:upload:start');
+            const { data } = await apis.user.uploadImage(formData);
+            module && module.__propEv('asset:upload:response', data);
+          } catch (error) {
+            console.error(error);
+            module && module.__propEv('asset:upload:error', error);
+          }
+        },
         upload: config.server.baseURL + '/secure/upload',
         uploadName: 'file',
         headers: {
           'auth-token': userDetails?.auth_token ?? getLocalUserDetails()?.auth_token ?? '',
         },
         multiUpload: false,
-        autoAdd: true,
+        autoAdd: false,
+        showUrlInput: false,
       },
       keepUnusedStyles: false,
       // Avoid any default panel
@@ -299,6 +342,48 @@ const PageEditor = ({ match, history }) => {
     //#endregion End of Custom Initialization Logic
 
     //#region Start of event listener hooks
+    editor.on('asset:upload:start', () => {
+      setIsLoading(true);
+    });
+
+    editor.on('asset:upload:error', (error) => {
+      message.error(error?.response?.data?.message ?? 'Failed uploading asset!');
+    });
+
+    editor.on('asset:upload:response', (assetUrl) => {
+      editor.AssetManager.add(assetUrl);
+    });
+
+    editor.on('asset:add', async (asset) => {
+      try {
+        const assetInfo = asset.attributes;
+
+        const additionalProperties =
+          assetInfo.type === 'image'
+            ? {
+                unitDim: assetInfo.unitDim,
+                height: assetInfo.height,
+                width: assetInfo.width,
+              }
+            : assetInfo;
+
+        const payload = {
+          type: assetInfo.type.toUpperCase(),
+          src: assetInfo.src,
+          properties: additionalProperties,
+        };
+
+        const { status, data } = await apis.custom_pages.createAsset(payload);
+
+        if (isAPISuccess(status) && data) {
+          setCreatorAssets((prevAssets) => [...prevAssets, data]);
+        }
+      } catch (error) {
+        console.error(error);
+        message.error('Failed saving asset!');
+      }
+      setIsLoading(false);
+    });
 
     editor.on('component:selected', () => {
       setIsComponentSelected(true);
@@ -334,8 +419,6 @@ const PageEditor = ({ match, history }) => {
       async store(payload, callback, errorCallback) {
         setIsSaving(true);
         try {
-          console.log(payload);
-
           if (!payload.external_id) {
             console.error('Invalid Data format!');
             message.error('Something wrong has occurred! Failed to save!');
@@ -360,7 +443,8 @@ const PageEditor = ({ match, history }) => {
     });
 
     setGjsEditor(editor);
-  }, [userDetails]);
+    fetchCreatorWebsiteAssets(editor);
+  }, [userDetails, fetchCreatorWebsiteAssets]);
 
   useEffect(() => {
     fetchCreatorCustomPages();
@@ -418,6 +502,36 @@ const PageEditor = ({ match, history }) => {
       setIsLoading(false);
     }
   }, [gjsEditor, selectedPageId, creatorPages]);
+
+  // The asset remove listener is separate here because it depends on the creatorAssets
+  useEffect(() => {
+    if (gjsEditor) {
+      // TODO: Later on we can move this to the initialization callback
+      // once we figure out how to update the asset definition
+      // That way we can attach external_ids to the asset themselves
+      gjsEditor.off('asset:remove');
+      gjsEditor.on('asset:remove', async (removedAsset) => {
+        try {
+          console.log(removedAsset);
+          const assetUrl = removedAsset.attributes.src;
+
+          const targetAsset = creatorAssets.find((asset) => asset.src === assetUrl);
+
+          if (targetAsset && targetAsset.external_id) {
+            const { status, data } = await apis.custom_pages.removeAsset(targetAsset.external_id);
+            if (isAPISuccess(status) && data) {
+              setCreatorAssets((prevAssets) =>
+                prevAssets.filter((asset) => asset.external_id !== targetAsset.external_id)
+              );
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          message.error('Failed saving asset!');
+        }
+      });
+    }
+  }, [gjsEditor, creatorAssets]);
 
   // Logic to handle rendering right panels
   useEffect(() => {
@@ -574,7 +688,7 @@ const PageEditor = ({ match, history }) => {
   //#endregion End of Editor Button Handlers
 
   return (
-    <Spin spinning={isLoading} tip="Loading template...">
+    <Spin spinning={isLoading}>
       <div>
         <div id="builder-page" className={styles.builderPage}>
           <div id="left-section" className={styles.leftSection}>

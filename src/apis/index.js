@@ -71,6 +71,9 @@ export default {
     createWebsiteComponent: (payload) => http.post('/secure/creator/website/components', payload),
     updateWebsiteComponent: (componentId, payload) =>
       http.patch(`/secure/creator/website/components/${componentId}`, payload),
+    getAssets: () => http.get('/secure/creator/website/assets'),
+    createAsset: (payload) => http.post('/secure/creator/website/assets', payload),
+    removeAsset: (assetId) => http.delete(`/secure/creator/website/assets/${assetId}`),
   },
   availabilities: {
     getAvailabilities: () => http.get('/secure/creator/sessions?type=AVAILABILITY'),
