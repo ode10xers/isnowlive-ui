@@ -56,6 +56,16 @@
       text-align: center;
       border: none;
       font-size: 20px;
+
+      &:hover {
+        color: map-get($map: $colors, $key: 'DodgerBlue');
+      }
+    }
+
+    :global {
+      button.active {
+        color: map-get($map: $colors, $key: 'DodgerBlue');
+      }
     }
 
     .buttonsContainer {

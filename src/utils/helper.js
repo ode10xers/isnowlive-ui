@@ -10,6 +10,27 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+// src : https://www.javascripttutorial.net/javascript-dom/javascript-siblings/
+export const getSiblingElements = (el) => {
+  // for collecting siblings
+  let siblings = [];
+  // if no parent, return no sibling
+  if (!el.parentNode) {
+    return siblings;
+  }
+  // first child of the parent node
+  let sibling = el.parentNode.firstChild;
+
+  // collecting siblings
+  while (sibling) {
+    if (sibling.nodeType === 1 && sibling !== el) {
+      siblings.push(sibling);
+    }
+    sibling = sibling.nextSibling;
+  }
+  return siblings;
+};
+
 export const deepCloneObject = (objData) => JSON.parse(JSON.stringify(objData));
 
 // Will occur if a member that is not yet approved tries to access secure APIS

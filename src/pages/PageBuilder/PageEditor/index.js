@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Spin, Row, Col, Space } from 'antd';
+import { Spin, Row, Col, Space, Select, Typography } from 'antd';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
@@ -8,7 +8,10 @@ import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
 import 'grapesjs-preset-webpage';
 
+import apis from 'apis';
 import config from 'config/index.js';
+
+import { showErrorModal } from 'components/Modals/modals.js';
 
 // These are to be put as part of the config
 import definedBlocks from '../Configs/blocks.js';
@@ -33,21 +36,55 @@ import Container from '../CustomComponents/Container.js';
 
 import { googleFonts } from 'utils/constants.js';
 import { getLocalUserDetails } from 'utils/storage.js';
+import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 
 import http from 'services/http.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
 
+const { Text } = Typography;
+
 // TODO: Refactor these into constants and configs of separate files
 const PageEditor = ({ match, history }) => {
   const isPublicPage = match.path.includes('page-');
+  const targetPageId = match.params.page_id;
 
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
 
+  const [creatorPages, setCreatorPages] = useState([]);
+  const [selectedPageId, setSelectedPageId] = useState(targetPageId ?? null);
+
   const [isComponentSelected, setIsComponentSelected] = useState(false);
 
+  const fetchCreatorCustomPages = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.custom_pages.getAllPages();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorPages(data);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed to fetch creator custom pages!',
+        error?.response?.data?.message ?? 'Something went wrong.'
+      );
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchCreatorCustomPages();
+  }, [fetchCreatorCustomPages]);
+
+  useEffect(() => {
+    // TODO: Load the selected page data here
+  }, [selectedPageId]);
+
+  // GrapesJS initialization
   const initializeGrapesJSEditor = useCallback((previewOn = false) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
@@ -269,6 +306,18 @@ const PageEditor = ({ match, history }) => {
     editor.on('component:deselected', () => {
       setIsComponentSelected(false);
     });
+    editor.on('run:preview', () => {
+      document.querySelector('#right-section').style.display = 'none';
+      document.querySelector('#left-section').style.display = 'none';
+      document.querySelector('#top-section').style.display = 'none';
+    });
+    editor.on('stop:preview', () => {
+      document.querySelector('#right-section').style.display = 'block';
+      document.querySelector('#left-section').style.display = 'block';
+      document.querySelector('#top-section').style.display = 'block';
+    });
+
+    editor.runCommand('sw-visibility');
 
     setGjsEditor(editor);
   }, []);
@@ -345,61 +394,81 @@ const PageEditor = ({ match, history }) => {
     }
   }, [isComponentSelected]);
 
-  // TODO: Refactor later
+  const toggleActiveClass = (targetEl) => {
+    targetEl.classList.add(['active']);
+    getSiblingElements(targetEl).forEach((el) => el.classList.remove('active'));
+  };
+
+  // TODO: Refactor later, also manage active classes
   //#region Start of Editor Button Handlers
-  const handleClickBlocks = () => {
+  const handleClickBlocks = (e) => {
     if (gjsEditor) {
       gjsEditor.runCommand('open-blocks');
+      toggleActiveClass(e.target);
       document.querySelector('#layers-panel').style.display = 'none';
       document.querySelector('#blocks-panel').style.display = 'block';
     }
   };
 
-  const handleClickLayers = () => {
+  const handleClickLayers = (e) => {
     if (gjsEditor) {
       gjsEditor.runCommand('open-layers');
+      toggleActiveClass(e.target);
       document.querySelector('#layers-panel').style.display = 'block';
       document.querySelector('#blocks-panel').style.display = 'none';
     }
   };
 
-  const handleClickStyles = () => {
+  const handleClickStyles = (e) => {
     if (gjsEditor) {
       gjsEditor.runCommand('open-sm');
+      toggleActiveClass(e.target);
       document.querySelector('#styling-section').style.display = 'block';
       document.querySelector('#traits-panel').style.display = 'none';
     }
   };
 
-  const handleClickTraits = () => {
+  const handleClickTraits = (e) => {
     if (gjsEditor) {
       gjsEditor.runCommand('open-tm');
+      toggleActiveClass(e.target);
       document.querySelector('#styling-section').style.display = 'none';
       document.querySelector('#traits-panel').style.display = 'block';
     }
   };
 
-  const handleSetDeviceDesktop = () => {
+  const handleSetDeviceDesktop = (e) => {
     if (gjsEditor) {
       gjsEditor.runCommand('set-device-desktop');
+      toggleActiveClass(e.target);
     }
   };
 
-  const handleSetDeviceTablet = () => {
+  const handleSetDeviceTablet = (e) => {
     if (gjsEditor) {
       gjsEditor.runCommand('set-device-tablet');
+      toggleActiveClass(e.target);
     }
   };
 
-  const handleSetDeviceMobile = () => {
+  const handleSetDeviceMobile = (e) => {
     if (gjsEditor) {
       gjsEditor.runCommand('set-device-mobile');
+      toggleActiveClass(e.target);
     }
   };
 
-  const handleSwitchVisibility = () => {
+  const handleSwitchVisibility = (e) => {
     if (gjsEditor) {
-      gjsEditor.runCommand('sw-visibility');
+      const isVisibilityActive = gjsEditor.Commands.isActive('sw-visibility');
+
+      if (isVisibilityActive) {
+        gjsEditor.stopCommand('sw-visibility');
+        e.target.classList.remove('active');
+      } else {
+        gjsEditor.runCommand('sw-visibility');
+        e.target.classList.add('active');
+      }
     }
   };
 
@@ -409,9 +478,17 @@ const PageEditor = ({ match, history }) => {
     }
   };
 
-  const handleToggleFullscreen = () => {
+  const handleToggleFullscreen = (e) => {
     if (gjsEditor) {
-      gjsEditor.runCommand('fullscreen');
+      const isInFullscreen = gjsEditor.Commands.isActive('fullscreen');
+
+      if (isInFullscreen) {
+        gjsEditor.stopCommand('fullscreen');
+        e.target.classList.remove('active');
+      } else {
+        gjsEditor.runCommand('fullscreen', { target: document.querySelector('#builder-page') });
+        e.target.classList.add(['active']);
+      }
     }
   };
 
@@ -450,10 +527,10 @@ const PageEditor = ({ match, history }) => {
   return (
     <Spin spinning={isLoading} tip="Loading template...">
       <div className={isPublicPage ? styles.hidden : undefined}>
-        <div className={styles.builderPage}>
-          <div className={styles.leftSection}>
+        <div id="builder-page" className={styles.builderPage}>
+          <div id="left-section" className={styles.leftSection}>
             <div className={styles.topPanel}>
-              <button className="fa fa-th-large" onClick={handleClickBlocks}></button>
+              <button className="fa fa-th-large active" onClick={handleClickBlocks}></button>
               <button className="fa fa-bars" onClick={handleClickLayers}></button>
             </div>
             <div className={styles.panelContainer}>
@@ -462,19 +539,30 @@ const PageEditor = ({ match, history }) => {
             </div>
           </div>
           <div className={styles.middleSection}>
-            <div className={styles.topPanel}>
+            <div id="top-section" className={styles.topPanel}>
               <Row gutter={8} justify="space-around" className={styles.buttonsContainer}>
-                <Col flex="0 0 45%">Page Selector Here</Col>
-                <Col flex="0 0 120px" className={styles.textAlignCenter}>
-                  <Space align="center">
-                    <button className="fa fa-desktop" onClick={handleSetDeviceDesktop}></button>
-                    <button className="fa fa-tablet" onClick={handleSetDeviceTablet}></button>
-                    <button className="fa fa-mobile" onClick={handleSetDeviceMobile}></button>
+                <Col flex="0 0 45%" className={styles.pageSelectorContainer}>
+                  <Space>
+                    <Text className={styles.whiteText}>Page :</Text>
+                    <Select
+                      value={selectedPageId}
+                      onChange={setSelectedPageId}
+                      loading={isLoading}
+                      options={creatorPages.map((page) => ({
+                        label: page.name,
+                        value: page.external_id,
+                      }))}
+                    />
                   </Space>
+                </Col>
+                <Col flex="0 0 120px" className={styles.textAlignCenter}>
+                  <button className="fa fa-desktop active" onClick={handleSetDeviceDesktop}></button>
+                  <button className="fa fa-tablet" onClick={handleSetDeviceTablet}></button>
+                  <button className="fa fa-mobile" onClick={handleSetDeviceMobile}></button>
                 </Col>
                 <Col flex="1 0 auto" className={styles.textAlignRight}>
                   <Space align="center">
-                    <button className="fa fa-square-o" onClick={handleSwitchVisibility}></button>
+                    <button className="fa fa-square-o active" onClick={handleSwitchVisibility}></button>
                     <button className="fa fa-eye" onClick={handlePreview}></button>
                     <button className="fa fa-arrows-alt" onClick={handleToggleFullscreen}></button>
                     <button className="fa fa-code" onClick={handleShowCode}></button>
@@ -488,9 +576,9 @@ const PageEditor = ({ match, history }) => {
             </div>
             <div id="builder-editor"></div>
           </div>
-          <div className={styles.rightSection}>
+          <div id="right-section" className={styles.rightSection}>
             <div className={styles.topPanel}>
-              <button className="fa fa-paint-brush" onClick={handleClickStyles}></button>
+              <button className="fa fa-paint-brush active" onClick={handleClickStyles}></button>
               <button className="fa fa-cog" onClick={handleClickTraits}></button>
             </div>
             <div id="empty-selection">Please select a component first.</div>
