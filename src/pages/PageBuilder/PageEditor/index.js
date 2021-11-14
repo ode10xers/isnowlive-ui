@@ -9,23 +9,19 @@ import grapesjs from 'grapesjs';
 import 'grapesjs-preset-webpage';
 
 import apis from 'apis';
-import config from 'config/index.js';
+import config from 'config';
 
 import { showErrorModal } from 'components/Modals/modals.js';
 
 // These are to be put as part of the config
+import elementIds from '../Configs/common/elementIds.js';
+import commonEditorConfig from '../Configs/common/config';
 import definedBlocks from '../Configs/blocks.js';
-// import definedPanels from '../Configs/panels.js';
 import definedStylePanels from '../Configs/style_panel.js';
 
 // THese are to be put in plugins
-// import CustomTraits from '../Plugins/traits';
 import CustomCommands from '../Plugins/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
-// import TextSection from '../CustomComponents/TextSection.js';
-// import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
-// import LinkButton from '../CustomComponents/LinkButton.js';
-// import SignInButton from '../CustomComponents/SignInButton.js';
 import PassionSessionList from '../CustomComponents/PassionSessionList.js';
 import PassionVideoList from '../CustomComponents/PassionVideoList.js';
 import PassionCourseList from '../CustomComponents/PassionCourseList.js';
@@ -44,6 +40,68 @@ import { useGlobalContext } from 'services/globalContext.js';
 import styles from './style.module.scss';
 
 const { Text } = Typography;
+
+const {
+  BUILDER_CONTAINER_ID,
+  SELECTOR_PANEL_ID,
+  STYLES_PANEL_ID,
+  TRAITS_PANEL_ID,
+  LAYERS_PANEL_ID,
+  BLOCKS_PANEL_ID,
+} = elementIds;
+
+const sectionIds = {
+  EDITOR: 'builder-page',
+  RIGHT: 'right-section',
+  RIGHT_INNER: 'right-panel',
+  TOP: 'top-section',
+  LEFT: 'left-section',
+  EMPTY: 'empty-selection',
+  STYLING: 'styling-section',
+};
+
+// TODO: Move this to separate file later
+const customEditorInitializationLogic = (editor) => {
+  // Modify Wrapper stylability
+  // Initially we can only modify background, but modifying
+  // padding also makes sense
+  const wrapper = editor.getWrapper();
+  wrapper.set({
+    stylable: [...wrapper.get('stylable'), 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
+  });
+
+  const editorCanvas = editor.Canvas;
+
+  // Loading external script and running certain logic
+  // inside iframe. In this case it's loading the fonts
+  // using WebFontLoader so the fonts are also visible
+  // inside the iframes
+  const iframeHead = editorCanvas.getDocument().head;
+  const libScript = document.createElement('script');
+  libScript.innerHTML = `
+      WebFontConfig = {
+        google: {
+          families: ${JSON.stringify(Object.values(googleFonts))},
+        }
+      };
+
+      (function(d) {
+        var wf = d.createElement('script'), s = d.scripts[0];
+        wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+        wf.async = true;
+        s.parentNode.insertBefore(wf, s);
+      })(document);
+    `;
+  iframeHead.appendChild(libScript);
+
+  // Hacky way of copying styles to the iframe inside
+  // Not sure if this will work dynamically or not
+  const iframeEl = editorCanvas.getWindow();
+  const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet']");
+  styleEls.forEach((el) => {
+    iframeEl.document.head.appendChild(el.cloneNode(true));
+  });
+};
 
 // TODO: Refactor these into constants and configs of separate files
 const PageEditor = ({ match, history }) => {
@@ -110,74 +168,20 @@ const PageEditor = ({ match, history }) => {
     // Since it's also going to be used in HeaderEditor and FooterEditor
     // When rendering in public [age]
     const editor = grapesjs.init({
-      // Indicate where to init the editor. You can also pass an HTMLElement
-      container: '#builder-editor',
-      baseCss: `
-    * {
-      box-sizing: border-box;
-    }
-    html, body, [data-gjs-type=wrapper] {
-      min-height: 100%;
-    }
-    body {
-      margin: 0;
-      height: 100%;
-      background-color: #fff
-    }
-    [data-gjs-type=wrapper] {
-      padding: 12px;
-      overflow: auto;
-      overflow-x: hidden;
-    }
-    * ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1)
-    }
-    * ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2)
-    }
-    * ::-webkit-scrollbar {
-      width: 10px
-    }
-  `,
-      // Get the content for the canvas directly from the element
-      // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
-      // fromElement: true,
-      // Size of the editor
-      noticeOnUnload: true,
-      height: 'calc(100vh - 40px)',
-      width: 'auto',
-      showOffsetsSelected: true,
-      // storageManager: {
-      //   id: 'gjs-', // Prefix identifier that will be used on parameters
-      //   type: 'local', // Type of the storage
-      //   autosave: true, // Store data automatically
-      //   autoload: false, // Autoload stored data on init
-      //   stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
-      // },
+      ...commonEditorConfig,
+      blockManager: {
+        ...commonEditorConfig.blockManager,
+        blocks: definedBlocks,
+      },
+
       storageManager: {
         id: '',
         type: 'passion-backend',
-        autoSave: true,
+        autosave: true,
         stepsBeforeSave: 15,
         autoload: false,
       },
-      // storageManager: {
-      //   id: '', // Prefix identifier that will be used on parameters
-      //   type: 'remote', // Type of the storage
-      //   autosave: true, // Store data automatically
-      //   autoload: false, // Autoload stored data on init
-      //   stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
-      //   urlStore: config.server.baseURL + '/secure/creator/website/pages',
-      //   headers: {
-      //     'auth-token': userDetails?.auth_token ?? getLocalUserDetails()?.auth_token ?? '',
-      //     'creator-username': getUsernameFromUrl() ?? '',
-      //   },
-      //   credentials: 'omit',
-      //   fetchOptions: (currentOptions) => {
-      //     console.log("Current Options: ", currentOptions)
-      //     return currentOptions.method === 'post' ? { method: 'PATCH' } : {};
-      //   }
-      // },
+
       assetManager: {
         assets: [],
         // customFetch: (url, options) => http.post(url, options.body),
@@ -211,47 +215,8 @@ const PageEditor = ({ match, history }) => {
         autoAdd: false,
         showUrlInput: false,
       },
-      keepUnusedStyles: false,
-      // Avoid any default panel
-      // panels: definedPanels,
-      // Built-in props for styles
-      // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
-      selectorManager: {
-        appendTo: '#selector-panel',
-        componentFirst: true,
-      },
-      styleManager: {
-        appendTo: '#styles-panel',
-        clearProperties: true,
-      },
-      traitManager: {
-        appendTo: '#traits-panel',
-      },
-      layerManager: {
-        appendTo: '#layers-panel',
-      },
-      blockManager: {
-        appendTo: '#blocks-panel',
-        blocks: definedBlocks,
-      },
-      deviceManager: {
-        devices: [
-          {
-            name: 'Desktop',
-            width: '', // default size
-          },
-          {
-            name: 'Tablet',
-            width: '768px', // this value will be used on canvas width
-            widthMedia: '768px', // this value will be used in CSS @media
-          },
-          {
-            name: 'Mobile',
-            width: '426px', // this value will be used on canvas width
-            widthMedia: '576px', // this value will be used in CSS @media
-          },
-        ],
-      },
+
+      // TODO: Can Probably group all passion components under a named plugin
       plugins: [
         'gjs-preset-webpage',
         Container,
@@ -262,12 +227,8 @@ const PageEditor = ({ match, history }) => {
         PassionSessionList,
         PassionPassList,
         CustomCommands,
-        // CustomTraits,
-        // TextSection,
-        // TextWithImageSection,
-        // LinkButton,
-        // SignInButton,
       ],
+
       pluginsOpts: {
         'gjs-preset-webpage': {
           modalImportLabel: 'This is the data format that will be saved',
@@ -291,55 +252,7 @@ const PageEditor = ({ match, history }) => {
       },
     });
 
-    //#region Start of Custom Initialization Logic
-
-    // Modify Wrapper stylability
-    // Initially we can only modify background, but modifying
-    // padding also makes sense
-    const wrapper = editor.getWrapper();
-    wrapper.set({
-      stylable: [
-        ...wrapper.get('stylable'),
-        'padding',
-        'padding-top',
-        'padding-right',
-        'padding-bottom',
-        'padding-left',
-      ],
-    });
-
-    // Loading external script and running certain logic
-    // inside iframe. In this case it's loading the fonts
-    // using WebFontLoader so the fonts are also visible
-    // inside the iframes
-    const iframeDoc = editor.Canvas.getDocument();
-    const iframeHead = iframeDoc.head;
-    const libScript = document.createElement('script');
-    libScript.innerHTML = `
-      WebFontConfig = {
-        google: {
-          families: ${JSON.stringify(Object.values(googleFonts))},
-        }
-      };
-
-      (function(d) {
-        var wf = d.createElement('script'), s = d.scripts[0];
-        wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-        wf.async = true;
-        s.parentNode.insertBefore(wf, s);
-      })(document);
-    `;
-    iframeHead.appendChild(libScript);
-
-    // Hacky way of copying styles to the iframe inside
-    // Not sure if this will work dynamically or not
-    const iframeEl = editor.Canvas.getWindow();
-    const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet']");
-    styleEls.forEach((el) => {
-      iframeEl.document.head.appendChild(el.cloneNode(true));
-    });
-
-    //#endregion End of Custom Initialization Logic
+    customEditorInitializationLogic(editor);
 
     //#region Start of event listener hooks
     editor.on('asset:upload:start', () => {
@@ -394,20 +307,20 @@ const PageEditor = ({ match, history }) => {
     });
 
     editor.on('run:preview', () => {
-      document.querySelector('#right-section').style.display = 'none';
-      document.querySelector('#left-section').style.display = 'none';
-      document.querySelector('#top-section').style.display = 'none';
+      document.getElementById(sectionIds.RIGHT).style.display = 'none';
+      document.getElementById(sectionIds.TOP).style.display = 'none';
+      document.getElementById(sectionIds.LEFT).style.display = 'none';
     });
 
     editor.on('stop:preview', () => {
-      document.querySelector('#right-section').style.display = 'block';
-      document.querySelector('#left-section').style.display = 'block';
-      document.querySelector('#top-section').style.display = 'block';
+      document.getElementById(sectionIds.RIGHT).style.display = 'block';
+      document.getElementById(sectionIds.TOP).style.display = 'block';
+      document.getElementById(sectionIds.LEFT).style.display = 'block';
     });
 
     editor.onReady(() => {
-      document.querySelector('#layers-panel').style.display = 'none';
-      document.querySelector('#traits-panel').style.display = 'none';
+      document.getElementById(LAYERS_PANEL_ID).style.display = 'none';
+      document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
     });
 
     //#endregion End of event listener hooks
@@ -462,6 +375,7 @@ const PageEditor = ({ match, history }) => {
         const targetPage = creatorPages.find((page) => page.external_id === selectedPageId);
 
         if (targetPage) {
+          // Override existing logic (especially the payload) with current page
           gjsEditor.StorageManager.add('passion-backend', {
             async store(payload, callback, errorCallback) {
               setIsSaving(true);
@@ -536,11 +450,11 @@ const PageEditor = ({ match, history }) => {
   // Logic to handle rendering right panels
   useEffect(() => {
     if (!isComponentSelected) {
-      document.querySelector('#right-panel').style.display = 'none';
-      document.querySelector('#empty-selection').style.display = 'block';
+      document.getElementById(sectionIds.RIGHT_INNER).style.display = 'none';
+      document.getElementById(sectionIds.EMPTY).style.display = 'block';
     } else {
-      document.querySelector('#right-panel').style.display = 'block';
-      document.querySelector('#empty-selection').style.display = 'none';
+      document.getElementById(sectionIds.RIGHT_INNER).style.display = 'block';
+      document.getElementById(sectionIds.EMPTY).style.display = 'none';
     }
   }, [isComponentSelected]);
 
@@ -552,9 +466,11 @@ const PageEditor = ({ match, history }) => {
   const onSelectedPageChanged = (value) => {
     if (gjsEditor) {
       gjsEditor.store(
+        // Success Callback
         () => {
           setSelectedPageId(value);
         },
+        // Error Callback
         () => {
           message.error('Failed to save changes to current page!');
         }
@@ -562,63 +478,60 @@ const PageEditor = ({ match, history }) => {
     }
   };
 
-  // TODO: Refactor later
   //#region Start of Editor Button Handlers
-  const handleClickBlocks = (e) => {
+  const runSimpleCommand = (command) => {
     if (gjsEditor) {
-      gjsEditor.runCommand('open-blocks');
-      toggleActiveClass(e.target);
-      document.querySelector('#layers-panel').style.display = 'none';
-      document.querySelector('#blocks-panel').style.display = 'block';
+      gjsEditor.runCommand(command);
+    }
+  };
+
+  const runCommandAndToggleActiveStyles = (targetElement, command = '') => {
+    if (gjsEditor && command) {
+      gjsEditor.runCommand(command);
+      toggleActiveClass(targetElement);
+      return true; // run complete
+    }
+    return false; // run failed
+  };
+
+  const handleClickBlocks = (e) => {
+    if (runCommandAndToggleActiveStyles(e.target, 'open-blocks')) {
+      document.getElementById(LAYERS_PANEL_ID).style.display = 'none';
+      document.getElementById(BLOCKS_PANEL_ID).style.display = 'block';
     }
   };
 
   const handleClickLayers = (e) => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('open-layers');
-      toggleActiveClass(e.target);
-      document.querySelector('#layers-panel').style.display = 'block';
-      document.querySelector('#blocks-panel').style.display = 'none';
+    if (runCommandAndToggleActiveStyles(e.target, 'open-layers')) {
+      document.getElementById(LAYERS_PANEL_ID).style.display = 'block';
+      document.getElementById(BLOCKS_PANEL_ID).style.display = 'none';
     }
   };
 
   const handleClickStyles = (e) => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('open-sm');
-      toggleActiveClass(e.target);
-      document.querySelector('#styling-section').style.display = 'block';
-      document.querySelector('#traits-panel').style.display = 'none';
+    if (runCommandAndToggleActiveStyles(e.target, 'open-sm')) {
+      document.getElementById(sectionIds.STYLING).style.display = 'block';
+      document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
     }
   };
 
   const handleClickTraits = (e) => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('open-tm');
-      toggleActiveClass(e.target);
-      document.querySelector('#styling-section').style.display = 'none';
-      document.querySelector('#traits-panel').style.display = 'block';
+    if (runCommandAndToggleActiveStyles(e.target, 'open-tm')) {
+      document.getElementById(sectionIds.STYLING).style.display = 'none';
+      document.getElementById(TRAITS_PANEL_ID).style.display = 'block';
     }
   };
 
   const handleSetDeviceDesktop = (e) => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('set-device-desktop');
-      toggleActiveClass(e.target);
-    }
+    runCommandAndToggleActiveStyles(e.target, 'set-device-desktop');
   };
 
   const handleSetDeviceTablet = (e) => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('set-device-tablet');
-      toggleActiveClass(e.target);
-    }
+    runCommandAndToggleActiveStyles(e.target, 'set-device-tablet');
   };
 
   const handleSetDeviceMobile = (e) => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('set-device-mobile');
-      toggleActiveClass(e.target);
-    }
+    runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
   };
 
   const handleSwitchVisibility = (e) => {
@@ -636,9 +549,7 @@ const PageEditor = ({ match, history }) => {
   };
 
   const handlePreview = () => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('preview');
-    }
+    runSimpleCommand('preview');
   };
 
   const handleToggleFullscreen = (e) => {
@@ -649,40 +560,32 @@ const PageEditor = ({ match, history }) => {
         gjsEditor.stopCommand('fullscreen');
         e.target.classList.remove('active');
       } else {
-        gjsEditor.runCommand('fullscreen', { target: document.querySelector('#builder-page') });
+        gjsEditor.runCommand('fullscreen', { target: document.getElementById(sectionIds.EDITOR) });
         e.target.classList.add(['active']);
       }
     }
   };
 
   const handleShowCode = () => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('export-template');
-    }
+    runSimpleCommand('export-template');
   };
 
   const handleUndo = () => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('core:undo');
-    }
+    runSimpleCommand('core:undo');
   };
 
   const handleRedo = () => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('core:redo');
-    }
+    runSimpleCommand('core:redo');
   };
 
   const handleSaveTemplate = () => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('save-as-json');
-    }
+    // Custom defined command in Plugins/commands.js
+    runSimpleCommand('save-as-json');
   };
 
   const handleCleanCanvas = () => {
-    if (gjsEditor) {
-      gjsEditor.runCommand('canvas-clear');
-    }
+    // Custom command, comes from grapesjs-preset-webpage
+    runSimpleCommand('canvas-clear');
   };
 
   //#endregion End of Editor Button Handlers
@@ -690,19 +593,19 @@ const PageEditor = ({ match, history }) => {
   return (
     <Spin spinning={isLoading}>
       <div>
-        <div id="builder-page" className={styles.builderPage}>
-          <div id="left-section" className={styles.leftSection}>
+        <div id={sectionIds.EDITOR} className={styles.builderPage}>
+          <div id={sectionIds.LEFT} className={styles.leftSection}>
             <div className={styles.topPanel}>
               <button className="fa fa-th-large active" onClick={handleClickBlocks}></button>
               <button className="fa fa-bars" onClick={handleClickLayers}></button>
             </div>
             <div className={styles.panelContainer}>
-              <div id="blocks-panel"></div>
-              <div id="layers-panel"></div>
+              <div id={BLOCKS_PANEL_ID}></div>
+              <div id={LAYERS_PANEL_ID}></div>
             </div>
           </div>
           <div className={styles.middleSection}>
-            <div id="top-section" className={styles.topPanel}>
+            <div id={sectionIds.TOP} className={styles.topPanel}>
               <Row gutter={8} justify="space-around" className={styles.buttonsContainer}>
                 <Col flex="0 0 45%" className={styles.pageSelectorContainer}>
                   <Space>
@@ -741,20 +644,20 @@ const PageEditor = ({ match, history }) => {
                 </Col>
               </Row>
             </div>
-            <div id="builder-editor"></div>
+            <div id={BUILDER_CONTAINER_ID}></div>
           </div>
-          <div id="right-section" className={styles.rightSection}>
+          <div id={sectionIds.RIGHT} className={styles.rightSection}>
             <div className={styles.topPanel}>
               <button className="fa fa-paint-brush active" onClick={handleClickStyles}></button>
               <button className="fa fa-cog" onClick={handleClickTraits}></button>
             </div>
-            <div id="empty-selection">Please select a component first.</div>
-            <div id="right-panel" className={styles.panelContainer}>
-              <div id="styling-section">
-                <div id="selector-panel"></div>
-                <div id="styles-panel"></div>
+            <div id={sectionIds.EMPTY}>Please select a component first.</div>
+            <div id={sectionIds.RIGHT_INNER} className={styles.panelContainer}>
+              <div id={sectionIds.STYLING}>
+                <div id={SELECTOR_PANEL_ID}></div>
+                <div id={STYLES_PANEL_ID}></div>
               </div>
-              <div id="traits-panel"></div>
+              <div id={TRAITS_PANEL_ID}></div>
             </div>
           </div>
         </div>

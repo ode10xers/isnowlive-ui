@@ -102,7 +102,7 @@ const CustomPagesListing = ({ match, history }) => {
     }
   };
 
-  const handleEditPageContent = (pageInfo) => () =>
+  const handleEditPageContent = (pageInfo) =>
     navigateWithUsernameUrl(
       generatePath(Routes.creatorDashboard.customPages.editor, { page_id: pageInfo.external_id })
     );

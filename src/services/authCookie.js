@@ -3,7 +3,7 @@ import { isInCustomDomain } from 'utils/url';
 const AUTH_COOKIE = {
   NAME: '__passion_auth_code__',
   DOMAIN: {
-    development: 'localhost',
+    development: window.location.hostname ?? 'localhost',
     staging: '.stage.passion.do',
     production: '.passion.do',
   },
