@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { generatePath } from 'react-router-dom';
 import classNames from 'classnames';
 
 import debounce from 'lodash.debounce';
@@ -14,13 +15,12 @@ import { pageCreateFormLayout, pageCreateFormTailLayout } from 'layouts/FormLayo
 
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
-import { pageTypes } from 'utils/constants';
 import { getLocalUserDetails } from 'utils/storage';
-import { blankPageTemplate } from 'utils/pageEditorTemplates';
+import { blankPageTemplate, headerTemplate, footerTemplate } from 'utils/pageEditorTemplates';
+import { pageTypes, websiteComponentTypes } from 'utils/constants';
 import { createValidSlug, generateUrlFromUsername } from 'utils/url';
 
 import styles from './styles.module.scss';
-import { generatePath } from 'react-router-dom';
 
 const DefaultImage = require('assets/images/greybg.jpg');
 
@@ -48,9 +48,40 @@ const CustomPageForm = ({ match, location, history }) => {
   const [isValidSlug, setIsValidSlug] = useState(true);
   const [isValidatingSlug, setIsValidatingSlug] = useState(false);
 
+  const [shouldCreateHeader, setShouldCreateHeader] = useState(false);
+  const [shouldCreateFooter, setShouldCreateFooter] = useState(false);
+
   // NOTE: We need to make sure at least there's a default template selected
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(blankPageTemplate);
+
+  const fetchCreatorHeaderComponent = useCallback(async () => {
+    try {
+      const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.HEADER);
+
+      if (isAPISuccess(status) && data) {
+        setShouldCreateHeader(false);
+      }
+    } catch (error) {
+      console.log('Failed fetching creator header component!');
+      console.error(error);
+      setShouldCreateHeader(true);
+    }
+  }, []);
+
+  const fetchCreatorFooterComponent = useCallback(async () => {
+    try {
+      const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.FOOTER);
+
+      if (isAPISuccess(status) && data) {
+        setShouldCreateFooter(false);
+      }
+    } catch (error) {
+      console.log('Failed fetching creator header component!');
+      console.error(error);
+      setShouldCreateFooter(true);
+    }
+  }, []);
 
   const fetchPageDetails = useCallback(async (pageId) => {
     setIsLoading(true);
@@ -68,6 +99,13 @@ const CustomPageForm = ({ match, location, history }) => {
 
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (isCreatingHomepage) {
+      fetchCreatorHeaderComponent();
+      fetchCreatorFooterComponent();
+    }
+  }, [isCreatingHomepage, fetchCreatorHeaderComponent, fetchCreatorFooterComponent]);
 
   useEffect(() => {
     if (targetPageId) {
@@ -148,8 +186,6 @@ const CustomPageForm = ({ match, location, history }) => {
         content: pageDetails ? pageDetails.content : selectedTemplate?.content ?? blankPageTemplate.content,
       };
 
-      console.log(payload);
-
       const { status, data } = targetPageId
         ? await apis.custom_pages.updatePage({ ...payload, external_id: targetPageId })
         : await apis.custom_pages.createPage(payload);
@@ -157,8 +193,34 @@ const CustomPageForm = ({ match, location, history }) => {
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
         message.success(`Page successfully ${targetPageId ? 'updated' : 'created'}!`);
-        // TODO: Here, we also need to initialize/trigger create HEADER and FOOTER
-        // When creating homepage for the first time
+
+        const additionalPromises = [];
+
+        if (shouldCreateHeader) {
+          const createHeaderPromise = apis.custom_pages.createWebsiteComponent({
+            content: headerTemplate,
+            component_type: websiteComponentTypes.HEADER,
+          });
+          additionalPromises.push(createHeaderPromise);
+        }
+
+        if (shouldCreateFooter) {
+          const createFooterPromise = apis.custom_pages.createWebsiteComponent({
+            content: footerTemplate,
+            component_type: websiteComponentTypes.FOOTER,
+          });
+          additionalPromises.push(createFooterPromise);
+        }
+
+        if (additionalPromises.length > 0) {
+          try {
+            await Promise.allSettled(additionalPromises);
+          } catch (error) {
+            console.error('Error while initializing website components');
+            console.error('error');
+          }
+        }
+
         if (shouldRedirect) {
           history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.list);
         } else {

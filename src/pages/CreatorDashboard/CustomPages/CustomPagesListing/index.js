@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { Spin, Row, Col, Button, Typography, Table, Empty, Modal, message } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
@@ -9,16 +10,23 @@ import Routes from 'routes';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
-import { pageTypes } from 'utils/constants';
+import { generateUrlFromUsername } from 'utils/url';
+import { pageTypes, websiteComponentTypes } from 'utils/constants';
 
 import styles from './styles.module.scss';
-import { generatePath } from 'react-router-dom';
+import { useGlobalContext } from 'services/globalContext';
 
 const { Text, Title } = Typography;
 
 const CustomPagesListing = ({ match, history }) => {
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
   const [creatorPages, setCreatorPages] = useState([]);
+  const [creatorHeader, setCreatorHeader] = useState(null);
+  const [creatorFooter, setCreatorFooter] = useState(null);
 
   const fetchCreatorCustomPages = useCallback(async () => {
     setIsLoading(true);
@@ -38,14 +46,50 @@ const CustomPagesListing = ({ match, history }) => {
     setIsLoading(false);
   }, []);
 
+  const fetchCreatorHeaderComponent = useCallback(async () => {
+    try {
+      const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.HEADER);
+
+      if (isAPISuccess(status) && data) {
+        setCreatorHeader(data);
+      }
+    } catch (error) {
+      console.log('Failed fetching creator header component!');
+      console.error(error);
+    }
+  }, []);
+
+  const fetchCreatorFooterComponent = useCallback(async () => {
+    try {
+      const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.FOOTER);
+
+      if (isAPISuccess(status) && data) {
+        setCreatorFooter(data);
+      }
+    } catch (error) {
+      console.log('Failed fetching creator header component!');
+      console.error(error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCreatorCustomPages();
-  }, [fetchCreatorCustomPages]);
+    fetchCreatorHeaderComponent();
+    fetchCreatorFooterComponent();
+  }, [fetchCreatorCustomPages, fetchCreatorHeaderComponent, fetchCreatorFooterComponent]);
+
+  const navigateWithUsernameUrl = (targetPath) => {
+    window.location.href = `${generateUrlFromUsername(userDetails.username)}${targetPath}`;
+  };
 
   const handleCreateNewPage = () =>
     history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.create, {
       isHome: creatorPages.every((page) => page.type !== pageTypes.HOME),
     });
+
+  const handleEditHeader = () => navigateWithUsernameUrl(Routes.creatorDashboard.customPages.headerEditor);
+
+  const handleEditFooter = () => navigateWithUsernameUrl(Routes.creatorDashboard.customPages.footerEditor);
 
   const handleEditPageDetails = (pageInfo) => {
     if (pageInfo && pageInfo.external_id) {
@@ -58,9 +102,10 @@ const CustomPagesListing = ({ match, history }) => {
     }
   };
 
-  const handleEditPageContent = (pageInfo) => {
-    history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: pageInfo.external_id }));
-  };
+  const handleEditPageContent = (pageInfo) => () =>
+    navigateWithUsernameUrl(
+      generatePath(Routes.creatorDashboard.customPages.editor, { page_id: pageInfo.external_id })
+    );
 
   const handleDeletePage = async (pageInfo, modalRef) => {
     setIsLoading(true);
@@ -144,13 +189,31 @@ const CustomPagesListing = ({ match, history }) => {
     <div className={styles.pageListContainer}>
       <Spin spinning={isLoading} tip="Fetching custom pages...">
         <Row gutter={[8, 16]}>
-          <Col xs={24} md={16} lg={18}>
+          <Col xs={24} md={8} lg={6}>
             <Title level={4}>Custom Pages</Title>
           </Col>
-          <Col xs={24} md={8} lg={6}>
-            <Button block type="primary" onClick={handleCreateNewPage}>
-              Create New Page
-            </Button>
+          <Col xs={24} md={16} lg={18}>
+            <Row gutter={[8, 8]} justify="end">
+              {creatorHeader && (
+                <Col flex="0 0 33%">
+                  <Button ghost block type="primary" onClick={handleEditHeader}>
+                    Edit Header
+                  </Button>
+                </Col>
+              )}
+              {creatorFooter && (
+                <Col flex="0 0 33%">
+                  <Button ghost block type="primary" onClick={handleEditFooter}>
+                    Edit Footer
+                  </Button>
+                </Col>
+              )}
+              <Col flex="0 0 33%">
+                <Button block type="primary" onClick={handleCreateNewPage}>
+                  Create New Page
+                </Button>
+              </Col>
+            </Row>
           </Col>
           <Col xs={24}>
             {creatorPages.length > 0 ? (
