@@ -62,6 +62,7 @@ const Onboarding = lazy(() => import('pages/EditProfile'));
 const PageEditor = lazy(() => import('pages/PageBuilder/PageEditor'));
 const HeaderEditor = lazy(() => import('pages/PageBuilder/HeaderEditor'));
 const FooterEditor = lazy(() => import('pages/PageBuilder/FooterEditor'));
+const PageRenderer = lazy(() => import('pages/PageBuilder/PageRenderer'));
 
 const PassDetailPreview = lazy(() => import('pages/PreviewPages/PassDetails'));
 const CourseDetailPreview = lazy(() => import('pages/PreviewPages/CourseDetails'));
@@ -388,7 +389,7 @@ function App() {
               component={CourseDetailedListView}
             />
             <RouteWithLayout
-              layout={MobileLayout}
+              layout={FullWidthLayout}
               exact
               path={[Routes.root, Routes.sessions, Routes.videos, Routes.courses, Routes.subscriptions, Routes.passes]}
               component={NewHome}
@@ -402,6 +403,7 @@ function App() {
                 }}
               />
             </Route>
+            <Route layout={FullWidthLayout} path={Routes.root} component={PageRenderer} />
           </Switch>
         )}
       </Router>

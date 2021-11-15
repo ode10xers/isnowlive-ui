@@ -41,11 +41,20 @@ const SignInButton = ({ target = 'dashboard', buttonType = 'primary' }) => {
   return (
     <div>
       {userDetails ? (
-        <Button type={buttonType ?? 'primary'} onClick={() => postLoginMessage(true)} icon={<AppstoreOutlined />}>
+        <Button
+          ghost={buttonType === 'outlined'}
+          type={buttonType === 'outlined' ? 'primary' : buttonType ?? 'primary'}
+          onClick={() => postLoginMessage(true)}
+          icon={<AppstoreOutlined />}
+        >
           My Dashboard
         </Button>
       ) : (
-        <Button type={buttonType ?? 'primary'} onClick={() => postLoginMessage(target === 'dashboard')}>
+        <Button
+          ghost={buttonType === 'outlined'}
+          type={buttonType === 'outlined' ? 'primary' : buttonType ?? 'primary'}
+          onClick={() => postLoginMessage(target === 'dashboard')}
+        >
           Sign In
         </Button>
       )}

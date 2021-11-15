@@ -36,7 +36,7 @@ export default (editor) => {
             name: 'buttonType',
             options: [
               { id: 'primary', name: 'Filled' },
-              { id: 'outline', name: 'Outlined' },
+              { id: 'outlined', name: 'Outlined' },
               { id: 'link', name: 'Link Text' },
             ],
           },

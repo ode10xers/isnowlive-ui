@@ -49,7 +49,7 @@ const {
   RIGHT_INNER,
   TOP,
   LEFT,
-  EMPTY,
+  // EMPTY,
   // STYLING,
 } = sectionIds;
 
@@ -62,7 +62,6 @@ const HeaderEditor = ({ match, history }) => {
   const [gjsEditor, setGjsEditor] = useState(null);
 
   const [creatorAssets, setCreatorAssets] = useState([]);
-  const [isComponentSelected, setIsComponentSelected] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const fetchCreatorHeaderComponent = useCallback(async (editor) => {
@@ -258,13 +257,13 @@ const HeaderEditor = ({ match, history }) => {
       setIsLoading(false);
     });
 
-    editor.on('component:selected', () => {
-      setIsComponentSelected(true);
-    });
+    // editor.on('component:selected', () => {
+    //   setIsComponentSelected(true);
+    // });
 
-    editor.on('component:deselected', () => {
-      setIsComponentSelected(false);
-    });
+    // editor.on('component:deselected', () => {
+    //   setIsComponentSelected(false);
+    // });
 
     editor.on('run:preview', () => {
       document.getElementById(RIGHT).style.display = 'none';
@@ -319,16 +318,16 @@ const HeaderEditor = ({ match, history }) => {
     }
   }, [gjsEditor, creatorAssets]);
 
-  // Logic to handle rendering right panels
-  useEffect(() => {
-    if (!isComponentSelected) {
-      document.getElementById(RIGHT_INNER).style.display = 'none';
-      document.getElementById(EMPTY).style.display = 'block';
-    } else {
-      document.getElementById(RIGHT_INNER).style.display = 'block';
-      document.getElementById(EMPTY).style.display = 'none';
-    }
-  }, [isComponentSelected]);
+  // // Logic to handle rendering right panels
+  // useEffect(() => {
+  //   if (!isComponentSelected) {
+  //     document.getElementById(RIGHT_INNER).style.display = 'none';
+  //     document.getElementById(EMPTY).style.display = 'block';
+  //   } else {
+  //     document.getElementById(RIGHT_INNER).style.display = 'block';
+  //     document.getElementById(EMPTY).style.display = 'none';
+  //   }
+  // }, [isComponentSelected]);
 
   //#region Start of Editor Button Handlers
   const handleBackToDashboard = () => {
@@ -484,7 +483,7 @@ const HeaderEditor = ({ match, history }) => {
               {/* <button className="fa fa-paint-brush" onClick={handleClickStyles}></button> */}
               <button className="fa fa-cog active" onClick={handleClickTraits}></button>
             </div>
-            <div id={EMPTY}>Please select a component first.</div>
+            {/* <div id={EMPTY}>Please select a component first.</div> */}
             <div id={RIGHT_INNER} className={styles.panelContainer}>
               {/* <div id={STYLING}>
                 <div id={SELECTOR_PANEL_ID}></div>

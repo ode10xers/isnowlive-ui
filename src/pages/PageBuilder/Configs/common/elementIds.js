@@ -5,4 +5,5 @@ export default {
   TRAITS_PANEL_ID: 'traits-panel',
   LAYERS_PANEL_ID: 'layers-panel',
   BLOCKS_PANEL_ID: 'blocks-panel',
+  PAGE_PORTAL_ID: 'page-portal',
 };

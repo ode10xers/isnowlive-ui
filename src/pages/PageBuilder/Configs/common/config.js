@@ -25,6 +25,7 @@ export default {
   width: 'auto',
   noticeOnUnload: true,
   showOffsetsSelected: true,
+  keepUnusedStyles: false,
   storageManager: {
     id: 'gjs-', // Prefix identifier that will be used on parameters
     type: 'local', // Type of the storage
@@ -32,7 +33,6 @@ export default {
     autoload: false, // Autoload stored data on init
     stepsBeforeSave: 5, // If autosave enabled, indicates how many changes are necessary before store method is triggered
   },
-  keepUnusedStyles: false,
   // Avoid any default panel
   // panels: definedPanels,
   // Built-in props for styles

@@ -121,6 +121,8 @@ const PageEditor = ({ match, history }) => {
     const editor = grapesjs.init({
       ...commonEditorConfig,
       // Adding padding to the wrapper
+      exportWrapper: true,
+      wrapperIsBody: false,
       baseCss: `
         * {
           box-sizing: border-box;
@@ -148,6 +150,10 @@ const PageEditor = ({ match, history }) => {
           width: 10px
         }
       `,
+      domComponents: {
+        storeWrapper: true,
+      },
+
       blockManager: {
         ...commonEditorConfig.blockManager,
         blocks: definedBlocks,

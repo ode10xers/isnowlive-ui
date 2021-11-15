@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { message } from 'antd';
 
 import Routes from 'routes';
+import elementIds from 'pages/PageBuilder/Configs/common/elementIds';
 
 import AuthModal from 'components/AuthModal';
 
@@ -11,6 +12,8 @@ import { isValidPostMessageEvent, postMessageToWindow } from 'utils/postMessage'
 import { postMessageCommands } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
+
+const { PAGE_PORTAL_ID } = elementIds;
 
 const PostMessageHandlers = () => {
   const history = useHistory();
@@ -31,8 +34,10 @@ const PostMessageHandlers = () => {
 
   const redirectToDashboard = useCallback(() => {
     const user_type = userDetails?.is_creator ? 'creatorDashboard' : 'attendeeDashboard';
-    const portalContainer = document.getElementById('page-portal');
+    const portalContainer = document.getElementById(PAGE_PORTAL_ID);
+    console.log(portalContainer);
     if (portalContainer) {
+      console.log('Removing page portal');
       portalContainer.remove();
     }
 
