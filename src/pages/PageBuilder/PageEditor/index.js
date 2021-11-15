@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Spin, Row, Col, Space, Select, Typography, message } from 'antd';
+import { Spin, Row, Col, Space, Select, Typography, Button, message } from 'antd';
+import { LeftOutlined } from '@ant-design/icons';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
@@ -10,11 +11,13 @@ import 'grapesjs-preset-webpage';
 
 import apis from 'apis';
 import config from 'config';
+import Routes from 'routes';
 
 import { showErrorModal } from 'components/Modals/modals.js';
 
 // These are to be put as part of the config
 import elementIds from '../Configs/common/elementIds.js';
+import sectionIds from '../Configs/common/sectionIds';
 import commonEditorConfig from '../Configs/common/config';
 import definedBlocks from '../Configs/blocks.js';
 import definedStylePanels from '../Configs/style_panel.js';
@@ -29,10 +32,10 @@ import PassionPassList from '../CustomComponents/PassionPassList.js';
 import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
 import Container from '../CustomComponents/Container.js';
 
-import { googleFonts } from 'utils/constants.js';
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
+import { customEditorInitializationLogic } from 'utils/pageEditor.js';
 
 import { useGlobalContext } from 'services/globalContext.js';
 
@@ -50,60 +53,8 @@ const {
   BLOCKS_PANEL_ID,
 } = elementIds;
 
-const sectionIds = {
-  EDITOR: 'builder-page',
-  RIGHT: 'right-section',
-  RIGHT_INNER: 'right-panel',
-  TOP: 'top-section',
-  LEFT: 'left-section',
-  EMPTY: 'empty-selection',
-  STYLING: 'styling-section',
-};
+const { EDITOR, RIGHT, RIGHT_INNER, TOP, LEFT, EMPTY, STYLING } = sectionIds;
 
-// TODO: Move this to separate file later
-const customEditorInitializationLogic = (editor) => {
-  // Modify Wrapper stylability
-  // Initially we can only modify background, but modifying
-  // padding also makes sense
-  const wrapper = editor.getWrapper();
-  wrapper.set({
-    stylable: [...wrapper.get('stylable'), 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
-  });
-
-  const editorCanvas = editor.Canvas;
-
-  // Loading external script and running certain logic
-  // inside iframe. In this case it's loading the fonts
-  // using WebFontLoader so the fonts are also visible
-  // inside the iframes
-  const iframeHead = editorCanvas.getDocument().head;
-  const libScript = document.createElement('script');
-  libScript.innerHTML = `
-      WebFontConfig = {
-        google: {
-          families: ${JSON.stringify(Object.values(googleFonts))},
-        }
-      };
-
-      (function(d) {
-        var wf = d.createElement('script'), s = d.scripts[0];
-        wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-        wf.async = true;
-        s.parentNode.insertBefore(wf, s);
-      })(document);
-    `;
-  iframeHead.appendChild(libScript);
-
-  // Hacky way of copying styles to the iframe inside
-  // Not sure if this will work dynamically or not
-  const iframeEl = editorCanvas.getWindow();
-  const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet']");
-  styleEls.forEach((el) => {
-    iframeEl.document.head.appendChild(el.cloneNode(true));
-  });
-};
-
-// TODO: Refactor these into constants and configs of separate files
 const PageEditor = ({ match, history }) => {
   const targetPageId = match.params.page_id;
 
@@ -169,6 +120,34 @@ const PageEditor = ({ match, history }) => {
     // When rendering in public [age]
     const editor = grapesjs.init({
       ...commonEditorConfig,
+      // Adding padding to the wrapper
+      baseCss: `
+        * {
+          box-sizing: border-box;
+        }
+        html, body, [data-gjs-type=wrapper] {
+          min-height: 100%;
+        }
+        body {
+          margin: 0;
+          height: 100%;
+          background-color: #fff
+        }
+        [data-gjs-type=wrapper] {
+          padding: 12px;
+          overflow: auto;
+          overflow-x: hidden;
+        }
+        * ::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.1)
+        }
+        * ::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2)
+        }
+        * ::-webkit-scrollbar {
+          width: 10px
+        }
+      `,
       blockManager: {
         ...commonEditorConfig.blockManager,
         blocks: definedBlocks,
@@ -254,6 +233,21 @@ const PageEditor = ({ match, history }) => {
 
     customEditorInitializationLogic(editor);
 
+    // Modify Wrapper stylability (I think this should only apply to pages)
+    // Initially we can only modify background, but modifying
+    // padding also makes sense
+    const wrapper = editor.getWrapper();
+    wrapper.set({
+      stylable: [
+        ...wrapper.get('stylable'),
+        'padding',
+        'padding-top',
+        'padding-right',
+        'padding-bottom',
+        'padding-left',
+      ],
+    });
+
     //#region Start of event listener hooks
     editor.on('asset:upload:start', () => {
       setIsLoading(true);
@@ -307,15 +301,15 @@ const PageEditor = ({ match, history }) => {
     });
 
     editor.on('run:preview', () => {
-      document.getElementById(sectionIds.RIGHT).style.display = 'none';
-      document.getElementById(sectionIds.TOP).style.display = 'none';
-      document.getElementById(sectionIds.LEFT).style.display = 'none';
+      document.getElementById(RIGHT).style.display = 'none';
+      document.getElementById(TOP).style.display = 'none';
+      document.getElementById(LEFT).style.display = 'none';
     });
 
     editor.on('stop:preview', () => {
-      document.getElementById(sectionIds.RIGHT).style.display = 'block';
-      document.getElementById(sectionIds.TOP).style.display = 'block';
-      document.getElementById(sectionIds.LEFT).style.display = 'block';
+      document.getElementById(RIGHT).style.display = 'block';
+      document.getElementById(TOP).style.display = 'block';
+      document.getElementById(LEFT).style.display = 'block';
     });
 
     editor.onReady(() => {
@@ -426,7 +420,6 @@ const PageEditor = ({ match, history }) => {
       gjsEditor.off('asset:remove');
       gjsEditor.on('asset:remove', async (removedAsset) => {
         try {
-          console.log(removedAsset);
           const assetUrl = removedAsset.attributes.src;
 
           const targetAsset = creatorAssets.find((asset) => asset.src === assetUrl);
@@ -450,18 +443,13 @@ const PageEditor = ({ match, history }) => {
   // Logic to handle rendering right panels
   useEffect(() => {
     if (!isComponentSelected) {
-      document.getElementById(sectionIds.RIGHT_INNER).style.display = 'none';
-      document.getElementById(sectionIds.EMPTY).style.display = 'block';
+      document.getElementById(RIGHT_INNER).style.display = 'none';
+      document.getElementById(EMPTY).style.display = 'block';
     } else {
-      document.getElementById(sectionIds.RIGHT_INNER).style.display = 'block';
-      document.getElementById(sectionIds.EMPTY).style.display = 'none';
+      document.getElementById(RIGHT_INNER).style.display = 'block';
+      document.getElementById(EMPTY).style.display = 'none';
     }
   }, [isComponentSelected]);
-
-  const toggleActiveClass = (targetEl) => {
-    targetEl.classList.add(['active']);
-    getSiblingElements(targetEl).forEach((el) => el.classList.remove('active'));
-  };
 
   const onSelectedPageChanged = (value) => {
     if (gjsEditor) {
@@ -479,6 +467,19 @@ const PageEditor = ({ match, history }) => {
   };
 
   //#region Start of Editor Button Handlers
+  const handleBackToDashboard = () => {
+    if (gjsEditor) {
+      gjsEditor.store();
+    }
+
+    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.list);
+  };
+
+  const toggleActiveClass = (targetEl) => {
+    targetEl.classList.add(['active']);
+    getSiblingElements(targetEl).forEach((el) => el.classList.remove('active'));
+  };
+
   const runSimpleCommand = (command) => {
     if (gjsEditor) {
       gjsEditor.runCommand(command);
@@ -510,14 +511,14 @@ const PageEditor = ({ match, history }) => {
 
   const handleClickStyles = (e) => {
     if (runCommandAndToggleActiveStyles(e.target, 'open-sm')) {
-      document.getElementById(sectionIds.STYLING).style.display = 'block';
+      document.getElementById(STYLING).style.display = 'block';
       document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
     }
   };
 
   const handleClickTraits = (e) => {
     if (runCommandAndToggleActiveStyles(e.target, 'open-tm')) {
-      document.getElementById(sectionIds.STYLING).style.display = 'none';
+      document.getElementById(STYLING).style.display = 'none';
       document.getElementById(TRAITS_PANEL_ID).style.display = 'block';
     }
   };
@@ -560,7 +561,7 @@ const PageEditor = ({ match, history }) => {
         gjsEditor.stopCommand('fullscreen');
         e.target.classList.remove('active');
       } else {
-        gjsEditor.runCommand('fullscreen', { target: document.getElementById(sectionIds.EDITOR) });
+        gjsEditor.runCommand('fullscreen', { target: document.getElementById(EDITOR) });
         e.target.classList.add(['active']);
       }
     }
@@ -593,8 +594,8 @@ const PageEditor = ({ match, history }) => {
   return (
     <Spin spinning={isLoading}>
       <div>
-        <div id={sectionIds.EDITOR} className={styles.builderPage}>
-          <div id={sectionIds.LEFT} className={styles.leftSection}>
+        <div id={EDITOR} className={styles.builderPage}>
+          <div id={LEFT} className={styles.leftSection}>
             <div className={styles.topPanel}>
               <button className="fa fa-th-large active" onClick={handleClickBlocks}></button>
               <button className="fa fa-bars" onClick={handleClickLayers}></button>
@@ -605,10 +606,19 @@ const PageEditor = ({ match, history }) => {
             </div>
           </div>
           <div className={styles.middleSection}>
-            <div id={sectionIds.TOP} className={styles.topPanel}>
+            <div id={TOP} className={styles.topPanel}>
               <Row gutter={8} justify="space-around" className={styles.buttonsContainer}>
                 <Col flex="0 0 45%" className={styles.pageSelectorContainer}>
                   <Space>
+                    <Button
+                      icon={<LeftOutlined />}
+                      className={styles.backButton}
+                      size="small"
+                      type="link"
+                      onClick={handleBackToDashboard}
+                    >
+                      Back to Dashboard
+                    </Button>
                     <Text className={styles.whiteText}>Page :</Text>
                     <Select
                       value={selectedPageId}
@@ -646,14 +656,14 @@ const PageEditor = ({ match, history }) => {
             </div>
             <div id={BUILDER_CONTAINER_ID}></div>
           </div>
-          <div id={sectionIds.RIGHT} className={styles.rightSection}>
+          <div id={RIGHT} className={styles.rightSection}>
             <div className={styles.topPanel}>
               <button className="fa fa-paint-brush active" onClick={handleClickStyles}></button>
               <button className="fa fa-cog" onClick={handleClickTraits}></button>
             </div>
-            <div id={sectionIds.EMPTY}>Please select a component first.</div>
-            <div id={sectionIds.RIGHT_INNER} className={styles.panelContainer}>
-              <div id={sectionIds.STYLING}>
+            <div id={EMPTY}>Please select a component first.</div>
+            <div id={RIGHT_INNER} className={styles.panelContainer}>
+              <div id={STYLING}>
                 <div id={SELECTOR_PANEL_ID}></div>
                 <div id={STYLES_PANEL_ID}></div>
               </div>

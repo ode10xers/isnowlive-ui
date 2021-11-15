@@ -16,9 +16,9 @@ import { pageCreateFormLayout, pageCreateFormTailLayout } from 'layouts/FormLayo
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { blankPageTemplate, headerTemplate, footerTemplate } from 'utils/pageEditorTemplates';
 import { pageTypes, websiteComponentTypes } from 'utils/constants';
 import { createValidSlug, generateUrlFromUsername } from 'utils/url';
+import { blankPageTemplate, headerTemplate, footerTemplate } from 'utils/pageEditorTemplates';
 
 import styles from './styles.module.scss';
 
@@ -65,7 +65,10 @@ const CustomPageForm = ({ match, location, history }) => {
     } catch (error) {
       console.log('Failed fetching creator header component!');
       console.error(error);
-      setShouldCreateHeader(true);
+
+      if (error?.response?.status === 500 && error?.response?.data?.message === 'component doesnt exist') {
+        setShouldCreateHeader(true);
+      }
     }
   }, []);
 
@@ -77,9 +80,11 @@ const CustomPageForm = ({ match, location, history }) => {
         setShouldCreateFooter(false);
       }
     } catch (error) {
-      console.log('Failed fetching creator header component!');
+      console.log('Failed fetching creator footer component!');
       console.error(error);
-      setShouldCreateFooter(true);
+      if (error?.response?.status === 500 && error?.response?.data?.message === 'component doesnt exist') {
+        setShouldCreateFooter(true);
+      }
     }
   }, []);
 

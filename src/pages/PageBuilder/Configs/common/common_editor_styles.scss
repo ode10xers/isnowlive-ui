@@ -1,0 +1,247 @@
+@import '../../../styles/variables';
+
+.builderPage {
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  height: 100vh;
+
+  .leftSection {
+    flex-grow: 1;
+    flex-basis: 15%;
+    overflow: hidden;
+    background-color: map-get($map: $colors, $key: 'Cyprus');
+    color: map-get($map: $colors, $key: 'White');
+  }
+
+  .rightSection {
+    flex-grow: 1;
+    flex-basis: 15%;
+    overflow: hidden;
+    background-color: map-get($map: $colors, $key: 'Cyprus');
+    color: map-get($map: $colors, $key: 'White');
+  }
+
+  .middleSection {
+    flex-grow: 1;
+    flex-basis: 75%;
+    overflow: auto;
+  }
+
+  .topPanel {
+    height: 40px;
+    padding: 4px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: nowrap;
+    background-color: map-get($map: $colors, $key: 'Cyprus');
+    color: map-get($map: $colors, $key: 'White');
+
+    .backButton {
+      font-size: 14px;
+      color: map-get($map: $colors, $key: 'White') !important;
+
+      &:hover {
+        color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+      }
+    }
+
+    button {
+      background: transparent;
+      text-align: center;
+      border: none;
+      font-size: 20px;
+
+      &:hover {
+        color: map-get($map: $colors, $key: 'DodgerBlue');
+      }
+    }
+
+    :global {
+      button.active {
+        color: map-get($map: $colors, $key: 'DodgerBlue');
+      }
+    }
+
+    .buttonsContainer {
+      width: 100%;
+      flex-basis: 100%;
+      padding: 0 8px;
+      align-items: center;
+    }
+  }
+
+  .panelContainer {
+    overflow: auto;
+    height: 100%;
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+  }
+}
+
+:global {
+  #empty-selection {
+    text-align: center;
+    padding: 12px;
+  }
+
+  .gjs-cv-canvas {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .gjs-pn-panels {
+    display: none;
+  }
+
+  .gjs-pn-buttons {
+    justify-content: space-around;
+  }
+
+  .custom-trait-layout {
+    .custom-trait-label {
+      margin-bottom: 12px;
+    }
+  }
+
+  .button-list-container {
+    display: flex;
+    flex: 1 0 100%;
+    row-gap: 8px;
+    flex-direction: column;
+    
+    .button-item-container {
+      display: flex;
+      flex: 1 0 100%;
+      justify-content: space-around;
+      flex-wrap: nowrap;
+      align-items: center;
+      column-gap: 8px;
+
+      .button-trait-content {
+        flex: 1 0 auto;
+      }
+      
+      .button-trait-cta {
+        padding: 2px 4px;
+        background-color: map-get($map: $colors, $key: 'DodgerBlue');
+      }
+    }
+
+    .button-trait-add {
+      display: flex;
+      flex: 1 0 100%;
+      justify-content: center;
+      text-align: center;
+      background-color: map-get($map: $colors, $key: 'DodgerBlue');
+    }
+  }
+
+  .input-slider-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    .input-slider-text {
+      flex: 0 0 24px;
+      margin: 0 2px;
+    }
+
+    .input-slider {
+      flex: 1 1 auto;
+    }
+  }
+
+  .input-slider-value-container {
+    width: 100%;
+    text-align: left;
+  }
+
+  .input-select {
+    color: map-get($map: $colors, $key: 'Black');
+    width: 100%;
+    min-height: 24px;
+  }
+
+  .gjs-one-bg {
+    background-color: map-get($map: $colors, $key: 'Cyprus');
+  }
+
+  .gjs-two-color {
+    color: map-get($map: $colors, $key: 'White');
+  }
+
+  .gjs-four-color {
+    color: map-get($map: $colors, $key: 'DodgerBlue');
+  }
+
+  .gjs-four-color-h:hover {
+    color: map-get($map: $colors, $key: 'DodgerBlue');
+  }
+
+  .gjs-field {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  // Styling for flex icons
+  .icons-flex {
+    background-size: 70% 65% !important;
+    height: 15px;
+    width: 17px;
+    opacity: 0.9;
+  }
+  .icon-dir-row {
+    background: url('/src/assets/images/flex_icons/flex-dir-row.png') no-repeat center;
+  }
+  .icon-dir-row-rev {
+    background: url('/src/assets/images/flex_icons/flex-dir-row-rev.png') no-repeat center;
+  }
+  .icon-dir-col {
+    background: url('/src/assets/images/flex_icons/flex-dir-col.png') no-repeat center;
+  }
+  .icon-dir-col-rev {
+    background: url('/src/assets/images/flex_icons/flex-dir-col-rev.png') no-repeat center;
+  }
+  .icon-just-start {
+    background: url('/src/assets/images/flex_icons/flex-just-start.png') no-repeat center;
+  }
+  .icon-just-end {
+    background: url('/src/assets/images/flex_icons/flex-just-end.png') no-repeat center;
+  }
+  .icon-just-sp-bet {
+    background: url('/src/assets/images/flex_icons/flex-just-sp-bet.png') no-repeat center;
+  }
+  .icon-just-sp-ar {
+    background: url('/src/assets/images/flex_icons/flex-just-sp-ar.png') no-repeat center;
+  }
+  .icon-just-sp-cent {
+    background: url('/src/assets/images/flex_icons/flex-just-sp-cent.png') no-repeat center;
+  }
+  .icon-al-start {
+    background: url('/src/assets/images/flex_icons/flex-al-start.png') no-repeat center;
+  }
+  .icon-al-end {
+    background: url('/src/assets/images/flex_icons/flex-al-end.png') no-repeat center;
+  }
+  .icon-al-str {
+    background: url('/src/assets/images/flex_icons/flex-al-str.png') no-repeat center;
+  }
+  .icon-al-center {
+    background: url('/src/assets/images/flex_icons/flex-al-center.png') no-repeat center;
+  }
+}

@@ -17,33 +17,6 @@ export default {
   // exportWrapper: true, // This is to allow them to play with paddings and all
   // The wrapper, if visible, will be shown as a `<body>`
   // wrapperIsBody: false,
-  baseCss: `
-    * {
-      box-sizing: border-box;
-    }
-    html, body, [data-gjs-type=wrapper] {
-      min-height: 100%;
-    }
-    body {
-      margin: 0;
-      height: 100%;
-      background-color: #fff
-    }
-    [data-gjs-type=wrapper] {
-      padding: 12px;
-      overflow: auto;
-      overflow-x: hidden;
-    }
-    * ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1)
-    }
-    * ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2)
-    }
-    * ::-webkit-scrollbar {
-      width: 10px
-    }
-  `,
   // Get the content for the canvas directly from the element
   // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
   // fromElement: true,
