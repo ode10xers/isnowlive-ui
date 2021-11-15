@@ -16,6 +16,13 @@ const supportedDeviceTypes = [
 ];
 
 export default (editor) => {
+  editor.Commands.add('core:component-exit', (editor) => {
+    const selectedComponent = editor.getSelected();
+    const selectedParent = selectedComponent.parent();
+    const targetIndex = Math.max(0, selectedComponent.index() - 1);
+    selectedComponent.move(selectedParent, { at: targetIndex });
+  });
+
   // Override import command
   editor.Commands.add('gjs-open-import-webpage', (editor) => {
     // run: (editor) => {
