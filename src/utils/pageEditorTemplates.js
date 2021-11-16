@@ -16,7 +16,7 @@ export const blankPageTemplate = {
   external_id: 'blank',
   name: 'Blank Template',
   description: 'An empty template if you want to start out fresh',
-  image_url: 'none',
+  thumbnail_url: 'none',
   content: {
     components: `[{"name":"Row","droppable":".cell","resizable":{"tl":0,"tc":0,"tr":0,"cl":0,"cr":0,"bl":0,"br":0,"minDim":1},"classes":[{"name":"row","private":1}],"components":[{"name":"Cell","draggable":".row","stylable-require":["flex-basis"],"unstylable":["width"],"resizable":{"tl":0,"tc":0,"tr":0,"cl":0,"cr":1,"bl":0,"br":0,"minDim":1,"bc":0,"currentUnit":1,"step":0.2,"keyWidth":"flex-basis"},"classes":[{"name":"cell","private":1}],"components":[{"tagName":"section","classes":["bdg-sect"],"components":[{"tagName":"h1","type":"text","classes":["heading"],"components":[{"type":"textnode","removable":false,"draggable":false,"highlightable":0,"copyable":false,"selectable":true,"content":"Blank Template","_innertext":false}]},{"tagName":"p","type":"text","classes":["paragraph"],"components":[{"type":"textnode","content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"}]}]}]}]}]`,
     styles: `[{"selectors":[{"name":"row","private":1}],"style":{"display":"flex","justify-content":"flex-start","align-items":"stretch","flex-wrap":"nowrap","padding-top":"10px","padding-right":"10px","padding-bottom":"10px","padding-left":"10px"}},{"selectors":[{"name":"row","private":1}],"style":{"flex-wrap":"wrap"},"mediaText":"(max-width: 768px)","atRuleType":"media"},{"selectors":[{"name":"cell","private":1}],"style":{"min-height":"75px","flex-grow":"1","flex-basis":"100%"}}]`,

@@ -39,7 +39,7 @@ export default {
   // https://grapesjs.com/docs/modules/Style-manager.html#built-in-properties
   selectorManager: {
     appendTo: '#' + SELECTOR_PANEL_ID,
-    componentFirst: true,
+    // componentFirst: true,
   },
   styleManager: {
     appendTo: '#' + STYLES_PANEL_ID,

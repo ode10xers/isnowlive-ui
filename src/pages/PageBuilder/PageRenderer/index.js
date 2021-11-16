@@ -119,6 +119,7 @@ const PageRenderer = ({ match, history }) => {
       // fromElement: true,
       // Size of the editor
       noticeOnUnload: false,
+      wrapperIsBody: false,
       height: '0',
       storageManager: {},
       assetManager: {},
@@ -205,9 +206,9 @@ const PageRenderer = ({ match, history }) => {
         const targetContent = `
           ${gjsEditor.getHtml()}
         `;
-        console.log(targetContent);
 
         setPageContent(targetContent);
+        console.log(gjsEditor.getCss());
         setPageStyles(`<style>${gjsEditor.getCss()}</style>`);
         // const iframeElement = gjsEditor.Canvas.getDocument();
         // const editorElements = Array.from(iframeElement.body.children);

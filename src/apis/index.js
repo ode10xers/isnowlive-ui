@@ -60,6 +60,7 @@ export default {
     },
   },
   custom_pages: {
+    getPageTemplates: () => http.get('/secure/creator/website/templates'),
     getPublicHomepage: () => http.get('/creator-website'),
     getPublicPageBySlug: (pageSlug) => http.get(`/creator-website/${pageSlug}`),
     getAllPages: () => http.get('/secure/creator/website/pages'),

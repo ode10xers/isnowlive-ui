@@ -174,13 +174,13 @@ const CustomPagesListing = ({ match, history }) => {
               Edit Page UI
             </Button>
           </Col>
-          {/* {record.type !== pageTypes.HOME && ( */}
-          <Col>
-            <Button danger type="text" onClick={() => handleDeletePageClicked(record)}>
-              Remove page
-            </Button>
-          </Col>
-          {/* )} */}
+          {record.type !== pageTypes.HOME && (
+            <Col>
+              <Button danger type="text" onClick={() => handleDeletePageClicked(record)}>
+                Remove page
+              </Button>
+            </Col>
+          )}
         </Row>
       ),
     },

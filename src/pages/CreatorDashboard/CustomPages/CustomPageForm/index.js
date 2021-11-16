@@ -30,7 +30,7 @@ const TemplatePreviewItem = ({ template = null, handleItemClicked = () => {} }) 
   <Card
     hoverable
     onClick={() => handleItemClicked(template)}
-    cover={<Image loading="lazy" src={template.image_url} fallback={DefaultImage} />}
+    cover={<Image loading="lazy" src={template.thumbnail_url} fallback={DefaultImage} />}
   >
     <Card.Meta title={template.name} description={template.description} />
   </Card>
@@ -53,7 +53,7 @@ const CustomPageForm = ({ match, location, history }) => {
 
   // NOTE: We need to make sure at least there's a default template selected
   const [templates, setTemplates] = useState([]);
-  const [selectedTemplate, setSelectedTemplate] = useState(blankPageTemplate);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const fetchCreatorHeaderComponent = useCallback(async () => {
     try {
@@ -105,6 +105,24 @@ const CustomPageForm = ({ match, location, history }) => {
     setIsLoading(false);
   }, []);
 
+  const fetchPageTemplates = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.custom_pages.getPageTemplates();
+
+      if (isAPISuccess(status) && data) {
+        setTemplates(data);
+        setSelectedTemplate(data[0] ?? null);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to fetch page templates!', error?.response?.data?.message ?? 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     if (isCreatingHomepage) {
       fetchCreatorHeaderComponent();
@@ -119,9 +137,8 @@ const CustomPageForm = ({ match, location, history }) => {
       setIsLoading(false);
     }
 
-    // TODO: Also fetch templates here
-    setTemplates([blankPageTemplate]);
-  }, [targetPageId, fetchPageDetails]);
+    fetchPageTemplates();
+  }, [targetPageId, fetchPageDetails, fetchPageTemplates]);
 
   useEffect(() => {
     if (pageDetails) {
@@ -354,21 +371,37 @@ const CustomPageForm = ({ match, location, history }) => {
                 <Title level={4}>Page Templates</Title>
 
                 <Row gutter={[8, 8]} className={styles.horizontalScrollableListContainer}>
-                  {templates.map((template) => (
-                    <Col
-                      xs={20}
-                      sm={15}
-                      md={10}
-                      lg={9}
-                      xl={7}
-                      key={template.external_id}
-                      className={
-                        selectedTemplate?.external_id === template.external_id ? styles.selectedTemplate : undefined
-                      }
-                    >
-                      <TemplatePreviewItem template={template} handleItemClicked={setSelectedTemplate} />
-                    </Col>
-                  ))}
+                  {templates.length > 0
+                    ? templates.map((template) => (
+                        <Col
+                          xs={20}
+                          sm={15}
+                          md={10}
+                          lg={9}
+                          xl={7}
+                          key={template.external_id}
+                          className={
+                            selectedTemplate?.external_id === template.external_id ? styles.selectedTemplate : undefined
+                          }
+                        >
+                          <TemplatePreviewItem template={template} handleItemClicked={setSelectedTemplate} />
+                        </Col>
+                      ))
+                    : [blankPageTemplate].map((template) => (
+                        <Col
+                          xs={20}
+                          sm={15}
+                          md={10}
+                          lg={9}
+                          xl={7}
+                          key={template.external_id}
+                          className={
+                            selectedTemplate?.external_id === template.external_id ? styles.selectedTemplate : undefined
+                          }
+                        >
+                          <TemplatePreviewItem template={template} handleItemClicked={setSelectedTemplate} />
+                        </Col>
+                      ))}
                 </Row>
               </Col>
             )}

@@ -42,7 +42,6 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-import LinkButton from '../CustomComponents/LinkButton.js';
 
 const { Text } = Typography;
 
@@ -141,6 +140,7 @@ const PageEditor = ({ match, history }) => {
         }
         [data-gjs-type=wrapper] {
           padding: 12px;
+          min-height: 100vh;
           overflow: auto;
           overflow-x: hidden;
         }
@@ -253,6 +253,7 @@ const PageEditor = ({ match, history }) => {
     // Initially we can only modify background, but modifying
     // padding also makes sense
     const wrapper = editor.getWrapper();
+    wrapper.setClass('page-body-section');
     wrapper.set({
       stylable: [
         ...wrapper.get('stylable'),
