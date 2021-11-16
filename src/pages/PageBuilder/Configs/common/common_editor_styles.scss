@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@import '../../../../styles/variables';
 
 .builderPage {
   display: flex;
@@ -40,12 +40,16 @@
     color: map-get($map: $colors, $key: 'White');
 
     .backButton {
-      font-size: 14px;
+      font-size: 13px;
       color: map-get($map: $colors, $key: 'White') !important;
 
       &:hover {
         color: map-get($map: $colors, $key: 'DodgerBlue') !important;
       }
+    }
+
+    .saveTimeText {
+      color: map-get($map: $colors, $key: 'Silver');
     }
 
     button {
@@ -198,50 +202,54 @@
     background-color: rgba(0, 0, 0, 0.7);
   }
 
+  .gjs-radio-item {
+    height: 24px;
+  }
+
   // Styling for flex icons
   .icons-flex {
-    background-size: 70% 65% !important;
-    height: 15px;
-    width: 17px;
+    // background-size: 70% 65% !important;
+    height: 100%;
+    width: 100%;
     opacity: 0.9;
   }
   .icon-dir-row {
-    background: url('/src/assets/images/flex_icons/flex-dir-row.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-dir-row.png') no-repeat center;
   }
   .icon-dir-row-rev {
-    background: url('/src/assets/images/flex_icons/flex-dir-row-rev.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-dir-row-rev.png') no-repeat center;
   }
   .icon-dir-col {
-    background: url('/src/assets/images/flex_icons/flex-dir-col.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-dir-col.png') no-repeat center;
   }
   .icon-dir-col-rev {
-    background: url('/src/assets/images/flex_icons/flex-dir-col-rev.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-dir-col-rev.png') no-repeat center;
   }
   .icon-just-start {
-    background: url('/src/assets/images/flex_icons/flex-just-start.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-just-start.png') no-repeat center;
   }
   .icon-just-end {
-    background: url('/src/assets/images/flex_icons/flex-just-end.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-just-end.png') no-repeat center;
   }
   .icon-just-sp-bet {
-    background: url('/src/assets/images/flex_icons/flex-just-sp-bet.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-just-sp-bet.png') no-repeat center;
   }
   .icon-just-sp-ar {
-    background: url('/src/assets/images/flex_icons/flex-just-sp-ar.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-just-sp-ar.png') no-repeat center;
   }
   .icon-just-sp-cent {
-    background: url('/src/assets/images/flex_icons/flex-just-sp-cent.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-just-sp-cent.png') no-repeat center;
   }
   .icon-al-start {
-    background: url('/src/assets/images/flex_icons/flex-al-start.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-al-start.png') no-repeat center;
   }
   .icon-al-end {
-    background: url('/src/assets/images/flex_icons/flex-al-end.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-al-end.png') no-repeat center;
   }
   .icon-al-str {
-    background: url('/src/assets/images/flex_icons/flex-al-str.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-al-str.png') no-repeat center;
   }
   .icon-al-center {
-    background: url('/src/assets/images/flex_icons/flex-al-center.png') no-repeat center;
+    background: url('../../../../assets/images/flex_icons/flex-al-center.png') no-repeat center;
   }
 }

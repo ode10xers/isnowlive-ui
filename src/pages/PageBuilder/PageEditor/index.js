@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Spin, Row, Col, Space, Select, Typography, Button, message } from 'antd';
+import { Spin, Row, Col, Space, Typography, Button, message } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
 // NOTE : We can also take the scss approach, we'll see
@@ -23,6 +23,7 @@ import definedBlocks from '../Configs/blocks.js';
 import definedStylePanels from '../Configs/style_panel.js';
 
 // THese are to be put in plugins
+import CustomTraits from '../Plugins/traits';
 import CustomCommands from '../Plugins/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
 import PassionSessionList from '../CustomComponents/PassionSessionList.js';
@@ -41,6 +42,7 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
+import LinkButton from '../CustomComponents/LinkButton.js';
 
 const { Text } = Typography;
 
@@ -63,11 +65,13 @@ const PageEditor = ({ match, history }) => {
   } = useGlobalContext();
 
   const [isSaving, setIsSaving] = useState(false);
+  const [lastSaveTime, setLastSaveTime] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
 
   const [creatorAssets, setCreatorAssets] = useState([]);
   const [creatorPages, setCreatorPages] = useState([]);
+  // eslint-disable-next-line
   const [selectedPageId, setSelectedPageId] = useState(targetPageId ?? null);
 
   const [isComponentSelected, setIsComponentSelected] = useState(false);
@@ -154,11 +158,6 @@ const PageEditor = ({ match, history }) => {
         storeWrapper: true,
       },
 
-      blockManager: {
-        ...commonEditorConfig.blockManager,
-        blocks: definedBlocks,
-      },
-
       storageManager: {
         id: '',
         type: 'passion-backend',
@@ -212,6 +211,7 @@ const PageEditor = ({ match, history }) => {
         PassionSessionList,
         PassionPassList,
         CustomCommands,
+        CustomTraits,
       ],
 
       pluginsOpts: {
@@ -226,15 +226,25 @@ const PageEditor = ({ match, history }) => {
               styles: editor.getStyle(),
             });
           },
+          // Default Values
+          // blocks: 	['link-block', 'quote', 'text-basic'],
+          blocks: ['text-basic'],
           blocksBasicOpts: {
             flexGrid: true,
             rowHeight: '120px',
+            // Default Values
+            // blocks: ['column1', 'column2', 'column3', 'column3-7', 'text', 'link', 'image', 'video', 'map'],
+            blocks: ['column1', 'column2', 'column3', 'column3-7', 'image', 'video', 'text', 'link'],
           },
           countdownOpts: 0,
           navbarOpts: 0,
           customStyleManager: definedStylePanels,
         },
       },
+    });
+
+    definedBlocks.forEach((blk) => {
+      editor.BlockManager.add(blk.id, blk);
     });
 
     customEditorInitializationLogic(editor);
@@ -255,6 +265,14 @@ const PageEditor = ({ match, history }) => {
     });
 
     //#region Start of event listener hooks
+    editor.on('storage:start:store', () => {
+      setIsSaving(true);
+    });
+
+    editor.on('storage:end:store', () => {
+      setIsSaving(false);
+    });
+
     editor.on('asset:upload:start', () => {
       setIsLoading(true);
     });
@@ -330,7 +348,6 @@ const PageEditor = ({ match, history }) => {
     // Initial definition for storage
     editor.StorageManager.add('passion-backend', {
       async store(payload, callback, errorCallback) {
-        setIsSaving(true);
         try {
           if (!payload.external_id) {
             console.error('Invalid Data format!');
@@ -348,7 +365,6 @@ const PageEditor = ({ match, history }) => {
           console.error(error);
           errorCallback(error);
         }
-        setIsSaving(false);
       },
       load(keysToLoad, callback, errorCallback) {
         console.log('FE will handle the loading');
@@ -364,6 +380,13 @@ const PageEditor = ({ match, history }) => {
     initializeGrapesJSEditor();
   }, [initializeGrapesJSEditor, fetchCreatorCustomPages]);
 
+  // Logic for updating autosave time
+  useEffect(() => {
+    if (isSaving) {
+      setLastSaveTime(new Date());
+    }
+  }, [isSaving]);
+
   useEffect(() => {
     if (gjsEditor) {
       const fallbackAction = () => {
@@ -378,8 +401,6 @@ const PageEditor = ({ match, history }) => {
           // Override existing logic (especially the payload) with current page
           gjsEditor.StorageManager.add('passion-backend', {
             async store(payload, callback, errorCallback) {
-              setIsSaving(true);
-
               try {
                 const { status, data } = await apis.custom_pages.updatePage({
                   ...targetPage,
@@ -398,13 +419,14 @@ const PageEditor = ({ match, history }) => {
                 console.error(error);
                 errorCallback(error);
               }
-              setIsSaving(false);
             },
             load(keysToLoad, callback, errorCallback) {
               console.log('FE will handle the loading');
             },
           });
 
+          // NOTE: Since we also export the wrapper, everytime this gets called
+          // a wrapper is nested inside another wrapper, which causes issues when editing
           gjsEditor.loadData(targetPage.content ?? blankPageTemplate.content);
         } else {
           fallbackAction();
@@ -457,20 +479,21 @@ const PageEditor = ({ match, history }) => {
     }
   }, [isComponentSelected]);
 
-  const onSelectedPageChanged = (value) => {
-    if (gjsEditor) {
-      gjsEditor.store(
-        // Success Callback
-        () => {
-          setSelectedPageId(value);
-        },
-        // Error Callback
-        () => {
-          message.error('Failed to save changes to current page!');
-        }
-      );
-    }
-  };
+  // Causes bugs, disable for the moment
+  // const onSelectedPageChanged = (value) => {
+  //   if (gjsEditor) {
+  //     gjsEditor.store(
+  //       // Success Callback
+  //       () => {
+  //         setSelectedPageId(value);
+  //       },
+  //       // Error Callback
+  //       () => {
+  //         message.error('Failed to save changes to current page!');
+  //       }
+  //     );
+  //   }
+  // };
 
   //#region Start of Editor Button Handlers
   const handleBackToDashboard = () => {
@@ -625,7 +648,15 @@ const PageEditor = ({ match, history }) => {
                     >
                       Back to Dashboard
                     </Button>
-                    <Text className={styles.whiteText}>Page :</Text>
+                    <Text className={styles.whiteText} strong>
+                      {creatorPages?.find((page) => page.external_id === selectedPageId)?.name ?? ''}
+                    </Text>
+                    {isSaving ? (
+                      <Spin />
+                    ) : lastSaveTime ? (
+                      <Text className={styles.saveTimeText}>Last Saved : {lastSaveTime.toLocaleTimeString()}</Text>
+                    ) : null}
+                    {/* <Text className={styles.whiteText}>Page :</Text>
                     <Select
                       value={selectedPageId}
                       onChange={onSelectedPageChanged}
@@ -634,7 +665,7 @@ const PageEditor = ({ match, history }) => {
                         label: page.name,
                         value: page.external_id,
                       }))}
-                    />
+                    /> */}
                   </Space>
                 </Col>
                 <Col flex="0 0 120px" className={styles.textAlignCenter}>

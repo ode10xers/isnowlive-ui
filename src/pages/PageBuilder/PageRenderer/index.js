@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-
+import ReactHtmlParser from 'react-html-parser';
+import JsxParser from 'react-jsx-parser';
 import { Spin } from 'antd';
 
 // NOTE : We can also take the scss approach, we'll see
@@ -18,25 +19,34 @@ import elementIds from '../Configs/common/elementIds.js';
 import sectionIds from '../Configs/common/sectionIds';
 import commonEditorConfig from '../Configs/common/config';
 
+// NOTE: These are component definitions to be used by GrapesJS
 import CustomTraits from '../Plugins/traits';
 import CustomCommands from '../Plugins/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
 // import TextSection from '../CustomComponents/TextSection.js';
 // import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
 // import SignInButton from '../CustomComponents/SignInButton.js';
-import LinkButton from '../CustomComponents/LinkButton.js';
-import PassionSessionList from '../CustomComponents/PassionSessionList.js';
-import PassionVideoList from '../CustomComponents/PassionVideoList.js';
-import PassionCourseList from '../CustomComponents/PassionCourseList.js';
-import PassionPassList from '../CustomComponents/PassionPassList.js';
-import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
-import Header from '../CustomComponents/Header.js';
-import Footer from '../CustomComponents/Footer.js';
-import Container from '../CustomComponents/Container.js';
+import EditorLinkButton from '../CustomComponents/LinkButton.js';
+import EditorPassionSessionList from '../CustomComponents/PassionSessionList.js';
+import EditorPassionVideoList from '../CustomComponents/PassionVideoList.js';
+import EditorPassionCourseList from '../CustomComponents/PassionCourseList.js';
+import EditorPassionPassList from '../CustomComponents/PassionPassList.js';
+import EditorPassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
+import EditorHeader from '../CustomComponents/Header.js';
+import EditorFooter from '../CustomComponents/Footer.js';
+import EditorContainer from '../CustomComponents/Container.js';
 
-//eslint-disable-next-line
-import styles from './style.module.scss';
+// NOTE: While the ones below are React Component Definitions used for parsing
+import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
+import PassionCourseList from 'components/PageEditorPassionComponents/CourseList';
+import PassionPassList from 'components/PageEditorPassionComponents/PassList';
+import PassionSubscriptionList from 'components/PageEditorPassionComponents/SubscriptionList';
+import PassionVideoList from 'components/PageEditorPassionComponents/VideoList';
+import PassionSessionList from 'components/PageEditorPassionComponents/SessionList';
+
 import { isAPISuccess } from 'utils/helper.js';
+
+import styles from './style.module.scss';
 
 const { BUILDER_CONTAINER_ID, PAGE_PORTAL_ID } = elementIds;
 
@@ -45,6 +55,9 @@ const { EDITOR } = sectionIds;
 const PageRenderer = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
+
+  const [pageContent, setPageContent] = useState(null);
+  const [pageStyles, setPageStyles] = useState(null);
 
   const fetchAndLoadPage = useCallback(
     async (editor) => {
@@ -77,6 +90,7 @@ const PageRenderer = ({ match, history }) => {
             ],
           });
 
+          document.title = data.page.name;
           setGjsEditor(editor);
         }
       } catch (error) {
@@ -133,21 +147,21 @@ const PageRenderer = ({ match, history }) => {
       },
       plugins: [
         'gjs-preset-webpage',
-        Container,
         ReactComponentHandler,
-        PassionSubscriptionList,
-        PassionVideoList,
-        PassionCourseList,
-        PassionSessionList,
-        PassionPassList,
-        CustomCommands,
         CustomTraits,
+        CustomCommands,
+        EditorContainer,
+        EditorPassionSubscriptionList,
+        EditorPassionVideoList,
+        EditorPassionCourseList,
+        EditorPassionSessionList,
+        EditorPassionPassList,
         // TextSection,
         // TextWithImageSection,
-        LinkButton,
+        EditorLinkButton,
         // SignInButton,
-        Header,
-        Footer,
+        EditorHeader,
+        EditorFooter,
       ],
       pluginsOpts: {
         'gjs-preset-webpage': {
@@ -172,6 +186,8 @@ const PageRenderer = ({ match, history }) => {
       },
     });
 
+    editor.runCommand('core:preview');
+
     fetchAndLoadPage(editor);
   }, [fetchAndLoadPage]);
 
@@ -186,20 +202,31 @@ const PageRenderer = ({ match, history }) => {
         // of the editor, but it might cause some issues when integrating
         // Now we instead take the contents of editor after load and put them
         // in the actual app (which is contained in #root)
+        const targetContent = `
+          ${gjsEditor.getHtml()}
+        `;
+        console.log(targetContent);
 
-        const iframeElement = gjsEditor.Canvas.getDocument();
-        const editorElements = Array.from(iframeElement.body.children);
+        setPageContent(targetContent);
+        setPageStyles(`<style>${gjsEditor.getCss()}</style>`);
+        // const iframeElement = gjsEditor.Canvas.getDocument();
+        // const editorElements = Array.from(iframeElement.body.children);
 
-        if (editorElements.length > 0) {
-          const reactRootElement = document.getElementById('root');
-          const portalContainer = document.getElementById(PAGE_PORTAL_ID);
+        // if (editorElements.length > 0) {
+        //   const reactRootElement = document.getElementById('root');
+        //   const portalContainer = document.getElementById(PAGE_PORTAL_ID);
 
-          editorElements.forEach((el) => {
-            portalContainer.appendChild(el);
-          });
+        //   // TODO: These things conflict each other, see a better way
+        //   // As of now, in order to support our component and flows
+        //   // We must not clone node
+        //   // This however results in editor events still attached
+        //   editorElements.forEach((el) => {
+        //     // portalContainer.appendChild(el.cloneNode(true));
+        //     portalContainer.appendChild(el);
+        //   });
 
-          reactRootElement.appendChild(portalContainer);
-        }
+        //   reactRootElement.appendChild(portalContainer);
+        // }
 
         setIsLoading(false);
       });
@@ -215,7 +242,24 @@ const PageRenderer = ({ match, history }) => {
           </div>
         </div>
       </div>
-      <div id={PAGE_PORTAL_ID}></div>
+      <div id={PAGE_PORTAL_ID}>
+        {pageStyles && ReactHtmlParser(pageStyles)}
+        {pageContent && (
+          <JsxParser
+            showWarnings={true}
+            allowUnknownElements={false}
+            components={{
+              SignInButton,
+              PassionCourseList,
+              PassionPassList,
+              PassionSessionList,
+              PassionSubscriptionList,
+              PassionVideoList,
+            }}
+            jsx={pageContent}
+          />
+        )}
+      </div>
     </Spin>
   );
 };

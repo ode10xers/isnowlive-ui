@@ -35,6 +35,8 @@ const SignInButton = ({ target = 'dashboard', buttonType = 'primary' }) => {
     const command =
       postMessageCommands.ACTION.PREFIX +
       (redirect ? postMessageCommands.ACTION.LOGIN_DASHBOARD : postMessageCommands.ACTION.LOGIN_NOTICE);
+
+    console.log(command);
     postMessageToWindow(command);
   };
 

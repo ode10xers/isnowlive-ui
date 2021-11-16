@@ -4,6 +4,7 @@ const categories = {
   LAYOUTS: 'Layouts',
   PASSION_COMPONENTS: 'Passion Components',
   SIMPLE_COMPONENTS: 'Simple Components',
+  BASIC: 'Basic',
 };
 
 // export default [
@@ -136,10 +137,10 @@ export default [
   // },
   // {
   //   id: 'link-buttons',
-  //   label: '<b> Button </b>',
+  //   label: '<b> Link Button </b>',
   //   droppable: false,
   //   resizable: true,
-  //   category: categories.SIMPLE_COMPONENTS,
+  //   category: categories.BASIC,
   //   content: {
   //     type: 'link-buttons',
   //   },

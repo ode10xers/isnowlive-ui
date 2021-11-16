@@ -1,5 +1,16 @@
 import { googleFonts } from 'utils/constants.js';
 
+// NOTE : using this on wrappers might cause nested wrappers, need to be careful with this
+const parseAsArray = (data) => {
+  const parsedData = JSON.parse(data);
+  return Array.isArray(parsedData) ? parsedData : [parsedData];
+};
+
+export const parseContentData = (contentData) => ({
+  components: [...parseAsArray(contentData.components)],
+  styles: [...parseAsArray(contentData.styles)],
+});
+
 export const customEditorInitializationLogic = (editor) => {
   const editorCanvas = editor.Canvas;
 

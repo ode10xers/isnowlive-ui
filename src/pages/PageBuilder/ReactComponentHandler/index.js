@@ -12,6 +12,8 @@ export default (editor) => {
   // Main React component
   domc.addType('react-component', {
     model: {
+      // TODO: If we can modify this so the ReactComponents
+      // Return usable HTML directly we can work with it
       toHTML(opts = {}) {
         return defModel.prototype.toHTML.call(this, {
           ...opts,
