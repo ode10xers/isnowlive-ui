@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import { isValidCSSStyle } from 'utils/colors';
 
 const supportedDeviceTypes = [
   {
@@ -58,6 +59,45 @@ export default (editor) => {
     });
   });
 
+  // NOTE: This is the counter part of the one below
+  editor.Commands.add('remove-background-image', (editor) => {
+    const selected = editor.getSelected();
+    selected.removeClass(['with-background-image']);
+  });
+
+  editor.Commands.add('set-background-image', {
+    run: (editor) => {
+      editor.AssetManager.open({
+        types: ['image'],
+        select(asset, complete) {
+          let isSet = false;
+          const selected = editor.getSelected();
+          selected.addClass(['with-background-image']);
+          const styleString = `url('${asset.getSrc()}') center center / cover no-repeat `;
+          // TODO: Can also throw error here if invalid style
+          selected.setStyle({
+            ...selected.getStyle(),
+            background: isValidCSSStyle('background', styleString) ? styleString : 'transparent',
+          });
+          selected.set({
+            'bg-style': isValidCSSStyle('background', styleString) ? styleString : 'transparent',
+          });
+
+          // The default AssetManager UI will trigger `select(asset, false)` on asset click
+          // and `select(asset, true)` on double-click
+          if (isSet) {
+            complete && editor.AssetManager.close();
+          } else {
+            editor.log('Failed to set image after Asset Manager Select', {
+              ns: 'asset-manager-close',
+              level: 'debug',
+            });
+          }
+        },
+      });
+    },
+  });
+
   editor.Commands.add('set-image-url', {
     run: (editor) => {
       editor.AssetManager.open({
@@ -65,13 +105,13 @@ export default (editor) => {
         select(asset, complete) {
           let isSet = false;
           const selected = editor.getSelected();
-          if (selected && selected.is('image')) {
+          if (selected && (selected.is('image') || selected.is('image-with-padding'))) {
             selected.addAttributes({ src: asset.getSrc() });
             isSet = true;
           } else {
             const closestImage = selected.find('img')[0] ?? null;
             if (closestImage && closestImage.is('image')) {
-              closestImage.addAttributes({ src: asset.getSrc() });
+              closestImage.addAttributes({ src: asset.getSrc(), width: '100%' });
               isSet = true;
             }
           }

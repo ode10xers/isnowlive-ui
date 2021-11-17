@@ -152,3 +152,14 @@ export const isBrightColorShade = ([r, g, b]) => {
 };
 
 export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];
+
+/// src: https://stackoverflow.com/questions/48484767/javascript-check-if-string-is-valid-css-color
+export const isValidCSSStyle = (cssProps, value) => CSS.supports(cssProps, value);
+
+// NOTE: Doesn't include strings like 'red', 'magenta', etc
+// Does support 6-digit hex, rgba, and hsla
+export const isValidCSSColor = (colorString) =>
+  /^#[0-9A-F]{6}$/i.test(colorString) ||
+  /^(rgb|hsl)(a?)[(]\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*,\s*([\d.]+\s*%?)\s*(?:,\s*([\d.]+)\s*)?[)]$/i.test(
+    colorString
+  );

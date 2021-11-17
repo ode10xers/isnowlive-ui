@@ -1,3 +1,4 @@
+import { isValidCSSColor } from 'utils/colors';
 import { googleFonts } from 'utils/constants.js';
 
 export default (editor) => {
@@ -249,9 +250,18 @@ export default (editor) => {
     // elInput` is the result HTMLElement you get from `createInput`
     onEvent({ elInput, component, event }) {
       const inputType = elInput.querySelector('#text-section-layout-select');
+      const alignValue = inputType.value;
       component.setStyle({
         ...component.getStyle(),
-        'text-align': inputType.value ?? 'left',
+        'text-align': alignValue ?? 'left',
+        'align-items':
+          alignValue === 'center'
+            ? alignValue
+            : alignValue === 'left'
+            ? 'flex-start'
+            : alignValue === 'right'
+            ? 'flex-end'
+            : 'flex-start',
       });
       component.addAttributes({
         layout: inputType.value,
@@ -302,13 +312,17 @@ export default (editor) => {
     // `elInput` is the result HTMLElement you get from `createInput`
     onEvent({ elInput, component, event }) {
       const inputType = elInput.querySelector('#image-position-select');
-      let classes = ['text-image-section-container'];
+      let classes = [];
+      let existingClasses = component.getClasses();
 
       if (inputType.value) {
         classes.push(`image-${inputType.value}`);
+        existingClasses = existingClasses.filter(
+          (cls) => !['image-left', 'image-top', 'image-right', 'image-bottom'].includes(cls)
+        );
       }
 
-      component.setClass(classes);
+      component.setClass([...new Set([...existingClasses, ...classes])]);
     },
     // Update elements on the component change
     onUpdate({ elInput, component }) {
@@ -413,23 +427,15 @@ export default (editor) => {
     onEvent({ elInput, component, event }) {
       const inputType = elInput.querySelector('#button-layout-select');
 
-      let classes = ['link-btn'];
+      let classes = [];
+      let existingClasses = component.getClasses();
 
       if (inputType.value) {
         classes.push(`button-type-${inputType.value}`);
+        existingClasses = existingClasses.filter((cls) => !['button-type-link', 'button-type-outlined'].includes(cls));
       }
 
-      component.setClass(classes);
-
-      // Adding Border Radius Trait
-      if (inputType.value === 'link') {
-        component.removeTrait('border-radius');
-      } else {
-        component.addTrait({
-          type: 'border-radius-slider',
-          name: 'border-radius',
-        });
-      }
+      component.setClass([...new Set([...existingClasses, ...classes])]);
     },
 
     onUpdate({ elInput, component }) {
@@ -565,6 +571,94 @@ export default (editor) => {
       };
 
       elInput.appendChild(addNavBtn);
+    },
+  });
+
+  editor.TraitManager.addType('background-styles', {
+    noLabel: true,
+    templateInput: `
+    <div class="custom-trait-layout">
+      <div class="custom-trait-label">
+        Container Background
+      </div>
+      <div class="custom-trait-input" data-input>
+      </div>
+    </div>
+    `,
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['styles-input-container']);
+
+      const selectDropdown = document.createElement('select');
+      [
+        { name: 'placeholder', value: 'Transparent' },
+        { name: 'class', value: 'input-select' },
+        { name: 'id', value: 'bg-style-select' },
+      ].map((attr) => selectDropdown.setAttribute(attr.name, attr.value));
+
+      // TODO: Can also put this in a separate file
+      const options = [
+        {
+          id: 'color',
+          name: 'Color Background',
+        },
+        {
+          id: 'image',
+          name: 'Image (with dark overlay)',
+        },
+      ];
+
+      selectDropdown.innerHTML = `${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}`;
+      el.appendChild(selectDropdown);
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const newValue = event.target.value;
+      let traitToAdd = null;
+      let traitToDel = '';
+
+      if (newValue === 'image') {
+        traitToDel = 'bg-style';
+        traitToAdd = {
+          id: 'bg-image-picker',
+          type: 'button',
+          text: 'Click to set image',
+          full: true,
+          label: 'Background Image',
+          command: 'set-background-image',
+        };
+        component.set({
+          'bg-style': '',
+        });
+      } else if (newValue === 'color') {
+        traitToDel = 'bg-image-picker';
+        traitToAdd = {
+          type: 'color',
+          label: 'Background color',
+          name: 'bg-style',
+          changeProp: true,
+        };
+        editor.runCommand('remove-background-image');
+        component.set({
+          'bg-style': '#ffffff',
+        });
+      }
+
+      if (traitToAdd) {
+        if (traitToDel) {
+          component.removeTrait(traitToDel);
+        }
+        const traitIndex = component.getTraitIndex('background-style-picker');
+        component.addTrait(traitToAdd, { at: traitIndex + 1 });
+      }
+    },
+
+    onUpdate({ elInput, component }) {
+      const bgStyle = component.props()['bg-style'] ?? component.getAttributes()['bg-style'] ?? '';
+      const selectEl = elInput.querySelector('#bg-style-select');
+      selectEl.value = isValidCSSColor(bgStyle) || bgStyle === 'transparent' ? 'color' : 'image';
+      selectEl.dispatchEvent(new CustomEvent('change'));
     },
   });
 };

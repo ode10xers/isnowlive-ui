@@ -1,3 +1,5 @@
+import { isValidCSSColor } from 'utils/colors';
+
 export default (editor) => {
   editor.DomComponents.addType('container', {
     model: {
@@ -7,6 +9,18 @@ export default (editor) => {
         attributes: {
           class: 'simple-container',
         },
+        'bg-style': '',
+        traits: [
+          {
+            type: 'padding-slider',
+          },
+          {
+            type: 'color',
+            label: 'Background color',
+            name: 'bg-style',
+            changeProp: true,
+          },
+        ],
         components: [],
         styles: `
           .simple-container {
@@ -14,6 +28,34 @@ export default (editor) => {
             padding: 8px;
           }
         `,
+      },
+      init() {
+        // We put a listener that triggers when an attribute changes
+        // In this case when bg-style attribute changes
+        this.on('change:bg-style', this.handleBGStyleChange);
+      },
+      handleBGStyleChange() {
+        const bgStyle = this.props()['bg-style'];
+        const componentList = this.components();
+
+        const isBackgroundColor = isValidCSSColor(bgStyle);
+
+        // NOTE: We might want to only propagate changes if the bg is color
+        // if not then just make it transparent
+        // Check for child components with the same property
+        const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-style'));
+        validChildList.forEach((childComp) => {
+          // NOTE: Right now this only works if the prop name and trait name is same
+          childComp.updateTrait('bg-style', {
+            type: 'color',
+            value: isBackgroundColor ? bgStyle : 'transparent',
+          });
+        });
+
+        this.setStyle({
+          ...this.getStyle(),
+          background: bgStyle,
+        });
       },
     },
   });

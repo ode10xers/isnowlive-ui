@@ -115,26 +115,46 @@ export default [
       ],
     },
   },
-  // {
-  //   id: 'text-section',
-  //   label: '<b> Text Section </b>',
-  //   droppable: false,
-  //   resizable: true,
-  //   category: categories.LAYOUTS,
-  //   content: {
-  //     type: 'text-section',
-  //   },
-  // },
-  // {
-  //   id: 'text-with-image',
-  //   label: '<b> Text with Image </b>',
-  //   droppable: false,
-  //   resizable: true,
-  //   category: categories.LAYOUTS,
-  //   content: {
-  //     type: 'text-with-image-section',
-  //   },
-  // },
+  {
+    id: 'text-section',
+    label: '<b> Text Section </b>',
+    droppable: false,
+    resizable: true,
+    category: categories.LAYOUTS,
+    content: {
+      type: 'text-section',
+    },
+  },
+  {
+    id: 'text-with-image',
+    label: '<b> Text with Image </b>',
+    droppable: false,
+    resizable: true,
+    category: categories.LAYOUTS,
+    content: {
+      type: 'text-with-image-section',
+    },
+  },
+  {
+    id: 'text-section-with-btn',
+    label: '<b> Text Section with Button </b>',
+    droppable: false,
+    resizable: true,
+    category: categories.LAYOUTS,
+    content: {
+      type: 'text-section-with-button',
+    },
+  },
+  {
+    id: 'text-button-with-image-section',
+    label: '<b> Text Section with Button and Image </b>',
+    droppable: false,
+    resizable: true,
+    category: categories.LAYOUTS,
+    content: {
+      type: 'text-button-with-image-section',
+    },
+  },
   // {
   //   id: 'link-buttons',
   //   label: '<b> Link Button </b>',

@@ -42,6 +42,9 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
+import TextSection from '../CustomComponents/TextSection.js';
+import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
+import LinkButton from '../CustomComponents/LinkButton.js';
 
 const { Text } = Typography;
 
@@ -204,6 +207,7 @@ const PageEditor = ({ match, history }) => {
       plugins: [
         'gjs-preset-webpage',
         Container,
+        LinkButton,
         ReactComponentHandler,
         PassionSubscriptionList,
         PassionVideoList,
@@ -212,6 +216,8 @@ const PageEditor = ({ match, history }) => {
         PassionPassList,
         CustomCommands,
         CustomTraits,
+        TextSection,
+        TextWithImageSection,
       ],
 
       pluginsOpts: {
@@ -253,7 +259,9 @@ const PageEditor = ({ match, history }) => {
     // Initially we can only modify background, but modifying
     // padding also makes sense
     const wrapper = editor.getWrapper();
-    wrapper.setClass('page-body-section');
+    const [bodyClassSelector] = wrapper.setClass(['page-body-section']);
+    // NOTE: We can also hide the class by setting private: true
+    bodyClassSelector.set({ protected: true });
     wrapper.set({
       stylable: [
         ...wrapper.get('stylable'),

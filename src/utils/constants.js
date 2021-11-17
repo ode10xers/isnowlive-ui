@@ -9,9 +9,21 @@ import LinkedInLogo from 'assets/icons/linkedin/LinkedInLogo';
 // Need to redefine the format
 export const googleFonts = {
   MERRIWEATHER: 'Merriweather',
-  INDIEFLOWER: 'Indie Flower',
+  INDIE_FLOWER: 'Indie Flower',
   OPENSANS: 'Open Sans',
   POPPINS: 'Poppins',
+  ARIAL: 'Arial',
+  ARIAL_BLACK: 'Arial Black',
+  BRUSH_SCRIPT_MT: 'Brush Script MT',
+  COURIER_NEW: 'Courier New',
+  GEORGIA: 'Georgia',
+  HELVETICA: 'Helvetica',
+  IMPACT: 'Impact',
+  LUCIDA_SANS_UNICODE: 'Lucida Sans Unicode',
+  TAHOMA: 'Tahoma',
+  TIMES_NEW_ROMAN: 'Times New Roman',
+  TREBUCHET_MS: 'Trebuchet MS',
+  VERDANA: 'Verdana',
 };
 
 export const pageTypes = {

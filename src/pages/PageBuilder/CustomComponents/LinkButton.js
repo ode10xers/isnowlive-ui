@@ -1,4 +1,5 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
+import { isValidCSSColor } from 'utils/colors';
 
 export default (editor) => {
   editor.DomComponents.addType('link-buttons', {
@@ -12,8 +13,8 @@ export default (editor) => {
           class: 'link-btn button-type-link',
         },
         'font-family': 'Arial',
-        'text-color': '#000',
-        'bg-color': 'transparent',
+        'text-color': '#000000',
+        'bg-style': '#ffffff',
         traits: [
           {
             type: 'text',
@@ -61,19 +62,29 @@ export default (editor) => {
           {
             type: 'color',
             label: 'Background color',
-            name: 'bg-color',
+            name: 'bg-style',
             changeProp: 1,
           },
+          {
+            type: 'border-radius-slider',
+            name: 'border-radius',
+          },
         ],
-        editable: true,
+        editable: false,
         droppable: false,
+        draggable: false,
+        toolbar: [],
         content: 'Link button',
         styles: `
-          .link-btn, .link-btn.button-type-link {
+          .link-btn {
             display: inline-block;
             padding: 8px;
             width: fit-content;
             text-align: center;
+            border: none;
+          }
+
+          .link-btn.button-type-link {
             border: none;
           }
 
@@ -84,27 +95,10 @@ export default (editor) => {
         `,
       },
       init() {
-        // Check the built it type
-        const btnType =
-          this.getClasses()
-            .find((cls) => cls.startsWith('button-type-'))
-            ?.split('-')[2] ?? 'link';
-
-        // TODO: This logic is the similar to the one in the onEvent
-        // of the button-type trait. Find a way to generalize it better
-        if (btnType === 'link') {
-          this.removeTrait('border-radius');
-        } else {
-          this.addTrait({
-            type: 'border-radius-slider',
-            name: 'border-radius',
-          });
-        }
-
         // We put a listener that triggers when an attribute changes
         // In this case when text-color attribute changes
         this.on('change:text-color', this.handleTextColorChange);
-        this.on('change:bg-color', this.handleBGColorChange);
+        this.on('change:bg-style', this.handleBGColorChange);
         this.on('change:font-family', this.handleFontChange);
       },
       handleTextColorChange() {
@@ -124,22 +118,25 @@ export default (editor) => {
         });
       },
       handleBGColorChange() {
-        const bgColor = this.props()['bg-color'];
+        const bgStyle = this.props()['bg-style'];
         const componentList = this.components();
+
+        const isBackgroundColor = isValidCSSColor(bgStyle);
+
         // Check for child components with the same property
-        const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-color'));
+        const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-style'));
 
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
-          childComp.updateTrait('bg-color', {
+          childComp.updateTrait('bg-style', {
             type: 'color',
-            value: bgColor,
+            value: isBackgroundColor ? bgStyle : 'transparent',
           });
         });
 
         this.setStyle({
           ...this.getStyle(),
-          'background-color': bgColor,
+          background: bgStyle,
         });
       },
       handleFontChange() {
@@ -149,6 +146,37 @@ export default (editor) => {
           ...this.getStyle(),
           'font-family': generateFontFamilyStylingText(font),
         });
+      },
+    },
+  });
+
+  editor.DomComponents.addType('text-section-link-button', {
+    extend: 'link-buttons',
+    model: {
+      defaults: {
+        attributes: {
+          href: '#',
+          target: '_blank',
+          class: 'text-section-btn button-type-link',
+        },
+        styles: `
+            .text-section-btn {
+              display: flex;
+              padding: 8px;
+              width: fit-content;
+              text-align: center;
+              border: none;
+            }
+
+            .text-section-btn.button-type-link {
+              border: none;
+            }
+  
+            .text-section-btn.button-type-outlined {
+              border: 1px solid currentColor;
+              border-radius: 8px;
+            }
+          `,
       },
     },
   });
