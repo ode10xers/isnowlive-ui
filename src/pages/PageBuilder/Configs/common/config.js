@@ -53,6 +53,9 @@ export default {
   },
   blockManager: {
     appendTo: '#' + BLOCKS_PANEL_ID,
+    appendOnClick: (block, editor) => {
+      editor.getWrapper().append(block.get('content'));
+    },
   },
   deviceManager: {
     devices: [

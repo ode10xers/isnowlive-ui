@@ -40,6 +40,7 @@ import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
 import { customEditorInitializationLogic } from 'utils/pageEditor.js';
+import { isValidCSSColor } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext.js';
 
@@ -156,6 +157,10 @@ const SimplePageEditor = ({ match, history }) => {
       blockManager: {
         appendTo: '#' + BLOCKS_PANEL_ID,
         blocks: definedBlocks,
+        appendOnClick: (block, editor) => {
+          editor.getWrapper().append(block.get('content'));
+          editor.Canvas.getWindow().scrollTo(0, editor.Canvas.getDocument().body.scrollHeight);
+        },
       },
       domComponents: {
         storeWrapper: true,
@@ -226,6 +231,41 @@ const SimplePageEditor = ({ match, history }) => {
     // Initially we can only modify background, but modifying
     // padding also makes sense
     const wrapper = editor.getWrapper();
+    wrapper.addTrait({
+      type: 'padding-slider',
+    });
+    wrapper.addTrait({
+      type: 'color',
+      label: 'Background color',
+      name: 'bg-style',
+      changeProp: true,
+    });
+    wrapper.on('change:bg-style', function () {
+      const bgStyle = wrapper.props()['bg-style'];
+      const componentList = wrapper.components();
+
+      const isBackgroundColor = isValidCSSColor(bgStyle);
+
+      // Check for child components with the same property
+      const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-style'));
+      validChildList.forEach((childComp) => {
+        // NOTE: Right now this only works if the prop name and trait name is same
+        childComp.updateTrait('bg-style', {
+          type: 'color',
+          value: isBackgroundColor ? bgStyle : 'transparent',
+        });
+      });
+
+      wrapper.setStyle({
+        ...wrapper.getStyle(),
+        background: bgStyle,
+      });
+    });
+    // TODO: This can also be the way to update component implementations
+    // when they are outdated
+    wrapper.set({
+      'bg-style': '',
+    });
     const [bodyClassSelector] = wrapper.setClass(['page-body-section']);
     // NOTE: We can also hide the class by setting private: true
     bodyClassSelector.set({ protected: true });

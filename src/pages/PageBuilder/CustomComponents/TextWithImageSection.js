@@ -2,7 +2,7 @@ import { isValidCSSColor } from 'utils/colors';
 
 export default (editor) => {
   // TODO: Rename this type for better understanding
-  editor.DomComponents.addType('image-with-padding', {
+  editor.DomComponents.addType('custom-image', {
     extend: 'image',
     model: {
       defaults: {
@@ -24,7 +24,6 @@ export default (editor) => {
         droppable: false,
         highlightable: false,
         copyable: false,
-        resizable: true,
         toolbar: [],
       },
     },
@@ -36,16 +35,7 @@ export default (editor) => {
         tagName: 'div',
         name: 'Text with Image',
         droppable: false,
-        resizable: {
-          tl: false, // Top left
-          tc: false, // Top center
-          tr: false, // Top right
-          cl: false, // Center left
-          cr: false, // Center right
-          bl: false, // Bottom left
-          bc: true, // Bottom center
-          br: false, // Bottom right
-        },
+
         attributes: {
           class: 'text-image-section-container',
         },
@@ -89,7 +79,7 @@ export default (editor) => {
             copyable: false,
           },
           {
-            type: 'image-with-padding',
+            type: 'custom-image',
           },
         ],
         // NOTE : this class probably needs to be global, can put in baseCss
@@ -214,7 +204,7 @@ export default (editor) => {
             copyable: false,
           },
           {
-            type: 'image-with-padding',
+            type: 'custom-image',
           },
         ],
       },

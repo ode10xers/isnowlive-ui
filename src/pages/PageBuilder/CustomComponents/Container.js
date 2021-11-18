@@ -7,6 +7,16 @@ export default (editor) => {
         tagName: 'div',
         name: 'Fixed Container',
         'bg-style': '#ffffff',
+        resizable: {
+          tl: false, // Top left
+          tc: false, // Top center
+          tr: false, // Top right
+          cl: false, // Center left
+          cr: false, // Center right
+          bl: false, // Bottom left
+          bc: true, // Bottom center
+          br: false, // Bottom right
+        },
         attributes: {
           class: 'fixed-container',
         },
@@ -21,12 +31,15 @@ export default (editor) => {
         components: [],
         styles: `
           .fixed-container {
-            display: block;
-            padding: 8px;
-            margin-left: auto;
-            margin-right: auto;
+            display: flex;
+            margin: 0 auto;
             max-width: 980px;
             width: 100%;
+            min-height: 400px;
+          }
+
+          @media (max-width: 768px) {
+            margin: 16px 8px;
           }
         `,
       },
@@ -69,7 +82,17 @@ export default (editor) => {
         attributes: {
           class: 'simple-container',
         },
-        'bg-style': '',
+        resizable: {
+          tl: false, // Top left
+          tc: false, // Top center
+          tr: false, // Top right
+          cl: false, // Center left
+          cr: false, // Center right
+          bl: false, // Bottom left
+          bc: true, // Bottom center
+          br: false, // Bottom right
+        },
+        'bg-style': '#ffffff',
         traits: [
           {
             type: 'padding-slider',

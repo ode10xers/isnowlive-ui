@@ -14,16 +14,6 @@ export default (editor) => {
         tagName: 'div',
         name: 'Text Section',
         droppable: false,
-        resizable: {
-          tl: false, // Top left
-          tc: false, // Top center
-          tr: false, // Top right
-          cl: false, // Center left
-          cr: false, // Center right
-          bl: false, // Bottom left
-          bc: true, // Bottom center
-          br: false, // Bottom right
-        },
         attributes: {
           layout: 'left',
           class: 'text-section-container',

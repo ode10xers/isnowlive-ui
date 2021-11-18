@@ -105,9 +105,13 @@ export default (editor) => {
         select(asset, complete) {
           let isSet = false;
           const selected = editor.getSelected();
-          if (selected && (selected.is('image') || selected.is('image-with-padding'))) {
-            selected.addAttributes({ src: asset.getSrc() });
-            isSet = true;
+          if (selected) {
+            const closestImage = selected.findType('custom-image')[0] ?? null;
+
+            if (closestImage) {
+              closestImage.addAttributes({ src: asset.getSrc() });
+              isSet = true;
+            }
           } else {
             const closestImage = selected.find('img')[0] ?? null;
             if (closestImage && closestImage.is('image')) {
