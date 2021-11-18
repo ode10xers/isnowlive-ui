@@ -587,7 +587,12 @@ const SimplePageEditor = ({ match, history }) => {
 
   const handleCleanCanvas = () => {
     // Custom command, comes from grapesjs-preset-webpage
-    runSimpleCommand('canvas-clear');
+    // runSimpleCommand('canvas-clear');
+    if (gjsEditor) {
+      if (window.confirm('Are you sure you want to clear the canvas?')) {
+        gjsEditor.runCommand('core:canvas-clear');
+      }
+    }
   };
 
   const handleAdvancedMode = () => {
