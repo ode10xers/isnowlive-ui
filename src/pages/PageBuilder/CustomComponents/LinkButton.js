@@ -41,6 +41,7 @@ export default (editor) => {
           },
           {
             type: 'padding-slider',
+            max: '80',
           },
           {
             type: 'margin-slider',
@@ -68,6 +69,8 @@ export default (editor) => {
           {
             type: 'border-radius-slider',
             name: 'border-radius',
+            min: 0,
+            max: 200,
           },
         ],
         editable: false,

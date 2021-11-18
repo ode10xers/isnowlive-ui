@@ -1,6 +1,12 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 import { isValidCSSColor } from 'utils/colors';
 
+const websiteIcon = require('assets/icons/website/website.svg');
+const facebookIcon = require('assets/icons/facebook/facebook.svg');
+const linkedinIcon = require('assets/icons/linkedin/linkedin.svg');
+const instagramIcon = require('assets/icons/instagram/instagram.svg');
+const twitterIcon = require('assets/icons/twitter/twitter.svg');
+
 export default (editor) => {
   editor.DomComponents.addType('text-section', {
     model: {
@@ -8,7 +14,6 @@ export default (editor) => {
         tagName: 'div',
         name: 'Text Section',
         droppable: false,
-        active: true,
         resizable: {
           tl: false, // Top left
           tc: false, // Top center
@@ -73,11 +78,9 @@ export default (editor) => {
             toolbar: [],
             removable: false,
             draggable: false,
-            badgable: false,
             droppable: false,
             highlightable: false,
             editable: true,
-            hoverable: false,
             copyable: false,
           },
           {
@@ -89,11 +92,9 @@ export default (editor) => {
             traits: [],
             removable: false,
             draggable: false,
-            badgable: false,
             droppable: false,
             highlightable: false,
             editable: true,
-            hoverable: false,
             copyable: false,
             toolbar: [],
           },
@@ -200,11 +201,9 @@ export default (editor) => {
             toolbar: [],
             removable: false,
             draggable: false,
-            badgable: false,
             droppable: false,
             highlightable: false,
             editable: true,
-            hoverable: false,
             copyable: false,
           },
           {
@@ -216,16 +215,225 @@ export default (editor) => {
             traits: [],
             removable: false,
             draggable: false,
-            badgable: false,
             droppable: false,
             highlightable: false,
             editable: true,
-            hoverable: false,
             copyable: false,
             toolbar: [],
           },
           {
             type: 'text-section-link-button',
+          },
+        ],
+      },
+    },
+  });
+
+  editor.DomComponents.addType('social-media-links', {
+    model: {
+      defaults: {
+        tagName: 'div',
+        name: 'Social Media Links',
+        droppable: false,
+        draggable: false,
+        attributes: {
+          class: 'social-icons-container',
+        },
+        toolbar: [],
+        removable: false,
+        highlightable: false,
+        copyable: false,
+        'bg-style': '#ffffff',
+        'facebook-link': 'https://www.facebook.com',
+        'instagram-link': 'https://www.instagram.com',
+        'linkedin-link': 'https://www.linkedin.com',
+        'twitter-link': 'https://twitter.com',
+        'website-link': '',
+        traits: [
+          {
+            type: 'text',
+            name: 'facebook-link',
+            label: 'Facebook',
+            changeProp: true,
+          },
+          {
+            type: 'text',
+            name: 'instagram-link',
+            label: 'Instagram',
+            changeProp: true,
+          },
+          {
+            type: 'text',
+            name: 'linkedin-link',
+            label: 'LinkedIn',
+            changeProp: true,
+          },
+          {
+            type: 'text',
+            name: 'twitter-link',
+            label: 'Twitter',
+            changeProp: true,
+          },
+          {
+            type: 'text',
+            name: 'website-link',
+            label: 'Website',
+            changeProp: true,
+          },
+        ],
+        styles: `
+          .social-icons-container {
+            gap: 12px;
+            display: flex;
+            width: fit-content;
+            justify-items: space-evenly;
+            align-content: center;
+            padding: 8px 12px;
+            background: white;
+            text-align:center;
+            box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
+            border-radius: 22.5px;
+          }
+        `,
+      },
+      init() {
+        this.on('change:facebook-link', this.handleLinkChanged);
+        this.on('change:instagram-link', this.handleLinkChanged);
+        this.on('change:linkedin-link', this.handleLinkChanged);
+        this.on('change:twitter-link', this.handleLinkChanged);
+        this.on('change:website-link', this.handleLinkChanged);
+
+        this.handleLinkChanged();
+        console.log(this.props());
+      },
+      handleLinkChanged() {
+        const {
+          'facebook-link': facebookLink,
+          'instagram-link': instagramLink,
+          'linkedin-link': linkedinLink,
+          'twitter-link': twitterLink,
+          'website-link': websiteLink,
+        } = this.props();
+
+        const linkArr = [];
+        console.log(facebookLink);
+
+        if (facebookLink) {
+          linkArr.push({
+            url: facebookLink,
+            icon: facebookIcon,
+            altText: 'Facebook',
+          });
+        }
+        if (instagramLink) {
+          linkArr.push({
+            url: instagramLink,
+            icon: instagramIcon,
+            altText: 'Instagram',
+          });
+        }
+        if (linkedinLink) {
+          linkArr.push({
+            url: linkedinLink,
+            icon: linkedinIcon,
+            altText: 'LinkedIn',
+          });
+        }
+        if (twitterLink) {
+          linkArr.push({
+            url: twitterLink,
+            icon: twitterIcon,
+            altText: 'Twitter',
+          });
+        }
+        if (websiteLink) {
+          linkArr.push({
+            url: websiteLink,
+            icon: websiteIcon,
+            altText: 'Website',
+          });
+        }
+
+        this.components(
+          linkArr.map((link) => ({
+            type: 'link',
+            attributes: {
+              class: 'social-icon-item',
+              href: link.url,
+              target: '_blank',
+            },
+            droppable: false,
+            draggable: false,
+            toolbar: [],
+            selectable: false,
+            removable: false,
+            badgable: false,
+            highlightable: false,
+            hoverable: false,
+            copyable: false,
+            components: [
+              {
+                type: 'image',
+                droppable: false,
+                draggable: false,
+                toolbar: [],
+                selectable: false,
+                removable: false,
+                badgable: false,
+                highlightable: false,
+                hoverable: false,
+                copyable: false,
+                attributes: {
+                  src: link.icon,
+                  alt: link.altText,
+                  height: '32',
+                  width: '32',
+                },
+              },
+            ],
+          }))
+        );
+      },
+    },
+  });
+
+  editor.DomComponents.addType('bio-social-media', {
+    extend: 'text-section',
+    model: {
+      defaults: {
+        components: [
+          {
+            tagName: 'h1',
+            type: 'text',
+            content: `Hi! I'm .....`,
+            name: 'Section Title',
+            attributes: {},
+            traits: [],
+            toolbar: [],
+            removable: false,
+            draggable: false,
+            droppable: false,
+            highlightable: false,
+            editable: true,
+            copyable: false,
+          },
+          {
+            tagName: 'p',
+            type: 'text',
+            content: 'This is my introduction',
+            name: 'Section Content',
+            attributes: {},
+            traits: [],
+            removable: false,
+            draggable: false,
+            droppable: false,
+            highlightable: false,
+            editable: true,
+            copyable: false,
+            toolbar: [],
+          },
+          {
+            type: 'social-media-links',
           },
         ],
       },

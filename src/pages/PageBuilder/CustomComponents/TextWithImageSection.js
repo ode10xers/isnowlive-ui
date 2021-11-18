@@ -1,6 +1,7 @@
 import { isValidCSSColor } from 'utils/colors';
 
 export default (editor) => {
+  // TODO: Rename this type for better understanding
   editor.DomComponents.addType('image-with-padding', {
     extend: 'image',
     model: {
@@ -12,13 +13,16 @@ export default (editor) => {
           {
             type: 'padding-slider',
           },
+          {
+            type: 'border-radius-slider',
+            name: 'border-radius',
+            unit: '%',
+          },
         ],
         removable: false,
         draggable: false,
-        badgable: false,
         droppable: false,
         highlightable: false,
-        hoverable: false,
         copyable: false,
         resizable: true,
         toolbar: [],
@@ -119,7 +123,7 @@ export default (editor) => {
           .text-image-section-container > img {
             width: 100%;
             height: auto;
-            flex: 0 0 50%;
+            flex: 0 1 50%;
           }
 
           .text-image-section-container.image-left {

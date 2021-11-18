@@ -155,6 +155,16 @@ export default [
       type: 'text-button-with-image-section',
     },
   },
+  {
+    id: 'bio-with-links',
+    label: '<b> Bio with Social Media Links </b>',
+    droppable: false,
+    resizable: true,
+    category: categories.LAYOUTS,
+    content: {
+      type: 'bio-social-media',
+    },
+  },
   // {
   //   id: 'link-buttons',
   //   label: '<b> Link Button </b>',

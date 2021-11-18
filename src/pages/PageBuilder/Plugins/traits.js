@@ -16,8 +16,9 @@ export default (editor) => {
     `,
     createInput({ trait }) {
       // Create a new element container and add some content
-      const minValue = 0;
-      const maxValue = 100;
+      console.log(trait.get('min'));
+      const minValue = trait.get('min') || 0;
+      const maxValue = trait.get('max') || 250;
       const el = document.createElement('div');
       el.innerHTML = `
       <div class="input-slider-container">
@@ -120,14 +121,17 @@ export default (editor) => {
     `,
     createInput({ trait }) {
       // Create a new element container and add some content
-      const minValue = 0;
-      const maxValue = 100;
+      const minValue = trait.get('min') || 0;
+      const maxValue = trait.get('max') || 100;
+      const traitUnit = trait.get('unit') || 'px';
+      const unitType = ['px', '%'].includes(traitUnit) ? traitUnit : 'px';
+      this.unit = unitType;
       const el = document.createElement('div');
       el.innerHTML = `
       <div class="input-slider-container">
-        <span class="input-slider-text">${minValue}px</span>
+        <span class="input-slider-text">${minValue}${unitType}</span>
         <input type="range" min="${minValue}" max="${maxValue}" id="border-radius-slider" class="input-slider" />
-        <span class="input-slider-text">${maxValue}px</span>
+        <span class="input-slider-text">${maxValue}${unitType}</span>
       </div>
       <div class="input-slider-value-container">
         Current Value: <span id="border-radius-slider-value" class="input-slider-value"></span>
@@ -140,10 +144,10 @@ export default (editor) => {
     onEvent({ elInput, component, event }) {
       const sliderInput = elInput.querySelector('#border-radius-slider');
       const valueText = elInput.querySelector('#border-radius-slider-value');
-      valueText.innerHTML = sliderInput.value + 'px';
+      valueText.innerHTML = sliderInput.value + (this.unit ?? 'px');
       component.setStyle({
         ...component.getStyle(),
-        'border-radius': `${sliderInput.value ?? 8}px`,
+        'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
       });
     },
     // Update elements on the component change
@@ -151,7 +155,10 @@ export default (editor) => {
       const componentStyle = component.getStyle();
       const borderRadius = componentStyle['border-radius'] ?? '0px';
       const sliderInput = elInput.querySelector('#border-radius-slider');
-      sliderInput.value = borderRadius.replace('px', '');
+      // Remove all non numeric char
+      // The logic below is for us to support multiple units
+      sliderInput.value = borderRadius.replaceAll('[^\\d]', '');
+
       const valueText = elInput.querySelector('#border-radius-slider-value');
       valueText.innerHTML = borderRadius;
       sliderInput.dispatchEvent(new CustomEvent('change'));
