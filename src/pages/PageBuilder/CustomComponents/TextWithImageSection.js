@@ -10,9 +10,9 @@ export default (editor) => {
           loading: 'lazy',
         },
         traits: [
-          {
-            type: 'padding-slider',
-          },
+          // {
+          //   type: 'padding-slider',
+          // },
           {
             type: 'border-radius-slider',
             name: 'border-radius',
@@ -51,9 +51,9 @@ export default (editor) => {
         },
         'bg-style': '',
         traits: [
-          {
-            type: 'padding-slider',
-          },
+          // {
+          //   type: 'padding-slider',
+          // },
           {
             type: 'image-position-layout',
             name: 'image-layout',
@@ -122,6 +122,7 @@ export default (editor) => {
 
           .text-image-section-container > img {
             width: 100%;
+            max-width: 270px;
             height: auto;
             flex: 0 1 50%;
           }

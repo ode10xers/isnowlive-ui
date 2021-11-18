@@ -90,7 +90,12 @@ export default [
     resizable: true,
     category: categories.LAYOUTS,
     content: {
-      type: 'text-section',
+      type: 'fixed-width-container',
+      components: [
+        {
+          type: 'text-section',
+        },
+      ],
     },
   },
   {
@@ -100,7 +105,12 @@ export default [
     resizable: true,
     category: categories.LAYOUTS,
     content: {
-      type: 'text-with-image-section',
+      type: 'fixed-width-container',
+      components: [
+        {
+          type: 'text-with-image-section',
+        },
+      ],
     },
   },
   {
@@ -110,7 +120,12 @@ export default [
     resizable: true,
     category: categories.LAYOUTS,
     content: {
-      type: 'text-section-with-button',
+      type: 'fixed-width-container',
+      components: [
+        {
+          type: 'text-section-with-button',
+        },
+      ],
     },
   },
   {
@@ -120,7 +135,12 @@ export default [
     resizable: true,
     category: categories.LAYOUTS,
     content: {
-      type: 'text-button-with-image-section',
+      type: 'fixed-width-container',
+      components: [
+        {
+          type: 'text-button-with-image-section',
+        },
+      ],
     },
   },
   {
@@ -130,7 +150,12 @@ export default [
     resizable: true,
     category: categories.LAYOUTS,
     content: {
-      type: 'bio-social-media',
+      type: 'fixed-width-container',
+      components: [
+        {
+          type: 'bio-social-media',
+        },
+      ],
     },
   },
   // {
