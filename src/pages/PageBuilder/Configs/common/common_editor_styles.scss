@@ -106,6 +106,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+    // overflow: auto;
   }
 
   .gjs-pn-panels {
@@ -213,6 +214,7 @@
     width: 100%;
     opacity: 0.9;
   }
+
   .icon-dir-row {
     background: url('../../../../assets/images/flex_icons/flex-dir-row.png') no-repeat center;
   }

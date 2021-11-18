@@ -151,7 +151,7 @@ const SimplePageEditor = ({ match, history }) => {
           width: 10px
         }
       `,
-      selectorManager: { appendTo: '' },
+      selectorManager: { appendTo: '', componentFirst: true },
       styleManager: { appendTo: '' },
       blockManager: {
         appendTo: '#' + BLOCKS_PANEL_ID,
