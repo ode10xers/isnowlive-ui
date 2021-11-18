@@ -62,7 +62,8 @@ const Routes = {
       create: '/pages/create',
       update: '/pages/edit/:page_id',
       // NOTE: THe paths below is to be used without creatorDashboard rootPath
-      editor: '/pages/editor/:page_id',
+      simpleEditor: '/pages/editor/:page_id',
+      editor: '/pages/editor/:page_id/advanced',
       headerEditor: '/header/editor',
       footerEditor: '/footer/editor',
     },

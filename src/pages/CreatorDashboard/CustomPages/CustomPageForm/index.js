@@ -267,7 +267,7 @@ const CustomPageForm = ({ match, location, history }) => {
       const pageId = await handleFormFinish(form.getFieldsValue(), false);
 
       if (pageId) {
-        history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: pageId }));
+        history.push(generatePath(Routes.creatorDashboard.customPages.simpleEditor, { page_id: pageId }));
       }
     } catch (error) {
       form.scrollToField(error.errorFields[0].name);

@@ -105,7 +105,7 @@ const CustomPagesListing = ({ match, history }) => {
 
   const handleEditPageContent = (pageInfo) =>
     navigateWithUsernameUrl(
-      generatePath(Routes.creatorDashboard.customPages.editor, { page_id: pageInfo.external_id })
+      generatePath(Routes.creatorDashboard.customPages.simpleEditor, { page_id: pageInfo.external_id })
     );
 
   const handleDeletePage = async (pageInfo, modalRef) => {
@@ -117,6 +117,7 @@ const CustomPagesListing = ({ match, history }) => {
       if (isAPISuccess(status)) {
         message.success('Page has been removed!');
         await fetchCreatorCustomPages();
+        modalRef.destroy();
       }
     } catch (error) {
       console.error(error);

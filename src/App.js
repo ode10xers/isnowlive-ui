@@ -60,6 +60,7 @@ const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
 const Legals = lazy(() => import('pages/Legals'));
 const Onboarding = lazy(() => import('pages/EditProfile'));
 const PageEditor = lazy(() => import('pages/PageBuilder/PageEditor'));
+const SimplePageEditor = lazy(() => import('pages/PageBuilder/SimplePageEditor'));
 const HeaderEditor = lazy(() => import('pages/PageBuilder/HeaderEditor'));
 const FooterEditor = lazy(() => import('pages/PageBuilder/FooterEditor'));
 const PageRenderer = lazy(() => import('pages/PageBuilder/PageRenderer'));
@@ -258,7 +259,13 @@ function App() {
             <RouteWithLayout
               layout={FullWidthLayout}
               exact
-              path={['/test-editor', '/page-render', Routes.creatorDashboard.customPages.editor]}
+              path={Routes.creatorDashboard.customPages.simpleEditor}
+              component={SimplePageEditor}
+            />
+            <RouteWithLayout
+              layout={FullWidthLayout}
+              exact
+              path={Routes.creatorDashboard.customPages.editor}
               component={PageEditor}
             />
             <RouteWithLayout

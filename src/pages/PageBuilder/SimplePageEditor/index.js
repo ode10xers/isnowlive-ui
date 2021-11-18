@@ -7,7 +7,7 @@ import { LeftOutlined } from '@ant-design/icons';
 import 'grapesjs/dist/css/grapes.min.css';
 // import 'grapesjs-blocks-flexbox';
 import grapesjs from 'grapesjs';
-import 'grapesjs-preset-webpage';
+// import 'grapesjs-preset-webpage';
 
 import apis from 'apis';
 import config from 'config';
@@ -20,7 +20,7 @@ import elementIds from '../Configs/common/elementIds.js';
 import sectionIds from '../Configs/common/sectionIds';
 import commonEditorConfig from '../Configs/common/config';
 import definedBlocks from '../Configs/blocks.js';
-import definedStylePanels from '../Configs/style_panel.js';
+// import definedStylePanels from '../Configs/style_panel.js';
 
 // THese are to be put in plugins
 import CustomTraits from '../Plugins/traits';
@@ -32,6 +32,9 @@ import PassionCourseList from '../CustomComponents/PassionCourseList.js';
 import PassionPassList from '../CustomComponents/PassionPassList.js';
 import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
 import Container from '../CustomComponents/Container.js';
+import TextSection from '../CustomComponents/TextSection.js';
+import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
+import LinkButton from '../CustomComponents/LinkButton.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
@@ -42,25 +45,15 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-import TextSection from '../CustomComponents/TextSection.js';
-import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
-import LinkButton from '../CustomComponents/LinkButton.js';
 import { generatePath } from 'react-router-dom';
 
 const { Text } = Typography;
 
-const {
-  BUILDER_CONTAINER_ID,
-  SELECTOR_PANEL_ID,
-  STYLES_PANEL_ID,
-  TRAITS_PANEL_ID,
-  LAYERS_PANEL_ID,
-  BLOCKS_PANEL_ID,
-} = elementIds;
+const { BUILDER_CONTAINER_ID, TRAITS_PANEL_ID, LAYERS_PANEL_ID, BLOCKS_PANEL_ID } = elementIds;
 
-const { EDITOR, RIGHT, RIGHT_INNER, TOP, LEFT, EMPTY, STYLING } = sectionIds;
+const { EDITOR, RIGHT, RIGHT_INNER, TOP, LEFT, EMPTY } = sectionIds;
 
-const PageEditor = ({ match, history }) => {
+const SimplePageEditor = ({ match, history }) => {
   const targetPageId = match.params.page_id;
 
   const {
@@ -158,6 +151,12 @@ const PageEditor = ({ match, history }) => {
           width: 10px
         }
       `,
+      selectorManager: { appendTo: '' },
+      styleManager: { appendTo: '' },
+      blockManager: {
+        appendTo: '#' + BLOCKS_PANEL_ID,
+        blocks: definedBlocks,
+      },
       domComponents: {
         storeWrapper: true,
       },
@@ -206,7 +205,6 @@ const PageEditor = ({ match, history }) => {
 
       // TODO: Can Probably group all passion components under a named plugin
       plugins: [
-        'gjs-preset-webpage',
         Container,
         LinkButton,
         ReactComponentHandler,
@@ -220,38 +218,6 @@ const PageEditor = ({ match, history }) => {
         TextSection,
         TextWithImageSection,
       ],
-
-      pluginsOpts: {
-        'gjs-preset-webpage': {
-          modalImportLabel: 'This is the data format that will be saved',
-          modalImportButton: 'Save',
-          modalImportContent: (editor) => {
-            return JSON.stringify({
-              html: editor.getHtml(),
-              css: editor.getCss(),
-              components: editor.getComponents(),
-              styles: editor.getStyle(),
-            });
-          },
-          // Default Values
-          // blocks: 	['link-block', 'quote', 'text-basic'],
-          blocks: ['text-basic'],
-          blocksBasicOpts: {
-            flexGrid: true,
-            rowHeight: '120px',
-            // Default Values
-            // blocks: ['column1', 'column2', 'column3', 'column3-7', 'text', 'link', 'image', 'video', 'map'],
-            blocks: ['column1', 'column2', 'column3', 'column3-7', 'image', 'video', 'text', 'link'],
-          },
-          countdownOpts: 0,
-          navbarOpts: 0,
-          customStyleManager: definedStylePanels,
-        },
-      },
-    });
-
-    definedBlocks.forEach((blk) => {
-      editor.BlockManager.add(blk.id, blk);
     });
 
     customEditorInitializationLogic(editor);
@@ -348,7 +314,7 @@ const PageEditor = ({ match, history }) => {
 
     editor.onReady(() => {
       document.getElementById(LAYERS_PANEL_ID).style.display = 'none';
-      document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
+      editor.Blocks.render();
     });
 
     //#endregion End of event listener hooks
@@ -548,16 +514,16 @@ const PageEditor = ({ match, history }) => {
     }
   };
 
-  const handleClickStyles = (e) => {
-    if (runCommandAndToggleActiveStyles(e.target, 'open-sm')) {
-      document.getElementById(STYLING).style.display = 'block';
-      document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
-    }
-  };
+  // const handleClickStyles = (e) => {
+  //   if (runCommandAndToggleActiveStyles(e.target, 'open-sm')) {
+  //     document.getElementById(STYLING).style.display = 'block';
+  //     document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
+  //   }
+  // };
 
   const handleClickTraits = (e) => {
     if (runCommandAndToggleActiveStyles(e.target, 'open-tm')) {
-      document.getElementById(STYLING).style.display = 'none';
+      // document.getElementById(STYLING).style.display = 'none';
       document.getElementById(TRAITS_PANEL_ID).style.display = 'block';
     }
   };
@@ -624,19 +590,19 @@ const PageEditor = ({ match, history }) => {
     runSimpleCommand('canvas-clear');
   };
 
-  const handleSimpleMode = () => {
+  const handleAdvancedMode = () => {
     if (gjsEditor) {
       const dirtyCount = gjsEditor.getDirtyCount() ?? 0;
 
       if (dirtyCount > 0) {
         if (window.confirm('You will lose unsaved changes! Are you sure about this?')) {
-          history.push(generatePath(Routes.creatorDashboard.customPages.simpleEditor, { page_id: targetPageId }));
+          history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
         }
       } else {
-        history.push(generatePath(Routes.creatorDashboard.customPages.simpleEditor, { page_id: targetPageId }));
+        history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
       }
     } else {
-      history.push(generatePath(Routes.creatorDashboard.customPages.simpleEditor, { page_id: targetPageId }));
+      history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
     }
   };
 
@@ -688,16 +654,6 @@ const PageEditor = ({ match, history }) => {
                     ) : lastSaveTime ? (
                       <Text className={styles.saveTimeText}>Last Saved : {lastSaveTime.toLocaleTimeString()}</Text>
                     ) : null}
-                    {/* <Text className={styles.whiteText}>Page :</Text>
-                    <Select
-                      value={selectedPageId}
-                      onChange={onSelectedPageChanged}
-                      loading={isLoading}
-                      options={creatorPages.map((page) => ({
-                        label: page.name,
-                        value: page.external_id,
-                      }))}
-                    /> */}
                   </Space>
                 </Col>
                 <Col flex="0 0 120px" className={styles.textAlignCenter}>
@@ -740,6 +696,7 @@ const PageEditor = ({ match, history }) => {
                       className="fa fa-arrows-alt"
                       onClick={handleToggleFullscreen}
                     ></button>
+                    {/* <button className="fa fa-code" onClick={handleShowCode}></button> */}
                     <button
                       data-tooltip="Undo"
                       data-tooltip-pos="bottom"
@@ -769,10 +726,10 @@ const PageEditor = ({ match, history }) => {
                       onClick={handleCleanCanvas}
                     ></button>
                     <button
-                      data-tooltip="Simple mode"
+                      data-tooltip="Advanced mode"
                       data-tooltip-pos="bottom"
-                      className="fa fa-magic"
-                      onClick={handleSimpleMode}
+                      className="fa fa-gears"
+                      onClick={handleAdvancedMode}
                     ></button>
                   </Space>
                 </Col>
@@ -782,25 +739,20 @@ const PageEditor = ({ match, history }) => {
           </div>
           <div id={RIGHT} className={styles.rightSection}>
             <div className={styles.topPanel}>
-              <button
-                data-tooltip="Component Styling"
-                data-tooltip-pos="bottom"
-                className="fa fa-paint-brush active"
-                onClick={handleClickStyles}
-              ></button>
+              {/* <button className="fa fa-paint-brush active" onClick={handleClickStyles}></button> */}
               <button
                 data-tooltip="Component Settings"
                 data-tooltip-pos="bottom"
-                className="fa fa-cog"
+                className="fa fa-cog active"
                 onClick={handleClickTraits}
               ></button>
             </div>
             <div id={EMPTY}>Please select a component first.</div>
             <div id={RIGHT_INNER} className={styles.panelContainer}>
-              <div id={STYLING}>
+              {/* <div id={STYLING}>
                 <div id={SELECTOR_PANEL_ID}></div>
                 <div id={STYLES_PANEL_ID}></div>
-              </div>
+              </div> */}
               <div id={TRAITS_PANEL_ID}></div>
             </div>
           </div>
@@ -810,4 +762,4 @@ const PageEditor = ({ match, history }) => {
   );
 };
 
-export default PageEditor;
+export default SimplePageEditor;
