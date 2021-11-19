@@ -196,6 +196,26 @@ export default [
           type: 'fixed-width-container',
           components: [
             {
+              tagName: 'h1',
+              type: 'text',
+              content: 'Testimonials',
+              name: 'Testimonial Section Title',
+              attributes: {},
+              traits: [],
+              toolbar: [
+                {
+                  attributes: { class: 'fa fa-trash-o' },
+                  command: 'tlb-delete',
+                },
+              ],
+              removable: true,
+              draggable: false,
+              droppable: false,
+              highlightable: false,
+              editable: true,
+              copyable: false,
+            },
+            {
               type: 'testimonials',
             },
           ],

@@ -32,11 +32,13 @@ export default (editor) => {
         styles: `
           .fixed-container {
             display: flex;
+            flex-direction: column;
             margin: 0 auto;
             max-width: 980px;
             width: 100%;
             min-height: 400px;
             padding: 4px;
+            text-align:center;
           }
 
           @media (max-width: 768px) {
