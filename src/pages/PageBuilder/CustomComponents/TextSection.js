@@ -168,6 +168,13 @@ export default (editor) => {
       handleFontChange() {
         const font = this.props()['font-family'];
 
+        this.components().forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            'font-family': generateFontFamilyStylingText(font),
+          });
+        });
+
         this.setStyle({
           ...this.getStyle(),
           'font-family': generateFontFamilyStylingText(font),

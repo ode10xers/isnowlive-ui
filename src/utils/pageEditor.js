@@ -11,6 +11,18 @@ export const parseContentData = (contentData) => ({
   styles: [...parseAsArray(contentData.styles)],
 });
 
+export const confirmDirtyCount = (editor) => {
+  if (!editor) return true;
+
+  const dirtyCount = editor.getDirtyCount() ?? 0;
+
+  if (dirtyCount > 0) {
+    return window.confirm('You will lose unsaved changes! Are you sure about this?');
+  } else {
+    return true;
+  }
+};
+
 export const customEditorInitializationLogic = (editor) => {
   const editorCanvas = editor.Canvas;
 

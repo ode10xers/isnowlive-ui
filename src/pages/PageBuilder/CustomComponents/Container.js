@@ -36,6 +36,7 @@ export default (editor) => {
             max-width: 980px;
             width: 100%;
             min-height: 400px;
+            padding: 4px;
           }
 
           @media (max-width: 768px) {
@@ -108,7 +109,7 @@ export default (editor) => {
         styles: `
           .simple-container {
             display: block;
-            padding: 8px;
+            padding: 4px;
           }
         `,
       },

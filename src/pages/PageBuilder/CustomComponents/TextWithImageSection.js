@@ -99,6 +99,7 @@ export default (editor) => {
           .with-background-image * {
             z-index: 1;
           }
+          
           .text-image-section-container {
             position: relative;
             display: flex;

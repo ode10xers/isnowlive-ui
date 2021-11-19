@@ -36,11 +36,12 @@ import Container from '../CustomComponents/Container.js';
 import TextSection from '../CustomComponents/TextSection.js';
 import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
 import LinkButton from '../CustomComponents/LinkButton.js';
+import Testimonials from '../CustomComponents/Testimonials.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
-import { customEditorInitializationLogic } from 'utils/pageEditor.js';
+import { confirmDirtyCount, customEditorInitializationLogic } from 'utils/pageEditor.js';
 
 import { useGlobalContext } from 'services/globalContext.js';
 
@@ -219,6 +220,7 @@ const PageEditor = ({ match, history }) => {
         CustomTraits,
         TextSection,
         TextWithImageSection,
+        Testimonials,
       ],
 
       pluginsOpts: {
@@ -507,11 +509,9 @@ const PageEditor = ({ match, history }) => {
 
   //#region Start of Editor Button Handlers
   const handleBackToDashboard = () => {
-    if (gjsEditor) {
-      gjsEditor.store();
+    if (confirmDirtyCount(gjsEditor)) {
+      history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.list);
     }
-
-    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.list);
   };
 
   const toggleActiveClass = (targetEl) => {

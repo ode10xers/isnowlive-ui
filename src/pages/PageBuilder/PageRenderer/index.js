@@ -35,6 +35,7 @@ import EditorPassionSubscriptionList from '../CustomComponents/PassionSubscripti
 import EditorHeader from '../CustomComponents/Header.js';
 import EditorFooter from '../CustomComponents/Footer.js';
 import EditorContainer from '../CustomComponents/Container.js';
+import Testimonials from '../CustomComponents/Testimonials.js';
 
 // NOTE: While the ones below are React Component Definitions used for parsing
 import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
@@ -163,6 +164,7 @@ const PageRenderer = ({ match, history }) => {
         // SignInButton,
         EditorHeader,
         EditorFooter,
+        Testimonials,
       ],
       pluginsOpts: {
         'gjs-preset-webpage': {

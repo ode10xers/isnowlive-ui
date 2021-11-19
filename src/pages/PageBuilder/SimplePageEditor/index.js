@@ -35,11 +35,12 @@ import Container from '../CustomComponents/Container.js';
 import TextSection from '../CustomComponents/TextSection.js';
 import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
 import LinkButton from '../CustomComponents/LinkButton.js';
+import Testimonials from '../CustomComponents/Testimonials.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
-import { customEditorInitializationLogic } from 'utils/pageEditor.js';
+import { confirmDirtyCount, customEditorInitializationLogic } from 'utils/pageEditor.js';
 import { isValidCSSColor } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext.js';
@@ -222,6 +223,7 @@ const SimplePageEditor = ({ match, history }) => {
         CustomTraits,
         TextSection,
         TextWithImageSection,
+        Testimonials,
       ],
     });
 
@@ -513,11 +515,9 @@ const SimplePageEditor = ({ match, history }) => {
 
   //#region Start of Editor Button Handlers
   const handleBackToDashboard = () => {
-    if (gjsEditor) {
-      gjsEditor.store();
+    if (confirmDirtyCount(gjsEditor)) {
+      history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.list);
     }
-
-    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.customPages.list);
   };
 
   const toggleActiveClass = (targetEl) => {
@@ -636,17 +636,7 @@ const SimplePageEditor = ({ match, history }) => {
   };
 
   const handleAdvancedMode = () => {
-    if (gjsEditor) {
-      const dirtyCount = gjsEditor.getDirtyCount() ?? 0;
-
-      if (dirtyCount > 0) {
-        if (window.confirm('You will lose unsaved changes! Are you sure about this?')) {
-          history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
-        }
-      } else {
-        history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
-      }
-    } else {
+    if (confirmDirtyCount(gjsEditor)) {
       history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
     }
   };

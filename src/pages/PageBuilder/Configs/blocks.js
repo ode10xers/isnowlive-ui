@@ -183,6 +183,26 @@ export default [
       ],
     },
   },
+  {
+    id: 'testimonials',
+    label: '<b> Testimonials </b>',
+    droppable: false,
+    resizable: true,
+    category: categories.LAYOUTS,
+    content: {
+      type: 'container',
+      components: [
+        {
+          type: 'fixed-width-container',
+          components: [
+            {
+              type: 'testimonials',
+            },
+          ],
+        },
+      ],
+    },
+  },
   // {
   //   id: 'link-buttons',
   //   label: '<b> Link Button </b>',
