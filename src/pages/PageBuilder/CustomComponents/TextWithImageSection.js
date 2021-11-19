@@ -138,10 +138,12 @@ export default (editor) => {
 
           .text-image-section-container.image-bottom > img {
             align-self: center;
+            max-width: 100%;
           }
 
           .text-image-section-container.image-top > img {
             align-self: center;
+            max-width: 100%;
           }
 
           @media (max-width: 768px) {
@@ -157,6 +159,7 @@ export default (editor) => {
 
             .text-image-section-container > img {
               flex: 1 1 100%;
+              max-width: 100%;
             }
           }
         `,

@@ -200,6 +200,12 @@ const CustomPageForm = ({ match, location, history }) => {
 
   const handleFormFinish = async (values, shouldRedirect = true) => {
     setIsLoading(true);
+
+    if (!isValidSlug) {
+      message.error('Please enter a valid slug!');
+      return;
+    }
+
     try {
       const payload = {
         name: values.customPageName,
@@ -409,12 +415,12 @@ const CustomPageForm = ({ match, location, history }) => {
             <Col xs={24}>
               <Row justify="end" gutter={[10, 10]}>
                 <Col>
-                  <Button size="large" htmlType="submit">
+                  <Button size="large" htmlType="submit" disabled={!isValidSlug}>
                     {targetPageId ? 'Update' : 'Create'} Page
                   </Button>
                 </Col>
                 <Col>
-                  <Button size="large" type="primary" onClick={handleSaveAndEditContent}>
+                  <Button size="large" type="primary" onClick={handleSaveAndEditContent} disabled={!isValidSlug}>
                     Save Changes and Edit Content
                   </Button>
                 </Col>

@@ -33,6 +33,7 @@ export default (editor) => {
           .fixed-container {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             margin: 0 auto;
             max-width: 980px;
             width: 100%;

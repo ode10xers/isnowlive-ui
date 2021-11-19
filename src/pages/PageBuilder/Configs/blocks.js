@@ -18,7 +18,12 @@ export default [
       type: 'container',
       components: [
         {
-          type: 'PassionSessionList',
+          type: 'fixed-width-container',
+          components: [
+            {
+              type: 'PassionSessionList',
+            },
+          ],
         },
       ],
     },
@@ -33,7 +38,12 @@ export default [
       type: 'container',
       components: [
         {
-          type: 'PassionVideoList',
+          type: 'fixed-width-container',
+          components: [
+            {
+              type: 'PassionVideoList',
+            },
+          ],
         },
       ],
     },
@@ -48,7 +58,12 @@ export default [
       type: 'container',
       components: [
         {
-          type: 'PassionCourseList',
+          type: 'fixed-width-container',
+          components: [
+            {
+              type: 'PassionVideoList',
+            },
+          ],
         },
       ],
     },
@@ -63,7 +78,12 @@ export default [
       type: 'container',
       components: [
         {
-          type: 'PassionPassList',
+          type: 'fixed-width-container',
+          components: [
+            {
+              type: 'PassionPassList',
+            },
+          ],
         },
       ],
     },
@@ -78,7 +98,12 @@ export default [
       type: 'container',
       components: [
         {
-          type: 'PassionSubscriptionList',
+          type: 'fixed-width-container',
+          components: [
+            {
+              type: 'PassionSubscriptionList',
+            },
+          ],
         },
       ],
     },
