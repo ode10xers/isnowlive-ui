@@ -96,7 +96,19 @@
       width: 100%;
       height: 100%;
       text-align: center;
-      padding-bottom: 80px;
+      padding-bottom: 100px;
+
+      @media screen and (max-width: 1024px) {
+        padding-bottom: 80px;
+      }
+
+      @media screen and (max-width: 769px) {
+        padding-bottom: 80px;
+      }
+
+      @media screen and (max-width: 526px) {
+        padding-bottom: 80px;
+      }
 
       .courseBuyDetails {
         margin: 120px auto 0;
@@ -129,7 +141,7 @@
           }
         }
 
-        .courseDesc {
+        .courseDescExpanded {
           max-width: 1000px;
           padding: 0 20px 20px;
           font-size: 18px;
@@ -147,11 +159,62 @@
           }
         }
 
+        .courseDescExpanded * {
+          // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+            // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+          background-color: transparent !important;
+          color: map-get($colors, 'White') !important;
+        }
+
+        .courseDesc {
+          max-width: 1000px;
+          padding: 0 20px 20px;
+          font-size: 18px;
+          max-height: 280px;
+          overflow: hidden;
+
+          @media screen and (max-width: 1025px) {
+            font-size: 16px;
+            max-height: 200px;
+          }
+
+          @media screen and (max-width: 769px) {
+            font-size: 14px;
+            max-height: 160px;
+          }
+
+          @media screen and (max-width: 526px) {
+            font-size: 12px;
+            max-height: 120px;
+          }
+        }
+
         .courseDesc * {
           // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
             // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
           background-color: transparent !important;
           color: map-get($colors, 'White') !important;
+        }
+
+        .readMoreText {
+          margin-top: 20px;
+          margin-bottom: 20px;
+          color: map-get($colors, 'White') !important;
+          cursor: pointer;
+          font-size: 16px;
+
+          &:hover {
+            transition: 0.4s;
+            color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+          }
+
+          @media screen and (max-width: 769px) {
+            font-size: 14px;
+          }
+
+          @media screen and (max-width: 526px) {
+            font-size: 12px;
+          }
         }
       }
 

@@ -57,6 +57,8 @@ const CourseDetails = ({ match }) => {
 
   const [expandedCourseModules, setExpandedCourseModules] = useState([]);
 
+  const [shouldShowMoreCourseDetails, setShouldShowMoreCourseDetails] = useState(false);
+
   const getCreatorProfileDetails = useCallback(async (creatorUsername) => {
     try {
       const { data } = creatorUsername
@@ -654,9 +656,17 @@ const CourseDetails = ({ match }) => {
                       <Title level={3} className={styles.courseName}>
                         {course?.name}
                       </Title>
-                      {course?.description && (
-                        <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
-                      )}
+                      {course?.description &&
+                        (shouldShowMoreCourseDetails ? (
+                          <div className={styles.courseDescExpanded}>{ReactHtmlParser(course?.description)}</div>
+                        ) : (
+                          <div>
+                            <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
+                            <div className={styles.readMoreText} onClick={() => setShouldShowMoreCourseDetails(true)}>
+                              Read More <DownOutlined />
+                            </div>
+                          </div>
+                        ))}
                       {course?.waitlist ? waitlistSection : courseBuyButton}
                     </Space>
                   </div>
