@@ -68,9 +68,20 @@
   .courseImageContainer {
     position: relative;
 
+    :global {
+      .ant-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
     .courseCoverImage {
       object-fit: cover;
       min-height: 550px;
+      height: 100%;
 
       @media screen and (max-width: 992px) {
         min-height: 320px;
@@ -78,13 +89,14 @@
     }
 
     .courseBuyContainer {
-      position: absolute;
+      position: relative;
       top: 0;
       left: 0;
       background-color: rgba(0, 0, 0, 0.4);
       width: 100%;
       height: 100%;
       text-align: center;
+      padding-bottom: 80px;
 
       .courseBuyDetails {
         margin: 120px auto 0;
