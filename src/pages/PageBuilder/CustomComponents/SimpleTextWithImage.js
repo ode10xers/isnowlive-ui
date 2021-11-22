@@ -21,6 +21,19 @@ const textSectionWithImageTraits = [
 ];
 
 export default (editor) => {
+  // TODO: Rename this type for better understanding
+  editor.DomComponents.addType('custom-image', {
+    extend: 'image',
+    model: {
+      defaults: {
+        attributes: {
+          loading: 'lazy',
+        },
+        ...fullyDisabledComponentFlags,
+      },
+    },
+  });
+
   // Text with Image Section
   editor.DomComponents.addType('simple-text-image-section', {
     model: {

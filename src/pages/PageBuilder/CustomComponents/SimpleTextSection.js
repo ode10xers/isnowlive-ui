@@ -1,7 +1,13 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 import { generateContainerWrapper } from '../Configs/blocks';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
-import { backgroundTraits, fontTraits, innerButtonTraits } from '../Configs/common/trait_sets';
+import { backgroundTraits, fontTraits, innerButtonTraits, socialLinksTraits } from '../Configs/common/trait_sets';
+
+const websiteIcon = require('assets/icons/website/website.svg');
+const facebookIcon = require('assets/icons/facebook/facebook.svg');
+const linkedinIcon = require('assets/icons/linkedin/linkedin.svg');
+const instagramIcon = require('assets/icons/instagram/instagram.svg');
+const twitterIcon = require('assets/icons/twitter/twitter.svg');
 
 export const textSectionPropHandlers = {
   handleTextColorChange() {
@@ -203,6 +209,121 @@ export default (editor) => {
   });
 
   // Bio Section with Links
+  editor.DomComponents.addType('social-media-links', {
+    model: {
+      defaults: {
+        tagName: 'div',
+        name: 'Social Media Links',
+        attributes: {
+          class: 'social-icons-container',
+        },
+        ...fullyDisabledComponentFlags,
+        'bg-style': '#ffffff',
+        'facebook-link': 'https://www.facebook.com',
+        'instagram-link': 'https://www.instagram.com',
+        'linkedin-link': 'https://www.linkedin.com',
+        'twitter-link': 'https://twitter.com',
+        'website-link': '',
+        traits: socialLinksTraits,
+        styles: `
+          .social-icons-container {
+            gap: 12px;
+            display: flex;
+            width: fit-content;
+            justify-items: space-evenly;
+            align-content: center;
+            padding: 8px 12px;
+            background: white;
+            text-align:center;
+            box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
+            border-radius: 22.5px;
+          }
+        `,
+      },
+      init() {
+        this.on('change:facebook-link', this.handleLinkChanged);
+        this.on('change:instagram-link', this.handleLinkChanged);
+        this.on('change:linkedin-link', this.handleLinkChanged);
+        this.on('change:twitter-link', this.handleLinkChanged);
+        this.on('change:website-link', this.handleLinkChanged);
+
+        this.handleLinkChanged();
+      },
+      handleLinkChanged() {
+        const {
+          'facebook-link': facebookLink,
+          'instagram-link': instagramLink,
+          'linkedin-link': linkedinLink,
+          'twitter-link': twitterLink,
+          'website-link': websiteLink,
+        } = this.props();
+
+        const linkArr = [];
+
+        // TODO: Refactor this
+        if (facebookLink) {
+          linkArr.push({
+            url: facebookLink,
+            icon: facebookIcon,
+            altText: 'Facebook',
+          });
+        }
+        if (instagramLink) {
+          linkArr.push({
+            url: instagramLink,
+            icon: instagramIcon,
+            altText: 'Instagram',
+          });
+        }
+        if (linkedinLink) {
+          linkArr.push({
+            url: linkedinLink,
+            icon: linkedinIcon,
+            altText: 'LinkedIn',
+          });
+        }
+        if (twitterLink) {
+          linkArr.push({
+            url: twitterLink,
+            icon: twitterIcon,
+            altText: 'Twitter',
+          });
+        }
+        if (websiteLink) {
+          linkArr.push({
+            url: websiteLink,
+            icon: websiteIcon,
+            altText: 'Website',
+          });
+        }
+
+        this.components(
+          linkArr.map((link) => ({
+            type: 'link',
+            attributes: {
+              class: 'social-icon-item',
+              href: link.url,
+              target: '_blank',
+            },
+            ...fullyDisabledComponentFlags,
+            components: [
+              {
+                type: 'image',
+                ...fullyDisabledComponentFlags,
+                attributes: {
+                  src: link.icon,
+                  alt: link.altText,
+                  height: '32',
+                  width: '32',
+                },
+              },
+            ],
+          }))
+        );
+      },
+    },
+  });
+
   editor.DomComponents.addType('simple-bio-section', {
     extend: 'simple-text-section',
     model: {

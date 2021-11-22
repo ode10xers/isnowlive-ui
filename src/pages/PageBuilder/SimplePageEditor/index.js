@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { Spin, Row, Col, Space, Typography, Button, message } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
@@ -32,10 +33,10 @@ import PassionCourseList from '../CustomComponents/PassionCourseList.js';
 import PassionPassList from '../CustomComponents/PassionPassList.js';
 import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
 import Container from '../CustomComponents/Container.js';
-import TextSection from '../CustomComponents/TextSection.js';
-import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
 import LinkButton from '../CustomComponents/LinkButton.js';
 import Testimonials from '../CustomComponents/Testimonials.js';
+import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
+import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
@@ -47,9 +48,6 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 //eslint-disable-next-line
 import styles from './style.module.scss';
-import { generatePath } from 'react-router-dom';
-import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
-import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 
 const { Text } = Typography;
 
@@ -223,8 +221,6 @@ const SimplePageEditor = ({ match, history }) => {
         PassionPassList,
         CustomCommands,
         CustomTraits,
-        TextSection,
-        TextWithImageSection,
         Testimonials,
         SimpleTextSection,
         SimpleTextWithImage,

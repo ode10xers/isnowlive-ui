@@ -23,8 +23,8 @@ import commonEditorConfig from '../Configs/common/config';
 import CustomTraits from '../Configs/traits';
 import CustomCommands from '../Configs/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
-import TextSection from '../CustomComponents/TextSection.js';
-import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';
+import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
+import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 // import SignInButton from '../CustomComponents/SignInButton.js';
 import EditorLinkButton from '../CustomComponents/LinkButton.js';
 import EditorPassionSessionList from '../CustomComponents/PassionSessionList.js';
@@ -48,8 +48,6 @@ import PassionSessionList from 'components/PageEditorPassionComponents/SessionLi
 import { isAPISuccess } from 'utils/helper.js';
 
 import styles from './style.module.scss';
-import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
-import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
 
 const { BUILDER_CONTAINER_ID, PAGE_PORTAL_ID } = elementIds;
 
@@ -160,8 +158,8 @@ const PageRenderer = ({ match, history }) => {
         EditorPassionCourseList,
         EditorPassionSessionList,
         EditorPassionPassList,
-        TextSection,
-        TextWithImageSection,
+        SimpleTextSection,
+        SimpleTextWithImage,
         EditorLinkButton,
         // SignInButton,
         EditorHeader,

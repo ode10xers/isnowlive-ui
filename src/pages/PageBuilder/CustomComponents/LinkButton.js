@@ -2,6 +2,7 @@ import { generateFontFamilyStylingText } from 'utils/helper.js';
 import { isValidCSSColor } from 'utils/colors';
 
 // TODO: Add filled button type here
+// TODO: Refactor and tidy up here
 export default (editor) => {
   editor.DomComponents.addType('link-buttons', {
     model: {
