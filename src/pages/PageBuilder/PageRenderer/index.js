@@ -48,6 +48,8 @@ import PassionSessionList from 'components/PageEditorPassionComponents/SessionLi
 import { isAPISuccess } from 'utils/helper.js';
 
 import styles from './style.module.scss';
+import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
+import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
 
 const { BUILDER_CONTAINER_ID, PAGE_PORTAL_ID } = elementIds;
 
@@ -165,6 +167,8 @@ const PageRenderer = ({ match, history }) => {
         EditorHeader,
         EditorFooter,
         Testimonials,
+        SimpleTextWithImage,
+        SimpleTextSection,
       ],
       pluginsOpts: {
         'gjs-preset-webpage': {

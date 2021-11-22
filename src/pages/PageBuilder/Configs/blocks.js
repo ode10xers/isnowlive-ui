@@ -108,106 +108,106 @@ export default [
       ],
     },
   },
-  {
-    id: 'text-section',
-    label: '<b> Text Section </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'text-section',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    id: 'text-with-image',
-    label: '<b> Text with Image </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'text-with-image-section',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    id: 'text-section-with-btn',
-    label: '<b> Text Section with Button </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'text-section-with-button',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    id: 'text-button-with-image-section',
-    label: '<b> Text Section with Button and Image </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'text-button-with-image-section',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    id: 'bio-with-links',
-    label: '<b> Bio with Social Media Links </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'bio-social-media',
-            },
-          ],
-        },
-      ],
-    },
-  },
+  // {
+  //   id: 'text-section',
+  //   label: '<b> Text Section </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.LAYOUTS,
+  //   content: {
+  //     type: 'container',
+  //     components: [
+  //       {
+  //         type: 'fixed-width-container',
+  //         components: [
+  //           {
+  //             type: 'text-section',
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // },
+  // {
+  //   id: 'text-with-image',
+  //   label: '<b> Text with Image </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.LAYOUTS,
+  //   content: {
+  //     type: 'container',
+  //     components: [
+  //       {
+  //         type: 'fixed-width-container',
+  //         components: [
+  //           {
+  //             type: 'text-with-image-section',
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // },
+  // {
+  //   id: 'text-section-with-btn',
+  //   label: '<b> Text Section with Button </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.LAYOUTS,
+  //   content: {
+  //     type: 'container',
+  //     components: [
+  //       {
+  //         type: 'fixed-width-container',
+  //         components: [
+  //           {
+  //             type: 'text-section-with-button',
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // },
+  // {
+  //   id: 'text-button-with-image-section',
+  //   label: '<b> Text Section with Button and Image </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.LAYOUTS,
+  //   content: {
+  //     type: 'container',
+  //     components: [
+  //       {
+  //         type: 'fixed-width-container',
+  //         components: [
+  //           {
+  //             type: 'text-button-with-image-section',
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // },
+  // {
+  //   id: 'bio-with-links',
+  //   label: '<b> Bio with Social Media Links </b>',
+  //   droppable: false,
+  //   resizable: true,
+  //   category: categories.LAYOUTS,
+  //   content: {
+  //     type: 'container',
+  //     components: [
+  //       {
+  //         type: 'fixed-width-container',
+  //         components: [
+  //           {
+  //             type: 'bio-social-media',
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // },
   {
     id: 'testimonials',
     label: '<b> Testimonials </b>',
@@ -262,6 +262,30 @@ export default [
     category: categories.LAYOUTS,
     content: {
       type: 'simple-text-with-image-block',
+    },
+  },
+  {
+    id: 'simple-text-with-button-section',
+    label: '<b> Simple Text with Button Section </b>',
+    category: categories.LAYOUTS,
+    content: {
+      type: 'simple-text-section-with-button-block',
+    },
+  },
+  {
+    id: 'simple-text-image-button-section',
+    label: '<b> Simple Text Image with Button Section </b>',
+    category: categories.LAYOUTS,
+    content: {
+      type: 'simple-text-button-with-image-block',
+    },
+  },
+  {
+    id: 'bio-with-links',
+    label: '<b> Simple Bio </b>',
+    category: categories.LAYOUTS,
+    content: {
+      type: 'simple-bio-section-block',
     },
   },
   // {

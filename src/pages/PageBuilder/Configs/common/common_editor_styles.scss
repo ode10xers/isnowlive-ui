@@ -6,23 +6,28 @@
   align-items: stretch;
   flex-wrap: nowrap;
   height: 100vh;
+  max-height: 100vh;
 
-  .leftSection {
+  .leftSection, .rightSection {
     flex-grow: 1;
     flex-basis: 15%;
-    overflow: hidden;
+    overflow: auto;
     background-color: map-get($map: $colors, $key: 'Cyprus');
     color: map-get($map: $colors, $key: 'White');
-  }
 
-  .rightSection {
-    flex-grow: 1;
-    flex-basis: 15%;
-    overflow: hidden;
-    background-color: map-get($map: $colors, $key: 'Cyprus');
-    color: map-get($map: $colors, $key: 'White');
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
   }
-
+  
   .middleSection {
     flex-grow: 1;
     flex-basis: 75%;
@@ -78,20 +83,8 @@
   }
 
   .panelContainer {
-    overflow: auto;
+    overflow: hidden;
     height: 100%;
-
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
   }
 }
 
@@ -190,10 +183,22 @@
     text-align: left;
   }
 
-  .input-select {
+  .input-select, .input-field {
     color: map-get($map: $colors, $key: 'Black');
     width: 100%;
     min-height: 24px;
+  }
+
+  .radio-btn-container {
+    display: flex;
+    width: 100%;
+
+    .radio-btn-item {
+      flex: 1 0 33%;
+      border-radius: 8px;
+      background-color: map-get($map: $colors, $key: 'PrussianBlue');
+      text-align: center;
+    }
   }
 
   .gjs-one-bg {

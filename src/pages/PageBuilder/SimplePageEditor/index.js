@@ -365,8 +365,6 @@ const SimplePageEditor = ({ match, history }) => {
 
     //#endregion End of event listener hooks
 
-    editor.runCommand('sw-visibility');
-
     // Initial definition for storage
     editor.StorageManager.add('passion-backend', {
       async store(payload, callback, errorCallback) {
@@ -720,7 +718,8 @@ const SimplePageEditor = ({ match, history }) => {
                     <button
                       data-tooltip="Toggle component borders"
                       data-tooltip-pos="bottom"
-                      className="fa fa-square-o active"
+                      // className="fa fa-check-square-o"
+                      className="fa fa-square-o"
                       onClick={handleSwitchVisibility}
                     ></button>
                     <button

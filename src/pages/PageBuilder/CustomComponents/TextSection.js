@@ -298,7 +298,6 @@ export default (editor) => {
         this.on('change:website-link', this.handleLinkChanged);
 
         this.handleLinkChanged();
-        console.log(this.props());
       },
       handleLinkChanged() {
         const {
@@ -310,7 +309,6 @@ export default (editor) => {
         } = this.props();
 
         const linkArr = [];
-        console.log(facebookLink);
 
         if (facebookLink) {
           linkArr.push({
