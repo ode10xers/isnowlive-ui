@@ -203,13 +203,13 @@ const CustomPagesListing = ({ match, history }) => {
                   </Button>
                 </Col>
               )}
-              {creatorFooter && (
+              {/* {creatorFooter && (
                 <Col flex="0 0 33%">
                   <Button ghost block type="primary" onClick={handleEditFooter}>
                     Edit Footer
                   </Button>
                 </Col>
-              )}
+              )} */}
               <Col flex="0 0 33%">
                 <Button block type="primary" onClick={handleCreateNewPage}>
                   Create New Page

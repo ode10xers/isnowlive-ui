@@ -62,7 +62,13 @@ export default (editor) => {
   // NOTE: This is the counter part of the one below
   editor.Commands.add('remove-background-image', (editor) => {
     const selected = editor.getSelected();
-    selected.removeClass(['with-background-image']);
+    // NOTE: will be unused with new method
+    // selected.removeClass(['with-background-image']);
+
+    selected.setStyle({
+      ...selected.getStyle(),
+      background: 'transparent',
+    });
   });
 
   editor.Commands.add('set-background-image', {
@@ -72,16 +78,18 @@ export default (editor) => {
         select(asset, complete) {
           let isSet = false;
           const selected = editor.getSelected();
-          selected.addClass(['with-background-image']);
+          // NOTE: will be unused with new method
+          // selected.addClass(['with-background-image']);
           const styleString = `url('${asset.getSrc()}') center center / cover no-repeat `;
-          // TODO: Can also throw error here if invalid style
+
           selected.setStyle({
             ...selected.getStyle(),
             background: isValidCSSStyle('background', styleString) ? styleString : 'transparent',
           });
-          selected.set({
-            'bg-style': isValidCSSStyle('background', styleString) ? styleString : 'transparent',
-          });
+          // NOTE: will be unused with new method
+          // selected.set({
+          //   'bg-style': isValidCSSStyle('background', styleString) ? styleString : 'transparent',
+          // });
 
           // The default AssetManager UI will trigger `select(asset, false)` on asset click
           // and `select(asset, true)` on double-click

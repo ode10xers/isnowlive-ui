@@ -258,6 +258,37 @@ export default (editor) => {
     onEvent({ elInput, component, event }) {
       const inputType = elInput.querySelector('#text-section-layout-select');
       const alignValue = inputType.value;
+
+      const textSection = component.find('div.text-section-container')[0];
+
+      if (textSection) {
+        textSection.setStyle({
+          ...textSection.getStyle(),
+          'text-align': alignValue ?? 'left',
+          'align-items':
+            alignValue === 'center'
+              ? alignValue
+              : alignValue === 'left'
+              ? 'flex-start'
+              : alignValue === 'right'
+              ? 'flex-end'
+              : 'flex-start',
+        });
+      } else {
+        component.setStyle({
+          ...component.getStyle(),
+          'text-align': alignValue ?? 'left',
+          'align-items':
+            alignValue === 'center'
+              ? alignValue
+              : alignValue === 'left'
+              ? 'flex-start'
+              : alignValue === 'right'
+              ? 'flex-end'
+              : 'flex-start',
+        });
+      }
+
       component.setStyle({
         ...component.getStyle(),
         'text-align': alignValue ?? 'left',
@@ -276,7 +307,7 @@ export default (editor) => {
     },
     // Update elements on the component change
     onUpdate({ elInput, component }) {
-      const layout = component.getAttributes()['layout'] || 'left';
+      const layout = component.getAttributes()['layout'] || 'center';
       const inputType = elInput.querySelector('#text-section-layout-select');
       inputType.value = layout;
 
@@ -666,6 +697,39 @@ export default (editor) => {
       const selectEl = elInput.querySelector('#bg-style-select');
       selectEl.value = isValidCSSColor(bgStyle) || bgStyle === 'transparent' ? 'color' : 'image';
       selectEl.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('background-image-picker', {
+    noLabel: true,
+    templateInput: `
+    <div class="custom-trait-layout">
+      <div class="custom-trait-label">
+        Container Background
+      </div>
+      <div class="custom-trait-input" data-input>
+      </div>
+    </div>
+    `,
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['actions-input-container']);
+
+      const setBtn = document.createElement('button');
+      setBtn.innerText = 'Set BG Image';
+      setBtn.addEventListener('click', () => {
+        editor.runCommand('set-background-image');
+      });
+
+      const resetBtn = document.createElement('button');
+      resetBtn.innerText = 'Reset BG';
+      resetBtn.addEventListener('click', () => {
+        editor.runCommand('remove-background-image');
+      });
+
+      el.appendChild(setBtn);
+      el.appendChild(resetBtn);
+      return el;
     },
   });
 };

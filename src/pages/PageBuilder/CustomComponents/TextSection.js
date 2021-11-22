@@ -26,9 +26,6 @@ export default (editor) => {
             type: 'text-section-layout',
             name: 'layout',
           },
-          // {
-          //   type: 'padding-slider',
-          // },
           {
             type: 'font-selector',
             name: 'font-family',

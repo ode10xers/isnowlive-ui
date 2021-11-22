@@ -123,6 +123,19 @@
     }
   }
 
+  .actions-input-container {
+    display: flex;
+    flex: 1 0 100%;
+    row-gap: 8px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    button {
+      flex: 0 0 50%;
+      background-color: map-get($map: $colors, $key: 'DodgerBlue');
+    }
+  }
+
   .button-list-container {
     display: flex;
     flex: 1 0 100%;

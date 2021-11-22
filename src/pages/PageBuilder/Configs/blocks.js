@@ -248,6 +248,14 @@ export default [
       ],
     },
   },
+  {
+    id: 'simple-text-section',
+    label: '<b> Simple Text Section </b>',
+    category: categories.LAYOUTS,
+    content: {
+      type: 'simple-text-section',
+    },
+  },
   // {
   //   id: 'link-buttons',
   //   label: '<b> Link Button </b>',

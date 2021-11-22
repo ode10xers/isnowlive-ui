@@ -48,6 +48,7 @@ import { useGlobalContext } from 'services/globalContext.js';
 //eslint-disable-next-line
 import styles from './style.module.scss';
 import { generatePath } from 'react-router-dom';
+import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
 
 const { Text } = Typography;
 
@@ -224,6 +225,7 @@ const SimplePageEditor = ({ match, history }) => {
         TextSection,
         TextWithImageSection,
         Testimonials,
+        SimpleTextSection,
       ],
     });
 
