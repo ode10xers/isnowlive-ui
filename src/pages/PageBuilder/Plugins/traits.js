@@ -145,14 +145,17 @@ export default (editor) => {
       const sliderInput = elInput.querySelector('#border-radius-slider');
       const valueText = elInput.querySelector('#border-radius-slider-value');
       valueText.innerHTML = sliderInput.value + (this.unit ?? 'px');
-      component.setStyle({
+
+      const targetComponent = component.find('img')[0] ?? component;
+
+      targetComponent.setStyle({
         ...component.getStyle(),
         'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
       });
     },
     // Update elements on the component change
     onUpdate({ elInput, component }) {
-      const componentStyle = component.getStyle();
+      const componentStyle = (component.find('img')[0] ?? component).getStyle();
       const borderRadius = componentStyle['border-radius'] ?? '0px';
       const sliderInput = elInput.querySelector('#border-radius-slider');
       // Remove all non numeric char
@@ -259,7 +262,7 @@ export default (editor) => {
       const inputType = elInput.querySelector('#text-section-layout-select');
       const alignValue = inputType.value;
 
-      const textSection = component.find('div.text-section-container')[0];
+      const textSection = component.findType('simple-text-section')[0];
 
       if (textSection) {
         textSection.setStyle({
@@ -288,19 +291,6 @@ export default (editor) => {
               : 'flex-start',
         });
       }
-
-      component.setStyle({
-        ...component.getStyle(),
-        'text-align': alignValue ?? 'left',
-        'align-items':
-          alignValue === 'center'
-            ? alignValue
-            : alignValue === 'left'
-            ? 'flex-start'
-            : alignValue === 'right'
-            ? 'flex-end'
-            : 'flex-start',
-      });
       component.addAttributes({
         layout: inputType.value,
       });
@@ -350,8 +340,10 @@ export default (editor) => {
     // `elInput` is the result HTMLElement you get from `createInput`
     onEvent({ elInput, component, event }) {
       const inputType = elInput.querySelector('#image-position-select');
+      const targetComponent = component.findType('simple-text-image-section')[0] ?? component;
+
       let classes = [];
-      let existingClasses = component.getClasses();
+      let existingClasses = targetComponent.getClasses();
 
       if (inputType.value) {
         classes.push(`image-${inputType.value}`);
@@ -360,7 +352,7 @@ export default (editor) => {
         );
       }
 
-      component.setClass([...new Set([...existingClasses, ...classes])]);
+      targetComponent.setClass([...new Set([...existingClasses, ...classes])]);
     },
     // Update elements on the component change
     onUpdate({ elInput, component }) {

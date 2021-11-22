@@ -49,6 +49,7 @@ import { useGlobalContext } from 'services/globalContext.js';
 import styles from './style.module.scss';
 import { generatePath } from 'react-router-dom';
 import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
+import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 
 const { Text } = Typography;
 
@@ -226,6 +227,7 @@ const SimplePageEditor = ({ match, history }) => {
         TextWithImageSection,
         Testimonials,
         SimpleTextSection,
+        SimpleTextWithImage,
       ],
     });
 

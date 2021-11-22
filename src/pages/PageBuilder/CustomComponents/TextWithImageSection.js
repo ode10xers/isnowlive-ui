@@ -10,9 +10,6 @@ export default (editor) => {
           loading: 'lazy',
         },
         traits: [
-          // {
-          //   type: 'padding-slider',
-          // },
           {
             type: 'border-radius-slider',
             name: 'border-radius',
@@ -24,6 +21,7 @@ export default (editor) => {
         droppable: false,
         highlightable: false,
         copyable: false,
+        selectable: false,
         toolbar: [],
       },
     },

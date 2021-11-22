@@ -253,7 +253,15 @@ export default [
     label: '<b> Simple Text Section </b>',
     category: categories.LAYOUTS,
     content: {
-      type: 'simple-text-section',
+      type: 'simple-text-section-block',
+    },
+  },
+  {
+    id: 'simple-text-with-image-section',
+    label: '<b> Simple Text with Image Section </b>',
+    category: categories.LAYOUTS,
+    content: {
+      type: 'simple-text-with-image-block',
     },
   },
   // {

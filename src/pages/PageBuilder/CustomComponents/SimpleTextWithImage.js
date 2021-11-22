@@ -1,7 +1,7 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 
 export default (editor) => {
-  editor.DomComponents.addType('simple-text-section', {
+  editor.DomComponents.addType('simple-text-image-section', {
     model: {
       defaults: {
         tagName: 'div',
@@ -15,80 +15,98 @@ export default (editor) => {
         badgable: false,
         hoverable: false,
         attributes: {
-          class: 'text-section-container',
+          class: 'text-image-section-container',
         },
         components: [
           {
-            tagName: 'h1',
-            type: 'text',
-            content: 'Section Title',
-            name: 'Section Title',
-            attributes: {},
-            traits: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
-            toolbar: [],
+            type: 'simple-text-section',
           },
           {
-            tagName: 'p',
-            type: 'text',
-            content: 'Section Content',
-            name: 'Section Content',
-            attributes: {},
-            traits: [],
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
+            type: 'custom-image',
           },
         ],
         styles: `
-          .text-section-container {
+          .text-image-section-container {
+            position: relative;
             display: flex;
             flex: 0 1 auto;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
             padding: 8px;
-            flex-direction: column;
-            justify-content: center;
           }
 
-          .text-section-container * {
-            position: relative;
-            flex: 0 0 auto;
+          .text-image-section-container > img {
+            width: 100%;
+            max-width: 270px;
+            height: auto;
+            flex: 0 1 50%;
+          }
+
+          .text-image-section-container.image-left {
+            flex-direction: row-reverse;
+          }
+
+          .text-image-section-container.image-right {
+            flex-direction: row;
+          }
+
+          .text-image-section-container.image-top {
+            flex-direction: column-reverse;
+            flex: 1 1 100%;
+          }
+
+          .text-image-section-container.image-bottom {
+            flex-direction: column;
+            flex: 1 1 100%;
+          }
+
+          .text-image-section-container.image-bottom > img {
+            align-self: center;
+            max-width: 100%;
+          }
+
+          .text-image-section-container.image-top > img {
+            align-self: center;
+            max-width: 100%;
+          }
+
+          @media (max-width: 768px) {
+            .text-image-section-container.image-left, .text-image-section-container {
+              flex-direction: column-reverse;
+              flex: 1 1 100%;
+            }
+
+            .text-image-section-container.image-right {
+              flex-direction: column;
+              flex: 1 1 100%;
+            }
+
+            .text-image-section-container > img {
+              flex: 1 1 100%;
+              max-width: 100%;
+            }
           }
         `,
       },
     },
   });
 
-  editor.DomComponents.addType('simple-text-section-block', {
+  editor.DomComponents.addType('simple-text-with-image-block', {
     model: {
       defaults: {
         tagName: 'div',
-        name: 'Simple Text Section',
+        name: 'Simple Text with Image Section',
         droppable: false,
-        // resizable: {
-        //   tl: false, // Top left
-        //   tc: false, // Top center
-        //   tr: false, // Top right
-        //   cl: false, // Center left
-        //   cr: false, // Center right
-        //   bl: false, // Bottom left
-        //   bc: true, // Bottom center
-        //   br: false, // Bottom right
-        // },
         attributes: {
           layout: 'center',
-          class: 'simple-text-section-block',
+          class: 'text-image-section-container',
         },
         traits: [
+          {
+            type: 'image-position-layout',
+          },
           {
             type: 'text-section-layout',
             name: 'layout',
@@ -112,6 +130,10 @@ export default (editor) => {
             label: 'Background color',
             name: 'bg-color',
             changeProp: true,
+          },
+          {
+            type: 'border-radius-slider',
+            unit: '%',
           },
         ],
         components: [
@@ -140,7 +162,7 @@ export default (editor) => {
                 hoverable: false,
                 components: [
                   {
-                    type: 'simple-text-section',
+                    type: 'simple-text-image-section',
                   },
                 ],
               },
@@ -151,6 +173,7 @@ export default (editor) => {
         'text-color': '#000000',
         'bg-color': '#ffffff',
       },
+
       init() {
         // We put a listener that triggers when an attribute changes
         // In this case when text-color attribute changes
@@ -201,7 +224,7 @@ export default (editor) => {
       handleFontChange() {
         const font = this.props()['font-family'];
 
-        const textSectionContainer = this.findType('simple-text-section')[0];
+        const textSectionContainer = this.find('div.text-section-container')[0];
 
         if (textSectionContainer) {
           textSectionContainer.setStyle({
