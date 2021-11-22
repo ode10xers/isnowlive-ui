@@ -29,7 +29,6 @@ export default (editor) => {
             width: 100%;
             min-height: 400px;
             padding: 4px;
-            text-align:center;
           }
 
           @media (max-width: 768px) {

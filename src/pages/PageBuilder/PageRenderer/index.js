@@ -25,13 +25,8 @@ import CustomCommands from '../Configs/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
 import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
 import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
-// import SignInButton from '../CustomComponents/SignInButton.js';
+import PassionProductsList from '../CustomComponents/PassionProductsList.js';
 import EditorLinkButton from '../CustomComponents/LinkButton.js';
-import EditorPassionSessionList from '../CustomComponents/PassionSessionList.js';
-import EditorPassionVideoList from '../CustomComponents/PassionVideoList.js';
-import EditorPassionCourseList from '../CustomComponents/PassionCourseList.js';
-import EditorPassionPassList from '../CustomComponents/PassionPassList.js';
-import EditorPassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
 import EditorHeader from '../CustomComponents/Header.js';
 import EditorFooter from '../CustomComponents/Footer.js';
 import EditorContainer from '../CustomComponents/Container.js';
@@ -153,11 +148,7 @@ const PageRenderer = ({ match, history }) => {
         CustomTraits,
         CustomCommands,
         EditorContainer,
-        EditorPassionSubscriptionList,
-        EditorPassionVideoList,
-        EditorPassionCourseList,
-        EditorPassionSessionList,
-        EditorPassionPassList,
+        PassionProductsList,
         SimpleTextSection,
         SimpleTextWithImage,
         EditorLinkButton,

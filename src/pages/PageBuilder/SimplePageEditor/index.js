@@ -27,11 +27,7 @@ import definedBlocks from '../Configs/blocks.js';
 import CustomTraits from '../Configs/traits';
 import CustomCommands from '../Configs/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
-import PassionSessionList from '../CustomComponents/PassionSessionList.js';
-import PassionVideoList from '../CustomComponents/PassionVideoList.js';
-import PassionCourseList from '../CustomComponents/PassionCourseList.js';
-import PassionPassList from '../CustomComponents/PassionPassList.js';
-import PassionSubscriptionList from '../CustomComponents/PassionSubscriptionList.js';
+import PassionProductsList from '../CustomComponents/PassionProductsList.js';
 import Container from '../CustomComponents/Container.js';
 import LinkButton from '../CustomComponents/LinkButton.js';
 import Testimonials from '../CustomComponents/Testimonials.js';
@@ -214,11 +210,7 @@ const SimplePageEditor = ({ match, history }) => {
         Container,
         LinkButton,
         ReactComponentHandler,
-        PassionSubscriptionList,
-        PassionVideoList,
-        PassionCourseList,
-        PassionSessionList,
-        PassionPassList,
+        PassionProductsList,
         CustomCommands,
         CustomTraits,
         Testimonials,

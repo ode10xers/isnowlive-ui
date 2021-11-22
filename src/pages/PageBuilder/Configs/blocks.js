@@ -24,103 +24,53 @@ export const generateContainerWrapper = (innerComponents = []) => [
 
 export default [
   {
-    id: 'PassionSessionList',
-    label: '<b> Passion Sessions List </b>',
+    id: 'passion-session-list-block',
+    label: '<b> Passion Session List </b>',
     droppable: false,
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'PassionSessionList',
-            },
-          ],
-        },
-      ],
+      type: 'passion-session-list-block',
     },
   },
   {
-    id: 'PassionVideoList',
-    label: '<b> Passion Videos List </b>',
+    id: 'passion-video-list-block',
+    label: '<b> Passion Video List </b>',
     droppable: false,
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'PassionVideoList',
-            },
-          ],
-        },
-      ],
+      type: 'passion-video-list-block',
     },
   },
   {
-    id: 'PassionCourseList',
+    id: 'passion-course-list-block',
     label: '<b> Passion Course List </b>',
     droppable: false,
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'PassionVideoList',
-            },
-          ],
-        },
-      ],
+      type: 'passion-course-list-block',
     },
   },
   {
-    id: 'PassionPassList',
-    label: '<b> Passion Passes List </b>',
+    id: 'passion-pass-list-block',
+    label: '<b> Passion Pass List </b>',
     droppable: false,
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'PassionPassList',
-            },
-          ],
-        },
-      ],
+      type: 'passion-pass-list-block',
     },
   },
   {
-    id: 'PassionSubscriptionList',
-    label: '<b> Passion Membership List </b>',
+    id: 'passion-subscription-list-block',
+    label: '<b> Passion Subscription List </b>',
     droppable: false,
     resizable: false,
     category: categories.PASSION_COMPONENTS,
     content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              type: 'PassionSubscriptionList',
-            },
-          ],
-        },
-      ],
+      type: 'passion-subscription-list-block',
     },
   },
   {
