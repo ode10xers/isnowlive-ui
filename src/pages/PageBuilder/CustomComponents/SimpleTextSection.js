@@ -1,4 +1,105 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
+import { generateContainerWrapper } from '../Configs/blocks';
+import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
+import { backgroundTraits, fontTraits, innerButtonTraits } from '../Configs/common/trait_sets';
+
+export const textSectionPropHandlers = {
+  handleTextColorChange() {
+    const textColor = this.props()['text-color'];
+    const textSectionContainer = this.find('div.text-section-container')[0];
+
+    if (textSectionContainer) {
+      textSectionContainer.setStyle({
+        ...textSectionContainer.getStyle(),
+        color: `${textColor} !important`,
+      });
+
+      textSectionContainer.components().forEach((comp) => {
+        comp.setStyle({
+          ...comp.getStyle(),
+          color: `${textColor} !important`,
+        });
+      });
+    } else {
+      this.setStyle({
+        ...this.getStyle(),
+        color: `${textColor} !important`,
+      });
+    }
+  },
+  handleBGStyleChange() {
+    const bgStyle = this.props()['bg-color'];
+
+    const containerComponent = this.findType('container')[0];
+
+    if (containerComponent) {
+      containerComponent.setStyle({
+        ...containerComponent.getStyle(),
+        background: bgStyle,
+      });
+    } else {
+      this.setStyle({
+        ...this.getStyle(),
+        background: bgStyle,
+      });
+    }
+  },
+  handleFontChange() {
+    const font = this.props()['font-family'];
+
+    const textSectionContainer = this.find('div.text-section-container')[0];
+
+    if (textSectionContainer) {
+      textSectionContainer.setStyle({
+        ...textSectionContainer.getStyle(),
+        'font-family': generateFontFamilyStylingText(font),
+      });
+    } else {
+      this.setStyle({
+        ...this.getStyle(),
+        'font-family': generateFontFamilyStylingText(font),
+      });
+    }
+  },
+};
+
+export const textSectionTraits = [
+  {
+    type: 'text-section-layout',
+    name: 'layout',
+  },
+  ...fontTraits,
+  ...backgroundTraits,
+];
+
+const textSectionBaseComponents = [
+  {
+    tagName: 'h1',
+    type: 'text',
+    content: 'Section Title',
+    name: 'Section Title',
+    attributes: {},
+    traits: [],
+    ...fullyDisabledComponentFlags,
+    editable: true,
+    badgable: true,
+    selectable: true,
+    hoverable: true,
+  },
+  {
+    tagName: 'p',
+    type: 'text',
+    content: 'Section Content',
+    name: 'Section Content',
+    attributes: {},
+    traits: [],
+    ...fullyDisabledComponentFlags,
+    editable: true,
+    badgable: true,
+    selectable: true,
+    hoverable: true,
+  },
+];
 
 export default (editor) => {
   // Text Section
@@ -6,50 +107,11 @@ export default (editor) => {
     model: {
       defaults: {
         tagName: 'div',
-        removable: false,
-        draggable: false,
-        droppable: false,
-        highlightable: false,
-        editable: false,
-        copyable: false,
-        selectable: false,
-        badgable: false,
-        hoverable: false,
+        ...fullyDisabledComponentFlags,
         attributes: {
           class: 'text-section-container',
         },
-        components: [
-          {
-            tagName: 'h1',
-            type: 'text',
-            content: 'Section Title',
-            name: 'Section Title',
-            attributes: {},
-            traits: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
-            toolbar: [],
-          },
-          {
-            tagName: 'p',
-            type: 'text',
-            content: 'Section Content',
-            name: 'Section Content',
-            attributes: {},
-            traits: [],
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
-          },
-        ],
+        components: textSectionBaseComponents,
         styles: `
           .text-section-container {
             display: flex;
@@ -80,65 +142,8 @@ export default (editor) => {
           layout: 'center',
           class: 'simple-text-section-block',
         },
-        traits: [
-          {
-            type: 'text-section-layout',
-            name: 'layout',
-          },
-          {
-            type: 'font-selector',
-            name: 'font-family',
-            changeProp: 1,
-          },
-          {
-            type: 'color',
-            label: 'Text color',
-            name: 'text-color',
-            changeProp: 1,
-          },
-          {
-            type: 'background-image-picker',
-          },
-          {
-            type: 'color',
-            label: 'Background color',
-            name: 'bg-color',
-            changeProp: true,
-          },
-        ],
-        components: [
-          {
-            type: 'container',
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: false,
-            copyable: false,
-            selectable: false,
-            badgable: false,
-            hoverable: false,
-            components: [
-              {
-                type: 'fixed-width-container',
-                removable: false,
-                draggable: false,
-                droppable: false,
-                highlightable: false,
-                editable: false,
-                copyable: false,
-                selectable: false,
-                badgable: false,
-                hoverable: false,
-                components: [
-                  {
-                    type: 'simple-text-section',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        traits: textSectionTraits,
+        components: generateContainerWrapper([{ type: 'simple-text-section' }]),
         'font-family': 'Arial',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -150,63 +155,7 @@ export default (editor) => {
         this.on('change:bg-color', this.handleBGStyleChange);
         this.on('change:font-family', this.handleFontChange);
       },
-      handleTextColorChange() {
-        const textColor = this.props()['text-color'];
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            color: `${textColor} !important`,
-          });
-
-          textSectionContainer.components().forEach((comp) => {
-            comp.setStyle({
-              ...comp.getStyle(),
-              color: `${textColor} !important`,
-            });
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            color: `${textColor} !important`,
-          });
-        }
-      },
-      handleBGStyleChange() {
-        const bgStyle = this.props()['bg-color'];
-
-        const containerComponent = this.findType('container')[0];
-
-        if (containerComponent) {
-          containerComponent.setStyle({
-            ...containerComponent.getStyle(),
-            background: bgStyle,
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            background: bgStyle,
-          });
-        }
-      },
-      handleFontChange() {
-        const font = this.props()['font-family'];
-
-        const textSectionContainer = this.findType('simple-text-section')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        } else {
-          this.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        }
-      },
+      ...textSectionPropHandlers,
     },
   });
 
@@ -216,45 +165,10 @@ export default (editor) => {
     model: {
       defaults: {
         components: [
-          {
-            tagName: 'h1',
-            type: 'text',
-            content: 'Section Title',
-            name: 'Section Title',
-            attributes: {},
-            traits: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
-            toolbar: [],
-          },
-          {
-            tagName: 'p',
-            type: 'text',
-            content: 'Section Content',
-            name: 'Section Content',
-            attributes: {},
-            traits: [],
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
-          },
+          ...textSectionBaseComponents,
           {
             type: 'text-section-link-button',
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
+            ...fullyDisabledComponentFlags,
           },
         ],
       },
@@ -271,74 +185,8 @@ export default (editor) => {
           layout: 'center',
           class: 'simple-text-section-block',
         },
-        traits: [
-          {
-            type: 'text-section-layout',
-            name: 'layout',
-          },
-          {
-            type: 'font-selector',
-            name: 'font-family',
-            changeProp: 1,
-          },
-          {
-            type: 'color',
-            label: 'Text color',
-            name: 'text-color',
-            changeProp: 1,
-          },
-          {
-            type: 'background-image-picker',
-          },
-          {
-            type: 'color',
-            label: 'Background color',
-            name: 'bg-color',
-            changeProp: true,
-          },
-          {
-            type: 'button-link',
-          },
-          {
-            type: 'button-target',
-          },
-          {
-            type: 'button-content',
-          },
-        ],
-        components: [
-          {
-            type: 'container',
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: false,
-            copyable: false,
-            selectable: false,
-            badgable: false,
-            hoverable: false,
-            components: [
-              {
-                type: 'fixed-width-container',
-                removable: false,
-                draggable: false,
-                droppable: false,
-                highlightable: false,
-                editable: false,
-                copyable: false,
-                selectable: false,
-                badgable: false,
-                hoverable: false,
-                components: [
-                  {
-                    type: 'simple-text-section-with-button',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        traits: [...textSectionTraits, ...innerButtonTraits],
+        components: generateContainerWrapper([{ type: 'simple-text-section-with-button' }]),
         'font-family': 'Arial',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -350,62 +198,7 @@ export default (editor) => {
         this.on('change:bg-color', this.handleBGStyleChange);
         this.on('change:font-family', this.handleFontChange);
       },
-      handleTextColorChange() {
-        const textColor = this.props()['text-color'];
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            color: `${textColor} !important`,
-          });
-
-          textSectionContainer.components().forEach((comp) => {
-            comp.setStyle({
-              ...comp.getStyle(),
-              color: `${textColor} !important`,
-            });
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            color: `${textColor} !important`,
-          });
-        }
-      },
-      handleBGStyleChange() {
-        const bgStyle = this.props()['bg-color'];
-
-        const containerComponent = this.findType('container')[0];
-
-        if (containerComponent) {
-          containerComponent.setStyle({
-            ...containerComponent.getStyle(),
-            background: bgStyle,
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            background: bgStyle,
-          });
-        }
-      },
-      handleFontChange() {
-        const font = this.props()['font-family'];
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        } else {
-          this.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        }
-      },
+      ...textSectionPropHandlers,
     },
   });
 
@@ -415,45 +208,10 @@ export default (editor) => {
     model: {
       defaults: {
         components: [
-          {
-            tagName: 'h1',
-            type: 'text',
-            content: 'Section Title',
-            name: 'Section Title',
-            attributes: {},
-            traits: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
-            toolbar: [],
-          },
-          {
-            tagName: 'p',
-            type: 'text',
-            content: 'Section Content',
-            name: 'Section Content',
-            attributes: {},
-            traits: [],
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
-          },
+          ...textSectionBaseComponents,
           {
             type: 'social-media-links',
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            copyable: false,
+            ...fullyDisabledComponentFlags,
           },
         ],
       },

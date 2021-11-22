@@ -20,8 +20,8 @@ import sectionIds from '../Configs/common/sectionIds';
 import commonEditorConfig from '../Configs/common/config';
 
 // NOTE: These are component definitions to be used by GrapesJS
-import CustomTraits from '../Plugins/traits';
-import CustomCommands from '../Plugins/commands';
+import CustomTraits from '../Configs/traits';
+import CustomCommands from '../Configs/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
 import TextSection from '../CustomComponents/TextSection.js';
 import TextWithImageSection from '../CustomComponents/TextWithImageSection.js';

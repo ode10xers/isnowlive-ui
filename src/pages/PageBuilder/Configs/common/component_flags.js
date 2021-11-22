@@ -1,0 +1,15 @@
+export const fullyDisabledComponentFlags = {
+  removable: false,
+  draggable: false,
+  droppable: false,
+  badgable: false,
+  stylable: false,
+  highlightable: false,
+  copyable: false,
+  resizable: false,
+  editable: false,
+  layerable: false,
+  selectable: false,
+  hoverable: false,
+  toolbar: [],
+};

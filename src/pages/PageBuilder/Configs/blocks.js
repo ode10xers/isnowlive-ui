@@ -1,4 +1,5 @@
 // API Doc : https://grapesjs.com/docs/api/block.html#block
+import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 
 const categories = {
   LAYOUTS: 'Layouts',
@@ -6,6 +7,20 @@ const categories = {
   SIMPLE_COMPONENTS: 'Simple Components',
   BASIC: 'Basic',
 };
+
+export const generateContainerWrapper = (innerComponents = []) => [
+  {
+    type: 'container',
+    ...fullyDisabledComponentFlags,
+    components: [
+      {
+        type: 'fixed-width-container',
+        ...fullyDisabledComponentFlags,
+        components: innerComponents,
+      },
+    ],
+  },
+];
 
 export default [
   {

@@ -1,4 +1,24 @@
-import { generateFontFamilyStylingText } from 'utils/helper.js';
+import { generateContainerWrapper } from '../Configs/blocks';
+import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
+import { innerButtonTraits, socialLinksTraits } from '../Configs/common/trait_sets';
+import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
+
+const textSectionWithImageTraits = [
+  {
+    type: 'image-cutout-select',
+  },
+  {
+    type: 'image-position-layout',
+  },
+  {
+    type: 'button',
+    text: 'Click to set image',
+    full: true,
+    label: 'Set Image',
+    command: 'set-image-url',
+  },
+  ...textSectionTraits,
+];
 
 export default (editor) => {
   // Text with Image Section
@@ -6,15 +26,7 @@ export default (editor) => {
     model: {
       defaults: {
         tagName: 'div',
-        removable: false,
-        draggable: false,
-        droppable: false,
-        highlightable: false,
-        editable: false,
-        copyable: false,
-        selectable: false,
-        badgable: false,
-        hoverable: false,
+        ...fullyDisabledComponentFlags,
         attributes: {
           class: 'text-image-section-container',
         },
@@ -31,7 +43,8 @@ export default (editor) => {
             position: relative;
             display: flex;
             flex: 0 1 auto;
-            gap: 12px;
+            row-gap: 20px;
+            column-gap: 80px;
             justify-content: space-between;
             align-items: center;
             width: 100%;
@@ -86,6 +99,12 @@ export default (editor) => {
 
             .text-image-section-container > img {
               flex: 1 1 100%;
+              max-width: 50%;
+            }
+          }
+
+          @media (max-width: 576px) {
+            .text-image-section-container > img {
               max-width: 100%;
             }
           }
@@ -104,78 +123,8 @@ export default (editor) => {
           layout: 'center',
           class: 'text-image-section-container',
         },
-        traits: [
-          {
-            type: 'text-section-layout',
-            name: 'layout',
-          },
-          {
-            type: 'font-selector',
-            name: 'font-family',
-            changeProp: 1,
-          },
-          {
-            type: 'color',
-            label: 'Text color',
-            name: 'text-color',
-            changeProp: 1,
-          },
-          {
-            type: 'background-image-picker',
-          },
-          {
-            type: 'color',
-            label: 'Background color',
-            name: 'bg-color',
-            changeProp: true,
-          },
-          {
-            type: 'image-cutout-select',
-          },
-          {
-            type: 'image-position-layout',
-          },
-          {
-            type: 'button',
-            text: 'Click to set image',
-            full: true,
-            label: 'Image',
-            command: 'set-image-url',
-          },
-        ],
-        components: [
-          {
-            type: 'container',
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: false,
-            copyable: false,
-            selectable: false,
-            badgable: false,
-            hoverable: false,
-            components: [
-              {
-                type: 'fixed-width-container',
-                removable: false,
-                draggable: false,
-                droppable: false,
-                highlightable: false,
-                editable: false,
-                copyable: false,
-                selectable: false,
-                badgable: false,
-                hoverable: false,
-                components: [
-                  {
-                    type: 'simple-text-image-section',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        traits: textSectionWithImageTraits,
+        components: generateContainerWrapper([{ type: 'simple-text-image-section' }]),
         'font-family': 'Arial',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -188,63 +137,7 @@ export default (editor) => {
         this.on('change:bg-color', this.handleBGStyleChange);
         this.on('change:font-family', this.handleFontChange);
       },
-      handleTextColorChange() {
-        const textColor = this.props()['text-color'];
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            color: `${textColor} !important`,
-          });
-
-          textSectionContainer.components().forEach((comp) => {
-            comp.setStyle({
-              ...comp.getStyle(),
-              color: `${textColor} !important`,
-            });
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            color: `${textColor} !important`,
-          });
-        }
-      },
-      handleBGStyleChange() {
-        const bgStyle = this.props()['bg-color'];
-
-        const containerComponent = this.findType('container')[0];
-
-        if (containerComponent) {
-          containerComponent.setStyle({
-            ...containerComponent.getStyle(),
-            background: bgStyle,
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            background: bgStyle,
-          });
-        }
-      },
-      handleFontChange() {
-        const font = this.props()['font-family'];
-
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        } else {
-          this.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        }
-      },
+      ...textSectionPropHandlers,
     },
   });
 
@@ -275,87 +168,8 @@ export default (editor) => {
           layout: 'center',
           class: 'text-image-section-container',
         },
-        traits: [
-          {
-            type: 'text-section-layout',
-            name: 'layout',
-          },
-          {
-            type: 'font-selector',
-            name: 'font-family',
-            changeProp: 1,
-          },
-          {
-            type: 'color',
-            label: 'Text color',
-            name: 'text-color',
-            changeProp: 1,
-          },
-          {
-            type: 'button-link',
-          },
-          {
-            type: 'button-target',
-          },
-          {
-            type: 'button-content',
-          },
-          {
-            type: 'background-image-picker',
-          },
-          {
-            type: 'color',
-            label: 'Background color',
-            name: 'bg-color',
-            changeProp: true,
-          },
-          {
-            type: 'image-position-layout',
-          },
-          {
-            type: 'image-cutout-select',
-          },
-          {
-            type: 'button',
-            text: 'Click to set image',
-            full: true,
-            label: 'Image',
-            command: 'set-image-url',
-          },
-        ],
-        components: [
-          {
-            type: 'container',
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: false,
-            copyable: false,
-            selectable: false,
-            badgable: false,
-            hoverable: false,
-            components: [
-              {
-                type: 'fixed-width-container',
-                removable: false,
-                draggable: false,
-                droppable: false,
-                highlightable: false,
-                editable: false,
-                copyable: false,
-                selectable: false,
-                badgable: false,
-                hoverable: false,
-                components: [
-                  {
-                    type: 'simple-text-image-button-section',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        traits: [...textSectionWithImageTraits, ...innerButtonTraits],
+        components: generateContainerWrapper([{ type: 'simple-text-image-button-section' }]),
         'font-family': 'Arial',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -368,63 +182,7 @@ export default (editor) => {
         this.on('change:bg-color', this.handleBGStyleChange);
         this.on('change:font-family', this.handleFontChange);
       },
-      handleTextColorChange() {
-        const textColor = this.props()['text-color'];
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            color: `${textColor} !important`,
-          });
-
-          textSectionContainer.components().forEach((comp) => {
-            comp.setStyle({
-              ...comp.getStyle(),
-              color: `${textColor} !important`,
-            });
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            color: `${textColor} !important`,
-          });
-        }
-      },
-      handleBGStyleChange() {
-        const bgStyle = this.props()['bg-color'];
-
-        const containerComponent = this.findType('container')[0];
-
-        if (containerComponent) {
-          containerComponent.setStyle({
-            ...containerComponent.getStyle(),
-            background: bgStyle,
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            background: bgStyle,
-          });
-        }
-      },
-      handleFontChange() {
-        const font = this.props()['font-family'];
-
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        } else {
-          this.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        }
-      },
+      ...textSectionPropHandlers,
     },
   });
 
@@ -455,119 +213,8 @@ export default (editor) => {
           layout: 'center',
           class: 'text-image-section-container',
         },
-        traits: [
-          {
-            type: 'text-section-layout',
-            name: 'layout',
-          },
-          {
-            type: 'font-selector',
-            name: 'font-family',
-            changeProp: 1,
-          },
-          {
-            type: 'color',
-            label: 'Text color',
-            name: 'text-color',
-            changeProp: 1,
-          },
-          // TODO: if possible try to merge these three
-          {
-            type: 'button-link',
-          },
-          {
-            type: 'button-target',
-          },
-          {
-            type: 'button-content',
-          },
-          {
-            type: 'background-image-picker',
-          },
-          {
-            type: 'color',
-            label: 'Background color',
-            name: 'bg-color',
-            changeProp: true,
-          },
-          {
-            type: 'image-position-layout',
-          },
-          {
-            type: 'image-cutout-select',
-          },
-          {
-            type: 'button',
-            text: 'Click to set image',
-            full: true,
-            label: 'Image',
-            command: 'set-image-url',
-          },
-          // TODO: This too
-          {
-            type: 'text',
-            name: 'facebook-link',
-            label: 'Facebook',
-            changeProp: true,
-          },
-          {
-            type: 'text',
-            name: 'instagram-link',
-            label: 'Instagram',
-            changeProp: true,
-          },
-          {
-            type: 'text',
-            name: 'linkedin-link',
-            label: 'LinkedIn',
-            changeProp: true,
-          },
-          {
-            type: 'text',
-            name: 'twitter-link',
-            label: 'Twitter',
-            changeProp: true,
-          },
-          {
-            type: 'text',
-            name: 'website-link',
-            label: 'Website',
-            changeProp: true,
-          },
-        ],
-        components: [
-          {
-            type: 'container',
-            removable: false,
-            draggable: false,
-            droppable: false,
-            highlightable: false,
-            editable: false,
-            copyable: false,
-            selectable: false,
-            badgable: false,
-            hoverable: false,
-            components: [
-              {
-                type: 'fixed-width-container',
-                removable: false,
-                draggable: false,
-                droppable: false,
-                highlightable: false,
-                editable: false,
-                copyable: false,
-                selectable: false,
-                badgable: false,
-                hoverable: false,
-                components: [
-                  {
-                    type: 'simple-bio-with-image-section',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        traits: [...textSectionWithImageTraits, ...socialLinksTraits],
+        components: generateContainerWrapper([{ type: 'simple-bio-with-image-section' }]),
         'font-family': 'Arial',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -593,63 +240,7 @@ export default (editor) => {
 
         this.handleLinkChanged();
       },
-      handleTextColorChange() {
-        const textColor = this.props()['text-color'];
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            color: `${textColor} !important`,
-          });
-
-          textSectionContainer.components().forEach((comp) => {
-            comp.setStyle({
-              ...comp.getStyle(),
-              color: `${textColor} !important`,
-            });
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            color: `${textColor} !important`,
-          });
-        }
-      },
-      handleBGStyleChange() {
-        const bgStyle = this.props()['bg-color'];
-
-        const containerComponent = this.findType('container')[0];
-
-        if (containerComponent) {
-          containerComponent.setStyle({
-            ...containerComponent.getStyle(),
-            background: bgStyle,
-          });
-        } else {
-          this.setStyle({
-            ...this.getStyle(),
-            background: bgStyle,
-          });
-        }
-      },
-      handleFontChange() {
-        const font = this.props()['font-family'];
-
-        const textSectionContainer = this.find('div.text-section-container')[0];
-
-        if (textSectionContainer) {
-          textSectionContainer.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        } else {
-          this.setStyle({
-            ...textSectionContainer.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        }
-      },
+      ...textSectionPropHandlers,
       handleLinkChanged() {
         const {
           'facebook-link': facebookLink,

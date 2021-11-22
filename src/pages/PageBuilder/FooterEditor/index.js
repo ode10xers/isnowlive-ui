@@ -19,7 +19,7 @@ import commonEditorConfig from '../Configs/common/config';
 import definedStylePanels from '../Configs/style_panel';
 
 // THese are to be put in plugins
-import CustomCommands from '../Plugins/commands';
+import CustomCommands from '../Configs/commands';
 import Footer from '../CustomComponents/Footer.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';

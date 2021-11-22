@@ -23,8 +23,8 @@ import definedBlocks from '../Configs/blocks.js';
 // import definedStylePanels from '../Configs/style_panel.js';
 
 // THese are to be put in plugins
-import CustomTraits from '../Plugins/traits';
-import CustomCommands from '../Plugins/commands';
+import CustomTraits from '../Configs/traits';
+import CustomCommands from '../Configs/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
 import PassionSessionList from '../CustomComponents/PassionSessionList.js';
 import PassionVideoList from '../CustomComponents/PassionVideoList.js';

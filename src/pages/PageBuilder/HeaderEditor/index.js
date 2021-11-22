@@ -18,8 +18,8 @@ import commonEditorConfig from '../Configs/common/config';
 // import definedPanels from '../Configs/panels.js';
 
 // THese are to be put in plugins
-import CustomTraits from '../Plugins/traits';
-import CustomCommands from '../Plugins/commands';
+import CustomTraits from '../Configs/traits';
+import CustomCommands from '../Configs/commands';
 import ReactComponentHandler from '../ReactComponentHandler';
 import LinkButton from '../CustomComponents/LinkButton.js';
 import Header from '../CustomComponents/Header.js';
