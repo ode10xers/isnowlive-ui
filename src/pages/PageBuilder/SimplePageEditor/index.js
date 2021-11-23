@@ -230,7 +230,7 @@ const SimplePageEditor = ({ match, history }) => {
       type: 'padding-slider',
     });
     wrapper.addTrait({
-      type: 'color',
+      type: 'custom-color-picker',
       label: 'Background color',
       name: 'bg-style',
       changeProp: true,
@@ -246,7 +246,7 @@ const SimplePageEditor = ({ match, history }) => {
       validChildList.forEach((childComp) => {
         // NOTE: Right now this only works if the prop name and trait name is same
         childComp.updateTrait('bg-style', {
-          type: 'color',
+          type: 'custom-color-picker',
           value: isBackgroundColor ? bgStyle : 'transparent',
         });
       });

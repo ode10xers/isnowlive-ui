@@ -6,7 +6,7 @@ export const genericFontTraits = [
     changeProp: 1,
   },
   // {
-  //   type: 'color',
+  //   type: 'custom-color-picker',
   //   label: 'Text color',
   //   name: 'text-color',
   //   changeProp: 1,

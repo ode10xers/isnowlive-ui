@@ -50,13 +50,13 @@ export default (editor) => {
             changeProp: 1,
           },
           {
-            type: 'color',
+            type: 'custom-color-picker',
             label: 'Text color',
             name: 'text-color',
             changeProp: 1,
           },
           {
-            type: 'color',
+            type: 'custom-color-picker',
             label: 'Background color',
             name: 'bg-style',
             changeProp: 1,
@@ -127,7 +127,7 @@ export default (editor) => {
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
           childComp.updateTrait('bg-style', {
-            type: 'color',
+            type: 'custom-color-picker',
             value: isBackgroundColor ? bgStyle : 'transparent',
           });
         });

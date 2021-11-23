@@ -12,7 +12,7 @@ export default (editor) => {
         },
         traits: [
           {
-            type: 'color',
+            type: 'custom-color-picker',
             label: 'Background color',
             name: 'bg-style',
             changeProp: true,
@@ -54,7 +54,7 @@ export default (editor) => {
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
           childComp.updateTrait('bg-style', {
-            type: 'color',
+            type: 'custom-color-picker',
             value: isBackgroundColor ? bgStyle : 'transparent',
           });
         });
@@ -81,7 +81,7 @@ export default (editor) => {
             type: 'padding-slider',
           },
           {
-            type: 'color',
+            type: 'custom-color-picker',
             label: 'Background color',
             name: 'bg-style',
             changeProp: true,
@@ -114,7 +114,7 @@ export default (editor) => {
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
           childComp.updateTrait('bg-style', {
-            type: 'color',
+            type: 'custom-color-picker',
             value: isBackgroundColor ? bgStyle : 'transparent',
           });
         });
