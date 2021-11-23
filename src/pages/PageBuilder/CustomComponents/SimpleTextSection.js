@@ -1,7 +1,13 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 import { generateContainerWrapper } from '../Configs/blocks';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
-import { backgroundTraits, fontTraits, innerButtonTraits, socialLinksTraits } from '../Configs/common/trait_sets';
+import {
+  backgroundTraits,
+  contextualFontTraits,
+  genericFontTraits,
+  innerButtonTraits,
+  socialLinksTraits,
+} from '../Configs/common/trait_sets';
 
 const websiteIcon = require('assets/icons/website/website.svg');
 const facebookIcon = require('assets/icons/facebook/facebook.svg');
@@ -9,7 +15,31 @@ const linkedinIcon = require('assets/icons/linkedin/linkedin.svg');
 const instagramIcon = require('assets/icons/instagram/instagram.svg');
 const twitterIcon = require('assets/icons/twitter/twitter.svg');
 
-export const textSectionPropHandlers = {
+const textPropHandlers = {
+  handleFontChange() {
+    const font = this.props()['font-family'];
+
+    const textSectionContainer = this.find('div.text-section-container')[0];
+
+    if (textSectionContainer) {
+      textSectionContainer.setStyle({
+        ...textSectionContainer.getStyle(),
+        'font-family': `${generateFontFamilyStylingText(font)} !important`,
+      });
+
+      textSectionContainer.components().forEach((comp) => {
+        comp.setStyle({
+          ...comp.getStyle(),
+          'font-family': `${generateFontFamilyStylingText(font)} !important`,
+        });
+      });
+    } else {
+      this.setStyle({
+        ...this.getStyle(),
+        'font-family': `${generateFontFamilyStylingText(font)} !important`,
+      });
+    }
+  },
   handleTextColorChange() {
     const textColor = this.props()['text-color'];
     const textSectionContainer = this.find('div.text-section-container')[0];
@@ -33,6 +63,10 @@ export const textSectionPropHandlers = {
       });
     }
   },
+};
+
+export const textSectionPropHandlers = {
+  ...textPropHandlers,
   handleBGStyleChange() {
     const bgStyle = this.props()['bg-color'];
 
@@ -50,23 +84,6 @@ export const textSectionPropHandlers = {
       });
     }
   },
-  handleFontChange() {
-    const font = this.props()['font-family'];
-
-    const textSectionContainer = this.find('div.text-section-container')[0];
-
-    if (textSectionContainer) {
-      textSectionContainer.setStyle({
-        ...textSectionContainer.getStyle(),
-        'font-family': generateFontFamilyStylingText(font),
-      });
-    } else {
-      this.setStyle({
-        ...this.getStyle(),
-        'font-family': generateFontFamilyStylingText(font),
-      });
-    }
-  },
 };
 
 export const textSectionTraits = [
@@ -74,40 +91,80 @@ export const textSectionTraits = [
     type: 'text-section-layout',
     name: 'layout',
   },
-  ...fontTraits,
+  ...genericFontTraits,
   ...backgroundTraits,
 ];
 
 const textSectionBaseComponents = [
   {
-    tagName: 'h1',
-    type: 'text',
-    content: 'Section Title',
-    name: 'Section Title',
-    attributes: {},
-    traits: [],
-    ...fullyDisabledComponentFlags,
-    editable: true,
-    badgable: true,
-    selectable: true,
-    hoverable: true,
+    type: 'text-section-heading',
   },
   {
-    tagName: 'p',
-    type: 'text',
-    content: 'Section Content',
-    name: 'Section Content',
-    attributes: {},
-    traits: [],
-    ...fullyDisabledComponentFlags,
-    editable: true,
-    badgable: true,
-    selectable: true,
-    hoverable: true,
+    type: 'text-section-content',
   },
 ];
 
 export default (editor) => {
+  // Base Components
+  editor.DomComponents.addType('text-section-heading', {
+    extend: 'text',
+    model: {
+      defaults: {
+        tagName: 'h1',
+        content: 'Section Title',
+        name: 'Section Title',
+        attributes: {
+          class: 'text-section-heading',
+        },
+        'font-family': 'Segoe UI',
+        'text-color': '#262626',
+        traits: contextualFontTraits,
+        ...fullyDisabledComponentFlags,
+        editable: true,
+        badgable: true,
+        selectable: true,
+        hoverable: true,
+      },
+      init() {
+        // We put a listener that triggers when an attribute changes
+        // In this case when text-color attribute changes
+        this.on('change:text-color', this.handleTextColorChange);
+        this.on('change:font-family', this.handleFontChange);
+      },
+      ...textPropHandlers,
+    },
+  });
+
+  editor.DomComponents.addType('text-section-content', {
+    extend: 'text',
+    model: {
+      defaults: {
+        tagName: 'p',
+        type: 'text',
+        content: 'Section Content',
+        name: 'Section Content',
+        attributes: {
+          class: 'text-section-content',
+        },
+        'font-family': 'Segoe UI',
+        'text-color': '#484949',
+        traits: contextualFontTraits,
+        ...fullyDisabledComponentFlags,
+        editable: true,
+        badgable: true,
+        selectable: true,
+        hoverable: true,
+      },
+      init() {
+        // We put a listener that triggers when an attribute changes
+        // In this case when text-color attribute changes
+        this.on('change:text-color', this.handleTextColorChange);
+        this.on('change:font-family', this.handleFontChange);
+      },
+      ...textPropHandlers,
+    },
+  });
+
   // Text Section
   editor.DomComponents.addType('simple-text-section', {
     model: {
@@ -132,6 +189,14 @@ export default (editor) => {
           .text-section-container * {
             position: relative;
             flex: 0 0 auto;
+          }
+
+          .text-section-container .text-section-heading {
+            color: #262626;
+          }
+
+          .text-section-container .text-section-content {
+            color: #484949;
           }
         `,
       },

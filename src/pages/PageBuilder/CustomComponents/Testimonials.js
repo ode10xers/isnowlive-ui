@@ -1,5 +1,6 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 
+// TODO: Resimplify this
 export default (editor) => {
   editor.DomComponents.addType('testimonial-item', {
     extend: 'text-with-image-section',

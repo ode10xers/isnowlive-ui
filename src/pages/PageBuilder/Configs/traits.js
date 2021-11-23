@@ -1,19 +1,21 @@
-import { isValidCSSColor } from 'utils/colors';
 import { googleFonts } from 'utils/constants.js';
 
+const generateTemplateHTML = (label = '') => `
+  <div class="custom-trait-layout">
+    <div class="custom-trait-label">
+      ${label}
+    </div>
+    <div class="custom-trait-input" data-input>
+    </div>
+  </div>
+`;
+
 export default (editor) => {
+  // NOTE: Image Traits
   editor.TraitManager.addType('image-cutout-select', {
     // Expects as return a simple HTML string or an HTML element
     noLabel: true,
-    templateInput: `
-        <div class="custom-trait-layout">
-          <div class="custom-trait-label">
-            Image Type
-          </div>
-          <div class="custom-trait-input" data-input>
-          </div>
-        </div>
-        `,
+    templateInput: generateTemplateHTML('Image Type'),
     createInput({ trait }) {
       // Create a new element container and add some content
       const el = document.createElement('div');
@@ -47,18 +49,89 @@ export default (editor) => {
     },
   });
 
+  editor.TraitManager.addType('border-radius-slider', {
+    // Expects as return a simple HTML string or an HTML element
+    noLabel: true,
+    templateInput: generateTemplateHTML('Roundness'),
+    createInput({ trait }) {
+      // Create a new element container and add some content
+      const minValue = trait.get('min') || 0;
+      const maxValue = trait.get('max') || 100;
+      const traitUnit = trait.get('unit') || 'px';
+      const unitType = ['px', '%'].includes(traitUnit) ? traitUnit : 'px';
+      this.unit = unitType;
+      const el = document.createElement('div');
+      el.innerHTML = `
+      <div class="input-slider-container">
+        <span class="input-slider-text">${minValue}${unitType}</span>
+        <input type="range" min="${minValue}" max="${maxValue}" id="border-radius-slider" class="input-slider" />
+        <span class="input-slider-text">${maxValue}${unitType}</span>
+      </div>
+      <div class="input-slider-value-container">
+        Current Value: <span id="border-radius-slider-value" class="input-slider-value"></span>
+      </div>
+      `;
+      return el;
+    },
+    // Update the component based on element changes
+    // `elInput` is the result HTMLElement you get from `createInput`
+    onEvent({ elInput, component, event }) {
+      const sliderInput = elInput.querySelector('#border-radius-slider');
+      const valueText = elInput.querySelector('#border-radius-slider-value');
+      valueText.innerHTML = sliderInput.value + (this.unit ?? 'px');
+
+      const targetComponent = component.find('img')[0] ?? component;
+
+      targetComponent.setStyle({
+        ...component.getStyle(),
+        'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
+      });
+    },
+    // Update elements on the component change
+    onUpdate({ elInput, component }) {
+      const componentStyle = (component.find('img')[0] ?? component).getStyle();
+      const borderRadius = componentStyle['border-radius'] ?? '0px';
+      const sliderInput = elInput.querySelector('#border-radius-slider');
+      // Remove all non numeric char
+      // The logic below is for us to support multiple units
+      sliderInput.value = borderRadius.replaceAll('[^\\d]', '');
+
+      const valueText = elInput.querySelector('#border-radius-slider-value');
+      valueText.innerHTML = borderRadius;
+      sliderInput.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('background-image-picker', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Container background'),
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['actions-input-container']);
+
+      const setBtn = document.createElement('button');
+      setBtn.innerText = 'Set BG Image';
+      setBtn.addEventListener('click', () => {
+        editor.runCommand('set-background-image');
+      });
+
+      const resetBtn = document.createElement('button');
+      resetBtn.innerText = 'Reset BG';
+      resetBtn.addEventListener('click', () => {
+        editor.runCommand('remove-background-image');
+      });
+
+      el.appendChild(setBtn);
+      el.appendChild(resetBtn);
+      return el;
+    },
+  });
+
+  // NOTE : Spacing traits
   editor.TraitManager.addType('padding-slider', {
     // Expects as return a simple HTML string or an HTML element
     noLabel: true,
-    templateInput: `
-      <div class="custom-trait-layout">
-        <div class="custom-trait-label">
-          Padding
-        </div>
-        <div class="custom-trait-input" data-input>
-        </div>
-      </div>
-    `,
+    templateInput: generateTemplateHTML('Padding'),
     createInput({ trait }) {
       // Create a new element container and add some content
       console.log(trait.get('min'));
@@ -152,131 +225,381 @@ export default (editor) => {
     },
   });
 
-  editor.TraitManager.addType('border-radius-slider', {
-    // Expects as return a simple HTML string or an HTML element
+  // NOTE : Font Traits
+  editor.TraitManager.addType('font-selector', {
     noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Roundness
-      </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
-    `,
+    templateInput: generateTemplateHTML('Text Font'),
     createInput({ trait }) {
+      // Here we can decide to use properties from the trait
+      const options = Object.values(googleFonts).map((font) => ({
+        id: font,
+        name: font,
+      }));
+
       // Create a new element container and add some content
-      const minValue = trait.get('min') || 0;
-      const maxValue = trait.get('max') || 100;
-      const traitUnit = trait.get('unit') || 'px';
-      const unitType = ['px', '%'].includes(traitUnit) ? traitUnit : 'px';
-      this.unit = unitType;
       const el = document.createElement('div');
       el.innerHTML = `
-      <div class="input-slider-container">
-        <span class="input-slider-text">${minValue}${unitType}</span>
-        <input type="range" min="${minValue}" max="${maxValue}" id="border-radius-slider" class="input-slider" />
-        <span class="input-slider-text">${maxValue}${unitType}</span>
-      </div>
-      <div class="input-slider-value-container">
-        Current Value: <span id="border-radius-slider-value" class="input-slider-value"></span>
-      </div>
+        <select placeholder="Default" class="input-select" id="font-select">
+          ${options
+            .map(
+              (opt) =>
+                `<option style="font-family: ${opt.id.includes(' ') ? `'${opt.id}'` : opt.id};" value="${opt.id}">${
+                  opt.name
+                }</option>`
+            )
+            .join('')}
+        </select>
       `;
+
       return el;
     },
     // Update the component based on element changes
     // `elInput` is the result HTMLElement you get from `createInput`
     onEvent({ elInput, component, event }) {
-      const sliderInput = elInput.querySelector('#border-radius-slider');
-      const valueText = elInput.querySelector('#border-radius-slider-value');
-      valueText.innerHTML = sliderInput.value + (this.unit ?? 'px');
-
-      const targetComponent = component.find('img')[0] ?? component;
-
-      targetComponent.setStyle({
-        ...component.getStyle(),
-        'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
+      const inputType = elInput.querySelector('#font-select');
+      component.updateTrait('font-family', {
+        type: 'text',
+        value: inputType.value,
+        changeProp: 1,
       });
     },
     // Update elements on the component change
     onUpdate({ elInput, component }) {
-      const componentStyle = (component.find('img')[0] ?? component).getStyle();
-      const borderRadius = componentStyle['border-radius'] ?? '0px';
-      const sliderInput = elInput.querySelector('#border-radius-slider');
-      // Remove all non numeric char
-      // The logic below is for us to support multiple units
-      sliderInput.value = borderRadius.replaceAll('[^\\d]', '');
+      // This is getting the trait value from the set classes
+      const font = component.props()['font-family'] ?? component.getAttributes()['font-family'] ?? '';
+      const inputType = elInput.querySelector('#font-select');
+      inputType.value = font;
 
-      const valueText = elInput.querySelector('#border-radius-slider-value');
-      valueText.innerHTML = borderRadius;
-      sliderInput.dispatchEvent(new CustomEvent('change'));
+      inputType.dispatchEvent(new CustomEvent('change'));
     },
   });
 
-  editor.TraitManager.addType('font-size-slider', {
-    // Expects as return a simple HTML string or an HTML element
+  editor.TraitManager.addType('font-size', {
     noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Text Size
-      </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
-    `,
+    templateInput: generateTemplateHTML('Text size'),
     createInput({ trait }) {
-      // Create a new element container and add some content
-      const minValue = 0;
-      const maxValue = 100;
       const el = document.createElement('div');
       el.innerHTML = `
-      <div class="input-slider-container">
-        <span class="input-slider-text">${minValue}px</span>
-        <input type="range" min="${minValue}" max="${maxValue}" id="font-size-slider" class="input-slider" />
-        <span class="input-slider-text">${maxValue}px</span>
-      </div>
-      <div class="input-slider-value-container">
-        Current Value: <span class="input-slider-value" id="font-size-slider-value"></span>
-      </div>
+        <input type="number" min="0" id="font-size-input" class="input-field" placeholder="Default size" />
       `;
       return el;
     },
-    // Update the component based on element changes
-    // `elInput` is the result HTMLElement you get from `createInput`
+
     onEvent({ elInput, component, event }) {
-      const sliderInput = elInput.querySelector('#font-size-slider');
-      const valueText = elInput.querySelector('#font-size-slider-value');
-      valueText.innerHTML = sliderInput.value + 'px';
-      component.setStyle({
-        ...component.getStyle(),
-        'font-size': `${sliderInput.value ?? 12}px`,
-      });
+      const inputLink = elInput.querySelector('#font-size-input');
+
+      if (inputLink.value) {
+        component.setStyle({
+          ...component.getStyle(),
+          'font-size': `${inputLink.value}px`,
+        });
+      }
     },
-    // Update elements on the component change
+
     onUpdate({ elInput, component }) {
-      const componentStyle = component.getStyle();
-      const fontSize = componentStyle['font-size'] ?? '12px';
-      const sliderInput = elInput.querySelector('#font-size-slider');
-      sliderInput.value = fontSize.replace('px', '');
-      const valueText = elInput.querySelector('#font-size-slider-value');
-      valueText.innerHTML = fontSize;
-      sliderInput.dispatchEvent(new CustomEvent('change'));
+      // This is getting the trait value from the set classes
+      const inputType = elInput.querySelector('#font-size-input');
+      inputType.value = (component.getStyle()['font-size'] ?? '14px').replace('px', '');
+
+      inputType.dispatchEvent(new CustomEvent('change'));
     },
   });
 
+  // Button Traits
+  editor.TraitManager.addType('button-types', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Button type'),
+    createInput({ trait }) {
+      // TODO: This probably needs to be a global var so can be referenced to easily
+      const options = [
+        { id: 'link', name: 'Link' },
+        { id: 'outlined', name: 'Outlined' },
+        // { id: 'filled', name: 'Filled' },
+      ];
+
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <select class="input-select" id="button-layout-select">
+          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
+        </select>
+      `;
+
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const inputType = elInput.querySelector('#button-layout-select');
+
+      let classes = [];
+      let existingClasses = component.getClasses();
+
+      if (inputType.value) {
+        classes.push(`button-type-${inputType.value}`);
+        existingClasses = existingClasses.filter((cls) => !['button-type-link', 'button-type-outlined'].includes(cls));
+      }
+
+      component.setClass([...new Set([...existingClasses, ...classes])]);
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const layout =
+        component
+          .getClasses()
+          .find((cls) => cls.startsWith('button-type-'))
+          ?.split('-')[2] ?? 'link';
+      const inputType = elInput.querySelector('#button-layout-select');
+      inputType.value = layout;
+
+      inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('button-link', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Button URL'),
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <input id="button-link-input" class="input-field" placeholder="The link to be opened" />
+      `;
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const inputLink = elInput.querySelector('#button-link-input');
+      const targetComponent =
+        component.findType('link-button')[0] ??
+        component.findType('text-section-link-button')[0] ??
+        component.find('a')[0] ??
+        component.find('button')[0] ??
+        component;
+
+      if (inputLink.value) {
+        targetComponent.setAttributes({
+          ...targetComponent.getAttributes(),
+          href: inputLink.value,
+        });
+      }
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const componentEl =
+        component.findType('link-button')[0] ??
+        component.findType('text-section-link-button')[0] ??
+        component.find('a')[0] ??
+        component.find('button')[0] ??
+        component;
+      const inputType = elInput.querySelector('#button-link-input');
+      inputType.value = componentEl.getAttributes()['href'];
+
+      inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('button-target', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Button behavior'),
+    createInput({ trait }) {
+      const options = [
+        { id: '_blank', name: 'New Page' },
+        { id: '_self', name: 'Same Page' },
+      ];
+
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <select class="input-select" id="button-target-select">
+          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
+        </select>
+      `;
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const inputLink = elInput.querySelector('#button-target-select');
+      const targetComponent =
+        component.findType('link-button')[0] ??
+        component.findType('text-section-link-button')[0] ??
+        component.find('a')[0] ??
+        component;
+
+      if (inputLink.value) {
+        targetComponent.setAttributes({
+          ...targetComponent.getAttributes(),
+          target: inputLink.value,
+        });
+      }
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const componentEl =
+        component.findType('link-button')[0] ??
+        component.findType('text-section-link-button')[0] ??
+        component.find('a')[0] ??
+        component;
+      const inputType = elInput.querySelector('#button-target-select');
+      inputType.value = componentEl.getAttributes()['target'];
+
+      inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('button-content', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Button text'),
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <input id="button-content-input" class="input-field" placeholder="The text shown in the button" />
+      `;
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const inputContent = elInput.querySelector('#button-content-input');
+      const targetComponent =
+        component.findType('link-button')[0] ??
+        component.findType('text-section-link-button')[0] ??
+        component.find('a')[0] ??
+        component.find('button')[0] ??
+        component;
+
+      if (inputContent.value) {
+        targetComponent.set({
+          content: inputContent.value,
+        });
+      }
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const componentEl =
+        component.findType('link-button')[0] ??
+        component.findType('text-section-link-button')[0] ??
+        component.find('a')[0] ??
+        component.find('button')[0] ??
+        component;
+      const inputType = elInput.querySelector('#button-content-input');
+      inputType.value = componentEl.props()['content'];
+
+      inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  // NOTE : Header Traits
+  editor.TraitManager.addType('brand-type-select', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Brand type'),
+    createInput({ trait }) {
+      // TODO: This probably needs to be a global var so can be referenced to easily
+      const options = [
+        { id: 'text', name: 'Text' },
+        { id: 'image', name: 'Image/Logo' },
+      ];
+
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <select class="input-select" id="brand-type-select">
+          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
+        </select>
+      `;
+
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      const inputType = elInput.querySelector('#brand-type-select');
+
+      component.set({
+        'brand-type': inputType.value ?? 'text',
+      });
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const brandType = component.get('brand-type') ?? 'text';
+      const inputType = elInput.querySelector('#brand-type-select');
+      inputType.value = brandType;
+
+      inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
+  editor.TraitManager.addType('nav-links', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Navigation links'),
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['button-list-container']);
+
+      return el;
+    },
+
+    onEvent({ elInput, component, event }) {
+      console.log(event);
+
+      if (event) {
+        return;
+      }
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const linkButtons = component.findType('link-buttons') ?? [];
+      // const elInput = elInput.querySelector('.button-list-container');
+
+      elInput.innerHTML = '';
+
+      linkButtons.forEach((btn) => {
+        const btnTraitContainer = document.createElement('div');
+        btnTraitContainer.classList.add(['button-item-container']);
+
+        const btnTraitContent = document.createElement('p');
+        btnTraitContent.classList.add(['button-trait-content']);
+        btnTraitContent.innerHTML = btn.get('content') ?? 'Link button';
+
+        const selectNavBtn = document.createElement('button');
+        selectNavBtn.classList.add(['button-trait-cta']);
+        selectNavBtn.innerText = 'Select';
+        selectNavBtn.onclick = () => {
+          editor.selectToggle(btn);
+          editor.select(btn);
+        };
+
+        const deleteNavBtn = document.createElement('button');
+        deleteNavBtn.classList.add(['button-trait-cta']);
+        deleteNavBtn.innerText = 'Delete';
+        deleteNavBtn.onclick = () => {
+          btn.remove();
+          component.emitUpdate();
+        };
+
+        btnTraitContainer.appendChild(btnTraitContent);
+        btnTraitContainer.appendChild(selectNavBtn);
+        btnTraitContainer.appendChild(deleteNavBtn);
+
+        elInput.appendChild(btnTraitContainer);
+      });
+
+      const addNavBtn = document.createElement('button');
+      addNavBtn.classList.add(['button-trait-add']);
+      addNavBtn.innerText = 'Add New Link';
+      addNavBtn.onclick = () => {
+        component.handleAddButtonLink();
+        component.emitUpdate();
+      };
+
+      elInput.appendChild(addNavBtn);
+    },
+  });
+
+  // Layout Traits
   editor.TraitManager.addType('text-section-layout', {
     // Expects as return a simple HTML string or an HTML element
     noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Text Layout
-      </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
-    `,
+    templateInput: generateTemplateHTML('Text layout'),
     createInput({ trait }) {
       // Here we can decide to use properties from the trait
       const options = [
@@ -353,15 +676,7 @@ export default (editor) => {
   editor.TraitManager.addType('image-position-layout', {
     // Expects as return a simple HTML string or an HTML element
     noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Image Layout
-      </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
-    `,
+    templateInput: generateTemplateHTML('Image Layout'),
     createInput({ trait }) {
       // Here we can decide to use properties from the trait
       const options = [
@@ -419,519 +734,6 @@ export default (editor) => {
       inputType.value = layout;
 
       inputType.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('font-selector', {
-    noLabel: true,
-    templateInput: `
-      <div class="custom-trait-layout">
-        <div class="custom-trait-label">
-          Text Font
-        </div>
-        <div class="custom-trait-input" data-input>
-        </div>
-      </div>
-    `,
-    createInput({ trait }) {
-      // Here we can decide to use properties from the trait
-      const options = Object.values(googleFonts).map((font) => ({
-        id: font,
-        name: font,
-      }));
-
-      // Create a new element container and add some content
-      const el = document.createElement('div');
-      el.innerHTML = `
-        <select placeholder="Default" class="input-select" id="font-select">
-          ${options
-            .map(
-              (opt) =>
-                `<option style="font-family: ${opt.id.includes(' ') ? `'${opt.id}'` : opt.id};" value="${opt.id}">${
-                  opt.name
-                }</option>`
-            )
-            .join('')}
-        </select>
-      `;
-
-      return el;
-    },
-    // Update the component based on element changes
-    // `elInput` is the result HTMLElement you get from `createInput`
-    onEvent({ elInput, component, event }) {
-      const inputType = elInput.querySelector('#font-select');
-      component.updateTrait('font-family', {
-        type: 'text',
-        value: inputType.value,
-        changeProp: 1,
-      });
-    },
-    // Update elements on the component change
-    onUpdate({ elInput, component }) {
-      // This is getting the trait value from the set classes
-      const font = component.props()['font-family'] ?? component.getAttributes()['font-family'] ?? '';
-      const inputType = elInput.querySelector('#font-select');
-      inputType.value = font;
-
-      inputType.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('button-types', {
-    noLabel: true,
-    templateInput: `
-      <div class="custom-trait-layout">
-        <div class="custom-trait-label">
-          Button Type
-        </div>
-        <div class="custom-trait-input" data-input>
-        </div>
-      </div>
-    `,
-    createInput({ trait }) {
-      // TODO: This probably needs to be a global var so can be referenced to easily
-      const options = [
-        { id: 'link', name: 'Link' },
-        { id: 'outlined', name: 'Outlined' },
-        // { id: 'filled', name: 'Filled' },
-      ];
-
-      const el = document.createElement('div');
-      el.innerHTML = `
-        <select class="input-select" id="button-layout-select">
-          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
-        </select>
-      `;
-
-      return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      const inputType = elInput.querySelector('#button-layout-select');
-
-      let classes = [];
-      let existingClasses = component.getClasses();
-
-      if (inputType.value) {
-        classes.push(`button-type-${inputType.value}`);
-        existingClasses = existingClasses.filter((cls) => !['button-type-link', 'button-type-outlined'].includes(cls));
-      }
-
-      component.setClass([...new Set([...existingClasses, ...classes])]);
-    },
-
-    onUpdate({ elInput, component }) {
-      // This is getting the trait value from the set classes
-      const layout =
-        component
-          .getClasses()
-          .find((cls) => cls.startsWith('button-type-'))
-          ?.split('-')[2] ?? 'link';
-      const inputType = elInput.querySelector('#button-layout-select');
-      inputType.value = layout;
-
-      inputType.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('button-link', {
-    noLabel: true,
-    templateInput: `
-      <div class="custom-trait-layout">
-        <div class="custom-trait-label">
-          Button URL
-        </div>
-        <div class="custom-trait-input" data-input>
-        </div>
-      </div>
-    `,
-    createInput({ trait }) {
-      const el = document.createElement('div');
-      el.innerHTML = `
-        <input id="button-link-input" class="input-field" placeholder="The link to be opened" />
-      `;
-      return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      const inputLink = elInput.querySelector('#button-link-input');
-      const targetComponent =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
-        component.find('a')[0] ??
-        component.find('button')[0] ??
-        component;
-
-      if (inputLink.value) {
-        targetComponent.setAttributes({
-          ...targetComponent.getAttributes(),
-          href: inputLink.value,
-        });
-      }
-    },
-
-    onUpdate({ elInput, component }) {
-      // This is getting the trait value from the set classes
-      const componentEl =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
-        component.find('a')[0] ??
-        component.find('button')[0] ??
-        component;
-      const inputType = elInput.querySelector('#button-link-input');
-      inputType.value = componentEl.getAttributes()['href'];
-
-      inputType.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('button-target', {
-    noLabel: true,
-    templateInput: `
-      <div class="custom-trait-layout">
-        <div class="custom-trait-label">
-          Button Behavior
-        </div>
-        <div class="custom-trait-input" data-input>
-        </div>
-      </div>
-    `,
-    createInput({ trait }) {
-      const options = [
-        { id: '_blank', name: 'New Page' },
-        { id: '_self', name: 'Same Page' },
-      ];
-
-      const el = document.createElement('div');
-      el.innerHTML = `
-        <select class="input-select" id="button-target-select">
-          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
-        </select>
-      `;
-      return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      const inputLink = elInput.querySelector('#button-target-select');
-      const targetComponent =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
-        component.find('a')[0] ??
-        component;
-
-      if (inputLink.value) {
-        targetComponent.setAttributes({
-          ...targetComponent.getAttributes(),
-          target: inputLink.value,
-        });
-      }
-    },
-
-    onUpdate({ elInput, component }) {
-      // This is getting the trait value from the set classes
-      const componentEl =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
-        component.find('a')[0] ??
-        component;
-      const inputType = elInput.querySelector('#button-target-select');
-      inputType.value = componentEl.getAttributes()['target'];
-
-      inputType.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('button-content', {
-    noLabel: true,
-    templateInput: `
-      <div class="custom-trait-layout">
-        <div class="custom-trait-label">
-          Button Text
-        </div>
-        <div class="custom-trait-input" data-input>
-        </div>
-      </div>
-    `,
-    createInput({ trait }) {
-      const el = document.createElement('div');
-      el.innerHTML = `
-        <input id="button-content-input" class="input-field" placeholder="The text shown in the button" />
-      `;
-      return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      const inputContent = elInput.querySelector('#button-content-input');
-      const targetComponent =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
-        component.find('a')[0] ??
-        component.find('button')[0] ??
-        component;
-
-      if (inputContent.value) {
-        targetComponent.set({
-          content: inputContent.value,
-        });
-      }
-    },
-
-    onUpdate({ elInput, component }) {
-      // This is getting the trait value from the set classes
-      const componentEl =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
-        component.find('a')[0] ??
-        component.find('button')[0] ??
-        component;
-      const inputType = elInput.querySelector('#button-content-input');
-      inputType.value = componentEl.props()['content'];
-
-      inputType.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('brand-type-select', {
-    noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-    <div class="custom-trait-label">
-      Brand Type
-    </div>
-    <div class="custom-trait-input" data-input>
-    </div>
-  </div>
-    `,
-    createInput({ trait }) {
-      // TODO: This probably needs to be a global var so can be referenced to easily
-      const options = [
-        { id: 'text', name: 'Text' },
-        { id: 'image', name: 'Image/Logo' },
-      ];
-
-      const el = document.createElement('div');
-      el.innerHTML = `
-        <select class="input-select" id="brand-type-select">
-          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
-        </select>
-      `;
-
-      return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      const inputType = elInput.querySelector('#brand-type-select');
-
-      component.set({
-        'brand-type': inputType.value ?? 'text',
-      });
-    },
-
-    onUpdate({ elInput, component }) {
-      // This is getting the trait value from the set classes
-      const brandType = component.get('brand-type') ?? 'text';
-      const inputType = elInput.querySelector('#brand-type-select');
-      inputType.value = brandType;
-
-      inputType.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('nav-links', {
-    noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Navigation Links
-      </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
-    `,
-    createInput({ trait }) {
-      const el = document.createElement('div');
-      el.classList.add(['button-list-container']);
-
-      return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      console.log(event);
-
-      if (event) {
-        return;
-      }
-    },
-
-    onUpdate({ elInput, component }) {
-      // This is getting the trait value from the set classes
-      const linkButtons = component.findType('link-buttons') ?? [];
-      // const elInput = elInput.querySelector('.button-list-container');
-
-      elInput.innerHTML = '';
-
-      linkButtons.forEach((btn) => {
-        const btnTraitContainer = document.createElement('div');
-        btnTraitContainer.classList.add(['button-item-container']);
-
-        const btnTraitContent = document.createElement('p');
-        btnTraitContent.classList.add(['button-trait-content']);
-        btnTraitContent.innerHTML = btn.get('content') ?? 'Link button';
-
-        const selectNavBtn = document.createElement('button');
-        selectNavBtn.classList.add(['button-trait-cta']);
-        selectNavBtn.innerText = 'Select';
-        selectNavBtn.onclick = () => {
-          editor.selectToggle(btn);
-          editor.select(btn);
-        };
-
-        const deleteNavBtn = document.createElement('button');
-        deleteNavBtn.classList.add(['button-trait-cta']);
-        deleteNavBtn.innerText = 'Delete';
-        deleteNavBtn.onclick = () => {
-          btn.remove();
-          component.emitUpdate();
-        };
-
-        btnTraitContainer.appendChild(btnTraitContent);
-        btnTraitContainer.appendChild(selectNavBtn);
-        btnTraitContainer.appendChild(deleteNavBtn);
-
-        elInput.appendChild(btnTraitContainer);
-      });
-
-      const addNavBtn = document.createElement('button');
-      addNavBtn.classList.add(['button-trait-add']);
-      addNavBtn.innerText = 'Add New Link';
-      addNavBtn.onclick = () => {
-        component.handleAddButtonLink();
-        component.emitUpdate();
-      };
-
-      elInput.appendChild(addNavBtn);
-    },
-  });
-
-  editor.TraitManager.addType('background-styles', {
-    noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Container Background
-      </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
-    `,
-    createInput({ trait }) {
-      const el = document.createElement('div');
-      el.classList.add(['styles-input-container']);
-
-      const selectDropdown = document.createElement('select');
-      [
-        { name: 'placeholder', value: 'Transparent' },
-        { name: 'class', value: 'input-select' },
-        { name: 'id', value: 'bg-style-select' },
-      ].map((attr) => selectDropdown.setAttribute(attr.name, attr.value));
-
-      // TODO: Can also put this in a separate file
-      const options = [
-        {
-          id: 'color',
-          name: 'Color Background',
-        },
-        {
-          id: 'image',
-          name: 'Image (with dark overlay)',
-        },
-      ];
-
-      selectDropdown.innerHTML = `${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}`;
-      el.appendChild(selectDropdown);
-      return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      const newValue = event.target.value;
-      let traitToAdd = null;
-      let traitToDel = '';
-
-      if (newValue === 'image') {
-        traitToDel = 'bg-style';
-        traitToAdd = {
-          id: 'bg-image-picker',
-          type: 'button',
-          text: 'Click to set image',
-          full: true,
-          label: 'Background Image',
-          command: 'set-background-image',
-        };
-        component.set({
-          'bg-style': '',
-        });
-      } else if (newValue === 'color') {
-        traitToDel = 'bg-image-picker';
-        traitToAdd = {
-          type: 'color',
-          label: 'Background color',
-          name: 'bg-style',
-          changeProp: true,
-        };
-        editor.runCommand('remove-background-image');
-        component.set({
-          'bg-style': '#ffffff',
-        });
-      }
-
-      if (traitToAdd) {
-        if (traitToDel) {
-          component.removeTrait(traitToDel);
-        }
-        const traitIndex = component.getTraitIndex('background-style-picker');
-        component.addTrait(traitToAdd, { at: traitIndex + 1 });
-      }
-    },
-
-    onUpdate({ elInput, component }) {
-      const bgStyle = component.props()['bg-style'] ?? component.getAttributes()['bg-style'] ?? '';
-      const selectEl = elInput.querySelector('#bg-style-select');
-      selectEl.value = isValidCSSColor(bgStyle) || bgStyle === 'transparent' ? 'color' : 'image';
-      selectEl.dispatchEvent(new CustomEvent('change'));
-    },
-  });
-
-  editor.TraitManager.addType('background-image-picker', {
-    noLabel: true,
-    templateInput: `
-    <div class="custom-trait-layout">
-      <div class="custom-trait-label">
-        Container Background
-      </div>
-      <div class="custom-trait-input" data-input>
-      </div>
-    </div>
-    `,
-    createInput({ trait }) {
-      const el = document.createElement('div');
-      el.classList.add(['actions-input-container']);
-
-      const setBtn = document.createElement('button');
-      setBtn.innerText = 'Set BG Image';
-      setBtn.addEventListener('click', () => {
-        editor.runCommand('set-background-image');
-      });
-
-      const resetBtn = document.createElement('button');
-      resetBtn.innerText = 'Reset BG';
-      resetBtn.addEventListener('click', () => {
-        editor.runCommand('remove-background-image');
-      });
-
-      el.appendChild(setBtn);
-      el.appendChild(resetBtn);
-      return el;
     },
   });
 };

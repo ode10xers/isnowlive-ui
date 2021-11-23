@@ -1,5 +1,5 @@
 // NOTE: Needs a 'font-family' and 'text-color' prop
-export const fontTraits = [
+export const genericFontTraits = [
   {
     type: 'font-selector',
     name: 'font-family',
@@ -10,6 +10,13 @@ export const fontTraits = [
     label: 'Text color',
     name: 'text-color',
     changeProp: 1,
+  },
+];
+
+export const contextualFontTraits = [
+  ...genericFontTraits,
+  {
+    type: 'font-size',
   },
 ];
 

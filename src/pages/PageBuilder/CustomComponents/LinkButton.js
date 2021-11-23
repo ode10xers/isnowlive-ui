@@ -42,14 +42,7 @@ export default (editor) => {
             type: 'button-types',
           },
           {
-            type: 'padding-slider',
-            max: '80',
-          },
-          {
-            type: 'margin-slider',
-          },
-          {
-            type: 'font-size-slider',
+            type: 'font-size',
           },
           {
             type: 'font-selector',
@@ -165,23 +158,23 @@ export default (editor) => {
           class: 'text-section-btn button-type-link',
         },
         styles: `
-            .text-section-btn {
-              display: flex;
-              padding: 8px;
-              width: fit-content;
-              text-align: center;
-              border: none;
-            }
+          .text-section-btn {
+            display: flex;
+            padding: 8px;
+            width: fit-content;
+            text-align: center;
+            border: none;
+          }
 
-            .text-section-btn.button-type-link {
-              border: none;
-            }
-  
-            .text-section-btn.button-type-outlined {
-              border: 1px solid currentColor;
-              border-radius: 8px;
-            }
-          `,
+          .text-section-btn.button-type-link {
+            border: none;
+          }
+
+          .text-section-btn.button-type-outlined {
+            border: 1px solid currentColor;
+            border-radius: 8px;
+          }
+        `,
       },
     },
   });

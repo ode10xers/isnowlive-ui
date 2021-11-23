@@ -24,6 +24,7 @@ export const googleFonts = {
   TIMES_NEW_ROMAN: 'Times New Roman',
   TREBUCHET_MS: 'Trebuchet MS',
   VERDANA: 'Verdana',
+  SEGOE_UI: 'Segoe UI',
 };
 
 export const pageTypes = {
