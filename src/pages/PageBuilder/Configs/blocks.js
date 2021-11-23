@@ -1,6 +1,8 @@
 // API Doc : https://grapesjs.com/docs/api/block.html#block
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 
+const websiteIcon = require('assets/icons/website/website.svg');
+
 const categories = {
   LAYOUTS: 'Layouts',
   PASSION_COMPONENTS: 'Passion Components',
@@ -28,6 +30,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Session List </b>',
     droppable: false,
     resizable: false,
+    media: `<img src="${websiteIcon}" loading="lazy" />`,
     category: categories.PASSION_COMPONENTS,
     content: {
       type: 'passion-session-list-block',
@@ -81,6 +84,9 @@ export default [
     id: 'simple-text-section',
     label: '<b> Simple Text Section </b>',
     category: categories.LAYOUTS,
+    attributes: {
+      'data-wide-mode': 'true',
+    },
     content: {
       type: 'simple-text-section-block',
     },
@@ -89,6 +95,9 @@ export default [
     id: 'simple-text-with-image-section',
     label: '<b> Simple Text with Image Section </b>',
     category: categories.LAYOUTS,
+    attributes: {
+      'data-wide-mode': 'true',
+    },
     content: {
       type: 'simple-text-with-image-block',
     },
@@ -97,6 +106,9 @@ export default [
     id: 'simple-text-with-button-section',
     label: '<b> Simple Text with Button Section </b>',
     category: categories.LAYOUTS,
+    attributes: {
+      'data-wide-mode': 'true',
+    },
     content: {
       type: 'simple-text-section-with-button-block',
     },
@@ -105,6 +117,9 @@ export default [
     id: 'simple-text-image-button-section',
     label: '<b> Simple Text Image with Button Section </b>',
     category: categories.LAYOUTS,
+    attributes: {
+      'data-wide-mode': 'true',
+    },
     content: {
       type: 'simple-text-button-with-image-block',
     },
@@ -113,6 +128,9 @@ export default [
     id: 'bio-with-links',
     label: '<b> Simple Bio </b>',
     category: categories.LAYOUTS,
+    attributes: {
+      'data-wide-mode': 'true',
+    },
     content: {
       type: 'simple-bio-section-block',
     },
@@ -121,6 +139,9 @@ export default [
     id: 'testimonials',
     label: '<b> Testimonials </b>',
     category: categories.LAYOUTS,
+    attributes: {
+      'data-wide-mode': 'true',
+    },
     content: {
       type: 'testimonials-block',
     },

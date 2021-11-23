@@ -37,7 +37,13 @@ const textPropHandlers = {
   },
   handleTextColorChange() {
     const textColor = this.props()['text-color'];
-    const textSectionContainer = this.find('div.text-section-container') ?? [this];
+    const textSectionContainer =
+      this.find('div.text-section-container') ??
+      this.findType('text') ??
+      this.findType('textnode') ??
+      this.components();
+
+    console.log(textSectionContainer);
 
     textSectionContainer.forEach((innerComp) => {
       innerComp.setStyle({
@@ -369,6 +375,7 @@ export default (editor) => {
                 type: 'image',
                 ...fullyDisabledComponentFlags,
                 attributes: {
+                  loading: 'lazy',
                   src: link.icon,
                   alt: link.altText,
                   height: '32',

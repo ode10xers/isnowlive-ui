@@ -5,11 +5,17 @@ export const genericFontTraits = [
     name: 'font-family',
     changeProp: 1,
   },
+  // {
+  //   type: 'color',
+  //   label: 'Text color',
+  //   name: 'text-color',
+  //   changeProp: 1,
+  // },
   {
-    type: 'color',
-    label: 'Text color',
+    type: 'custom-color-picker',
+    label: 'Text Color',
     name: 'text-color',
-    changeProp: 1,
+    changeProp: true,
   },
 ];
 
@@ -26,7 +32,7 @@ export const backgroundTraits = [
     type: 'background-image-picker',
   },
   {
-    type: 'color',
+    type: 'custom-color-picker',
     label: 'Background color',
     name: 'bg-color',
     changeProp: true,

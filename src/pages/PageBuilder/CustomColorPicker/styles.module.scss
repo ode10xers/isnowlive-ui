@@ -1,0 +1,17 @@
+@import '../../../styles/colors.scss';
+
+:global {
+  .color-picker-input {
+    .ant-input-group-addon {
+      padding: 4px;
+      background-color: map-get($map: $colors, $key: 'White');
+    }
+
+    .color-representation {
+      border: 0.4px solid map-get($map: $colors, $key: 'Silver');
+      border-radius: 4px;
+      height: 20px;
+      width: 20px;
+    }
+  }
+}

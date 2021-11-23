@@ -1,1 +1,178 @@
 @import '../Configs/common/common_editor_styles.scss';
+
+.contentContainer {
+  height: calc(100vh - 80px);
+  // overflow: hidden;
+}
+
+.middleContainer {
+  height: 100%;
+  // overflow: hidden;
+
+  :global {
+    .gjs-editor {
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+      
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+    }
+  }
+}
+
+.sidePanelContainer {
+  padding: 20px;
+  background-color: map-get($map: $colors, $key: 'White');
+  border-right: 1px solid map-get($map: $colors, $key: 'Gainsboro');
+  border-left: 1px solid map-get($map: $colors, $key: 'Gainsboro');
+  height: 100%;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .sectionHeading {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .buttonsContainer {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: space-around;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: map-get($map: $colors, $key: 'Solitude');
+
+    button {
+      width: 100%;
+      border: none;
+      padding: 6px;
+      color: map-get($map: $colors, $key: 'Mako');
+      font-size: 11px;
+      font-weight: 500;
+      
+      &:hover {
+        transition: 0.3s;
+        color: map-get($map: $colors, $key: 'Endeavour');
+        box-shadow: 0px 1px 0px map-get($map: $colors, $key: 'Silver');
+      }
+    }
+
+    :global {
+      button.active {
+        border-radius: 6px;
+        color: map-get($map: $colors, $key: 'White');
+        background-color: map-get($map: $colors, $key: 'Endeavour');
+      }
+    }
+  }
+
+  :global {
+    .gjs-one-bg {
+      background-color: map-get($map: $colors, $key: 'White');
+    }
+
+    .gjs-two-color {
+      color: map-get($map: $colors, $key: 'Mako');
+    }
+
+    .gjs-block-category {
+      margin-bottom: 12px;
+      &.gjs-open {
+        border: none;
+      }
+
+      .gjs-title {
+        background-color: transparent;
+        font-weight: 700;
+        border: none;
+        letter-spacing: initial;
+      }
+
+      .gjs-block {
+        background-color: map-get($map: $colors, $key: 'Solitude');
+        border-radius: 8px;
+        padding: 16px;
+        
+        &[data-wide-mode="true"] {
+          width: 100%;
+        }
+
+        .gjs-block-label {
+          color: map-get($map: $colors, $key: 'Mako');
+          font-family: inherit;
+          font-size: 10px;
+        }
+      }
+    }
+  }
+}
+
+.topPanelContainer {
+  background-color: map-get($map: $colors, $key: 'White');
+  border-bottom: 1px solid map-get($map: $colors, $key: 'Gainsboro');
+  color: map-get($map: $colors, $key: 'Nero');
+  padding: 12px 20px;
+
+  .ctaButtonContainer {
+    padding: 0 20px;
+  }
+
+  .devicesContainer {
+    display:flex;
+    width: 100%;
+    max-width: 180px;
+    justify-content: space-around;
+    margin: 0 auto;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: map-get($map: $colors, $key: 'Solitude');
+    font-size: 24px;
+
+    :global {
+      .device-button {
+        min-width: 32px;
+        border: none;
+        padding: 6px;
+        color: map-get($map: $colors, $key: 'Endeavour');
+      }
+
+      .device-button.active, .device-button:hover {
+        background-color: map-get($map: $colors, $key: 'Endeavour');
+        color: map-get($map: $colors, $key: 'White');
+        border-radius: 8px;
+      }
+    }
+  }
+}
+
+// TODO: Manage hover/disabled state as required
+.primaryEditorButton {
+  background-color: map-get($map: $colors, $key: 'Endeavour') !important;
+  border-color: map-get($map: $colors, $key: 'Endeavour') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+
+.linkEditorButton {
+  background-color: transparent !important;
+  border: none !important;
+  color: map-get($map: $colors, $key: 'Endeavour') !important;
+}
+

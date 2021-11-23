@@ -21,7 +21,7 @@ export default {
   // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
   // fromElement: true,
   // Size of the editor
-  height: 'calc(100vh - 40px)',
+  height: 'calc(100vh - 80px)',
   width: 'auto',
   noticeOnUnload: true,
   showOffsetsSelected: true,

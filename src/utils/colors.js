@@ -3,6 +3,16 @@ import { isInIframeWidget, isWidgetUrl } from './widgets';
 
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
+export const parseReactColorObject = (colorData, syntax = 'rgba') => {
+  switch (syntax) {
+    case 'rgba':
+      const { r = 255, g = 255, b = 255, a = 1 } = colorData.rgb;
+      return `rgba(${r}, ${g}, ${b}, ${a})`;
+    default:
+      return 'transparent';
+  }
+};
+
 export const convertHSLToHex = (hslString) => {
   const regexString = /hsl\(\s*(\d+)\s*,\s*(\d+(?:\.\d+)?%)\s*,\s*(\d+(?:\.\d+)?%)\)/g;
 

@@ -110,29 +110,66 @@
     justify-content: space-around;
   }
 
+  .gjs-trt-trait {
+    font-weight: initial;
+    gap: 4px;
+
+    // .gjs-field.gjs-field-color {
+    //   background-color: transparent;
+    //   color: map-get($map: $colors, $key: 'Black');
+    //   border: 0.5px solid map-get($map: $colors, $key: 'Mako');
+    //   padding: 4px;
+    //   border-radius: 6px;
+
+    //   .gjs-field-colorp {
+    //     border: 1px solid map-get($colors, 'WhiteSmoke2');
+    //     border-radius: 4px;
+    //     width: 28px;
+    //     height: 28px;
+    //     top: 4px;
+    //     bottom: 4px;
+    //     right: 8px;
+    //   }
+    // }
+
+    button {
+      background-color: map-get($map: $colors, $key: 'Endeavour');
+      color: map-get($colors, 'White');
+      border: none;
+      border-radius: 8px;
+      padding: 6px 8px;
+    }
+  }
+
   .custom-trait-layout {
     .custom-trait-label {
       margin-bottom: 12px;
+      font-weight: 500;
+      font-size: 13px;
     }
   }
 
   .actions-input-container {
     display: flex;
     flex: 1 0 100%;
-    row-gap: 8px;
+    gap: 8px;
     flex-direction: row;
     flex-wrap: nowrap;
 
     button {
       flex: 0 0 50%;
-      background-color: map-get($map: $colors, $key: 'DodgerBlue');
+      background-color: map-get($map: $colors, $key: 'Endeavour');
+      color: map-get($colors, 'White');
+      border: none;
+      border-radius: 8px;
+      padding: 6px 8px;
     }
   }
 
   .button-list-container {
     display: flex;
     flex: 1 0 100%;
-    row-gap: 8px;
+    gap: 8px;
     flex-direction: column;
     
     .button-item-container {
@@ -140,16 +177,20 @@
       flex: 1 0 100%;
       justify-content: space-around;
       flex-wrap: nowrap;
-      align-items: center;
+      align-items: baseline;
       column-gap: 8px;
 
       .button-trait-content {
         flex: 1 0 auto;
+        font-weight: initial;
       }
       
       .button-trait-cta {
-        padding: 2px 4px;
-        background-color: map-get($map: $colors, $key: 'DodgerBlue');
+        background-color: map-get($map: $colors, $key: 'Endeavour');
+        color: map-get($colors, 'White');
+        border: none;
+        border-radius: 8px;
+        padding: 6px 8px;
       }
     }
 
@@ -158,7 +199,11 @@
       flex: 1 0 100%;
       justify-content: center;
       text-align: center;
-      background-color: map-get($map: $colors, $key: 'DodgerBlue');
+      background-color: map-get($map: $colors, $key: 'Endeavour');
+      color: map-get($colors, 'White');
+      border: none;
+      border-radius: 8px;
+      padding: 6px 8px;
     }
   }
 
@@ -184,20 +229,28 @@
   }
 
   .input-select, .input-field {
-    color: map-get($map: $colors, $key: 'Black');
     width: 100%;
     min-height: 24px;
+    padding: 8px;
+    border-radius: 8px;
+    color: map-get($map: $colors, $key: 'Black');
+    border: 0.5px solid map-get($map: $colors, $key: 'Mako');
   }
 
   .radio-btn-container {
     display: flex;
+    gap: 8px;
     width: 100%;
 
     .radio-btn-item {
       flex: 1 0 33%;
       border-radius: 8px;
-      background-color: map-get($map: $colors, $key: 'PrussianBlue');
       text-align: center;
+      background-color: map-get($map: $colors, $key: 'Endeavour');
+      color: map-get($colors, 'White');
+      border: none;
+      border-radius: 8px;
+      padding: 6px 8px;
     }
   }
 

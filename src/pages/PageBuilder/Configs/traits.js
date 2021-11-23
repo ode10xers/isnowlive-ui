@@ -1,4 +1,8 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import { googleFonts } from 'utils/constants.js';
+import CustomColorPicker from '../CustomColorPicker';
 
 const generateTemplateHTML = (label = '') => `
   <div class="custom-trait-layout">
@@ -11,6 +15,47 @@ const generateTemplateHTML = (label = '') => `
 `;
 
 export default (editor) => {
+  // NOTE : Custom Color Picker
+  editor.TraitManager.addType('custom-color-picker', {
+    noLabel: true,
+    templateInput({ trait }) {
+      return generateTemplateHTML(trait.get('label') ?? '');
+    },
+    createInput({ trait }) {
+      const el = document.createElement('div');
+
+      const targetTraitName = trait.get('name') ?? 'color';
+      const initialColor = editor.getSelected()?.getStyle()[targetTraitName] ?? '#ffffff';
+
+      const targetComponent = editor.getSelected() ?? null;
+
+      const handleColorChange = (color) => {
+        if (targetComponent) {
+          if (trait.get('changeProp')) {
+            targetComponent.set({
+              [targetTraitName]: color,
+            });
+          } else {
+            targetComponent.setAttributes({
+              ...targetComponent.getAttributes(),
+              [targetTraitName]: color,
+            });
+          }
+        }
+      };
+
+      ReactDOM.render(<CustomColorPicker initialColor={initialColor} colorChangeCallback={handleColorChange} />, el);
+
+      return el;
+    },
+
+    removed() {
+      // TODO: Test if this works, or should this be called on remove()
+      const containerEl = this.getInputElem();
+      ReactDOM.unmountComponentAtNode(containerEl);
+    },
+  });
+
   // NOTE : Testimonials
   editor.TraitManager.addType('testimonial-items-list', {
     noLabel: true,

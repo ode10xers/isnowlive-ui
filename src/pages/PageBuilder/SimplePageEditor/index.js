@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { Spin, Row, Col, Space, Typography, Button, message } from 'antd';
-import { LeftOutlined } from '@ant-design/icons';
+import { LeftOutlined, FileTextOutlined } from '@ant-design/icons';
 
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
@@ -140,10 +140,11 @@ const SimplePageEditor = ({ match, history }) => {
           overflow-x: hidden;
         }
         * ::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.1)
+          background: #dadada;
         }
         * ::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.2)
+          background: rgba(255, 255, 255, 0.75);
+          border-radius: 8px;
         }
         * ::-webkit-scrollbar {
           width: 10px
@@ -559,15 +560,18 @@ const SimplePageEditor = ({ match, history }) => {
   };
 
   const handleSetDeviceDesktop = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-desktop');
+    runCommandAndToggleActiveStyles(e.currentTarget, 'set-device-desktop');
+    // runCommandAndToggleActiveStyles(e.target, 'set-device-desktop');
   };
 
   const handleSetDeviceTablet = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-tablet');
+    runCommandAndToggleActiveStyles(e.currentTarget, 'set-device-tablet');
+    // runCommandAndToggleActiveStyles(e.target, 'set-device-tablet');
   };
 
   const handleSetDeviceMobile = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
+    runCommandAndToggleActiveStyles(e.currentTarget, 'set-device-mobile');
+    // runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
   };
 
   const handleSwitchVisibility = (e) => {
@@ -635,7 +639,98 @@ const SimplePageEditor = ({ match, history }) => {
 
   return (
     <Spin spinning={isLoading}>
-      <div>
+      <Row style={{ height: '100vh' }}>
+        <Col id={TOP} xs={24} className={styles.topPanelContainer}>
+          <Row gutter={8} align="middle">
+            <Col flex="0 0 15%">
+              <Button
+                icon={<LeftOutlined />}
+                className={styles.dashboardButton}
+                type="text"
+                onClick={handleBackToDashboard}
+              >
+                Back to Dashboard
+              </Button>
+            </Col>
+            <Col flex="1 0 auto" className={styles.textAlignCenter}>
+              <div className={styles.devicesContainer}>
+                <button className="device-button active fa fa-desktop" onClick={handleSetDeviceDesktop} />
+                <button className="device-button fa fa-tablet" onClick={handleSetDeviceTablet} />
+                <button className="device-button fa fa-mobile" onClick={handleSetDeviceMobile} />
+              </div>
+            </Col>
+            <Col flex="0 0 15%" className={styles.textAlignRight}>
+              <Space align="center" className={styles.ctaButtonContainer}>
+                <Button className={styles.linkEditorButton} size="large" type="link" onClick={handlePreview}>
+                  Preview
+                </Button>
+                <Button
+                  className={styles.primaryEditorButton}
+                  size="large"
+                  type="primary"
+                  loading={isSaving}
+                  disabled={isSaving}
+                  onClick={handleSaveTemplate}
+                >
+                  {isSaving ? 'Saving...' : 'Publish'}
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Col>
+        <Col xs={24}>
+          <Row className={styles.contentContainer}>
+            <Col id={LEFT} flex="0 0 15%" className={styles.sidePanelContainer}>
+              <Row gutter={[12, 12]}>
+                <Col xs={24}>
+                  <Text className={styles.sectionHeading}>
+                    <FileTextOutlined className={styles.mr10} />{' '}
+                    {creatorPages?.find((page) => page.external_id === selectedPageId)?.name ?? ''}
+                  </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.buttonsContainer}>
+                    <button className="active" onClick={handleClickBlocks}>
+                      Components
+                    </button>
+                    <button onClick={handleClickLayers}>Layer Blocks</button>
+                  </div>
+                </Col>
+                <Col xs={24}>
+                  <div id={BLOCKS_PANEL_ID}></div>
+                  <div id={LAYERS_PANEL_ID}></div>
+                </Col>
+              </Row>
+            </Col>
+            <Col flex="1 0 auto" className={styles.middleContainer}>
+              <div id={BUILDER_CONTAINER_ID}></div>
+            </Col>
+            <Col id={RIGHT} flex="0 0 15%" className={styles.sidePanelContainer}>
+              <Row gutter={[12, 12]}>
+                <Col xs={24}>
+                  <Text className={styles.sectionHeading}>Customization</Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.buttonsContainer}>
+                    <button className="active" onClick={handleClickTraits}>
+                      Basic Mode
+                    </button>
+                    {/* <button onClick={handleClickStyles}>
+                      Advanced
+                    </button> */}
+                  </div>
+                </Col>
+                <Col xs={24}>
+                  <div id={EMPTY}>Please select a component first.</div>
+                  <div id={TRAITS_PANEL_ID}></div>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+
+      <div style={{ display: 'none' }}>
         <div id={EDITOR} className={styles.builderPage}>
           <div id={LEFT} className={styles.leftSection}>
             <div className={styles.topPanel}>
@@ -761,7 +856,7 @@ const SimplePageEditor = ({ match, history }) => {
                 </Col>
               </Row>
             </div>
-            <div id={BUILDER_CONTAINER_ID}></div>
+            {/* <div id={BUILDER_CONTAINER_ID}></div> */}
           </div>
           <div id={RIGHT} className={styles.rightSection}>
             <div className={styles.topPanel}>
@@ -775,10 +870,6 @@ const SimplePageEditor = ({ match, history }) => {
             </div>
             <div id={EMPTY}>Please select a component first.</div>
             <div id={RIGHT_INNER} className={styles.panelContainer}>
-              {/* <div id={STYLING}>
-                <div id={SELECTOR_PANEL_ID}></div>
-                <div id={STYLES_PANEL_ID}></div>
-              </div> */}
               <div id={TRAITS_PANEL_ID}></div>
             </div>
           </div>
