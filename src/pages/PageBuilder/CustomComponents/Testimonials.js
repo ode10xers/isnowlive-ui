@@ -1,59 +1,50 @@
-import { generateFontFamilyStylingText } from 'utils/helper.js';
+import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
+import { generateContainerWrapper } from '../Configs/blocks';
+import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
+import { genericFontTraits } from '../Configs/common/trait_sets';
 
-// TODO: Resimplify this
 export default (editor) => {
   editor.DomComponents.addType('testimonial-item', {
-    extend: 'text-with-image-section',
+    extend: 'simple-text-image-section',
     model: {
       defaults: {
+        ...fullyDisabledComponentFlags,
+        selectable: true,
+        badgable: true,
+        hoverable: true,
+        name: 'Testimonial Item',
         attributes: {
           class: 'testimonials-item',
         },
-        traits: [],
+        'font-family': 'Segoe UI',
+        'text-color': '#000000',
+        traits: [
+          {
+            type: 'image-cutout-select',
+          },
+          {
+            type: 'button',
+            text: 'Click to set image',
+            full: true,
+            label: 'Set Image',
+            command: 'set-image-url',
+          },
+          ...genericFontTraits,
+        ],
         components: [
           {
             type: 'custom-image',
           },
           {
-            type: 'text-section',
-            removable: false,
-            draggable: false,
-            droppable: false,
-            copyable: false,
-            attributes: {
-              class: 'text-section-container',
-            },
-            traits: [],
+            type: 'simple-text-section',
             components: [
               {
                 tagName: 'h2',
-                type: 'text',
+                type: 'text-section-heading',
                 content: 'John Doe',
-                name: 'Testimonial Name',
-                attributes: {},
-                traits: [],
-                toolbar: [],
-                removable: false,
-                draggable: false,
-                droppable: false,
-                highlightable: false,
-                editable: true,
-                copyable: false,
               },
               {
-                tagName: 'p',
-                type: 'text',
-                content: 'Overall satisfied and really happy!',
-                name: 'Testimonial Content',
-                attributes: {},
-                traits: [],
-                removable: false,
-                draggable: false,
-                droppable: false,
-                highlightable: false,
-                editable: true,
-                copyable: false,
-                toolbar: [],
+                type: 'text-section-content',
               },
             ],
           },
@@ -82,25 +73,10 @@ export default (editor) => {
       defaults: {
         tagName: 'div',
         name: 'Testimonials',
-        droppable: false,
+        ...fullyDisabledComponentFlags,
         attributes: {
-          class: 'testimonials-container',
+          class: 'testimonial-items-container',
         },
-        'font-family': 'Arial',
-        'text-color': '#000000',
-        traits: [
-          {
-            type: 'font-selector',
-            name: 'font-family',
-            changeProp: 1,
-          },
-          {
-            type: 'color',
-            label: 'Text color',
-            name: 'text-color',
-            changeProp: 1,
-          },
-        ],
         components: [
           {
             type: 'testimonial-item',
@@ -113,71 +89,86 @@ export default (editor) => {
           },
         ],
         styles: `
-          .with-background-image:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background-image: linear-gradient(to bottom right,rgba(0,0,0,0.6), rgba(0,0,0,0.6));
-            opacity: .6; 
-            z-index: 0;
-          }
-
-          .with-background-image * {
-            z-index: 1;
-          }
-
-          .testimonials-container {
+          .testimonial-items-container {
             display: flex;
             width: 100%;
             flex: 1 0 100%;
             gap: 8px;
             justify-content: space-evenly;
             padding: 8px;
+            text-align: center;
           }
 
           @media (max-width: 768px) {
-            .testimonials-container {
+            .testimonial-items-container {
               flex-direction: column;
             }
           }
         `,
       },
+    },
+  });
+
+  // Testimonials
+  editor.DomComponents.addType('testimonials-block', {
+    model: {
+      defaults: {
+        tagName: 'div',
+        name: 'Testimonials',
+        droppable: false,
+        resizable: {
+          tl: 0, // Top left
+          tc: 0, // Top center
+          tr: 0, // Top right
+          cl: 0, // Center left
+          cr: 0, // Center right
+          bl: 0, // Bottom left
+          bc: 1, // Bottom center
+          br: 0, // Bottom right
+        },
+        attributes: {
+          class: 'testimonial-container',
+        },
+        traits: [
+          ...textSectionTraits,
+          {
+            type: 'testimonial-items-list',
+            id: 'testimonial-items-list',
+            value: false,
+          },
+        ],
+        components: generateContainerWrapper([
+          { type: 'text-section-heading', attributes: {} },
+          { type: 'testimonials' },
+        ]),
+        'font-family': 'Segoe UI',
+        'text-color': '#000000',
+        'bg-color': '#ffffff',
+        styles: `
+          .testimonial-container {
+            text-align: center;
+          }
+        `,
+      },
       init() {
+        // We put a listener that triggers when an attribute changes
+        // In this case when text-color attribute changes
         this.on('change:text-color', this.handleTextColorChange);
+        this.on('change:bg-color', this.handleBGStyleChange);
         this.on('change:font-family', this.handleFontChange);
+
+        const componentCollection = this.components();
+        this.listenTo(componentCollection, 'add remove change', this.handleComponentsChange);
       },
-      handleTextColorChange() {
-        const textColor = this.props()['text-color'];
+      ...textSectionPropHandlers,
+      handleComponentsChange() {
+        // Here we're simply toggling the value
+        // to trigger the trait update
+        const targetTrait = 'testimonial-items-list';
+        const prevValue = this.getTrait(targetTrait).get('value');
 
-        //Propagate this inside
-        this.components().forEach((comp) => {
-          comp.setStyle({
-            ...comp.getStyle(),
-            color: `${textColor} !important`,
-          });
-        });
-
-        this.setStyle({
-          ...this.getStyle(),
-          color: `${textColor} !important`,
-        });
-      },
-      handleFontChange() {
-        const font = this.props()['font-family'];
-
-        this.components().forEach((comp) => {
-          comp.setStyle({
-            ...comp.getStyle(),
-            'font-family': generateFontFamilyStylingText(font),
-          });
-        });
-
-        this.setStyle({
-          ...this.getStyle(),
-          'font-family': generateFontFamilyStylingText(font),
+        this.updateTrait(targetTrait, {
+          value: !prevValue,
         });
       },
     },

@@ -11,6 +11,78 @@ const generateTemplateHTML = (label = '') => `
 `;
 
 export default (editor) => {
+  // NOTE : Testimonials
+  editor.TraitManager.addType('testimonial-items-list', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Testimonials'),
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['button-list-container']);
+
+      return el;
+    },
+
+    onUpdate({ elInput, component }) {
+      // This is getting the trait value from the set classes
+      const testimonialItems = component.findType('testimonial-item') ?? [];
+      // const elInput = elInput.querySelector('.button-list-container');
+
+      elInput.innerHTML = '';
+
+      testimonialItems.forEach((item) => {
+        const btnTraitContainer = document.createElement('div');
+        btnTraitContainer.classList.add(['button-item-container']);
+
+        const btnTraitContent = document.createElement('p');
+        btnTraitContent.classList.add(['button-trait-content']);
+        const targetHeading = item.findType('text-section-heading')[0] ?? null;
+        btnTraitContent.innerHTML =
+          targetHeading?.get('content') || targetHeading?.findType('textnode')[0]?.get('content') || 'John Doe';
+
+        const selectBtn = document.createElement('button');
+        selectBtn.classList.add(['button-trait-cta']);
+        selectBtn.innerText = 'Select';
+        selectBtn.onclick = () => {
+          editor.select(item);
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add(['button-trait-cta']);
+        deleteBtn.innerText = 'Delete';
+        deleteBtn.onclick = () => {
+          item.remove();
+          component.emitUpdate();
+        };
+
+        btnTraitContainer.appendChild(btnTraitContent);
+        btnTraitContainer.appendChild(selectBtn);
+        btnTraitContainer.appendChild(deleteBtn);
+
+        elInput.appendChild(btnTraitContainer);
+      });
+
+      const addNewBtn = document.createElement('button');
+      addNewBtn.classList.add(['button-trait-add']);
+      addNewBtn.innerText = 'Add New';
+      addNewBtn.onclick = () => {
+        // component.handleAddButtonLink();
+        component.append(
+          {
+            type: 'testimonial-items',
+            toolbar: [],
+            removable: false,
+          },
+          {
+            at: (component.components().length ?? 1) - 1,
+          }
+        );
+        component.emitUpdate();
+      };
+
+      elInput.appendChild(addNewBtn);
+    },
+  });
+
   // NOTE: Image Traits
   editor.TraitManager.addType('image-cutout-select', {
     // Expects as return a simple HTML string or an HTML element
@@ -23,11 +95,13 @@ export default (editor) => {
 
       const adjustBorderRadius = (value) => {
         const selected = editor.getSelected();
-        const targetComponent = selected.find('img')[0] ?? selected;
+        const targetComponent = selected.find('img') ?? [selected];
 
-        targetComponent.setStyle({
-          ...targetComponent.getStyle(),
-          'border-radius': value,
+        targetComponent.forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            'border-radius': value,
+          });
         });
       };
 
@@ -80,11 +154,13 @@ export default (editor) => {
       const valueText = elInput.querySelector('#border-radius-slider-value');
       valueText.innerHTML = sliderInput.value + (this.unit ?? 'px');
 
-      const targetComponent = component.find('img')[0] ?? component;
+      const targetComponent = component.find('img') ?? [component];
 
-      targetComponent.setStyle({
-        ...component.getStyle(),
-        'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
+      targetComponent.forEach((comp) => {
+        comp.setStyle({
+          ...comp.getStyle(),
+          'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
+        });
       });
     },
     // Update elements on the component change
@@ -527,6 +603,7 @@ export default (editor) => {
     },
   });
 
+  // TODO: We can make a generic list item handler based on this
   editor.TraitManager.addType('nav-links', {
     noLabel: true,
     templateInput: generateTemplateHTML('Navigation links'),
@@ -535,14 +612,6 @@ export default (editor) => {
       el.classList.add(['button-list-container']);
 
       return el;
-    },
-
-    onEvent({ elInput, component, event }) {
-      console.log(event);
-
-      if (event) {
-        return;
-      }
     },
 
     onUpdate({ elInput, component }) {
@@ -564,7 +633,6 @@ export default (editor) => {
         selectNavBtn.classList.add(['button-trait-cta']);
         selectNavBtn.innerText = 'Select';
         selectNavBtn.onclick = () => {
-          editor.selectToggle(btn);
           editor.select(btn);
         };
 
@@ -587,7 +655,17 @@ export default (editor) => {
       addNavBtn.classList.add(['button-trait-add']);
       addNavBtn.innerText = 'Add New Link';
       addNavBtn.onclick = () => {
-        component.handleAddButtonLink();
+        component.append(
+          {
+            type: 'link-buttons',
+            toolbar: [],
+            removable: false,
+          },
+          {
+            at: (component.components().length ?? 1) - 1,
+          }
+        );
+        component.emitUpdate();
         component.emitUpdate();
       };
 
@@ -630,11 +708,11 @@ export default (editor) => {
       const inputType = elInput.querySelector('#text-section-layout-select');
       const alignValue = inputType.value;
 
-      const textSection = component.find('.text-section-container')[0] ?? component;
+      const textSection = component.find('.text-section-container') ?? [component];
 
-      if (textSection) {
-        textSection.setStyle({
-          ...textSection.getStyle(),
+      textSection.forEach((comp) => {
+        comp.setStyle({
+          ...comp.getStyle(),
           'text-align': alignValue ?? 'left',
           'align-items':
             alignValue === 'center'
@@ -645,20 +723,8 @@ export default (editor) => {
               ? 'flex-end'
               : 'flex-start',
         });
-      } else {
-        component.setStyle({
-          ...component.getStyle(),
-          'text-align': alignValue ?? 'left',
-          'align-items':
-            alignValue === 'center'
-              ? alignValue
-              : alignValue === 'left'
-              ? 'flex-start'
-              : alignValue === 'right'
-              ? 'flex-end'
-              : 'flex-start',
-        });
-      }
+      });
+
       component.addAttributes({
         layout: inputType.value,
       });

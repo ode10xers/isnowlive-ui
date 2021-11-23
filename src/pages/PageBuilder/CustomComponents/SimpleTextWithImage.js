@@ -21,7 +21,6 @@ const textSectionWithImageTraits = [
 ];
 
 export default (editor) => {
-  // TODO: Rename this type for better understanding
   editor.DomComponents.addType('custom-image', {
     extend: 'image',
     model: {
@@ -91,12 +90,12 @@ export default (editor) => {
 
           .text-image-section-container.image-bottom > img {
             align-self: center;
-            max-width: 100%;
+            max-width: 280px;
           }
 
           .text-image-section-container.image-top > img {
             align-self: center;
-            max-width: 100%;
+            max-width: 280px;
           }
 
           @media (max-width: 768px) {
@@ -138,7 +137,7 @@ export default (editor) => {
         },
         traits: textSectionWithImageTraits,
         components: generateContainerWrapper([{ type: 'simple-text-image-section' }]),
-        'font-family': 'Arial',
+        'font-family': 'Segoe UI',
         'text-color': '#000000',
         'bg-color': '#ffffff',
       },
@@ -183,7 +182,7 @@ export default (editor) => {
         },
         traits: [...textSectionWithImageTraits, ...innerButtonTraits],
         components: generateContainerWrapper([{ type: 'simple-text-image-button-section' }]),
-        'font-family': 'Arial',
+        'font-family': 'Segoe UI',
         'text-color': '#000000',
         'bg-color': '#ffffff',
       },
@@ -228,7 +227,7 @@ export default (editor) => {
         },
         traits: [...textSectionWithImageTraits, ...socialLinksTraits],
         components: generateContainerWrapper([{ type: 'simple-bio-with-image-section' }]),
-        'font-family': 'Arial',
+        'font-family': 'Segoe UI',
         'text-color': '#000000',
         'bg-color': '#ffffff',
         'facebook-link': 'https://www.facebook.com',

@@ -19,49 +19,39 @@ const textPropHandlers = {
   handleFontChange() {
     const font = this.props()['font-family'];
 
-    const textSectionContainer = this.find('div.text-section-container')[0];
+    const textSectionContainer = this.find('div.text-section-container') ?? [this];
 
-    if (textSectionContainer) {
-      textSectionContainer.setStyle({
-        ...textSectionContainer.getStyle(),
+    textSectionContainer.forEach((innerComp) => {
+      innerComp.setStyle({
+        ...innerComp.getStyle(),
         'font-family': `${generateFontFamilyStylingText(font)} !important`,
       });
 
-      textSectionContainer.components().forEach((comp) => {
+      innerComp.components().forEach((comp) => {
         comp.setStyle({
           ...comp.getStyle(),
           'font-family': `${generateFontFamilyStylingText(font)} !important`,
         });
       });
-    } else {
-      this.setStyle({
-        ...this.getStyle(),
-        'font-family': `${generateFontFamilyStylingText(font)} !important`,
-      });
-    }
+    });
   },
   handleTextColorChange() {
     const textColor = this.props()['text-color'];
-    const textSectionContainer = this.find('div.text-section-container')[0];
+    const textSectionContainer = this.find('div.text-section-container') ?? [this];
 
-    if (textSectionContainer) {
-      textSectionContainer.setStyle({
-        ...textSectionContainer.getStyle(),
+    textSectionContainer.forEach((innerComp) => {
+      innerComp.setStyle({
+        ...innerComp.getStyle(),
         color: `${textColor} !important`,
       });
 
-      textSectionContainer.components().forEach((comp) => {
+      innerComp.components().forEach((comp) => {
         comp.setStyle({
           ...comp.getStyle(),
           color: `${textColor} !important`,
         });
       });
-    } else {
-      this.setStyle({
-        ...this.getStyle(),
-        color: `${textColor} !important`,
-      });
-    }
+    });
   },
 };
 
@@ -111,13 +101,13 @@ export default (editor) => {
     model: {
       defaults: {
         tagName: 'h1',
-        content: 'Section Title',
         name: 'Section Title',
         attributes: {
           class: 'text-section-heading',
         },
         'font-family': 'Segoe UI',
         'text-color': '#262626',
+        content: 'Ad astra per aspera',
         traits: contextualFontTraits,
         ...fullyDisabledComponentFlags,
         editable: true,
@@ -141,13 +131,15 @@ export default (editor) => {
       defaults: {
         tagName: 'p',
         type: 'text',
-        content: 'Section Content',
         name: 'Section Content',
         attributes: {
           class: 'text-section-content',
         },
         'font-family': 'Segoe UI',
         'text-color': '#484949',
+        content: `
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vestibulum vestibulum est at fringilla. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed tempus augue vel eros elementum mollis.
+        `,
         traits: contextualFontTraits,
         ...fullyDisabledComponentFlags,
         editable: true,
@@ -184,6 +176,7 @@ export default (editor) => {
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            text-align:center;
           }
 
           .text-section-container * {
@@ -215,7 +208,7 @@ export default (editor) => {
         },
         traits: textSectionTraits,
         components: generateContainerWrapper([{ type: 'simple-text-section' }]),
-        'font-family': 'Arial',
+        'font-family': 'Segoe UI',
         'text-color': '#000000',
         'bg-color': '#ffffff',
       },
@@ -258,7 +251,7 @@ export default (editor) => {
         },
         traits: [...textSectionTraits, ...innerButtonTraits],
         components: generateContainerWrapper([{ type: 'simple-text-section-with-button' }]),
-        'font-family': 'Arial',
+        'font-family': 'Segoe UI',
         'text-color': '#000000',
         'bg-color': '#ffffff',
       },

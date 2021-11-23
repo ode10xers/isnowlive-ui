@@ -22,7 +22,7 @@ export const generateContainerWrapper = (innerComponents = []) => [
   },
 ];
 
-export default [
+const passionProductListBlocks = [
   {
     id: 'passion-session-list-block',
     label: '<b> Passion Session List </b>',
@@ -73,46 +73,10 @@ export default [
       type: 'passion-subscription-list-block',
     },
   },
-  {
-    id: 'testimonials',
-    label: '<b> Testimonials </b>',
-    droppable: false,
-    resizable: true,
-    category: categories.LAYOUTS,
-    content: {
-      type: 'container',
-      components: [
-        {
-          type: 'fixed-width-container',
-          components: [
-            {
-              tagName: 'h1',
-              type: 'text',
-              content: 'Testimonials',
-              name: 'Testimonial Section Title',
-              attributes: {},
-              traits: [],
-              toolbar: [
-                {
-                  attributes: { class: 'fa fa-trash-o' },
-                  command: 'tlb-delete',
-                },
-              ],
-              removable: true,
-              draggable: false,
-              droppable: false,
-              highlightable: false,
-              editable: true,
-              copyable: false,
-            },
-            {
-              type: 'testimonials',
-            },
-          ],
-        },
-      ],
-    },
-  },
+];
+
+export default [
+  ...passionProductListBlocks,
   {
     id: 'simple-text-section',
     label: '<b> Simple Text Section </b>',
@@ -153,14 +117,12 @@ export default [
       type: 'simple-bio-section-block',
     },
   },
-  // {
-  //   id: 'link-buttons',
-  //   label: '<b> Link Button </b>',
-  //   droppable: false,
-  //   resizable: true,
-  //   category: categories.BASIC,
-  //   content: {
-  //     type: 'link-buttons',
-  //   },
-  // },
+  {
+    id: 'testimonials',
+    label: '<b> Testimonials </b>',
+    category: categories.LAYOUTS,
+    content: {
+      type: 'testimonials-block',
+    },
+  },
 ];

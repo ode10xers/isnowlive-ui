@@ -14,7 +14,7 @@ export default (editor) => {
           target: '_blank',
           class: 'link-btn button-type-link',
         },
-        'font-family': 'Arial',
+        'font-family': 'Segoe UI',
         'text-color': '#000000',
         'bg-style': '#ffffff',
         traits: [

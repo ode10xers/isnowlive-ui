@@ -230,7 +230,6 @@ export default (editor) => {
         this.on('change:bg-color', this.handleBGColorChange);
 
         const componentCollection = this.components();
-
         this.listenTo(componentCollection, 'add remove', this.handleComponentsChange);
       },
       handleBGColorChange() {
@@ -253,24 +252,14 @@ export default (editor) => {
         });
       },
       handleComponentsChange() {
+        // Here we're simply toggling the value
+        // to trigger the trait update
         const targetTrait = 'nav-links';
         const prevValue = this.getTrait(targetTrait).get('value');
 
         this.updateTrait(targetTrait, {
           value: !prevValue,
         });
-      },
-      handleAddButtonLink() {
-        this.append(
-          {
-            type: 'link-buttons',
-            toolbar: [],
-            removable: false,
-          },
-          {
-            at: (this.components().length ?? 1) - 1,
-          }
-        );
       },
     },
   });
