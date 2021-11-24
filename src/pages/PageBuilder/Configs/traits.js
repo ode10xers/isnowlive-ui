@@ -437,7 +437,7 @@ export default (editor) => {
       const options = [
         { id: 'link', name: 'Link' },
         { id: 'outlined', name: 'Outlined' },
-        // { id: 'filled', name: 'Filled' },
+        { id: 'filled', name: 'Filled' },
       ];
 
       const el = document.createElement('div');

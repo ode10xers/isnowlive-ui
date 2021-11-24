@@ -387,6 +387,11 @@ const SimplePageEditor = ({ match, history }) => {
   useEffect(() => {
     fetchCreatorCustomPages();
     initializeGrapesJSEditor();
+
+    return () => {
+      console.log('Unmounted');
+      window.onbeforeunload = null;
+    };
   }, [initializeGrapesJSEditor, fetchCreatorCustomPages]);
 
   // Logic for updating autosave time

@@ -84,11 +84,19 @@ export default (editor) => {
 
           .link-btn.button-type-link {
             border: none;
+            color: #1890ff;
           }
 
           .link-btn.button-type-outlined {
             border: 1px solid currentColor;
             border-radius: 8px;
+            color: #1890ff;
+            background: transparent;
+          }
+
+          .link-btn.button-type-filled {
+            background-color: #1890ff;
+            color: #ffffff;
           }
         `,
       },
@@ -155,7 +163,7 @@ export default (editor) => {
         attributes: {
           href: '#',
           target: '_blank',
-          class: 'text-section-btn button-type-link',
+          class: 'text-section-btn button-type-filled',
         },
         styles: `
           .text-section-btn {
@@ -173,6 +181,13 @@ export default (editor) => {
           .text-section-btn.button-type-outlined {
             border: 1px solid currentColor;
             border-radius: 8px;
+            color: #1890ff;
+            background: transparent;
+          }
+
+          .text-section-btn.button-type-filled {
+            background-color: #1890ff;
+            color: #ffffff;
           }
         `,
       },
