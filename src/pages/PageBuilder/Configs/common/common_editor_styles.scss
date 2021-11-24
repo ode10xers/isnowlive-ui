@@ -1,5 +1,9 @@
 @import '../../../../styles/variables';
 
+.saveTimeText {
+  color: map-get($map: $colors, $key: 'Mako');
+}
+
 .builderPage {
   display: flex;
   justify-content: flex-start;

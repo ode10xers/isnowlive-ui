@@ -135,6 +135,27 @@
     padding: 0 20px;
   }
 
+  .helperContainer {
+    font-size: 18px;
+    padding: 8px 12px;
+
+    :global {
+      .helper-button {
+        min-width: 32px;
+        border: none;
+        padding: 6px;
+        color: map-get($map: $colors, $key: 'Endeavour');
+        background: transparent;
+      }
+
+      .helper-button:hover {
+        background-color: map-get($map: $colors, $key: 'Endeavour');
+        color: map-get($map: $colors, $key: 'White');
+        border-radius: 8px;
+      }
+    }
+  }
+
   .devicesContainer {
     display:flex;
     width: 100%;

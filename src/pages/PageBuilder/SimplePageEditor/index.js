@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { generatePath } from 'react-router-dom';
 
 import { Spin, Row, Col, Space, Typography, Button, message } from 'antd';
 import { LeftOutlined, FileTextOutlined } from '@ant-design/icons';
@@ -48,7 +47,7 @@ const { Text } = Typography;
 
 const { BUILDER_CONTAINER_ID, TRAITS_PANEL_ID, LAYERS_PANEL_ID, BLOCKS_PANEL_ID } = elementIds;
 
-const { EDITOR, RIGHT, RIGHT_INNER, TOP, LEFT, EMPTY } = sectionIds;
+const { RIGHT, TOP, LEFT, EMPTY } = sectionIds;
 
 const SimplePageEditor = ({ match, history }) => {
   const targetPageId = match.params.page_id;
@@ -470,10 +469,10 @@ const SimplePageEditor = ({ match, history }) => {
   // Logic to handle rendering right panels
   useEffect(() => {
     if (!isComponentSelected) {
-      document.getElementById(RIGHT_INNER).style.display = 'none';
+      document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
       document.getElementById(EMPTY).style.display = 'block';
     } else {
-      document.getElementById(RIGHT_INNER).style.display = 'block';
+      document.getElementById(TRAITS_PANEL_ID).style.display = 'block';
       document.getElementById(EMPTY).style.display = 'none';
     }
   }, [isComponentSelected]);
@@ -542,12 +541,12 @@ const SimplePageEditor = ({ match, history }) => {
   //   }
   // };
 
-  const handleClickTraits = (e) => {
-    if (runCommandAndToggleActiveStyles(e.target, 'open-tm')) {
-      // document.getElementById(STYLING).style.display = 'none';
-      document.getElementById(TRAITS_PANEL_ID).style.display = 'block';
-    }
-  };
+  // const handleClickTraits = (e) => {
+  //   if (runCommandAndToggleActiveStyles(e.target, 'open-tm')) {
+  //     // document.getElementById(STYLING).style.display = 'none';
+  //     document.getElementById(TRAITS_PANEL_ID).style.display = 'block';
+  //   }
+  // };
 
   const handleSetDeviceDesktop = (e) => {
     runCommandAndToggleActiveStyles(e.currentTarget, 'set-device-desktop');
@@ -564,37 +563,37 @@ const SimplePageEditor = ({ match, history }) => {
     // runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
   };
 
-  const handleSwitchVisibility = (e) => {
-    if (gjsEditor) {
-      const isVisibilityActive = gjsEditor.Commands.isActive('sw-visibility');
+  // const handleSwitchVisibility = (e) => {
+  //   if (gjsEditor) {
+  //     const isVisibilityActive = gjsEditor.Commands.isActive('sw-visibility');
 
-      if (isVisibilityActive) {
-        gjsEditor.stopCommand('sw-visibility');
-        e.target.classList.remove('active');
-      } else {
-        gjsEditor.runCommand('sw-visibility');
-        e.target.classList.add('active');
-      }
-    }
-  };
+  //     if (isVisibilityActive) {
+  //       gjsEditor.stopCommand('sw-visibility');
+  //       e.target.classList.remove('active');
+  //     } else {
+  //       gjsEditor.runCommand('sw-visibility');
+  //       e.target.classList.add('active');
+  //     }
+  //   }
+  // };
 
   const handlePreview = () => {
     runSimpleCommand('preview');
   };
 
-  const handleToggleFullscreen = (e) => {
-    if (gjsEditor) {
-      const isInFullscreen = gjsEditor.Commands.isActive('fullscreen');
+  // const handleToggleFullscreen = (e) => {
+  //   if (gjsEditor) {
+  //     const isInFullscreen = gjsEditor.Commands.isActive('fullscreen');
 
-      if (isInFullscreen) {
-        gjsEditor.stopCommand('fullscreen');
-        e.target.classList.remove('active');
-      } else {
-        gjsEditor.runCommand('fullscreen', { target: document.getElementById(EDITOR) });
-        e.target.classList.add(['active']);
-      }
-    }
-  };
+  //     if (isInFullscreen) {
+  //       gjsEditor.stopCommand('fullscreen');
+  //       e.target.classList.remove('active');
+  //     } else {
+  //       gjsEditor.runCommand('fullscreen', { target: document.getElementById(EDITOR) });
+  //       e.target.classList.add(['active']);
+  //     }
+  //   }
+  // };
 
   const handleUndo = () => {
     runSimpleCommand('core:undo');
@@ -609,21 +608,21 @@ const SimplePageEditor = ({ match, history }) => {
     runSimpleCommand('save-as-json');
   };
 
-  const handleCleanCanvas = () => {
-    // Custom command, comes from grapesjs-preset-webpage
-    // runSimpleCommand('canvas-clear');
-    if (gjsEditor) {
-      if (window.confirm('Are you sure you want to clear the canvas?')) {
-        gjsEditor.runCommand('core:canvas-clear');
-      }
-    }
-  };
+  // const handleCleanCanvas = () => {
+  //   // Custom command, comes from grapesjs-preset-webpage
+  //   // runSimpleCommand('canvas-clear');
+  //   if (gjsEditor) {
+  //     if (window.confirm('Are you sure you want to clear the canvas?')) {
+  //       gjsEditor.runCommand('core:canvas-clear');
+  //     }
+  //   }
+  // };
 
-  const handleAdvancedMode = () => {
-    if (confirmDirtyCount(gjsEditor)) {
-      history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
-    }
-  };
+  // const handleAdvancedMode = () => {
+  //   if (confirmDirtyCount(gjsEditor)) {
+  //     history.push(generatePath(Routes.creatorDashboard.customPages.editor, { page_id: targetPageId }));
+  //   }
+  // };
 
   //#endregion End of Editor Button Handlers
 
@@ -643,11 +642,28 @@ const SimplePageEditor = ({ match, history }) => {
               </Button>
             </Col>
             <Col flex="1 0 auto" className={styles.textAlignCenter}>
-              <div className={styles.devicesContainer}>
-                <button className="device-button active fa fa-desktop" onClick={handleSetDeviceDesktop} />
-                <button className="device-button fa fa-tablet" onClick={handleSetDeviceTablet} />
-                <button className="device-button fa fa-mobile" onClick={handleSetDeviceMobile} />
-              </div>
+              <Row gutter={8} align="middle">
+                <Col flex="0 0 200px">
+                  {isSaving ? (
+                    <Spin />
+                  ) : lastSaveTime ? (
+                    <Text className={styles.saveTimeText}>Last Saved : {lastSaveTime.toLocaleTimeString()}</Text>
+                  ) : null}
+                </Col>
+                <Col flex="1 0 auto">
+                  <div className={styles.devicesContainer}>
+                    <button className="device-button active fa fa-desktop" onClick={handleSetDeviceDesktop} />
+                    <button className="device-button fa fa-tablet" onClick={handleSetDeviceTablet} />
+                    <button className="device-button fa fa-mobile" onClick={handleSetDeviceMobile} />
+                  </div>
+                </Col>
+                <Col flex="0 0 100px">
+                  <Space className={styles.helperContainer}>
+                    <button className="helper-button fa fa-undo" onClick={handleUndo} />
+                    <button className="helper-button fa fa-repeat" onClick={handleRedo} />
+                  </Space>
+                </Col>
+              </Row>
             </Col>
             <Col flex="0 0 15%" className={styles.textAlignRight}>
               <Space align="center" className={styles.ctaButtonContainer}>
@@ -700,16 +716,16 @@ const SimplePageEditor = ({ match, history }) => {
                 <Col xs={24}>
                   <Text className={styles.sectionHeading}>Customization</Text>
                 </Col>
-                <Col xs={24}>
+                {/* <Col xs={24}>
                   <div className={styles.buttonsContainer}>
                     <button className="active" onClick={handleClickTraits}>
                       Basic Mode
                     </button>
-                    {/* <button onClick={handleClickStyles}>
+                    <button onClick={handleClickStyles}>
                       Advanced
-                    </button> */}
+                    </button>
                   </div>
-                </Col>
+                </Col> */}
                 <Col xs={24}>
                   <div id={EMPTY}>Please select a component first.</div>
                   <div id={TRAITS_PANEL_ID}></div>
@@ -719,152 +735,6 @@ const SimplePageEditor = ({ match, history }) => {
           </Row>
         </Col>
       </Row>
-
-      <div style={{ display: 'none' }}>
-        <div id={EDITOR} className={styles.builderPage}>
-          <div id={LEFT} className={styles.leftSection}>
-            <div className={styles.topPanel}>
-              <button
-                data-tooltip="Component List"
-                data-tooltip-pos="bottom"
-                className="fa fa-th-large active"
-                onClick={handleClickBlocks}
-              ></button>
-              <button
-                data-tooltip="Navigator"
-                data-tooltip-pos="bottom"
-                className="fa fa-bars"
-                onClick={handleClickLayers}
-              ></button>
-            </div>
-            <div className={styles.panelContainer}>
-              <div id={BLOCKS_PANEL_ID}></div>
-              <div id={LAYERS_PANEL_ID}></div>
-            </div>
-          </div>
-          <div className={styles.middleSection}>
-            <div id={TOP} className={styles.topPanel}>
-              <Row gutter={8} justify="space-around" className={styles.buttonsContainer}>
-                <Col flex="0 0 45%" className={styles.pageSelectorContainer}>
-                  <Space>
-                    <Button
-                      icon={<LeftOutlined />}
-                      className={styles.backButton}
-                      size="small"
-                      type="link"
-                      onClick={handleBackToDashboard}
-                    >
-                      Back to Dashboard
-                    </Button>
-                    <Text className={styles.whiteText} strong>
-                      {creatorPages?.find((page) => page.external_id === selectedPageId)?.name ?? ''}
-                    </Text>
-                    {isSaving ? (
-                      <Spin />
-                    ) : lastSaveTime ? (
-                      <Text className={styles.saveTimeText}>Last Saved : {lastSaveTime.toLocaleTimeString()}</Text>
-                    ) : null}
-                  </Space>
-                </Col>
-                <Col flex="0 0 120px" className={styles.textAlignCenter}>
-                  <button
-                    data-tooltip="Desktop mode"
-                    data-tooltip-pos="bottom"
-                    className="fa fa-desktop active"
-                    onClick={handleSetDeviceDesktop}
-                  ></button>
-                  <button
-                    data-tooltip="Tablet mode"
-                    data-tooltip-pos="bottom"
-                    className="fa fa-tablet"
-                    onClick={handleSetDeviceTablet}
-                  ></button>
-                  <button
-                    data-tooltip="Phone mode"
-                    data-tooltip-pos="bottom"
-                    className="fa fa-mobile"
-                    onClick={handleSetDeviceMobile}
-                  ></button>
-                </Col>
-                <Col flex="1 0 auto" className={styles.textAlignRight}>
-                  <Space align="center">
-                    <button
-                      data-tooltip="Toggle component borders"
-                      data-tooltip-pos="bottom"
-                      // className="fa fa-check-square-o"
-                      className="fa fa-square-o"
-                      onClick={handleSwitchVisibility}
-                    ></button>
-                    <button
-                      data-tooltip="Toggle preview"
-                      data-tooltip-pos="bottom"
-                      className="fa fa-eye"
-                      onClick={handlePreview}
-                    ></button>
-                    <button
-                      data-tooltip="Toggle fullscreen"
-                      data-tooltip-pos="bottom"
-                      className="fa fa-arrows-alt"
-                      onClick={handleToggleFullscreen}
-                    ></button>
-                    {/* <button className="fa fa-code" onClick={handleShowCode}></button> */}
-                    <button
-                      data-tooltip="Undo"
-                      data-tooltip-pos="bottom"
-                      className="fa fa-undo"
-                      onClick={handleUndo}
-                    ></button>
-                    <button
-                      data-tooltip="Redo"
-                      data-tooltip-pos="bottom"
-                      className="fa fa-repeat"
-                      onClick={handleRedo}
-                    ></button>
-                    {isSaving ? (
-                      <button data-tooltip="Saving..." data-tooltip-pos="bottom" className="fa fa-spinner"></button>
-                    ) : (
-                      <button
-                        data-tooltip="Save Page"
-                        data-tooltip-pos="bottom"
-                        className="fa fa-floppy-o"
-                        onClick={handleSaveTemplate}
-                      ></button>
-                    )}
-                    <button
-                      data-tooltip="Clear canvas"
-                      data-tooltip-pos="bottom"
-                      className="fa fa-trash"
-                      onClick={handleCleanCanvas}
-                    ></button>
-                    <button
-                      data-tooltip="Advanced mode"
-                      data-tooltip-pos="bottom"
-                      className="fa fa-gears"
-                      onClick={handleAdvancedMode}
-                    ></button>
-                  </Space>
-                </Col>
-              </Row>
-            </div>
-            {/* <div id={BUILDER_CONTAINER_ID}></div> */}
-          </div>
-          <div id={RIGHT} className={styles.rightSection}>
-            <div className={styles.topPanel}>
-              {/* <button className="fa fa-paint-brush active" onClick={handleClickStyles}></button> */}
-              <button
-                data-tooltip="Component Settings"
-                data-tooltip-pos="bottom"
-                className="fa fa-cog active"
-                onClick={handleClickTraits}
-              ></button>
-            </div>
-            <div id={EMPTY}>Please select a component first.</div>
-            <div id={RIGHT_INNER} className={styles.panelContainer}>
-              <div id={TRAITS_PANEL_ID}></div>
-            </div>
-          </div>
-        </div>
-      </div>
     </Spin>
   );
 };
