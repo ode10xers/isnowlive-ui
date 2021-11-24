@@ -805,7 +805,7 @@ const Videos = () => {
   return (
     <div className={styles.box}>
       <UploadVideoModal
-        key={selectedVideo?.external_id ?? 'new'}
+        // key={selectedVideo?.external_id ?? 'new'}
         formPart={formPart}
         setFormPart={setFormPart}
         visible={createModalVisible}

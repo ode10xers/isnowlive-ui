@@ -1397,7 +1397,7 @@ const UploadVideoModal = ({
           <Form
             name="uploadVideoForm"
             form={uploadForm}
-            initialValue={uploadVideoFormInitialValues}
+            initialValues={uploadVideoFormInitialValues}
             onFinish={handleUploadVideoFormFinish}
             scrollToFirstError={true}
           >
