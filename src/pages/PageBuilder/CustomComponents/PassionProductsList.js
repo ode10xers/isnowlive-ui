@@ -8,6 +8,8 @@ import PassionCourseList from 'components/PageEditorPassionComponents/CourseList
 import PassionPassList from 'components/PageEditorPassionComponents/PassList';
 import PassionSubscriptionList from 'components/PageEditorPassionComponents/SubscriptionList';
 
+import defaultBlockToolbar from '../Configs/common/toolbar.js';
+
 /* 
 NOTE: Old flag used in the React Components 
   stylable: false,
@@ -89,6 +91,8 @@ export default (editor) => {
           tagName: 'div',
           name: comp.name,
           droppable: false,
+          toolbar: defaultBlockToolbar,
+
           attributes: {},
           traits: [],
           components: generateContainerWrapper([{ type: comp.type }]),

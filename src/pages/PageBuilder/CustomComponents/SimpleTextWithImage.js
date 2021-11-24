@@ -3,6 +3,8 @@ import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { innerButtonTraits, socialLinksTraits } from '../Configs/common/trait_sets';
 import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
 
+import defaultBlockToolbar from '../Configs/common/toolbar.js';
+
 const textSectionWithImageTraits = [
   {
     type: 'image-cutout-select',
@@ -131,6 +133,8 @@ export default (editor) => {
         tagName: 'div',
         name: 'Simple Text with Image Section',
         droppable: false,
+        toolbar: defaultBlockToolbar,
+
         attributes: {
           layout: 'center',
           class: 'text-image-section-container',
@@ -176,6 +180,8 @@ export default (editor) => {
         tagName: 'div',
         name: 'Simple Text with Image Section',
         droppable: false,
+        toolbar: defaultBlockToolbar,
+
         attributes: {
           layout: 'center',
           class: 'text-image-section-container',
@@ -221,6 +227,8 @@ export default (editor) => {
         tagName: 'div',
         name: 'Simple Text with Image Section',
         droppable: false,
+        toolbar: defaultBlockToolbar,
+
         attributes: {
           layout: 'center',
           class: 'text-image-section-container',

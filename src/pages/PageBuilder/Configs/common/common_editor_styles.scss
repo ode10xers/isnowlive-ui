@@ -94,6 +94,29 @@
     padding: 12px;
   }
 
+  // Handling Click UIs
+  #gjs-tools {
+    .gjs-toolbar {
+      top: 8px !important;
+      right: 12px !important;
+      left: auto !important;
+      background-color: map-get($colors, 'Endeavour');
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+  }
+
+  .gjs-tools {
+    .gjs-badge {
+      top: 8px !important;
+      left: 12px !important;
+      right: auto !important;
+      background-color: map-get($colors, 'Endeavour');
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+  }
+
   .gjs-cv-canvas {
     top: 0;
     left: 0;

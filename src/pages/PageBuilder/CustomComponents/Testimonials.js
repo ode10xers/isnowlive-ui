@@ -3,6 +3,8 @@ import { generateContainerWrapper } from '../Configs/blocks';
 import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
 import { genericFontTraits } from '../Configs/common/trait_sets';
 
+import defaultBlockToolbar from '../Configs/common/toolbar.js';
+
 export default (editor) => {
   editor.DomComponents.addType('testimonial-item', {
     extend: 'simple-text-image-section',
@@ -117,6 +119,7 @@ export default (editor) => {
         tagName: 'div',
         name: 'Testimonials',
         droppable: false,
+        toolbar: defaultBlockToolbar,
         attributes: {
           class: 'testimonial-container',
         },

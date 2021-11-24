@@ -17,11 +17,24 @@ const supportedDeviceTypes = [
 ];
 
 export default (editor) => {
-  editor.Commands.add('core:component-exit', (editor) => {
+  // Previously we're overriding the "Exit" command, now we make it custom command
+  // editor.Commands.add('core:component-exit', (editor) => {
+  editor.Commands.add('tlb-move-component-up', (editor) => {
     const selectedComponent = editor.getSelected();
     const selectedParent = selectedComponent.parent();
     const targetIndex = Math.max(0, selectedComponent.index() - 1);
     selectedComponent.move(selectedParent, { at: targetIndex });
+    editor.selectToggle(selectedComponent);
+    editor.selectToggle(selectedComponent);
+  });
+
+  editor.Commands.add('tlb-move-component-down', (editor) => {
+    const selectedComponent = editor.getSelected();
+    const selectedParent = selectedComponent.parent();
+    const targetIndex = Math.min(selectedParent.components().length - 1, selectedComponent.index() + 1);
+    selectedComponent.move(selectedParent, { at: targetIndex });
+    editor.selectToggle(selectedComponent);
+    editor.selectToggle(selectedComponent);
   });
 
   // Override import command

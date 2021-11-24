@@ -9,6 +9,8 @@ import {
   socialLinksTraits,
 } from '../Configs/common/trait_sets';
 
+import defaultBlockToolbar from '../Configs/common/toolbar.js';
+
 const websiteIcon = require('assets/icons/website/website.svg');
 const facebookIcon = require('assets/icons/facebook/facebook.svg');
 const linkedinIcon = require('assets/icons/linkedin/linkedin.svg');
@@ -208,6 +210,8 @@ export default (editor) => {
         tagName: 'div',
         name: 'Simple Text Section',
         droppable: false,
+        toolbar: defaultBlockToolbar,
+
         attributes: {
           layout: 'center',
           class: 'simple-text-section-block',
@@ -251,6 +255,8 @@ export default (editor) => {
         tagName: 'div',
         name: 'Simple Text With Button Section',
         droppable: false,
+        toolbar: defaultBlockToolbar,
+
         attributes: {
           layout: 'center',
           class: 'simple-text-section-block',
