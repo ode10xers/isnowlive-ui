@@ -111,16 +111,18 @@ export default (editor) => {
       addNewBtn.innerText = 'Add New';
       addNewBtn.onclick = () => {
         // component.handleAddButtonLink();
-        component.append(
-          {
-            type: 'testimonial-items',
-            toolbar: [],
-            removable: false,
-          },
-          {
-            at: (component.components().length ?? 1) - 1,
-          }
-        );
+        const testimonialContainer = component.findType('testimonials')[0] ?? null;
+
+        if (testimonialContainer) {
+          testimonialContainer.append(
+            {
+              type: 'testimonial-item',
+            },
+            {
+              at: testimonialContainer.components().length ?? 1,
+            }
+          );
+        }
         component.emitUpdate();
       };
 
@@ -710,7 +712,6 @@ export default (editor) => {
             at: (component.components().length ?? 1) - 1,
           }
         );
-        component.emitUpdate();
         component.emitUpdate();
       };
 

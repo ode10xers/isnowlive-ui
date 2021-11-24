@@ -52,7 +52,7 @@ export default (editor) => {
         styles: `
           .testimonials-item {
             flex-direction: column;
-            flex: 1 1 100%;
+            flex: 0 0 30%;
             text-align: center;
           }
 
@@ -97,6 +97,7 @@ export default (editor) => {
             justify-content: space-evenly;
             padding: 8px;
             text-align: center;
+            flex-wrap: wrap;
           }
 
           @media (max-width: 768px) {
@@ -116,16 +117,6 @@ export default (editor) => {
         tagName: 'div',
         name: 'Testimonials',
         droppable: false,
-        resizable: {
-          tl: 0, // Top left
-          tc: 0, // Top center
-          tr: 0, // Top right
-          cl: 0, // Center left
-          cr: 0, // Center right
-          bl: 0, // Bottom left
-          bc: 1, // Bottom center
-          br: 0, // Bottom right
-        },
         attributes: {
           class: 'testimonial-container',
         },
@@ -157,7 +148,8 @@ export default (editor) => {
         this.on('change:bg-color', this.handleBGStyleChange);
         this.on('change:font-family', this.handleFontChange);
 
-        const componentCollection = this.components();
+        const innerItemsList = this.findType('testimonials')[0] ?? null;
+        const componentCollection = innerItemsList ? innerItemsList.components() : this.components();
         this.listenTo(componentCollection, 'add remove change', this.handleComponentsChange);
       },
       ...textSectionPropHandlers,
