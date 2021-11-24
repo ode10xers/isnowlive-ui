@@ -95,6 +95,7 @@ const formInitialValues = {
   classList: [],
   videoType: videoPriceTypes.FREE.name,
   price: 0,
+  validity: 1,
   watch_limit: 1,
   video_course_type: 'normal',
   videoTagType: 'anyone',
