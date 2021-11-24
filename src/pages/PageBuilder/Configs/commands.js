@@ -130,21 +130,36 @@ export default (editor) => {
             const closestImage = selected.findType('custom-image')[0] ?? null;
 
             if (closestImage) {
-              closestImage.addAttributes({ src: asset.getSrc() });
+              // closestImage.addAttributes({ src: asset.getSrc() });
+              closestImage.setAttributes({
+                ...closestImage.getAttributes(),
+                src: asset.getSrc(),
+              });
+              closestImage.set('src', asset.getSrc(), { silent: 1 });
               isSet = true;
-            }
-          } else {
-            const closestImage = selected.find('img')[0] ?? null;
-            if (closestImage && closestImage.is('image')) {
-              closestImage.addAttributes({ src: asset.getSrc(), width: '100%' });
+            } else if (selected.is('image') || selected.is('custom-image')) {
+              // selected.addAttributes({ src: asset.getSrc() });
+              selected.setAttributes({
+                ...selected.getAttributes(),
+                src: asset.getSrc(),
+              });
+              selected.set('src', asset.getSrc(), { silent: 1 });
+
               isSet = true;
             }
           }
+          // else {
+          //   const closestImage = selected.find('img')[0] ?? null;
+          //   if (closestImage && closestImage.is('image')) {
+          //     closestImage.addAttributes({ src: asset.getSrc(), width: '100%' });
+          //     isSet = true;
+          //   }
+          // }
 
           // The default AssetManager UI will trigger `select(asset, false)` on asset click
           // and `select(asset, true)` on double-click
           if (isSet) {
-            complete && editor.AssetManager.close();
+            editor.AssetManager.close();
           } else {
             editor.log('Failed to set image after Asset Manager Select', {
               ns: 'asset-manager-close',

@@ -38,7 +38,6 @@ import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
 import { confirmDirtyCount, customEditorInitializationLogic } from 'utils/pageEditor.js';
-import { isValidCSSColor } from 'utils/colors';
 
 import { useGlobalContext } from 'services/globalContext.js';
 
@@ -232,25 +231,11 @@ const SimplePageEditor = ({ match, history }) => {
     wrapper.addTrait({
       type: 'custom-color-picker',
       label: 'Background color',
-      name: 'bg-style',
+      name: 'bg-color',
       changeProp: true,
     });
     wrapper.on('change:bg-style', function () {
-      const bgStyle = wrapper.props()['bg-style'];
-      const componentList = wrapper.components();
-
-      const isBackgroundColor = isValidCSSColor(bgStyle);
-
-      // Check for child components with the same property
-      const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-style'));
-      validChildList.forEach((childComp) => {
-        // NOTE: Right now this only works if the prop name and trait name is same
-        childComp.updateTrait('bg-style', {
-          type: 'custom-color-picker',
-          value: isBackgroundColor ? bgStyle : 'transparent',
-        });
-      });
-
+      const bgStyle = this.props()['bg-color'];
       wrapper.setStyle({
         ...wrapper.getStyle(),
         background: bgStyle,
@@ -259,7 +244,7 @@ const SimplePageEditor = ({ match, history }) => {
     // TODO: This can also be the way to update component implementations
     // when they are outdated
     wrapper.set({
-      'bg-style': '',
+      'bg-style': '#ffffff',
     });
     const [bodyClassSelector] = wrapper.setClass(['page-body-section']);
     // NOTE: We can also hide the class by setting private: true
