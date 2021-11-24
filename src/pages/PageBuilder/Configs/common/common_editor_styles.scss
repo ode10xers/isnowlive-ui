@@ -137,23 +137,13 @@
     font-weight: initial;
     gap: 4px;
 
-    // .gjs-field.gjs-field-color {
-    //   background-color: transparent;
-    //   color: map-get($map: $colors, $key: 'Black');
-    //   border: 0.5px solid map-get($map: $colors, $key: 'Mako');
-    //   padding: 4px;
-    //   border-radius: 6px;
-
-    //   .gjs-field-colorp {
-    //     border: 1px solid map-get($colors, 'WhiteSmoke2');
-    //     border-radius: 4px;
-    //     width: 28px;
-    //     height: 28px;
-    //     top: 4px;
-    //     bottom: 4px;
-    //     right: 8px;
-    //   }
-    // }
+    .gjs-field.gjs-field-text {
+      background-color: map-get($map: $colors, $key: 'White');
+      color: map-get($map: $colors, $key: 'Black');
+      border: 0.5px solid map-get($map: $colors, $key: 'Mako');
+      padding: 4px;
+      border-radius: 4px;
+    }
 
     button {
       background-color: map-get($map: $colors, $key: 'Endeavour');
