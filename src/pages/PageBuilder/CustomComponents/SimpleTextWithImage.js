@@ -31,6 +31,7 @@ export default (editor) => {
           loading: 'lazy',
         },
         ...fullyDisabledComponentFlags,
+        editable: true,
       },
     },
   });
@@ -62,7 +63,6 @@ export default (editor) => {
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 8px;
           }
 
           .text-image-section-container > img {

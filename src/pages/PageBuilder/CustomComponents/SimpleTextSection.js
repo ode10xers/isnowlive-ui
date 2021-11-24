@@ -21,45 +21,54 @@ const textPropHandlers = {
   handleFontChange() {
     const font = this.props()['font-family'];
 
-    const textSectionContainer = this.find('div.text-section-container') ?? [this];
+    const textSectionContainer = this.find('div.text-section-container') ?? [];
 
-    textSectionContainer.forEach((innerComp) => {
-      innerComp.setStyle({
-        ...innerComp.getStyle(),
-        'font-family': `${generateFontFamilyStylingText(font)} !important`,
-      });
-
-      innerComp.components().forEach((comp) => {
-        comp.setStyle({
-          ...comp.getStyle(),
+    if (textSectionContainer.length > 0) {
+      textSectionContainer.forEach((innerComp) => {
+        innerComp.setStyle({
+          ...innerComp.getStyle(),
           'font-family': `${generateFontFamilyStylingText(font)} !important`,
         });
+
+        innerComp.components().forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            'font-family': `${generateFontFamilyStylingText(font)} !important`,
+          });
+        });
       });
-    });
+    } else {
+      this.setStyle({
+        ...this.getStyle(),
+        'font-family': `${generateFontFamilyStylingText(font)} !important`,
+      });
+    }
   },
   handleTextColorChange() {
     const textColor = this.props()['text-color'];
     const textSectionContainer =
-      this.find('div.text-section-container') ??
-      this.findType('text') ??
-      this.findType('textnode') ??
-      this.components();
+      this.find('div.text-section-container') ?? this.findType('text') ?? this.findType('textnode') ?? [];
 
-    console.log(textSectionContainer);
-
-    textSectionContainer.forEach((innerComp) => {
-      innerComp.setStyle({
-        ...innerComp.getStyle(),
-        color: `${textColor} !important`,
-      });
-
-      innerComp.components().forEach((comp) => {
-        comp.setStyle({
-          ...comp.getStyle(),
+    if (textSectionContainer.length > 0) {
+      textSectionContainer.forEach((innerComp) => {
+        innerComp.setStyle({
+          ...innerComp.getStyle(),
           color: `${textColor} !important`,
         });
+
+        innerComp.components().forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            color: `${textColor} !important`,
+          });
+        });
       });
-    });
+    } else {
+      this.setStyle({
+        ...this.getStyle(),
+        color: `${textColor} !important`,
+      });
+    }
   },
 };
 

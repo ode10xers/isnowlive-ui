@@ -25,7 +25,13 @@ export default (editor) => {
       const el = document.createElement('div');
 
       const targetTraitName = trait.get('name') ?? 'color';
-      const initialColor = editor.getSelected()?.getStyle()[targetTraitName] ?? '#ffffff';
+      const selectedComponent = editor.getSelected() ?? null;
+      const initialColor =
+        (trait.get('changeProp')
+          ? selectedComponent?.props()[targetTraitName]
+          : selectedComponent?.getAttributes()[targetTraitName]) ??
+        selectedComponent.getStyle()[targetTraitName] ??
+        '#ffffff';
 
       const targetComponent = editor.getSelected() ?? null;
 
@@ -50,7 +56,6 @@ export default (editor) => {
     },
 
     removed() {
-      // TODO: Test if this works, or should this be called on remove()
       const containerEl = this.getInputElem();
       ReactDOM.unmountComponentAtNode(containerEl);
     },
