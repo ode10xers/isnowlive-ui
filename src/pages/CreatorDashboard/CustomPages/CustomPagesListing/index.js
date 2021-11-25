@@ -27,6 +27,7 @@ const CustomPagesListing = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [creatorPages, setCreatorPages] = useState([]);
   const [creatorHeader, setCreatorHeader] = useState(null);
+  // eslint-disable-next-line
   const [creatorFooter, setCreatorFooter] = useState(null);
 
   const fetchCreatorCustomPages = useCallback(async () => {
@@ -35,6 +36,13 @@ const CustomPagesListing = ({ match, history }) => {
       const { status, data } = await apis.custom_pages.getAllPages();
 
       if (isAPISuccess(status) && data) {
+        // This is to move the homepage to first
+        const homepageIndex = data.findIndex((page) => page.type === pageTypes.HOME);
+
+        if (homepageIndex > 0) {
+          data.unshift(data.splice(homepageIndex, 1)[0]);
+        }
+
         setCreatorPages(data);
       }
     } catch (error) {
@@ -90,7 +98,7 @@ const CustomPagesListing = ({ match, history }) => {
 
   const handleEditHeader = () => navigateWithUsernameUrl(Routes.creatorDashboard.customPages.headerEditor);
 
-  const handleEditFooter = () => navigateWithUsernameUrl(Routes.creatorDashboard.customPages.footerEditor);
+  // const handleEditFooter = () => navigateWithUsernameUrl(Routes.creatorDashboard.customPages.footerEditor);
 
   const handleEditPageDetails = (pageInfo) => {
     if (pageInfo && pageInfo.external_id) {

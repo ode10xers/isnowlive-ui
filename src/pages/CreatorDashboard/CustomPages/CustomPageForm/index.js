@@ -312,6 +312,7 @@ const CustomPageForm = ({ match, location, history }) => {
                     rules={validationRules.requiredValidation}
                   >
                     <Input
+                      className={styles.formInputElement}
                       onChange={(e) => {
                         if (targetPageId || isCreatingHomepage || pageDetails?.type === pageTypes.HOME) {
                           return;
@@ -339,13 +340,15 @@ const CustomPageForm = ({ match, location, history }) => {
                     }
                     extra={
                       isCreatingHomepage || pageDetails?.type === pageTypes.HOME ? (
-                        <Text type="secondary">
-                          Your homepage will be accessible at {generateUrlFromUsername(getLocalUserDetails().username)}
+                        <Text className={styles.inputHelpText} type="secondary">
+                          You are creating your HOMEPAGE which will be available at{' '}
+                          {generateUrlFromUsername(getLocalUserDetails().username)}
                         </Text>
                       ) : null
                     }
                   >
                     <Input
+                      className={styles.formInputElement}
                       onChange={onSlugChangeCallback}
                       disabled={isCreatingHomepage || pageDetails?.type === pageTypes.HOME}
                       addonBefore="/"

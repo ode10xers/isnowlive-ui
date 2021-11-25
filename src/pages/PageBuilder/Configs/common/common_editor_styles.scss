@@ -102,6 +102,9 @@
   .gjs-off-prv {
     background-color: map-get($map: $colors, $key: 'Endeavour');
     font-family: inherit;
+    float:right;
+    padding: 12px;
+    font-size: 14px;
 
     &::before {
       content: 'Quit Preview';

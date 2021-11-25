@@ -131,7 +131,7 @@
   background-color: map-get($map: $colors, $key: 'White');
   border-bottom: 1px solid map-get($map: $colors, $key: 'Gainsboro');
   color: map-get($map: $colors, $key: 'Nero');
-  padding: 12px 20px;
+  padding: 8px 20px;
 
   .ctaButtonContainer {
     padding: 0 20px;
