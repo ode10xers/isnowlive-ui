@@ -11,11 +11,11 @@ import {
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 
-const websiteIcon = require('assets/icons/website/website.svg');
-const facebookIcon = require('assets/icons/facebook/facebook.svg');
-const linkedinIcon = require('assets/icons/linkedin/linkedin.svg');
-const instagramIcon = require('assets/icons/instagram/instagram.svg');
-const twitterIcon = require('assets/icons/twitter/twitter.svg');
+import websiteIcon from 'assets/icons/website/website.svg';
+import facebookIcon from 'assets/icons/facebook/facebook.svg';
+import linkedinIcon from 'assets/icons/linkedin/linkedin.svg';
+import instagramIcon from 'assets/icons/instagram/instagram.svg';
+import twitterIcon from 'assets/icons/twitter/twitter.svg';
 
 const textPropHandlers = {
   handleFontChange() {

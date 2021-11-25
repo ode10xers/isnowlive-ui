@@ -14,7 +14,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
-const logo = require('assets/images/passion-orange-logo.png');
+import logo from 'assets/images/passion-orange-logo.png';
 
 const { useBreakpoint } = Grid;
 

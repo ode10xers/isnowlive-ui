@@ -37,6 +37,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 
 import styles from './style.module.scss';
+import PassionLogo from 'assets/images/passion-orange-logo.png';
 
 const AvailabilityProfileComponent = lazy(() =>
   import('components/DynamicProfileComponents/AvailabilityProfileComponent')
@@ -59,8 +60,6 @@ const DescriptionProfileComponent = lazy(() =>
   import('components/DynamicProfileComponents/DescriptionProfileComponent')
 );
 const TextListProfileComponent = lazy(() => import('components/DynamicProfileComponents/TextListProfileComponent'));
-
-const PassionLogo = require('assets/images/passion-orange-logo.png');
 
 const { Paragraph } = Typography;
 

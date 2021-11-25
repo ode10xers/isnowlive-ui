@@ -22,14 +22,13 @@ import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 
 import styles from './style.module.scss';
+import SoldOutImage from 'assets/images/sold_out.png';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 const {
   formatDate: { getTimeDiff },
 } = dateUtil;
-
-const SoldOutImage = require('assets/images/sold_out.png');
 
 const InventoryDetails = ({ match, history }) => {
   const { lg } = useBreakpoint();

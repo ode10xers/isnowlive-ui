@@ -16,7 +16,6 @@ import { orderType, productType, paymentSource } from 'utils/constants';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-// const logo = require('assets/images/Logo-passion-transparent.png');
 
 const { Text } = Typography;
 const {

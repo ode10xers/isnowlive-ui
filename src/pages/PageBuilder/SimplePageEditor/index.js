@@ -138,14 +138,14 @@ const SimplePageEditor = ({ match, history }) => {
           overflow-x: hidden;
         }
         * ::-webkit-scrollbar-track {
-          background: #dadada;
+          background: rgba(255, 255, 255, 0.8);
         }
         * ::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.75);
+          background: #214698;
           border-radius: 8px;
         }
         * ::-webkit-scrollbar {
-          width: 10px
+          width: 8px;
         }
       `,
       selectorManager: { appendTo: '', componentFirst: true },
@@ -170,7 +170,7 @@ const SimplePageEditor = ({ match, history }) => {
         id: '',
         type: 'passion-backend',
         autosave: true,
-        stepsBeforeSave: 15,
+        stepsBeforeSave: 5,
         autoload: false,
       },
 
@@ -230,7 +230,7 @@ const SimplePageEditor = ({ match, history }) => {
             // https://github.com/ckeditor/ckeditor4/tree/f6dd30807a1c7cb585f376a38fb13dffd2213a75/plugins
             // plugins: ['contextmenu','basicstyles', 'sharedspace'],
             extraPlugins: 'sharedspace',
-            toolbar: [['Bold', 'Italic', 'Underline', 'Strike']],
+            toolbar: [['Bold', 'Italic', 'Underline', 'Strike'], { name: 'links', items: ['Link', 'Unlink'] }],
           },
         },
       },
@@ -677,8 +677,12 @@ const SimplePageEditor = ({ match, history }) => {
                 </Col>
                 <Col flex="0 0 100px">
                   <Space className={styles.helperContainer}>
-                    <button className="helper-button fa fa-undo" onClick={handleUndo} />
-                    <button className="helper-button fa fa-repeat" onClick={handleRedo} />
+                    <button className="helper-button fa fa-undo" onClick={handleUndo}>
+                      Undo
+                    </button>
+                    <button className="helper-button fa fa-repeat" onClick={handleRedo}>
+                      Redo
+                    </button>
                   </Space>
                 </Col>
               </Row>

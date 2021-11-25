@@ -35,11 +35,13 @@
   overflow-y: scroll;
 
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
+    // background: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.8)
   }
   
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: map-get($map: $colors, $key: 'Endeavour');
+    border-radius: 8px;
   }
   
   &::-webkit-scrollbar {
@@ -146,12 +148,22 @@
         padding: 6px;
         color: map-get($map: $colors, $key: 'Endeavour');
         background: transparent;
+        // font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: inherit;
+        font-size: 12px;
       }
 
       .helper-button:hover {
         background-color: map-get($map: $colors, $key: 'Endeavour');
         color: map-get($map: $colors, $key: 'White');
         border-radius: 8px;
+      }
+
+      .helper-button::before {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 18px;
+        font-family: FontAwesome;
       }
     }
   }

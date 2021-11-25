@@ -22,7 +22,7 @@ import { blankPageTemplate, headerTemplate, footerTemplate } from 'utils/pageEdi
 
 import styles from './styles.module.scss';
 
-const DefaultImage = require('assets/images/greybg.jpg');
+import DefaultImage from 'assets/images/greybg.jpg';
 
 const { Title, Text } = Typography;
 

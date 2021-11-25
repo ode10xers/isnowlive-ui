@@ -13,7 +13,7 @@ import { redirectToSessionsPage } from 'utils/redirect';
 import { mapInventoryDays, getDaysForSession } from 'utils/session';
 
 import styles from './styles.module.scss';
-const DefaultImage = require('assets/images/greybg.jpg');
+import DefaultImage from 'assets/images/greybg.jpg';
 
 const { Title } = Typography;
 

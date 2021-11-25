@@ -32,6 +32,9 @@ const passionProductListBlocks = [
     resizable: false,
     media: `<img src="${websiteIcon}" loading="lazy" />`,
     category: categories.PASSION_COMPONENTS,
+    attributes: {
+      title: 'Click to add',
+    },
     content: {
       type: 'passion-session-list-block',
     },
@@ -42,6 +45,9 @@ const passionProductListBlocks = [
     droppable: false,
     resizable: false,
     category: categories.PASSION_COMPONENTS,
+    attributes: {
+      title: 'Click to add',
+    },
     content: {
       type: 'passion-video-list-block',
     },

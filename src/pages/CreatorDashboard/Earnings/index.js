@@ -27,10 +27,10 @@ import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/int
 
 import styles from './styles.module.scss';
 
-const cashIcon = require('assets/images/cash.png');
-const checkIcon = require('assets/images/check.png');
-const timerIcon = require('assets/images/timer.png');
-const bankIcon = require('assets/images/bank.png');
+import cashIcon from 'assets/images/cash.png';
+import checkIcon from 'assets/images/check.png';
+import timerIcon from 'assets/images/timer.png';
+import bankIcon from 'assets/images/bank.png';
 
 const { Title, Text, Paragraph } = Typography;
 const { useBreakpoint } = Grid;

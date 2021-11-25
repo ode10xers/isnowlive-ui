@@ -12,8 +12,7 @@ import { getExternalLink } from 'utils/url';
 import { socialMediaIcons } from 'utils/constants';
 
 import styles from './styles.module.scss';
-
-const DefaultImage = require('assets/images/greybg.jpg');
+import DefaultImage from 'assets/images/greybg.jpg';
 
 const { Title } = Typography;
 
