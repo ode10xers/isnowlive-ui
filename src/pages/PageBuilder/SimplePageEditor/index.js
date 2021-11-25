@@ -3,11 +3,13 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Spin, Row, Col, Space, Typography, Button, message } from 'antd';
 import { LeftOutlined, FileTextOutlined } from '@ant-design/icons';
 
+// import 'ckeditor4';
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
 // import 'grapesjs-blocks-flexbox';
 import grapesjs from 'grapesjs';
 // import 'grapesjs-preset-webpage';
+import 'grapesjs-plugin-ckeditor';
 
 import apis from 'apis';
 import config from 'config';
@@ -83,7 +85,6 @@ const SimplePageEditor = ({ match, history }) => {
         error?.response?.data?.message ?? 'Something went wrong.'
       );
     }
-    setIsLoading(false);
   }, []);
 
   const fetchCreatorWebsiteAssets = useCallback(async (editor) => {
@@ -111,7 +112,6 @@ const SimplePageEditor = ({ match, history }) => {
     // NOTE: Configuration object examples can be seen here
     // https://github.com/artf/grapesjs/blob/master/src/dom_components/model/Component.js
 
-    // TODO: Export this config and separate it into parts
     // Since it's also going to be used in HeaderEditor and FooterEditor
     // When rendering in public [age]
     const editor = grapesjs.init({
@@ -155,6 +155,10 @@ const SimplePageEditor = ({ match, history }) => {
         blocks: definedBlocks,
         appendOnClick: (block, editor) => {
           editor.getWrapper().append(block.get('content'));
+          // const cnv = editor.Canvas;
+          // if (cnv && cnv.getWindow()) {
+          //   cnv.getWindow().scrollTo(0, cnv.getDocument()?.body.scrollHeight ?? 0);
+          // }
           editor.Canvas.getWindow().scrollTo(0, editor.Canvas.getDocument().body.scrollHeight);
         },
       },
@@ -215,7 +219,21 @@ const SimplePageEditor = ({ match, history }) => {
         Testimonials,
         SimpleTextSection,
         SimpleTextWithImage,
+        'gjs-plugin-ckeditor',
       ],
+      pluginsOpts: {
+        'gjs-plugin-ckeditor': {
+          position: 'right',
+          options: {
+            forcePasteAsPlainText: true,
+            // Refer to list of plugins to load here
+            // https://github.com/ckeditor/ckeditor4/tree/f6dd30807a1c7cb585f376a38fb13dffd2213a75/plugins
+            // plugins: ['contextmenu','basicstyles', 'sharedspace'],
+            extraPlugins: 'sharedspace',
+            toolbar: [['Bold', 'Italic', 'Underline', 'Strike']],
+          },
+        },
+      },
     });
 
     customEditorInitializationLogic(editor);
@@ -433,7 +451,7 @@ const SimplePageEditor = ({ match, history }) => {
         fallbackAction();
       }
 
-      setIsLoading(false);
+      setTimeout(() => setIsLoading(false), 1000);
     }
   }, [gjsEditor, selectedPageId, creatorPages]);
 

@@ -1,7 +1,7 @@
 // API Doc : https://grapesjs.com/docs/api/block.html#block
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 
-const websiteIcon = require('assets/icons/website/website.svg');
+import websiteIcon from 'assets/icons/website/website.svg';
 
 const categories = {
   LAYOUTS: 'Layouts',

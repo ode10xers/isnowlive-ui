@@ -18,7 +18,7 @@ export default (editor) => {
         attributes: {
           class: 'testimonials-item',
         },
-        'font-family': 'Segoe UI',
+        'font-family': 'Times New Roman',
         'text-color': '#000000',
         traits: [
           {
@@ -135,7 +135,7 @@ export default (editor) => {
           { type: 'text-section-heading', attributes: {} },
           { type: 'testimonials' },
         ]),
-        'font-family': 'Segoe UI',
+        'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
         styles: `

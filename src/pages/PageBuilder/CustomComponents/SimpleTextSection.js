@@ -122,7 +122,7 @@ export default (editor) => {
         attributes: {
           class: 'text-section-heading',
         },
-        'font-family': 'Segoe UI',
+        'font-family': 'Times New Roman',
         'text-color': '#262626',
         content: 'Ad astra per aspera',
         traits: contextualFontTraits,
@@ -152,7 +152,7 @@ export default (editor) => {
         attributes: {
           class: 'text-section-content',
         },
-        'font-family': 'Segoe UI',
+        'font-family': 'Times New Roman',
         'text-color': '#484949',
         content: `
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vestibulum vestibulum est at fringilla. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed tempus augue vel eros elementum mollis.
@@ -227,7 +227,7 @@ export default (editor) => {
         },
         traits: textSectionTraits,
         components: generateContainerWrapper([{ type: 'simple-text-section' }]),
-        'font-family': 'Segoe UI',
+        'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
       },
@@ -272,7 +272,7 @@ export default (editor) => {
         },
         traits: [...textSectionTraits, ...innerButtonTraits],
         components: generateContainerWrapper([{ type: 'simple-text-section-with-button' }]),
-        'font-family': 'Segoe UI',
+        'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
       },

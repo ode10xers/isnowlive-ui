@@ -108,13 +108,18 @@
       padding: 4px 12px;
       border-radius: 8px;
     }
+
+    .gjs-rte-toolbar {
+      right: 0 !important;
+      left: auto !important;
+    }
   }
 
   .gjs-tools {
     .gjs-badge {
-      top: 8px !important;
-      left: 12px !important;
-      right: auto !important;
+      // top: 8px !important;
+      // left: 12px !important;
+      // right: auto !important;
       background-color: map-get($colors, 'Endeavour');
       padding: 6px 12px;
       border-radius: 8px;
