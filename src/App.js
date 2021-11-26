@@ -59,7 +59,7 @@ const CourseDetailedListView = lazy(() => import('pages/DetailedListView/Courses
 const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
 const Legals = lazy(() => import('pages/Legals'));
 const Onboarding = lazy(() => import('pages/EditProfile'));
-const PageEditor = lazy(() => import('pages/PageBuilder/PageEditor'));
+// const PageEditor = lazy(() => import('pages/PageBuilder/PageEditor'));
 const SimplePageEditor = lazy(() => import('pages/PageBuilder/SimplePageEditor'));
 const HeaderEditor = lazy(() => import('pages/PageBuilder/HeaderEditor'));
 const FooterEditor = lazy(() => import('pages/PageBuilder/FooterEditor'));
@@ -262,12 +262,12 @@ function App() {
               path={Routes.creatorDashboard.customPages.simpleEditor}
               component={SimplePageEditor}
             />
-            <RouteWithLayout
+            {/* <RouteWithLayout
               layout={FullWidthLayout}
               exact
               path={Routes.creatorDashboard.customPages.editor}
               component={PageEditor}
-            />
+            /> */}
             <RouteWithLayout
               layout={FullWidthLayout}
               exact

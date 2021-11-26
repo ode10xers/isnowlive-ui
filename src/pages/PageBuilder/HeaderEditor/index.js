@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Spin, Row, Col, Space, Button, message } from 'antd';
+import { Spin, Row, Col, Space, Button, Typography, message } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
 // NOTE : We can also take the scss approach, we'll see
@@ -34,6 +34,8 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
 
+const { Text } = Typography;
+
 const {
   BUILDER_CONTAINER_ID,
   // SELECTOR_PANEL_ID,
@@ -44,12 +46,12 @@ const {
 } = elementIds;
 
 const {
-  EDITOR,
+  // EDITOR,
   RIGHT,
-  RIGHT_INNER,
+  // RIGHT_INNER,
   TOP,
   LEFT,
-  // EMPTY,
+  EMPTY,
   // STYLING,
 } = sectionIds;
 
@@ -63,6 +65,9 @@ const HeaderEditor = ({ match, history }) => {
 
   const [creatorAssets, setCreatorAssets] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  const [lastSaveTime, setLastSaveTime] = useState(null);
+  const [isComponentSelected, setIsComponentSelected] = useState(false);
 
   const fetchCreatorHeaderComponent = useCallback(async (editor) => {
     const initializeEditorWithHeader = (headerData) => {
@@ -257,13 +262,13 @@ const HeaderEditor = ({ match, history }) => {
       setIsLoading(false);
     });
 
-    // editor.on('component:selected', () => {
-    //   setIsComponentSelected(true);
-    // });
+    editor.on('component:selected', () => {
+      setIsComponentSelected(true);
+    });
 
-    // editor.on('component:deselected', () => {
-    //   setIsComponentSelected(false);
-    // });
+    editor.on('component:deselected', () => {
+      setIsComponentSelected(false);
+    });
 
     editor.on('run:preview', () => {
       document.getElementById(RIGHT).style.display = 'none';
@@ -277,8 +282,6 @@ const HeaderEditor = ({ match, history }) => {
       document.getElementById(LEFT).style.display = 'block';
     });
     //#endregion Start of Asset Listener Definition
-
-    editor.runCommand('sw-visibility');
 
     setGjsEditor(editor);
     fetchCreatorWebsiteAssets(editor);
@@ -318,16 +321,23 @@ const HeaderEditor = ({ match, history }) => {
     }
   }, [gjsEditor, creatorAssets]);
 
-  // // Logic to handle rendering right panels
-  // useEffect(() => {
-  //   if (!isComponentSelected) {
-  //     document.getElementById(RIGHT_INNER).style.display = 'none';
-  //     document.getElementById(EMPTY).style.display = 'block';
-  //   } else {
-  //     document.getElementById(RIGHT_INNER).style.display = 'block';
-  //     document.getElementById(EMPTY).style.display = 'none';
-  //   }
-  // }, [isComponentSelected]);
+  // Logic for updating autosave time
+  useEffect(() => {
+    if (isSaving) {
+      setLastSaveTime(new Date());
+    }
+  }, [isSaving]);
+
+  // Logic to handle rendering right panels
+  useEffect(() => {
+    if (!isComponentSelected) {
+      document.getElementById(TRAITS_PANEL_ID).style.display = 'none';
+      document.getElementById(EMPTY).style.display = 'block';
+    } else {
+      document.getElementById(TRAITS_PANEL_ID).style.display = 'block';
+      document.getElementById(EMPTY).style.display = 'none';
+    }
+  }, [isComponentSelected]);
 
   //#region Start of Editor Button Handlers
   const handleBackToDashboard = () => {
@@ -358,14 +368,6 @@ const HeaderEditor = ({ match, history }) => {
     return false; // run failed
   };
 
-  const handleClickLayers = () => {
-    runSimpleCommand('open-layers');
-  };
-
-  const handleClickTraits = () => {
-    runSimpleCommand('open-tm');
-  };
-
   const handleSetDeviceDesktop = (e) => {
     runCommandAndToggleActiveStyles(e.target, 'set-device-desktop');
   };
@@ -378,36 +380,8 @@ const HeaderEditor = ({ match, history }) => {
     runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
   };
 
-  const handleSwitchVisibility = (e) => {
-    if (gjsEditor) {
-      const isVisibilityActive = gjsEditor.Commands.isActive('sw-visibility');
-
-      if (isVisibilityActive) {
-        gjsEditor.stopCommand('sw-visibility');
-        e.target.classList.remove('active');
-      } else {
-        gjsEditor.runCommand('sw-visibility');
-        e.target.classList.add('active');
-      }
-    }
-  };
-
   const handlePreview = () => {
     runSimpleCommand('preview');
-  };
-
-  const handleToggleFullscreen = (e) => {
-    if (gjsEditor) {
-      const isInFullscreen = gjsEditor.Commands.isActive('fullscreen');
-
-      if (isInFullscreen) {
-        gjsEditor.stopCommand('fullscreen');
-        e.target.classList.remove('active');
-      } else {
-        gjsEditor.runCommand('fullscreen', { target: document.getElementById(EDITOR) });
-        e.target.classList.add(['active']);
-      }
-    }
   };
 
   const handleUndo = () => {
@@ -427,73 +401,111 @@ const HeaderEditor = ({ match, history }) => {
 
   return (
     <Spin spinning={isLoading}>
-      <div>
-        <div id={EDITOR} className={styles.builderPage}>
-          <div id={LEFT} className={styles.leftSection}>
-            <div className={styles.topPanel}>
-              {/* <button className="fa fa-th-large" onClick={handleClickBlocks}></button> */}
-              <button className="fa fa-bars active" onClick={handleClickLayers}></button>
-            </div>
-            <div className={styles.panelContainer}>
-              {/* <div id={BLOCKS_PANEL_ID}></div> */}
-              <div id={LAYERS_PANEL_ID}></div>
-            </div>
-          </div>
-          <div className={styles.middleSection}>
-            <div id={TOP} className={styles.topPanel}>
-              <Row gutter={8} justify="space-around" className={styles.buttonsContainer}>
-                <Col flex="0 0 45%" className={styles.pageSelectorContainer}>
-                  <Button
-                    icon={<LeftOutlined />}
-                    className={styles.backButton}
-                    size="small"
-                    type="link"
-                    onClick={handleBackToDashboard}
-                  >
-                    Back to Dashboard
-                  </Button>
+      <Row style={{ height: '100vh' }}>
+        <Col id={TOP} xs={24} className={styles.topPanelContainer}>
+          <Row gutter={8} align="middle">
+            <Col flex="0 0 15%">
+              <Button
+                icon={<LeftOutlined />}
+                className={styles.dashboardButton}
+                type="text"
+                onClick={handleBackToDashboard}
+              >
+                Back to Dashboard
+              </Button>
+            </Col>
+            <Col flex="1 0 auto" className={styles.textAlignCenter}>
+              <Row gutter={8} align="middle">
+                <Col flex="0 0 200px">
+                  {isSaving ? (
+                    <Spin />
+                  ) : lastSaveTime ? (
+                    <Text className={styles.saveTimeText}>Last Saved : {lastSaveTime.toLocaleTimeString()}</Text>
+                  ) : null}
                 </Col>
-                <Col flex="0 0 120px" className={styles.textAlignCenter}>
-                  <button className="fa fa-desktop active" onClick={handleSetDeviceDesktop}></button>
-                  <button className="fa fa-tablet" onClick={handleSetDeviceTablet}></button>
-                  <button className="fa fa-mobile" onClick={handleSetDeviceMobile}></button>
+                <Col flex="1 0 auto">
+                  <div className={styles.devicesContainer}>
+                    <button className="device-button active fa fa-desktop" onClick={handleSetDeviceDesktop} />
+                    <button className="device-button fa fa-tablet" onClick={handleSetDeviceTablet} />
+                    <button className="device-button fa fa-mobile" onClick={handleSetDeviceMobile} />
+                  </div>
                 </Col>
-                <Col flex="1 0 auto" className={styles.textAlignRight}>
-                  <Space align="center">
-                    <button className="fa fa-square-o active" onClick={handleSwitchVisibility}></button>
-                    <button className="fa fa-eye" onClick={handlePreview}></button>
-                    <button className="fa fa-arrows-alt" onClick={handleToggleFullscreen}></button>
-                    {/* <button className="fa fa-code" onClick={handleShowCode}></button> */}
-                    <button className="fa fa-undo" onClick={handleUndo}></button>
-                    <button className="fa fa-repeat" onClick={handleRedo}></button>
-                    {isSaving ? (
-                      <button className="fa fa-spinner"></button>
-                    ) : (
-                      <button className="fa fa-floppy-o" onClick={handleSaveTemplate}></button>
-                    )}
-                    {/* <button className="fa fa-trash" onClick={handleCleanCanvas}></button> */}
+                <Col flex="0 0 100px">
+                  <Space className={styles.helperContainer}>
+                    <button className="helper-button fa fa-undo" onClick={handleUndo}>
+                      Undo
+                    </button>
+                    <button className="helper-button fa fa-repeat" onClick={handleRedo}>
+                      Redo
+                    </button>
                   </Space>
                 </Col>
               </Row>
-            </div>
-            <div id={BUILDER_CONTAINER_ID}></div>
-          </div>
-          <div id={RIGHT} className={styles.rightSection}>
-            <div className={styles.topPanel}>
-              {/* <button className="fa fa-paint-brush" onClick={handleClickStyles}></button> */}
-              <button className="fa fa-cog active" onClick={handleClickTraits}></button>
-            </div>
-            {/* <div id={EMPTY}>Please select a component first.</div> */}
-            <div id={RIGHT_INNER} className={styles.panelContainer}>
-              {/* <div id={STYLING}>
-                <div id={SELECTOR_PANEL_ID}></div>
-                <div id={STYLES_PANEL_ID}></div>
-              </div> */}
-              <div id={TRAITS_PANEL_ID}></div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </Col>
+            <Col flex="0 0 15%" className={styles.textAlignRight}>
+              <Space align="center" className={styles.ctaButtonContainer}>
+                <Button className={styles.linkEditorButton} size="large" type="link" onClick={handlePreview}>
+                  Preview
+                </Button>
+                <Button
+                  className={styles.primaryEditorButton}
+                  size="large"
+                  type="primary"
+                  loading={isSaving}
+                  disabled={isSaving}
+                  onClick={handleSaveTemplate}
+                >
+                  {isSaving ? 'Saving...' : 'Publish'}
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Col>
+        <Col xs={24}>
+          <Row className={styles.contentContainer}>
+            <Col id={LEFT} flex="0 0 15%" className={styles.sidePanelContainer}>
+              <Row gutter={[12, 12]}>
+                {/* <Col xs={24}>
+                <div className={styles.buttonsContainer}>
+                  <button className="active" onClick={handleClickBlocks}>
+                    Components
+                  </button>
+                  <button onClick={handleClickLayers}>Layer Blocks</button>
+                </div>
+              </Col> */}
+                <Col xs={24}>
+                  {/* <div id={BLOCKS_PANEL_ID}></div> */}
+                  <div id={LAYERS_PANEL_ID}></div>
+                </Col>
+              </Row>
+            </Col>
+            <Col flex="1 0 auto" className={styles.middleContainer}>
+              <div id={BUILDER_CONTAINER_ID}></div>
+            </Col>
+            <Col id={RIGHT} flex="0 0 15%" className={styles.sidePanelContainer}>
+              <Row gutter={[12, 12]}>
+                <Col xs={24}>
+                  <Text className={styles.sectionHeading}>Customization</Text>
+                </Col>
+                {/* <Col xs={24}>
+                <div className={styles.buttonsContainer}>
+                  <button className="active" onClick={handleClickTraits}>
+                    Basic Mode
+                  </button>
+                  <button onClick={handleClickStyles}>
+                    Advanced
+                  </button>
+                </div>
+              </Col> */}
+                <Col xs={24}>
+                  <div id={EMPTY}>Please select a component first.</div>
+                  <div id={TRAITS_PANEL_ID}></div>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
     </Spin>
   );
 };

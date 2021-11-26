@@ -391,7 +391,6 @@ const SimplePageEditor = ({ match, history }) => {
     initializeGrapesJSEditor();
 
     return () => {
-      console.log('Unmounted');
       window.onbeforeunload = null;
     };
   }, [initializeGrapesJSEditor, fetchCreatorCustomPages]);

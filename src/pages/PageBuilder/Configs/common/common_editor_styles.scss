@@ -165,6 +165,23 @@
     font-weight: initial;
     gap: 4px;
 
+    .gjs-field.gjs-field-select {
+      background-color: map-get($map: $colors, $key: 'White');
+      color: map-get($colors, 'Endeavour');
+      border: 0.5px solid map-get($map: $colors, $key: 'Mako');
+      padding: 4px;
+      border-radius: 4px;
+
+      .gjs-d-s-arrow {
+        border-top: 4px solid map-get($colors, 'Endeavour');
+      }
+
+      option {
+        background-color: unset;
+        color: unset;
+      }
+    }
+
     .gjs-field.gjs-field-text {
       background-color: map-get($map: $colors, $key: 'White');
       color: map-get($map: $colors, $key: 'Black');
