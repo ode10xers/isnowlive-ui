@@ -6,10 +6,10 @@ export const headerTemplate = {
 };
 
 export const footerTemplate = {
-  html: `<footer><h5 class="footer-text">© 2021 Passion.do | All rights reserved</h5></footer>`,
-  css: `* { box-sizing: border-box; } body {margin: 0;}.footer-text{text-align:center;padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px;font-weight:500;font-size:16px;}`,
-  components: `[{"type":"site-footer","components":[{"tagName":"h5","content":"© 2021 Passion.do | All rights reserved","styles":".footer-text {text-align: center;padding: 20px;font-weight: 500;font-size: 16px;}","classes":["footer-text"]}]}]`,
-  styles: `[{"selectors":["footer-text"],"style":{"text-align":"center","padding-top":"20px","padding-right":"20px","padding-bottom":"20px","padding-left":"20px","font-weight":"500","font-size":"16px"},"group":"cmp:"}]`,
+  html: `<PassionFooter></PassionFooter>`,
+  css: `* { box-sizing: border-box; } body {margin: 0;}`,
+  components: `[{"type":"PassionFooter"}]`,
+  styles: `[]`,
 };
 
 export const blankPageTemplate = {

@@ -293,6 +293,10 @@ const HeaderEditor = ({ match, history }) => {
 
   useEffect(() => {
     initializeGrapesJSEditor();
+
+    return () => {
+      window.onbeforeunload = null;
+    };
   }, [initializeGrapesJSEditor]);
 
   // The asset remove listener is separate here because it depends on the creatorAssets

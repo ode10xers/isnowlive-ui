@@ -57,6 +57,7 @@ const {
 
 const { EDITOR, RIGHT, RIGHT_INNER, TOP, LEFT, EMPTY, STYLING } = sectionIds;
 
+// NOTE: Old UI, currently unused. Currently using SimplePageEditor
 const PageEditor = ({ match, history }) => {
   const targetPageId = match.params.page_id;
 

@@ -31,6 +31,7 @@ import { customEditorInitializationLogic } from 'utils/pageEditor.js';
 import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
+import ReactComponentHandler from '../ReactComponentHandler/index.js';
 
 const {
   BUILDER_CONTAINER_ID,
@@ -88,8 +89,13 @@ const FooterEditor = ({ match, history }) => {
     const fallbackEditorInitialization = () => {
       editor.StorageManager.setCurrent('local');
 
-      editor.loadData(footerTemplate);
+      // editor.loadData(footerTemplate);
+      editor.loadData({ components: [{ type: 'PassionFooter' }] });
     };
+
+    fallbackEditorInitialization();
+    setIsLoading(false);
+    return;
 
     try {
       const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.FOOTER);
@@ -192,28 +198,29 @@ const FooterEditor = ({ match, history }) => {
         autoAdd: false,
         showUrlInput: false,
       },
-      plugins: ['gjs-preset-webpage', CustomCommands, Footer],
-      pluginsOpts: {
-        'gjs-preset-webpage': {
-          modalImportLabel: 'This is the data format that will be saved',
-          modalImportButton: 'Save',
-          modalImportContent: (editor) => {
-            return JSON.stringify({
-              html: editor.getHtml(),
-              css: editor.getCss(),
-              components: editor.getComponents(),
-              styles: editor.getStyle(),
-            });
-          },
-          blocksBasicOpts: {
-            flexGrid: true,
-            rowHeight: '120px',
-          },
-          countdownOpts: 0,
-          navbarOpts: 0,
-          customStyleManager: definedStylePanels,
-        },
-      },
+      plugins: [ReactComponentHandler, Footer, CustomCommands],
+      // plugins: ['gjs-preset-webpage', CustomCommands, Footer],
+      // pluginsOpts: {
+      //   'gjs-preset-webpage': {
+      //     modalImportLabel: 'This is the data format that will be saved',
+      //     modalImportButton: 'Save',
+      //     modalImportContent: (editor) => {
+      //       return JSON.stringify({
+      //         html: editor.getHtml(),
+      //         css: editor.getCss(),
+      //         components: editor.getComponents(),
+      //         styles: editor.getStyle(),
+      //       });
+      //     },
+      //     blocksBasicOpts: {
+      //       flexGrid: true,
+      //       rowHeight: '120px',
+      //     },
+      //     countdownOpts: 0,
+      //     navbarOpts: 0,
+      //     customStyleManager: definedStylePanels,
+      //   },
+      // },
     });
 
     customEditorInitializationLogic(editor);
