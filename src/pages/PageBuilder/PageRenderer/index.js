@@ -39,6 +39,7 @@ import PassionPassList from 'components/PageEditorPassionComponents/PassList';
 import PassionSubscriptionList from 'components/PageEditorPassionComponents/SubscriptionList';
 import PassionVideoList from 'components/PageEditorPassionComponents/VideoList';
 import PassionSessionList from 'components/PageEditorPassionComponents/SessionList';
+import PassionFooter from 'components/PageEditorPassionComponents/PassionFooter';
 
 import { isAPISuccess } from 'utils/helper.js';
 
@@ -251,6 +252,7 @@ const PageRenderer = ({ match, history }) => {
               PassionSessionList,
               PassionSubscriptionList,
               PassionVideoList,
+              PassionFooter,
             }}
             jsx={pageContent}
           />

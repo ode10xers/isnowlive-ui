@@ -16,7 +16,6 @@ import config from 'config/index.js';
 import elementIds from '../Configs/common/elementIds.js';
 import sectionIds from '../Configs/common/sectionIds';
 import commonEditorConfig from '../Configs/common/config';
-import definedStylePanels from '../Configs/style_panel';
 
 // THese are to be put in plugins
 import CustomCommands from '../Configs/commands';
@@ -92,10 +91,6 @@ const FooterEditor = ({ match, history }) => {
       // editor.loadData(footerTemplate);
       editor.loadData({ components: [{ type: 'PassionFooter' }] });
     };
-
-    fallbackEditorInitialization();
-    setIsLoading(false);
-    return;
 
     try {
       const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.FOOTER);

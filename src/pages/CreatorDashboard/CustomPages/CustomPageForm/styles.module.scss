@@ -1,5 +1,16 @@
 @import '../../../../styles/variables.scss';
 
+.templatePreviewContainer {
+  position: relative;
+
+  .previewButton {
+    position: absolute;
+    z-index: 5;
+    top: 8px;
+    right: 8px;
+  }
+}
+
 .formInputElement {
   max-width: 640px;
 }

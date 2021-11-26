@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { generatePath } from 'react-router-dom';
+
 import classNames from 'classnames';
 
 import debounce from 'lodash.debounce';
@@ -10,6 +11,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import { showErrorModal } from 'components/Modals/modals';
+import TemplatePreviewModal from 'pages/PageBuilder/PageRenderer/TemplatePreviewModal';
 
 import { pageCreateFormLayout, pageCreateFormTailLayout } from 'layouts/FormLayouts';
 
@@ -26,11 +28,24 @@ import DefaultImage from 'assets/images/greybg.jpg';
 
 const { Title, Text } = Typography;
 
-const TemplatePreviewItem = ({ template = null, handleItemClicked = () => {} }) => (
+const TemplatePreviewItem = ({ template = null, handleItemClicked = () => {}, handlePreviewClicked = () => {} }) => (
   <Card
     hoverable
     onClick={() => handleItemClicked(template)}
-    cover={<Image loading="lazy" src={template.thumbnail_url} fallback={DefaultImage} />}
+    cover={
+      <div className={styles.templatePreviewContainer}>
+        <Image
+          className={styles.templatePreviewImage}
+          preview={false}
+          loading="lazy"
+          src={template.thumbnail_url}
+          fallback={DefaultImage}
+        />
+        <Button size="small" className={styles.previewButton} type="primary" onClick={handlePreviewClicked}>
+          Preview
+        </Button>
+      </div>
+    }
   >
     <Card.Meta title={template.name} description={template.description} />
   </Card>
@@ -51,9 +66,13 @@ const CustomPageForm = ({ match, location, history }) => {
   const [shouldCreateHeader, setShouldCreateHeader] = useState(false);
   const [shouldCreateFooter, setShouldCreateFooter] = useState(false);
 
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
+
   // NOTE: We need to make sure at least there's a default template selected
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+  const [slugInputTouched, setSlugInputTouched] = useState(isCreatingHomepage);
 
   const fetchCreatorHeaderComponent = useCallback(async () => {
     try {
@@ -151,6 +170,15 @@ const CustomPageForm = ({ match, location, history }) => {
     }
   }, [pageDetails, form]);
 
+  const closePreviewModal = () => {
+    setPreviewModalVisible(false);
+  };
+
+  const showTemplatePreview = (template) => {
+    setSelectedTemplate(template);
+    setPreviewModalVisible(true);
+  };
+
   const checkValidPageSlug = useCallback(
     async (e) => {
       setIsValidatingSlug(true);
@@ -203,6 +231,11 @@ const CustomPageForm = ({ match, location, history }) => {
 
     if (!isValidSlug) {
       message.error('Please enter a valid slug!');
+      return;
+    }
+
+    if (!isCreatingHomepage && !values.customPageSlug) {
+      message.error('Please enter a page slug!');
       return;
     }
 
@@ -284,6 +317,11 @@ const CustomPageForm = ({ match, location, history }) => {
 
   return (
     <div>
+      <TemplatePreviewModal
+        visible={previewModalVisible}
+        closeModal={closePreviewModal}
+        templateData={selectedTemplate}
+      />
       <Spin spinning={isLoading} tip="Processing...">
         <Form layout="horizontal" name="pageForm" form={form} onFinish={handleFormFinish} scrollToFirstError={true}>
           <Row gutter={[8, 24]}>
@@ -393,7 +431,11 @@ const CustomPageForm = ({ match, location, history }) => {
                             selectedTemplate?.external_id === template.external_id ? styles.selectedTemplate : undefined
                           }
                         >
-                          <TemplatePreviewItem template={template} handleItemClicked={setSelectedTemplate} />
+                          <TemplatePreviewItem
+                            template={template}
+                            handleItemClicked={setSelectedTemplate}
+                            handlePreviewClicked={showTemplatePreview}
+                          />
                         </Col>
                       ))
                     : [blankPageTemplate].map((template) => (
@@ -408,7 +450,11 @@ const CustomPageForm = ({ match, location, history }) => {
                             selectedTemplate?.external_id === template.external_id ? styles.selectedTemplate : undefined
                           }
                         >
-                          <TemplatePreviewItem template={template} handleItemClicked={setSelectedTemplate} />
+                          <TemplatePreviewItem
+                            template={template}
+                            handleItemClicked={setSelectedTemplate}
+                            handlePreviewClicked={showTemplatePreview}
+                          />
                         </Col>
                       ))}
                 </Row>
@@ -418,12 +464,17 @@ const CustomPageForm = ({ match, location, history }) => {
             <Col xs={24}>
               <Row justify="end" gutter={[10, 10]}>
                 <Col>
-                  <Button size="large" htmlType="submit" disabled={!isValidSlug}>
+                  <Button size="large" htmlType="submit" disabled={!isValidSlug || !selectedTemplate}>
                     {targetPageId ? 'Update' : 'Create'} Page
                   </Button>
                 </Col>
                 <Col>
-                  <Button size="large" type="primary" onClick={handleSaveAndEditContent} disabled={!isValidSlug}>
+                  <Button
+                    size="large"
+                    type="primary"
+                    onClick={handleSaveAndEditContent}
+                    disabled={!isValidSlug || !selectedTemplate}
+                  >
                     Save Changes and Edit Content
                   </Button>
                 </Col>
