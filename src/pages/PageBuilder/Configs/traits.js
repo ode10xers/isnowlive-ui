@@ -147,7 +147,7 @@ export default (editor) => {
 
       const adjustBorderRadius = (value) => {
         const selected = editor.getSelected();
-        const targetComponent = selected.find('img') ?? selected.findType('custom-image') ?? [];
+        const targetComponent = selected.find('img') ?? [];
 
         if (targetComponent.length > 0) {
           targetComponent.forEach((comp) => {
@@ -213,14 +213,21 @@ export default (editor) => {
       const valueText = elInput.querySelector('#border-radius-slider-value');
       valueText.innerHTML = sliderInput.value + (this.unit ?? 'px');
 
-      const targetComponent = component.find('img') ?? [component];
+      const targetComponent = component.find('img') ?? [];
 
-      targetComponent.forEach((comp) => {
-        comp.setStyle({
-          ...comp.getStyle(),
+      if (targetComponent.length > 0) {
+        targetComponent.forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
+          });
+        });
+      } else {
+        component.setStyle({
+          ...component.getStyle(),
           'border-radius': `${sliderInput.value ?? 8}${this.unit ?? 'px'}`,
         });
-      });
+      }
     },
     // Update elements on the component change
     onUpdate({ elInput, component }) {
@@ -440,7 +447,7 @@ export default (editor) => {
     },
   });
 
-  // Button Traits
+  // Button Traits (to be deprecated)
   editor.TraitManager.addType('button-types', {
     noLabel: true,
     templateInput: generateTemplateHTML('Button type'),
@@ -470,7 +477,9 @@ export default (editor) => {
 
       if (inputType.value) {
         classes.push(`button-type-${inputType.value}`);
-        existingClasses = existingClasses.filter((cls) => !['button-type-link', 'button-type-outlined'].includes(cls));
+        existingClasses = existingClasses.filter(
+          (cls) => !['button-type-link', 'button-type-outlined', 'button-type-filled'].includes(cls)
+        );
       }
 
       component.setClass([...new Set([...existingClasses, ...classes])]);
@@ -766,11 +775,26 @@ export default (editor) => {
       const inputType = elInput.querySelector('#text-section-layout-select');
       const alignValue = inputType.value;
 
-      const textSection = component.find('.text-section-container') ?? [component];
+      const textSection = component.find('.text-section-container') ?? [];
 
-      textSection.forEach((comp) => {
-        comp.setStyle({
-          ...comp.getStyle(),
+      if (textSection.length > 0) {
+        textSection.forEach((comp) => {
+          comp.setStyle({
+            ...comp.getStyle(),
+            'text-align': alignValue ?? 'left',
+            'align-items':
+              alignValue === 'center'
+                ? alignValue
+                : alignValue === 'left'
+                ? 'flex-start'
+                : alignValue === 'right'
+                ? 'flex-end'
+                : 'flex-start',
+          });
+        });
+      } else {
+        component.setStyle({
+          ...component.getStyle(),
           'text-align': alignValue ?? 'left',
           'align-items':
             alignValue === 'center'
@@ -781,7 +805,7 @@ export default (editor) => {
               ? 'flex-end'
               : 'flex-start',
         });
-      });
+      }
 
       component.addAttributes({
         layout: inputType.value,

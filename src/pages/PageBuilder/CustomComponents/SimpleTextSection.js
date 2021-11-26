@@ -5,7 +5,6 @@ import {
   backgroundTraits,
   contextualFontTraits,
   genericFontTraits,
-  innerButtonTraits,
   socialLinksTraits,
 } from '../Configs/common/trait_sets';
 
@@ -252,6 +251,9 @@ export default (editor) => {
           {
             type: 'text-section-link-button',
             ...fullyDisabledComponentFlags,
+            selectable: true,
+            hoverable: true,
+            badgable: true,
           },
         ],
       },
@@ -270,7 +272,7 @@ export default (editor) => {
           layout: 'center',
           class: 'simple-text-section-block',
         },
-        traits: [...textSectionTraits, ...innerButtonTraits],
+        traits: [...textSectionTraits],
         components: generateContainerWrapper([{ type: 'simple-text-section-with-button' }]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',

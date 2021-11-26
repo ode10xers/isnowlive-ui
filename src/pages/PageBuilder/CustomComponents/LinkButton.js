@@ -1,5 +1,4 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
-import { isValidCSSColor } from 'utils/colors';
 
 // TODO: Add filled button type here
 // TODO: Refactor and tidy up here
@@ -12,11 +11,12 @@ export default (editor) => {
         attributes: {
           href: '#',
           target: '_blank',
-          class: 'link-btn button-type-link',
+          class: 'link-btn',
         },
         'font-family': 'Segoe UI',
-        'text-color': '#000000',
-        'bg-style': '#ffffff',
+        'text-color': '#1890ff',
+        'bg-color': '#ffffff',
+        'border-color': '#ffffff',
         traits: [
           {
             type: 'text',
@@ -39,9 +39,6 @@ export default (editor) => {
             changeProp: 1,
           },
           {
-            type: 'button-types',
-          },
-          {
             type: 'font-size',
           },
           {
@@ -58,7 +55,13 @@ export default (editor) => {
           {
             type: 'custom-color-picker',
             label: 'Background color',
-            name: 'bg-style',
+            name: 'bg-color',
+            changeProp: 1,
+          },
+          {
+            type: 'custom-color-picker',
+            label: 'Border color',
+            name: 'border-color',
             changeProp: 1,
           },
           {
@@ -81,31 +84,23 @@ export default (editor) => {
             text-align: center;
             border: none;
           }
-
-          .link-btn.button-type-link {
-            border: none;
-            color: #1890ff;
-          }
-
-          .link-btn.button-type-outlined {
-            border: 1px solid currentColor;
-            border-radius: 8px;
-            color: #1890ff;
-            background: transparent;
-          }
-
-          .link-btn.button-type-filled {
-            background-color: #1890ff;
-            color: #ffffff;
-          }
         `,
       },
       init() {
         // We put a listener that triggers when an attribute changes
         // In this case when text-color attribute changes
-        this.on('change:text-color', this.handleTextColorChange);
-        this.on('change:bg-style', this.handleBGColorChange);
         this.on('change:font-family', this.handleFontChange);
+        this.on('change:text-color', this.handleTextColorChange);
+        this.on('change:bg-color', this.handleBGColorChange);
+        this.on('change:border-color', this.handleBorderColorChange);
+      },
+      handleFontChange() {
+        const font = this.props()['font-family'];
+
+        this.setStyle({
+          ...this.getStyle(),
+          'font-family': `${generateFontFamilyStylingText(font)} !important`,
+        });
       },
       handleTextColorChange() {
         const textColor = this.props()['text-color'];
@@ -124,33 +119,19 @@ export default (editor) => {
         });
       },
       handleBGColorChange() {
-        const bgStyle = this.props()['bg-style'];
-        const componentList = this.components();
-
-        const isBackgroundColor = isValidCSSColor(bgStyle);
-
-        // Check for child components with the same property
-        const validChildList = componentList.filter((comp) => comp.props().hasOwnProperty('bg-style'));
-
-        validChildList.forEach((childComp) => {
-          // NOTE: Right now this only works if the prop name and trait name is same
-          childComp.updateTrait('bg-style', {
-            type: 'custom-color-picker',
-            value: isBackgroundColor ? bgStyle : 'transparent',
-          });
-        });
+        const bgStyle = this.props()['bg-color'];
 
         this.setStyle({
           ...this.getStyle(),
-          background: bgStyle,
+          'background-color': bgStyle,
         });
       },
-      handleFontChange() {
-        const font = this.props()['font-family'];
+      handleBorderColorChange() {
+        const bgStyle = this.props()['border-color'];
 
         this.setStyle({
           ...this.getStyle(),
-          'font-family': generateFontFamilyStylingText(font),
+          'border-color': bgStyle,
         });
       },
     },
@@ -163,29 +144,19 @@ export default (editor) => {
         attributes: {
           href: '#',
           target: '_blank',
-          class: 'text-section-btn button-type-filled',
+          class: 'text-section-btn',
         },
+        'font-family': 'Segoe UI',
+        'text-color': '#ffffff',
+        'bg-color': '#1890ff',
+        'border-color': '#1890ff',
         styles: `
           .text-section-btn {
             display: flex;
             padding: 8px;
             width: fit-content;
             text-align: center;
-            border: none;
-          }
-
-          .text-section-btn.button-type-link {
-            border: none;
-          }
-
-          .text-section-btn.button-type-outlined {
-            border: 1px solid currentColor;
-            border-radius: 8px;
-            color: #1890ff;
-            background: transparent;
-          }
-
-          .text-section-btn.button-type-filled {
+            border: 2px solid #1890ff;
             background-color: #1890ff;
             color: #ffffff;
           }

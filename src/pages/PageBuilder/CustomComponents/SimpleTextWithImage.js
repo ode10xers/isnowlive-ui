@@ -1,6 +1,6 @@
 import { generateContainerWrapper } from '../Configs/blocks';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
-import { innerButtonTraits, socialLinksTraits } from '../Configs/common/trait_sets';
+import { socialLinksTraits } from '../Configs/common/trait_sets';
 import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
@@ -193,7 +193,7 @@ export default (editor) => {
           layout: 'center',
           class: 'text-image-section-container',
         },
-        traits: [...textSectionWithImageTraits, ...innerButtonTraits],
+        traits: [...textSectionWithImageTraits],
         components: generateContainerWrapper([{ type: 'simple-text-image-button-section' }]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',
