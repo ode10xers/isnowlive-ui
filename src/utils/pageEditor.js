@@ -52,7 +52,6 @@ export const customEditorInitializationLogic = (editor) => {
   // Not sure if this will work dynamically or not
   const iframeEl = editorCanvas.getWindow();
   const styleEls = iframeEl.parent.document.querySelectorAll("[type='text/css'], [rel='stylesheet'], style");
-  console.log(styleEls);
   styleEls.forEach((el) => {
     iframeEl.document.head.appendChild(el.cloneNode(true));
   });

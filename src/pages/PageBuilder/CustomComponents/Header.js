@@ -1,4 +1,7 @@
 import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
+import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
+import { contextualFontTraits } from '../Configs/common/trait_sets';
+import { textPropHandlers } from './SimpleTextSection';
 
 // NOTE: In this case, the header is completely uninteractable (except selecting)
 export default (editor) => {
@@ -7,15 +10,11 @@ export default (editor) => {
     model: {
       defaults: {
         component: SignInButton,
-        stylable: false,
-        resizable: false,
-        editable: false,
-        droppable: false,
-        draggable: false,
-        removable: false,
-        highlightable: false,
-        hoverable: false,
-        copyable: false,
+        ...fullyDisabledComponentFlags,
+        highlightable: true,
+        hoverable: true,
+        selectable: true,
+        badgable: true,
         attributes: {
           target: 'current',
           buttonType: 'primary',
@@ -40,13 +39,36 @@ export default (editor) => {
               { id: 'link', name: 'Link Text' },
             ],
           },
-          // {
-          //   type: 'link-button-list',
-          // }
         ],
       },
     },
     isComponent: (el) => el.tagName === 'SIGNINBUTTON',
+  });
+
+  editor.Components.addType('header-text-brand', {
+    extend: 'text',
+    model: {
+      defaults: {
+        tagName: 'h1',
+        content: 'My Brand',
+        name: 'My Brand',
+        traits: contextualFontTraits,
+        attributes: {
+          class: 'brand-text',
+        },
+        'font-family': 'Times New Roman',
+        'text-color': '#262626',
+        ...fullyDisabledComponentFlags,
+        editable: true,
+        init() {
+          // We put a listener that triggers when an attribute changes
+          // In this case when text-color attribute changes
+          this.on('change:text-color', this.handleTextColorChange);
+          this.on('change:font-family', this.handleFontChange);
+        },
+        ...textPropHandlers,
+      },
+    },
   });
 
   editor.Components.addType('header-brand', {
@@ -54,43 +76,13 @@ export default (editor) => {
       defaults: {
         tagName: 'div',
         name: 'Header Brand',
-        droppable: false,
-        draggable: false,
-        removable: false,
-        stylable: false,
-        copyable: false,
-        resizeable: false,
-        layerable: false,
-        highlightable: true,
-        selectable: true,
-        hoverable: true,
-        badgeable: true,
-        toolbar: [],
+        ...fullyDisabledComponentFlags,
         attributes: {
           class: 'header-brand',
         },
-        'brand-type': 'text',
-        traits: [
-          {
-            type: 'brand-type-select',
-          },
-        ],
         components: [
           {
-            tagName: 'h1',
-            type: 'text',
-            content: 'My Brand',
-            name: 'My Brand',
-            traits: [],
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            badgable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            hoverable: false,
-            copyable: false,
+            type: 'header-text-brand',
           },
         ],
         styles: `
@@ -99,71 +91,16 @@ export default (editor) => {
             padding: 8px;
           }
 
-          .header-brand h1 {
+          .header-brand .brand-text {
             font-size: 20px;
             font-weight: 500;
+            margin-bottom: 0 !important;
           }
 
-          .header-brand img {
+          .header-brand .brand-image {
             max-height: 48px;
           }
         `,
-      },
-      init() {
-        this.on('change:brand-type', this.handleBrandTypeChange);
-      },
-      handleBrandTypeChange() {
-        const brandType = this.props()['brand-type'];
-
-        let childQuery = null;
-        let appendedComponent = null;
-
-        if (brandType === 'text') {
-          childQuery = 'text';
-          appendedComponent = {
-            tagName: 'h1',
-            type: 'text',
-            content: 'My Brand',
-            name: 'My Brand',
-            traits: [],
-            toolbar: [],
-            removable: false,
-            draggable: false,
-            badgable: false,
-            droppable: false,
-            highlightable: false,
-            editable: true,
-            hoverable: false,
-            copyable: false,
-          };
-        } else if (brandType === 'image') {
-          childQuery = 'image';
-          appendedComponent = {
-            type: 'image',
-            attributes: {
-              loading: 'lazy',
-            },
-            removable: false,
-            draggable: false,
-            badgable: false,
-            droppable: false,
-            highlightable: false,
-            hoverable: false,
-            copyable: false,
-            resizable: false,
-            toolbar: [],
-          };
-        }
-
-        if (!childQuery || !appendedComponent) {
-          return;
-        }
-
-        const componentList = this.findType(childQuery);
-
-        if (componentList.length <= 0) {
-          this.components(appendedComponent);
-        }
       },
     },
   });
@@ -173,28 +110,26 @@ export default (editor) => {
       defaults: {
         tagName: 'header',
         name: 'Navbar Header',
-        droppable: false,
-        draggable: false,
-        removable: false,
-        stylable: false,
-        copyable: false,
-        resizeable: false,
-        layerable: false,
+        ...fullyDisabledComponentFlags,
         highlightable: true,
         selectable: true,
         hoverable: true,
-        badgeable: true,
-        toolbar: [],
+        badgable: true,
+        layerable: true,
         attributes: {
           class: 'header-container',
         },
-        'bg-color': 'transparent',
+        'bg-color': '#ffffff',
+        'brand-type': 'text',
         traits: [
           {
             type: 'custom-color-picker',
             label: 'Background color',
             name: 'bg-color',
             changeProp: 1,
+          },
+          {
+            type: 'brand-type-select',
           },
           {
             type: 'nav-links',
@@ -208,6 +143,11 @@ export default (editor) => {
           },
           {
             type: 'SignInButton',
+            highlightable: true,
+            selectable: true,
+            hoverable: true,
+            badgable: true,
+            layerable: true,
           },
         ],
         styles: `
@@ -228,6 +168,7 @@ export default (editor) => {
         // We put a listener that triggers when an attribute changes
         // In this case when text-color attribute changes
         this.on('change:bg-color', this.handleBGColorChange);
+        this.on('change:brand-type', this.handleBrandTypeChange);
 
         const componentCollection = this.components();
         this.listenTo(componentCollection, 'add remove', this.handleComponentsChange);
@@ -248,8 +189,48 @@ export default (editor) => {
 
         this.setStyle({
           ...this.getStyle(),
-          'background-color': bgColor,
+          background: bgColor,
         });
+      },
+      handleBrandTypeChange() {
+        const brandType = this.props()['brand-type'];
+
+        let childQuery = null;
+        let appendedComponent = null;
+
+        if (brandType === 'text') {
+          childQuery = 'header-text-brand';
+          appendedComponent = {
+            type: 'header-text-brand',
+          };
+        } else if (brandType === 'image') {
+          childQuery = 'custom-image';
+          appendedComponent = {
+            type: 'custom-image',
+            attributes: {
+              class: 'brand-image',
+            },
+            highlightable: true,
+            selectable: true,
+            hoverable: true,
+            editable: true,
+            badgable: true,
+          };
+        }
+
+        if (!childQuery || !appendedComponent) {
+          return;
+        }
+
+        const brandContainer = this.findType('header-brand')[0] ?? null;
+
+        if (brandContainer) {
+          const componentList = brandContainer.findType(childQuery);
+
+          if (componentList.length <= 0) {
+            brandContainer.components(appendedComponent);
+          }
+        }
       },
       handleComponentsChange() {
         // Here we're simply toggling the value

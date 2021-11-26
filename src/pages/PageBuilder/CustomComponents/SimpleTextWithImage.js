@@ -5,20 +5,25 @@ import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection'
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 
-const textSectionWithImageTraits = [
+export const imageTraits = [
   {
     type: 'image-cutout-select',
   },
   {
-    type: 'image-position-layout',
-  },
-  {
+    name: 'set-img-btn',
     type: 'button',
     text: 'Click to set image',
     full: true,
     label: 'Set Image',
     command: 'set-image-url',
   },
+];
+
+const textSectionWithImageTraits = [
+  {
+    type: 'image-position-layout',
+  },
+  ...imageTraits,
   ...textSectionTraits,
 ];
 
@@ -27,9 +32,11 @@ export default (editor) => {
     extend: 'image',
     model: {
       defaults: {
+        name: 'Image',
         attributes: {
           loading: 'lazy',
         },
+        traits: imageTraits,
         ...fullyDisabledComponentFlags,
         editable: true,
       },

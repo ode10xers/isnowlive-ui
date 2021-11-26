@@ -147,14 +147,21 @@ export default (editor) => {
 
       const adjustBorderRadius = (value) => {
         const selected = editor.getSelected();
-        const targetComponent = selected.find('img') ?? [selected];
+        const targetComponent = selected.find('img') ?? selected.findType('custom-image') ?? [];
 
-        targetComponent.forEach((comp) => {
-          comp.setStyle({
-            ...comp.getStyle(),
+        if (targetComponent.length > 0) {
+          targetComponent.forEach((comp) => {
+            comp.setStyle({
+              ...comp.getStyle(),
+              'border-radius': value,
+            });
+          });
+        } else {
+          selected.setStyle({
+            ...selected.getStyle(),
             'border-radius': value,
           });
-        });
+        }
       };
 
       const squareButton = document.createElement('button');

@@ -71,6 +71,7 @@
 
 .menuContainer {
   text-align: right !important;
+  justify-content: end;
   line-height: 64px !important;
   background-color: var(--passion-profile-navbar-bg, #{map-get($colors, 'White')}) !important;
 

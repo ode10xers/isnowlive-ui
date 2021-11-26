@@ -33,6 +33,7 @@ import { customEditorInitializationLogic } from 'utils/pageEditor.js';
 import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
+import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 
 const { Text } = Typography;
 
@@ -101,7 +102,8 @@ const HeaderEditor = ({ match, history }) => {
     const fallbackEditorInitialization = () => {
       editor.StorageManager.setCurrent('local');
 
-      editor.loadData(headerTemplate);
+      // editor.loadData(headerTemplate);
+      editor.loadData({ components: [{ type: 'navbar-header' }] });
     };
 
     try {
@@ -128,6 +130,7 @@ const HeaderEditor = ({ match, history }) => {
           console.error(err);
           fallbackEditorInitialization();
         }
+        fallbackEditorInitialization();
       } else {
         fallbackEditorInitialization();
       }
@@ -213,7 +216,7 @@ const HeaderEditor = ({ match, history }) => {
       blockManager: {
         blocks: [],
       },
-      plugins: [ReactComponentHandler, LinkButton, Header, CustomCommands, CustomTraits],
+      plugins: [ReactComponentHandler, LinkButton, Header, SimpleTextWithImage, CustomCommands, CustomTraits],
     });
 
     customEditorInitializationLogic(editor);

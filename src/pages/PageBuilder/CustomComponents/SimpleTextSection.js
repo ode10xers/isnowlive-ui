@@ -17,7 +17,7 @@ import linkedinIcon from 'assets/icons/linkedin/linkedin.svg';
 import instagramIcon from 'assets/icons/instagram/instagram.svg';
 import twitterIcon from 'assets/icons/twitter/twitter.svg';
 
-const textPropHandlers = {
+export const textPropHandlers = {
   handleFontChange() {
     const font = this.props()['font-family'];
 
