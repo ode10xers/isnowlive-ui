@@ -1,7 +1,13 @@
 // API Doc : https://grapesjs.com/docs/api/block.html#block
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 
-import websiteIcon from 'assets/icons/website/website.svg';
+import sessionListIcon from 'assets/icons/page_editor_blocks/session_list.svg';
+import videoListIcon from 'assets/icons/page_editor_blocks/video_list.svg';
+import courseListIcon from 'assets/icons/page_editor_blocks/course_list.svg';
+import passListIcon from 'assets/icons/page_editor_blocks/pass_list.svg';
+import membershipListIcon from 'assets/icons/page_editor_blocks/membership_list.svg';
+import textSectionIcon from 'assets/icons/page_editor_blocks/text_section.svg';
+import textWithImageIcon from 'assets/icons/page_editor_blocks/text_with_image.svg';
 
 const categories = {
   LAYOUTS: 'Layouts',
@@ -30,7 +36,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Session List </b>',
     droppable: false,
     resizable: false,
-    media: `<img src="${websiteIcon}" loading="lazy" />`,
+    media: `<img src="${sessionListIcon}" loading="lazy" />`,
     category: categories.PASSION_COMPONENTS,
     attributes: {
       title: 'Click to add',
@@ -44,6 +50,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Video List </b>',
     droppable: false,
     resizable: false,
+    media: `<img src="${videoListIcon}" loading="lazy" />`,
     category: categories.PASSION_COMPONENTS,
     attributes: {
       title: 'Click to add',
@@ -57,6 +64,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Course List </b>',
     droppable: false,
     resizable: false,
+    media: `<img src="${courseListIcon}" loading="lazy" />`,
     category: categories.PASSION_COMPONENTS,
     content: {
       type: 'passion-course-list-block',
@@ -67,6 +75,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Pass List </b>',
     droppable: false,
     resizable: false,
+    media: `<img src="${passListIcon}" loading="lazy" />`,
     category: categories.PASSION_COMPONENTS,
     content: {
       type: 'passion-pass-list-block',
@@ -77,6 +86,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Subscription List </b>',
     droppable: false,
     resizable: false,
+    media: `<img src="${membershipListIcon}" loading="lazy" />`,
     category: categories.PASSION_COMPONENTS,
     content: {
       type: 'passion-subscription-list-block',
@@ -89,6 +99,7 @@ export default [
   {
     id: 'simple-text-section',
     label: '<b> Simple Text Section </b>',
+    media: `<img src="${textSectionIcon}" loading="lazy" />`,
     category: categories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
@@ -100,6 +111,7 @@ export default [
   {
     id: 'simple-text-with-image-section',
     label: '<b> Simple Text with Image Section </b>',
+    media: `<img src="${textWithImageIcon}" loading="lazy" />`,
     category: categories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
