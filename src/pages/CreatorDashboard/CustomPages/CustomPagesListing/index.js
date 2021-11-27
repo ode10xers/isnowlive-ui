@@ -9,7 +9,7 @@ import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import { copyToClipboard, isAPISuccess } from 'utils/helper';
 import { generateUrlFromUsername } from 'utils/url';
 import { pageTypes, websiteComponentTypes } from 'utils/constants';
 
@@ -151,6 +151,11 @@ const CustomPagesListing = ({ match, history }) => {
     });
   };
 
+  const handleCopyPageLink = (pageInfo) => {
+    const targetLink = generateUrlFromUsername(userDetails.username) + '/' + (pageInfo.slug ?? '');
+    copyToClipboard(targetLink);
+  };
+
   const pageTableColumns = [
     {
       title: 'Page Name',
@@ -173,6 +178,11 @@ const CustomPagesListing = ({ match, history }) => {
       align: 'right',
       render: (text, record) => (
         <Row gutter={[8, 8]} align="middle" justify="end">
+          <Col>
+            <Button ghost type="primary" onClick={() => handleCopyPageLink(record)}>
+              Copy Link
+            </Button>
+          </Col>
           <Col>
             <Button type="primary" onClick={() => handleEditPageDetails(record)}>
               Edit Page Details

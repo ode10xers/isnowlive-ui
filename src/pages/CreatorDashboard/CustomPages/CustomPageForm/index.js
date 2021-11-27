@@ -72,8 +72,6 @@ const CustomPageForm = ({ match, location, history }) => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
-  const [slugInputTouched, setSlugInputTouched] = useState(isCreatingHomepage);
-
   const fetchCreatorHeaderComponent = useCallback(async () => {
     try {
       const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.HEADER);
@@ -234,7 +232,7 @@ const CustomPageForm = ({ match, location, history }) => {
       return;
     }
 
-    if (!isCreatingHomepage && !values.customPageSlug) {
+    if (!targetPageId && !isCreatingHomepage && !values.customPageSlug) {
       message.error('Please enter a page slug!');
       return;
     }
@@ -317,11 +315,13 @@ const CustomPageForm = ({ match, location, history }) => {
 
   return (
     <div>
-      <TemplatePreviewModal
-        visible={previewModalVisible}
-        closeModal={closePreviewModal}
-        templateData={selectedTemplate}
-      />
+      {!targetPageId && (
+        <TemplatePreviewModal
+          visible={previewModalVisible}
+          closeModal={closePreviewModal}
+          templateData={selectedTemplate}
+        />
+      )}
       <Spin spinning={isLoading} tip="Processing...">
         <Form layout="horizontal" name="pageForm" form={form} onFinish={handleFormFinish} scrollToFirstError={true}>
           <Row gutter={[8, 24]}>
@@ -348,6 +348,12 @@ const CustomPageForm = ({ match, location, history }) => {
                     name="customPageName"
                     label="Page Name"
                     rules={validationRules.requiredValidation}
+                    extra={
+                      <Text className={styles.inputHelpText} type="secondary">
+                        This will be the name of the page, as well as the title that show up at the tab bar (at the top
+                        of the browser)
+                      </Text>
+                    }
                   >
                     <Input
                       className={styles.formInputElement}
@@ -464,7 +470,11 @@ const CustomPageForm = ({ match, location, history }) => {
             <Col xs={24}>
               <Row justify="end" gutter={[10, 10]}>
                 <Col>
-                  <Button size="large" htmlType="submit" disabled={!isValidSlug || !selectedTemplate}>
+                  <Button
+                    size="large"
+                    htmlType="submit"
+                    disabled={!isValidSlug || (!targetPageId && !selectedTemplate)}
+                  >
                     {targetPageId ? 'Update' : 'Create'} Page
                   </Button>
                 </Col>
@@ -473,7 +483,7 @@ const CustomPageForm = ({ match, location, history }) => {
                     size="large"
                     type="primary"
                     onClick={handleSaveAndEditContent}
-                    disabled={!isValidSlug || !selectedTemplate}
+                    disabled={!isValidSlug || (!targetPageId && !selectedTemplate)}
                   >
                     Save Changes and Edit Content
                   </Button>
