@@ -11,7 +11,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import { showErrorModal } from 'components/Modals/modals';
-import TemplatePreviewModal from 'pages/PageBuilder/PageRenderer/TemplatePreviewModal';
+import TemplatePreviewModal from 'pages/CreatorDashboard/CustomPages/TemplatePreviewModal';
 
 import { pageCreateFormLayout, pageCreateFormTailLayout } from 'layouts/FormLayouts';
 

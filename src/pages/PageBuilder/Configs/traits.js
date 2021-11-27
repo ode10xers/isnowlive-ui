@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { googleFonts } from 'utils/constants.js';
-import CustomColorPicker from '../CustomColorPicker';
+import CustomColorPicker from '../CustomInputs/CustomColorPicker';
 
 const generateTemplateHTML = (label = '') => `
   <div class="custom-trait-layout">

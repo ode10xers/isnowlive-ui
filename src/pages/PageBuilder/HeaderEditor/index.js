@@ -20,7 +20,7 @@ import commonEditorConfig from '../Configs/common/config';
 // THese are to be put in plugins
 import CustomTraits from '../Configs/traits';
 import CustomCommands from '../Configs/commands';
-import ReactComponentHandler from '../ReactComponentHandler';
+import ReactComponentHandler from '../CustomComponents/ReactComponentHandler.js';
 import LinkButton from '../CustomComponents/LinkButton.js';
 import Header from '../CustomComponents/Header.js';
 

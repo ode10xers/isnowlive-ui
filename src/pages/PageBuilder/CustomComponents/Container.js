@@ -1,5 +1,6 @@
 import { isValidCSSColor } from 'utils/colors';
 
+// TODO: Refactor these later
 export default (editor) => {
   editor.DomComponents.addType('fixed-width-container', {
     model: {

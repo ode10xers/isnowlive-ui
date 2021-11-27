@@ -22,7 +22,7 @@ import commonEditorConfig from '../Configs/common/config';
 // NOTE: These are component definitions to be used by GrapesJS
 import CustomTraits from '../Configs/traits';
 import CustomCommands from '../Configs/commands';
-import ReactComponentHandler from '../ReactComponentHandler';
+import ReactComponentHandler from '../CustomComponents/ReactComponentHandler.js';
 import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
 import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 import PassionProductsList from '../CustomComponents/PassionProductsList.js';

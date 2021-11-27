@@ -19,6 +19,7 @@ import commonEditorConfig from '../Configs/common/config';
 
 // THese are to be put in plugins
 import CustomCommands from '../Configs/commands';
+import ReactComponentHandler from '../CustomComponents/ReactComponentHandler.js';
 import Footer from '../CustomComponents/Footer.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
@@ -30,7 +31,6 @@ import { customEditorInitializationLogic } from 'utils/pageEditor.js';
 import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
-import ReactComponentHandler from '../ReactComponentHandler/index.js';
 
 const {
   BUILDER_CONTAINER_ID,

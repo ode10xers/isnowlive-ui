@@ -27,7 +27,7 @@ import definedBlocks from '../Configs/blocks.js';
 // THese are to be put in plugins
 import CustomTraits from '../Configs/traits';
 import CustomCommands from '../Configs/commands';
-import ReactComponentHandler from '../ReactComponentHandler';
+import ReactComponentHandler from '../CustomComponents/ReactComponentHandler.js';
 import PassionProductsList from '../CustomComponents/PassionProductsList.js';
 import Container from '../CustomComponents/Container.js';
 import LinkButton from '../CustomComponents/LinkButton.js';
