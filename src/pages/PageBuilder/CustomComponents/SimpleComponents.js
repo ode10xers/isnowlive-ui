@@ -1,6 +1,7 @@
-import { backgroundTraits } from '../Configs/common/trait_sets';
+import { backgroundTraits, contextualFontTraits, spacingTraits } from '../Configs/common/trait_sets';
 import defaultToolbar from '../Configs/common/toolbar.js';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
+import { textPropHandlers } from './SimpleTextSection';
 
 const containerBGHandler = {
   handleBGStyleChange() {
@@ -14,6 +15,7 @@ const containerBGHandler = {
 };
 
 export default (editor) => {
+  // NOTE : Container Components
   editor.DomComponents.addType('flex-column-container', {
     model: {
       defaults: {
@@ -39,14 +41,7 @@ export default (editor) => {
             type: 'container-justify-content',
             label: 'Vertical Align',
           },
-          {
-            type: 'padding-slider',
-            min: 0,
-            max: 100,
-          },
-          {
-            type: 'margin-slider',
-          },
+          ...spacingTraits,
           ...backgroundTraits,
         ],
         styles: `
@@ -128,14 +123,7 @@ export default (editor) => {
             type: 'container-align-items',
             label: 'Vertical Align',
           },
-          {
-            type: 'padding-slider',
-            min: 0,
-            max: 100,
-          },
-          {
-            type: 'margin-slider',
-          },
+          ...spacingTraits,
           ...backgroundTraits,
         ],
         styles: `
@@ -166,6 +154,38 @@ export default (editor) => {
         this.on('change:bg-style', this.handleBGStyleChange);
       },
       ...containerBGHandler,
+    },
+  });
+
+  // NOTE : Text & Image Components
+  editor.DomComponents.addType('text-item', {
+    model: {
+      defaults: {
+        tagName: 'p',
+        name: 'Text',
+        attributes: {
+          class: 'text-item',
+        },
+        'font-family': 'Times New Roman',
+        'text-color': '#000000',
+        content: `
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vestibulum vestibulum est at fringilla. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed tempus augue vel eros elementum mollis.
+        `,
+        traits: [
+          {
+            type: 'text-section-layout',
+          },
+          ...spacingTraits,
+          ...contextualFontTraits,
+        ],
+      },
+      init() {
+        // We put a listener that triggers when an attribute changes
+        // In this case when text-color attribute changes
+        this.on('change:text-color', this.handleTextColorChange);
+        this.on('change:font-family', this.handleFontChange);
+      },
+      ...textPropHandlers,
     },
   });
 };

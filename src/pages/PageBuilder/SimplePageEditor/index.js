@@ -152,16 +152,8 @@ const SimplePageEditor = ({ match, history }) => {
       selectorManager: { appendTo: '', componentFirst: true },
       styleManager: { appendTo: '' },
       blockManager: {
-        appendTo: '#' + BLOCKS_PANEL_ID,
+        ...commonEditorConfig.blockManager,
         blocks: definedBlocks,
-        appendOnClick: (block, editor) => {
-          editor.getWrapper().append(block.get('content'));
-          // const cnv = editor.Canvas;
-          // if (cnv && cnv.getWindow()) {
-          //   cnv.getWindow().scrollTo(0, cnv.getDocument()?.body.scrollHeight ?? 0);
-          // }
-          editor.Canvas.getWindow().scrollTo(0, editor.Canvas.getDocument().body.scrollHeight);
-        },
       },
       domComponents: {
         storeWrapper: true,

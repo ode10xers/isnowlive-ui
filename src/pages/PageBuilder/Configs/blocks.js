@@ -9,7 +9,7 @@ import membershipListIcon from 'assets/icons/page_editor_blocks/membership_list.
 import textSectionIcon from 'assets/icons/page_editor_blocks/text_section.svg';
 import textWithImageIcon from 'assets/icons/page_editor_blocks/text_with_image.svg';
 
-const categories = {
+export const blockCategories = {
   LAYOUTS: 'Layouts',
   PASSION_COMPONENTS: 'Passion Components',
   SIMPLE_COMPONENTS: 'Simple Components',
@@ -37,7 +37,7 @@ const passionProductListBlocks = [
     droppable: false,
     resizable: false,
     media: `<img src="${sessionListIcon}" loading="lazy" />`,
-    category: categories.PASSION_COMPONENTS,
+    category: blockCategories.PASSION_COMPONENTS,
     attributes: {
       title: 'Click to add',
     },
@@ -51,7 +51,7 @@ const passionProductListBlocks = [
     droppable: false,
     resizable: false,
     media: `<img src="${videoListIcon}" loading="lazy" />`,
-    category: categories.PASSION_COMPONENTS,
+    category: blockCategories.PASSION_COMPONENTS,
     attributes: {
       title: 'Click to add',
     },
@@ -65,7 +65,7 @@ const passionProductListBlocks = [
     droppable: false,
     resizable: false,
     media: `<img src="${courseListIcon}" loading="lazy" />`,
-    category: categories.PASSION_COMPONENTS,
+    category: blockCategories.PASSION_COMPONENTS,
     content: {
       type: 'passion-course-list-block',
     },
@@ -76,7 +76,7 @@ const passionProductListBlocks = [
     droppable: false,
     resizable: false,
     media: `<img src="${passListIcon}" loading="lazy" />`,
-    category: categories.PASSION_COMPONENTS,
+    category: blockCategories.PASSION_COMPONENTS,
     content: {
       type: 'passion-pass-list-block',
     },
@@ -87,7 +87,7 @@ const passionProductListBlocks = [
     droppable: false,
     resizable: false,
     media: `<img src="${membershipListIcon}" loading="lazy" />`,
-    category: categories.PASSION_COMPONENTS,
+    category: blockCategories.PASSION_COMPONENTS,
     content: {
       type: 'passion-subscription-list-block',
     },
@@ -99,7 +99,7 @@ const presetLayouts = [
     id: 'simple-text-section',
     label: '<b> Simple Text Section </b>',
     media: `<img src="${textSectionIcon}" loading="lazy" />`,
-    category: categories.LAYOUTS,
+    category: blockCategories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
     },
@@ -111,7 +111,7 @@ const presetLayouts = [
     id: 'simple-text-with-image-section',
     label: '<b> Simple Text with Image Section </b>',
     media: `<img src="${textWithImageIcon}" loading="lazy" />`,
-    category: categories.LAYOUTS,
+    category: blockCategories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
     },
@@ -122,7 +122,7 @@ const presetLayouts = [
   {
     id: 'simple-text-with-button-section',
     label: '<b> Simple Text with Button Section </b>',
-    category: categories.LAYOUTS,
+    category: blockCategories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
     },
@@ -133,7 +133,7 @@ const presetLayouts = [
   {
     id: 'simple-text-image-button-section',
     label: '<b> Simple Text Image with Button Section </b>',
-    category: categories.LAYOUTS,
+    category: blockCategories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
     },
@@ -144,7 +144,7 @@ const presetLayouts = [
   {
     id: 'bio-with-links',
     label: '<b> Simple Bio </b>',
-    category: categories.LAYOUTS,
+    category: blockCategories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
     },
@@ -155,7 +155,7 @@ const presetLayouts = [
   {
     id: 'testimonials',
     label: '<b> Testimonials </b>',
-    category: categories.LAYOUTS,
+    category: blockCategories.LAYOUTS,
     attributes: {
       'data-wide-mode': 'true',
     },
@@ -169,7 +169,7 @@ const simpleComponents = [
   {
     id: 'flex-container',
     label: '<b> Single Column Container </b>',
-    category: categories.SIMPLE_COMPONENTS,
+    category: blockCategories.SIMPLE_COMPONENTS,
     select: true,
     content: {
       type: 'flex-column-container',
@@ -178,10 +178,19 @@ const simpleComponents = [
   {
     id: 'two-column-container',
     label: '<b> Two Column Container </b>',
-    category: categories.SIMPLE_COMPONENTS,
+    category: blockCategories.SIMPLE_COMPONENTS,
     select: true,
     content: {
       type: 'two-column-container',
+    },
+  },
+  {
+    id: 'text-item',
+    label: '<b> Text </b>',
+    category: blockCategories.SIMPLE_COMPONENTS,
+    select: true,
+    content: {
+      type: 'text-item',
     },
   },
 ];

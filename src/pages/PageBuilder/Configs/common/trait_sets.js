@@ -20,6 +20,19 @@ export const contextualFontTraits = [
   },
 ];
 
+export const spacingTraits = [
+  {
+    type: 'padding-slider',
+    min: 0,
+    max: 100,
+  },
+  {
+    type: 'margin-slider',
+    min: 0,
+    max: 100,
+  },
+];
+
 //NOTE: Needs a 'bg-color' prop
 export const backgroundTraits = [
   {

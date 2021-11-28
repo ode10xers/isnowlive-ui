@@ -1,3 +1,5 @@
+import { message } from 'antd';
+import { blockCategories } from '../blocks.js';
 import elementIds from './elementIds';
 
 const {
@@ -54,7 +56,13 @@ export default {
   blockManager: {
     appendTo: '#' + BLOCKS_PANEL_ID,
     appendOnClick: (block, editor) => {
-      editor.getWrapper().append(block.get('content'));
+      const cat = block.getCategoryLabel();
+      if (cat === blockCategories.SIMPLE_COMPONENTS) {
+        message.warning('For Simple Components, please drag and drop them directly!');
+      } else {
+        editor.getWrapper().append(block.get('content'));
+        editor.Canvas.getWindow().scrollTo(0, editor.Canvas.getDocument().body.scrollHeight);
+      }
     },
   },
   deviceManager: {

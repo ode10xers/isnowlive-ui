@@ -447,8 +447,8 @@ export default (editor) => {
     `,
     createInput({ trait }) {
       // Create a new element container and add some content
-      const minValue = 0;
-      const maxValue = 100;
+      const minValue = trait.get('min') || 0;
+      const maxValue = trait.get('max') || 250;
       const el = document.createElement('div');
       el.innerHTML = `
       <div class="input-slider-container">
