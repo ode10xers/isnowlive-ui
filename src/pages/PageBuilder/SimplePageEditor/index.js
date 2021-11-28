@@ -34,6 +34,7 @@ import LinkButton from '../CustomComponents/LinkButton.js';
 import Testimonials from '../CustomComponents/Testimonials.js';
 import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
 import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
+import SimpleComponents from '../CustomComponents/SimpleComponents.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
@@ -219,6 +220,7 @@ const SimplePageEditor = ({ match, history }) => {
         Testimonials,
         SimpleTextSection,
         SimpleTextWithImage,
+        SimpleComponents,
         'gjs-plugin-ckeditor',
       ],
       pluginsOpts: {

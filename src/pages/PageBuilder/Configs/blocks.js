@@ -94,8 +94,7 @@ const passionProductListBlocks = [
   },
 ];
 
-export default [
-  ...passionProductListBlocks,
+const presetLayouts = [
   {
     id: 'simple-text-section',
     label: '<b> Simple Text Section </b>',
@@ -165,3 +164,26 @@ export default [
     },
   },
 ];
+
+const simpleComponents = [
+  {
+    id: 'flex-container',
+    label: '<b> Single Column Container </b>',
+    category: categories.SIMPLE_COMPONENTS,
+    select: true,
+    content: {
+      type: 'flex-column-container',
+    },
+  },
+  {
+    id: 'two-column-container',
+    label: '<b> Two Column Container </b>',
+    category: categories.SIMPLE_COMPONENTS,
+    select: true,
+    content: {
+      type: 'two-column-container',
+    },
+  },
+];
+
+export default [...passionProductListBlocks, ...presetLayouts, ...simpleComponents];

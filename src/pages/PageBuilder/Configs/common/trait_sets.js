@@ -3,14 +3,8 @@ export const genericFontTraits = [
   {
     type: 'font-selector',
     name: 'font-family',
-    changeProp: 1,
+    changeProp: true,
   },
-  // {
-  //   type: 'custom-color-picker',
-  //   label: 'Text color',
-  //   name: 'text-color',
-  //   changeProp: 1,
-  // },
   {
     type: 'custom-color-picker',
     label: 'Text Color',

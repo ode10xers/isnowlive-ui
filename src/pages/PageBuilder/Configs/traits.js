@@ -15,6 +15,101 @@ const generateTemplateHTML = (label = '') => `
 `;
 
 export default (editor) => {
+  // NOTE : Flex Container Trait
+  // On Flex Direction Columns, this will work to control vertical align
+  editor.TraitManager.addType('container-justify-content', {
+    noLabel: true,
+    templateInput({ trait }) {
+      return generateTemplateHTML(trait.get('label') || 'Vertical Align');
+    },
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['radio-btn-container']);
+
+      const adjustFlexVerticalAlign = (value) => {
+        const selected = editor.getSelected();
+
+        if (selected) {
+          selected.setStyle({
+            ...selected.getStyle(),
+            'justify-content': value,
+          });
+        }
+      };
+
+      [
+        {
+          labelText: 'Top',
+          value: 'flex-start',
+        },
+        {
+          labelText: 'Center',
+          value: 'center',
+        },
+        {
+          labelText: 'Bottom',
+          value: 'flex-end',
+        },
+      ].map((btnData) => {
+        const btn = document.createElement('button');
+        btn.classList.add('radio-btn-item');
+        btn.innerText = btnData.labelText;
+        btn.addEventListener('click', () => adjustFlexVerticalAlign(btnData.value));
+
+        el.appendChild(btn);
+      });
+
+      return el;
+    },
+  });
+
+  // Vertical align control for flex-column;
+  editor.TraitManager.addType('container-align-items', {
+    noLabel: true,
+    templateInput({ trait }) {
+      return generateTemplateHTML(trait.get('label') || 'Vertical Align');
+    },
+    createInput({ trait }) {
+      const el = document.createElement('div');
+      el.classList.add(['radio-btn-container']);
+
+      const adjustFlexVerticalAlign = (value) => {
+        const selected = editor.getSelected();
+
+        if (selected) {
+          selected.setStyle({
+            ...selected.getStyle(),
+            'align-items': value,
+          });
+        }
+      };
+
+      [
+        {
+          labelText: 'Top',
+          value: 'flex-start',
+        },
+        {
+          labelText: 'Center',
+          value: 'center',
+        },
+        {
+          labelText: 'Bottom',
+          value: 'flex-end',
+        },
+      ].map((btnData) => {
+        const btn = document.createElement('button');
+        btn.classList.add('radio-btn-item');
+        btn.innerText = btnData.labelText;
+        btn.addEventListener('click', () => adjustFlexVerticalAlign(btnData.value));
+
+        el.appendChild(btn);
+      });
+
+      return el;
+    },
+  });
+
   // NOTE : Custom Color Picker
   editor.TraitManager.addType('custom-color-picker', {
     noLabel: true,
@@ -164,20 +259,44 @@ export default (editor) => {
         }
       };
 
-      const squareButton = document.createElement('button');
-      // squareButton.classList.add('fa', 'fa-square', 'radio-btn-item');
-      squareButton.classList.add('radio-btn-item');
-      squareButton.innerText = 'Square';
-      squareButton.addEventListener('click', () => adjustBorderRadius('0px'));
+      [
+        {
+          labelText: 'Square',
+          value: '0px',
+        },
+        {
+          labelText: 'Round',
+          value: '0px',
+        },
+      ].map((btnData) => {
+        const btn = document.createElement('button');
+        btn.classList.add('radio-btn-item');
+        btn.innerText = btnData.labelText;
+        btn.addEventListener('click', () => adjustBorderRadius(btnData.value));
 
-      const roundButton = document.createElement('button');
-      // roundButton.classList.add('fa', 'fa-circle', 'radio-btn-item');
-      roundButton.classList.add('radio-btn-item');
-      roundButton.innerText = 'Round';
-      roundButton.addEventListener('click', () => adjustBorderRadius('50%'));
+        el.appendChild(btn);
+      });
 
-      el.appendChild(squareButton);
-      el.appendChild(roundButton);
+      // const squareButton = document.createElement('button');
+      // // squareButton.classList.add('fa', 'fa-square', 'radio-btn-item');
+      // squareButton.classList.add('radio-btn-item');
+      // squareButton.innerText = 'Square';
+      // squareButton.addEventListener('click', () => adjustBorderRadius('0px'));
+
+      // const roundButton = document.createElement('button');
+      // // roundButton.classList.add('fa', 'fa-circle', 'radio-btn-item');
+      // roundButton.classList.add('radio-btn-item');
+      // roundButton.innerText = 'Round';
+      // roundButton.addEventListener('click', () => adjustBorderRadius('50%'));
+
+      // el.appendChild(squareButton);
+      // el.appendChild(roundButton);
+
+      const helpText = document.createElement('div');
+      helpText.classList.add('radio-btn-helptext');
+      helpText.innerText = 'To have a perfectly circle image, the image needs to have 1:1 (square) ratio';
+
+      el.appendChild(helpText);
       return el;
     },
   });
@@ -276,7 +395,6 @@ export default (editor) => {
     templateInput: generateTemplateHTML('Padding'),
     createInput({ trait }) {
       // Create a new element container and add some content
-      console.log(trait.get('min'));
       const minValue = trait.get('min') || 0;
       const maxValue = trait.get('max') || 250;
       const el = document.createElement('div');
