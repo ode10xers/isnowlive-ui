@@ -110,6 +110,52 @@ export default (editor) => {
     },
   });
 
+  // Alignment for Flex Items
+  editor.TraitManager.addType('flex-align-self', {
+    noLabel: true,
+    templateInput: generateTemplateHTML('Position'),
+    createInput({ trait }) {
+      // Here we can decide to use properties from the trait
+      const options = [
+        { id: 'flex-start', name: 'Left', class: 'fa fa-align-left' },
+        { id: 'center', name: 'Centered', class: 'fa fa-align-center' },
+        { id: 'flex-end', name: 'Right', class: 'fa fa-align-right' },
+      ];
+
+      // Create a new element container and add some content
+      const el = document.createElement('div');
+      // el.classList.add(['trait-radio-button-container']);
+      // el.innerHTML = `
+      //   ${options.map((opt) => `
+      //     <input type="radio" class="trait-radio-button ${opt.class}" name="${opt.name}" value="${opt.value}" />
+      //   `)}
+      // `;
+      el.innerHTML = `
+        <select class="input-select" id="flex-item-layout-select">
+          ${options.map((opt) => `<option value="${opt.id}">${opt.name}</option>`).join('')}
+        </select>
+      `;
+
+      return el;
+    },
+    onEvent({ elInput, component, event }) {
+      const inputType = elInput.querySelector('#flex-item-layout-select');
+      const alignValue = inputType.value;
+
+      component.setStyle({
+        ...component.getStyle(),
+        'align-self': alignValue,
+      });
+    },
+    onUpdate({ elInput, component }) {
+      const layout = component.getStyle()['align-self'] || 'flex-start';
+      const inputType = elInput.querySelector('#flex-item-layout-select');
+      inputType.value = layout;
+
+      inputType.dispatchEvent(new CustomEvent('change'));
+    },
+  });
+
   // NOTE : Custom Color Picker
   editor.TraitManager.addType('custom-color-picker', {
     noLabel: true,
@@ -236,6 +282,8 @@ export default (editor) => {
     noLabel: true,
     templateInput: generateTemplateHTML('Image Type'),
     createInput({ trait }) {
+      const container = document.createElement('div');
+
       // Create a new element container and add some content
       const el = document.createElement('div');
       el.classList.add(['radio-btn-container']);
@@ -266,7 +314,7 @@ export default (editor) => {
         },
         {
           labelText: 'Round',
-          value: '0px',
+          value: '50%',
         },
       ].map((btnData) => {
         const btn = document.createElement('button');
@@ -277,27 +325,14 @@ export default (editor) => {
         el.appendChild(btn);
       });
 
-      // const squareButton = document.createElement('button');
-      // // squareButton.classList.add('fa', 'fa-square', 'radio-btn-item');
-      // squareButton.classList.add('radio-btn-item');
-      // squareButton.innerText = 'Square';
-      // squareButton.addEventListener('click', () => adjustBorderRadius('0px'));
-
-      // const roundButton = document.createElement('button');
-      // // roundButton.classList.add('fa', 'fa-circle', 'radio-btn-item');
-      // roundButton.classList.add('radio-btn-item');
-      // roundButton.innerText = 'Round';
-      // roundButton.addEventListener('click', () => adjustBorderRadius('50%'));
-
-      // el.appendChild(squareButton);
-      // el.appendChild(roundButton);
+      container.appendChild(el);
 
       const helpText = document.createElement('div');
       helpText.classList.add('radio-btn-helptext');
       helpText.innerText = 'To have a perfectly circle image, the image needs to have 1:1 (square) ratio';
 
-      el.appendChild(helpText);
-      return el;
+      container.appendChild(helpText);
+      return container;
     },
   });
 

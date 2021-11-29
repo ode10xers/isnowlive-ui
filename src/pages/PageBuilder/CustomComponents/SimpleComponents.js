@@ -3,6 +3,8 @@ import defaultToolbar from '../Configs/common/toolbar.js';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { textPropHandlers } from './SimpleTextSection';
 
+import { imageTraits } from './SimpleTextWithImage.js';
+
 const containerBGHandler = {
   handleBGStyleChange() {
     const bgStyle = this.props()['bg-style'];
@@ -165,6 +167,7 @@ export default (editor) => {
         tagName: 'p',
         name: 'Text',
         editable: true,
+        droppable: false,
         attributes: {
           class: 'text-item',
         },
@@ -181,6 +184,11 @@ export default (editor) => {
           ...spacingTraits,
           ...contextualFontTraits,
         ],
+        styles: `
+          .text-item {
+            width: auto;
+          }
+        `,
       },
       init() {
         // We put a listener that triggers when an attribute changes
@@ -192,5 +200,26 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('image-item', {});
+  editor.DomComponents.addType('image-item', {
+    extend: 'image',
+    model: {
+      defaults: {
+        name: 'Image',
+        tagName: 'img',
+        attributes: {
+          loading: 'lazy',
+        },
+        toolbar: defaultToolbar,
+        droppable: false,
+        editable: true,
+        traits: [
+          {
+            type: 'flex-align-self',
+          },
+          ...spacingTraits,
+          ...imageTraits,
+        ],
+      },
+    },
+  });
 };

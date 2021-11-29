@@ -193,6 +193,15 @@ const simpleComponents = [
       type: 'text-item',
     },
   },
+  {
+    id: 'image-item',
+    label: '<b> Image </b>',
+    category: blockCategories.SIMPLE_COMPONENTS,
+    select: true,
+    content: {
+      type: 'image-item',
+    },
+  },
 ];
 
-export default [...passionProductListBlocks, ...presetLayouts, ...simpleComponents];
+export default [...presetLayouts, ...simpleComponents, ...passionProductListBlocks];

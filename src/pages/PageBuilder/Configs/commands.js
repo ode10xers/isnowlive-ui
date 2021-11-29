@@ -137,7 +137,7 @@ export default (editor) => {
               });
               closestImage.set('src', asset.getSrc(), { silent: 1 });
               isSet = true;
-            } else if (selected.is('image') || selected.is('custom-image')) {
+            } else if (selected.is('image') || selected.is('custom-image') || selected.is('image-item')) {
               // selected.addAttributes({ src: asset.getSrc() });
               selected.setAttributes({
                 ...selected.getAttributes(),
