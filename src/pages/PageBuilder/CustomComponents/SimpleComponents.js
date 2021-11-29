@@ -159,13 +159,16 @@ export default (editor) => {
 
   // NOTE : Text & Image Components
   editor.DomComponents.addType('text-item', {
+    extend: 'text',
     model: {
       defaults: {
         tagName: 'p',
         name: 'Text',
+        editable: true,
         attributes: {
           class: 'text-item',
         },
+        toolbar: defaultToolbar,
         'font-family': 'Times New Roman',
         'text-color': '#000000',
         content: `
@@ -188,4 +191,6 @@ export default (editor) => {
       ...textPropHandlers,
     },
   });
+
+  editor.DomComponents.addType('image-item', {});
 };
