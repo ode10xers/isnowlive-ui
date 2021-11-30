@@ -35,10 +35,15 @@ import Testimonials from '../CustomComponents/Testimonials.js';
 import SimpleTextSection from '../CustomComponents/SimpleTextSection.js';
 import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 import SimpleComponents from '../CustomComponents/SimpleComponents.js';
+import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
+import PassionFooter from 'components/PageEditorPassionComponents/PassionFooter';
+
+import EditorRenderer from '../EditorRenderer/index.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
 import { getSiblingElements, isAPISuccess } from 'utils/helper.js';
 import { blankPageTemplate } from 'utils/pageEditorTemplates.js';
+import { websiteComponentTypes } from 'utils/constants';
 import { confirmDirtyCount, customEditorInitializationLogic } from 'utils/pageEditor.js';
 
 import { useGlobalContext } from 'services/globalContext.js';
@@ -52,6 +57,7 @@ const { BUILDER_CONTAINER_ID, TRAITS_PANEL_ID, LAYERS_PANEL_ID, BLOCKS_PANEL_ID 
 
 const { RIGHT, TOP, LEFT, EMPTY } = sectionIds;
 
+// TODO: Refactor the configs and stuff to use variable instead of hardcoded strings
 const SimplePageEditor = ({ match, history }) => {
   const targetPageId = match.params.page_id;
 
@@ -64,12 +70,43 @@ const SimplePageEditor = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [gjsEditor, setGjsEditor] = useState(null);
 
+  const [creatorHeader, setCreatorHeader] = useState(null);
+  const [creatorFooter, setCreatorFooter] = useState(null);
+  const [headerContainer, setHeaderContainer] = useState(null);
+  const [footerContainer, setFooterContainer] = useState(null);
+
   const [creatorAssets, setCreatorAssets] = useState([]);
   const [creatorPages, setCreatorPages] = useState([]);
   // eslint-disable-next-line
   const [selectedPageId, setSelectedPageId] = useState(targetPageId ?? null);
 
   const [isComponentSelected, setIsComponentSelected] = useState(false);
+
+  const fetchCreatorHeaderComponent = useCallback(async () => {
+    try {
+      const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.HEADER);
+
+      if (isAPISuccess(status) && data) {
+        setCreatorHeader(data);
+      }
+    } catch (error) {
+      console.log('Failed fetching creator header component!');
+      console.error(error);
+    }
+  }, []);
+
+  const fetchCreatorFooterComponent = useCallback(async () => {
+    try {
+      const { status, data } = await apis.custom_pages.getWebsiteComponent(websiteComponentTypes.FOOTER);
+
+      if (isAPISuccess(status) && data) {
+        setCreatorFooter(data);
+      }
+    } catch (error) {
+      console.log('Failed fetching creator header component!');
+      console.error(error);
+    }
+  }, []);
 
   const fetchCreatorCustomPages = useCallback(async () => {
     setIsLoading(true);
@@ -335,17 +372,36 @@ const SimplePageEditor = ({ match, history }) => {
       document.getElementById(RIGHT).style.display = 'none';
       document.getElementById(TOP).style.display = 'none';
       document.getElementById(LEFT).style.display = 'none';
+      document.getElementById(BUILDER_CONTAINER_ID).style.height = '100%';
     });
 
     editor.on('stop:preview', () => {
       document.getElementById(RIGHT).style.display = 'block';
       document.getElementById(TOP).style.display = 'block';
       document.getElementById(LEFT).style.display = 'block';
+      document.getElementById(BUILDER_CONTAINER_ID).style.height = editor.getConfig().height;
     });
 
     editor.onReady(() => {
       document.getElementById(LAYERS_PANEL_ID).style.display = 'none';
       editor.Blocks.render();
+
+      // Creates portal for header and footer
+      const headerEl = document.createElement('div');
+      headerEl.id = 'editor-header-container';
+      headerEl.className = 'disable-overlay';
+
+      const footerEl = document.createElement('div');
+      footerEl.id = 'editor-footer-container';
+      footerEl.className = 'disable-overlay';
+
+      const wrapperElement = editor.Canvas.getBody().querySelector('[data-gjs-type="wrapper"]');
+      wrapperElement.insertAdjacentElement('beforebegin', headerEl);
+      wrapperElement.insertAdjacentElement('afterend', footerEl);
+      // setContainerReady(true);
+
+      setHeaderContainer(headerEl);
+      setFooterContainer(footerEl);
     });
 
     //#endregion End of event listener hooks
@@ -381,13 +437,15 @@ const SimplePageEditor = ({ match, history }) => {
   }, [userDetails, fetchCreatorWebsiteAssets]);
 
   useEffect(() => {
+    fetchCreatorHeaderComponent();
+    fetchCreatorFooterComponent();
     fetchCreatorCustomPages();
     initializeGrapesJSEditor();
 
     return () => {
       window.onbeforeunload = null;
     };
-  }, [initializeGrapesJSEditor, fetchCreatorCustomPages]);
+  }, [initializeGrapesJSEditor, fetchCreatorCustomPages, fetchCreatorHeaderComponent, fetchCreatorFooterComponent]);
 
   // Logic for updating autosave time
   useEffect(() => {
@@ -639,7 +697,24 @@ const SimplePageEditor = ({ match, history }) => {
 
   return (
     <Spin spinning={isLoading}>
-      <Row style={{ height: '100vh' }}>
+      {/* These are portals */}
+      {creatorHeader && headerContainer && (
+        <EditorRenderer
+          html={creatorHeader.content.html}
+          css={creatorHeader.content.css}
+          container={headerContainer}
+          componentList={{ SignInButton }}
+        />
+      )}
+      {creatorFooter && footerContainer && (
+        <EditorRenderer
+          html={creatorFooter.content.html}
+          css={creatorFooter.content.css}
+          container={footerContainer}
+          componentList={{ PassionFooter }}
+        />
+      )}
+      <Row style={{ height: '100vh', overflow: 'hidden' }}>
         <Col id={TOP} xs={24} className={styles.topPanelContainer}>
           <Row gutter={8} align="middle">
             <Col flex="0 0 15%">

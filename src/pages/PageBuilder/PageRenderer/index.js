@@ -204,7 +204,6 @@ const PageRenderer = ({ match, history }) => {
         `;
 
         setPageContent(targetContent);
-        console.log(gjsEditor.getCss());
         setPageStyles(`<style>${gjsEditor.getCss()}</style>`);
         // const iframeElement = gjsEditor.Canvas.getDocument();
         // const editorElements = Array.from(iframeElement.body.children);
@@ -246,13 +245,13 @@ const PageRenderer = ({ match, history }) => {
             showWarnings={true}
             allowUnknownElements={false}
             components={{
-              SignInButton,
+              SignInButton, // Used in header
               PassionCourseList,
               PassionPassList,
               PassionSessionList,
               PassionSubscriptionList,
               PassionVideoList,
-              PassionFooter,
+              PassionFooter, // The footer component
             }}
             jsx={pageContent}
           />

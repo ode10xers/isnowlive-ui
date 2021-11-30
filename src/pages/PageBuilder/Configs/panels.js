@@ -1,3 +1,5 @@
+// NOTE: This is currently unused
+
 // This is the default value
 // taken from https://github.com/artf/grapesjs/blob/master/src/panels/config/config.js
 
