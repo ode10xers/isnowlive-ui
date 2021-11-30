@@ -112,10 +112,11 @@
         background-color: map-get($map: $colors, $key: 'Solitude');
         border-radius: 8px;
         padding: 16px;
+        width: 100%;
         
-        &[data-wide-mode="true"] {
-          width: 100%;
-        }
+        // &[data-wide-mode="true"] {
+        // width: 100%;
+        // }
 
         .gjs-block-label {
           color: map-get($map: $colors, $key: 'Mako');

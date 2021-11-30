@@ -100,9 +100,6 @@ const presetLayouts = [
     label: '<b> Simple Text Section </b>',
     media: `<img src="${textSectionIcon}" loading="lazy" />`,
     category: blockCategories.LAYOUTS,
-    attributes: {
-      'data-wide-mode': 'true',
-    },
     content: {
       type: 'simple-text-section-block',
     },
@@ -112,9 +109,6 @@ const presetLayouts = [
     label: '<b> Simple Text with Image Section </b>',
     media: `<img src="${textWithImageIcon}" loading="lazy" />`,
     category: blockCategories.LAYOUTS,
-    attributes: {
-      'data-wide-mode': 'true',
-    },
     content: {
       type: 'simple-text-with-image-block',
     },
@@ -123,9 +117,6 @@ const presetLayouts = [
     id: 'simple-text-with-button-section',
     label: '<b> Simple Text with Button Section </b>',
     category: blockCategories.LAYOUTS,
-    attributes: {
-      'data-wide-mode': 'true',
-    },
     content: {
       type: 'simple-text-section-with-button-block',
     },
@@ -134,9 +125,6 @@ const presetLayouts = [
     id: 'simple-text-image-button-section',
     label: '<b> Simple Text Image with Button Section </b>',
     category: blockCategories.LAYOUTS,
-    attributes: {
-      'data-wide-mode': 'true',
-    },
     content: {
       type: 'simple-text-button-with-image-block',
     },
@@ -145,9 +133,6 @@ const presetLayouts = [
     id: 'bio-with-links',
     label: '<b> Simple Bio </b>',
     category: blockCategories.LAYOUTS,
-    attributes: {
-      'data-wide-mode': 'true',
-    },
     content: {
       type: 'simple-bio-section-block',
     },
@@ -156,9 +141,6 @@ const presetLayouts = [
     id: 'testimonials',
     label: '<b> Testimonials </b>',
     category: blockCategories.LAYOUTS,
-    attributes: {
-      'data-wide-mode': 'true',
-    },
     content: {
       type: 'testimonials-block',
     },

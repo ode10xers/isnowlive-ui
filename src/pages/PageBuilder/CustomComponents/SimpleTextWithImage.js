@@ -41,6 +41,16 @@ export default (editor) => {
         editable: true,
       },
     },
+    view: {
+      events: {
+        // We reverse click and dblclick event
+        dblclick: 'initResize',
+        click: 'onActive',
+        error: 'onError',
+        load: 'onLoad',
+        dragstart: 'noDrag',
+      },
+    },
   });
 
   // Text with Image Section
@@ -185,7 +195,7 @@ export default (editor) => {
     model: {
       defaults: {
         tagName: 'div',
-        name: 'Simple Text with Image Section',
+        name: 'Simple Text with Button and Image Section',
         droppable: false,
         toolbar: defaultBlockToolbar,
 
@@ -232,7 +242,7 @@ export default (editor) => {
     model: {
       defaults: {
         tagName: 'div',
-        name: 'Simple Text with Image Section',
+        name: 'Bio Section',
         droppable: false,
         toolbar: defaultBlockToolbar,
 

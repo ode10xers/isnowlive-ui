@@ -221,5 +221,14 @@ export default (editor) => {
         ],
       },
     },
+    view: {
+      events: {
+        dblclick: 'initResize',
+        click: 'onActive',
+        error: 'onError',
+        load: 'onLoad',
+        dragstart: 'noDrag',
+      },
+    },
   });
 };

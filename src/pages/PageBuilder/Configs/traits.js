@@ -296,25 +296,25 @@ export default (editor) => {
           targetComponent.forEach((comp) => {
             comp.setStyle({
               ...comp.getStyle(),
-              'border-radius': value,
+              'clip-path': value,
             });
           });
         } else {
           selected.setStyle({
             ...selected.getStyle(),
-            'border-radius': value,
+            'clip-path': value,
           });
         }
       };
 
       [
         {
-          labelText: 'Square',
-          value: '0px',
+          labelText: 'Original',
+          value: 'none',
         },
         {
-          labelText: 'Round',
-          value: '50%',
+          labelText: 'Circle',
+          value: 'circle(closest-side)',
         },
       ].map((btnData) => {
         const btn = document.createElement('button');
@@ -327,11 +327,11 @@ export default (editor) => {
 
       container.appendChild(el);
 
-      const helpText = document.createElement('div');
-      helpText.classList.add('radio-btn-helptext');
-      helpText.innerText = 'To have a perfectly circle image, the image needs to have 1:1 (square) ratio';
+      // const helpText = document.createElement('div');
+      // helpText.classList.add('radio-btn-helptext');
+      // helpText.innerText = 'To have a perfectly circle image, the image needs to have 1:1 (square) ratio';
 
-      container.appendChild(helpText);
+      // container.appendChild(helpText);
       return container;
     },
   });
