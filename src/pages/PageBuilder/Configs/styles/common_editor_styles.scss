@@ -21,7 +21,6 @@
 }
 
 .contentContainer {
-  // height: calc(100vh - 80px);
   height: 100%;
 }
 
@@ -50,7 +49,7 @@
   background-color: map-get($map: $colors, $key: 'White');
   border-right: 1px solid map-get($map: $colors, $key: 'Gainsboro');
   border-left: 1px solid map-get($map: $colors, $key: 'Gainsboro');
-  height: 100%;
+  height: calc(100vh - 80px);
   overflow-y: scroll;
 
   &::-webkit-scrollbar-track {

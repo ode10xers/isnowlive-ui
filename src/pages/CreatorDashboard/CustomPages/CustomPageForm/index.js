@@ -22,6 +22,8 @@ import { pageTypes, websiteComponentTypes } from 'utils/constants';
 import { createValidSlug, generateUrlFromUsername } from 'utils/url';
 import { blankPageTemplate, headerTemplate, footerTemplate } from 'utils/pageEditorTemplates';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
 import DefaultImage from 'assets/images/greybg.jpg';
@@ -52,6 +54,10 @@ const TemplatePreviewItem = ({ template = null, handleItemClicked = () => {}, ha
 );
 
 const CustomPageForm = ({ match, location, history }) => {
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
   const targetPageId = match.params.page_id ?? null;
   const isCreatingHomepage = location.state?.isHome ?? false;
 
@@ -304,7 +310,10 @@ const CustomPageForm = ({ match, location, history }) => {
       const pageId = await handleFormFinish(form.getFieldsValue(), false);
 
       if (pageId) {
-        history.push(generatePath(Routes.creatorDashboard.customPages.simpleEditor, { page_id: pageId }));
+        window.location.href = `${generateUrlFromUsername(userDetails.username)}${generatePath(
+          Routes.creatorDashboard.customPages.simpleEditor,
+          { page_id: pageId }
+        )}`;
       }
     } catch (error) {
       form.scrollToField(error.errorFields[0].name);
@@ -422,6 +431,12 @@ const CustomPageForm = ({ match, location, history }) => {
             {!targetPageId && (
               <Col xs={24}>
                 <Title level={4}>Page Templates</Title>
+                <div className={styles.templateHelpText}>
+                  <Text type="secondary">
+                    Please select a page template. This template will be used as a starting point for your page. You can
+                    click on "Preview" to have an idea of how the template looks like.
+                  </Text>
+                </div>
 
                 <Row gutter={[8, 8]} className={styles.horizontalScrollableListContainer}>
                   {templates.length > 0
