@@ -1,7 +1,7 @@
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { generateContainerWrapper } from '../CustomComponents/Container.js';
 
-import layouts from 'components/PageEditorPassionComponents/layouts';
+import layouts, { sessionsLayout } from 'components/PageEditorPassionComponents/layouts';
 import PassionSessionList from 'components/PageEditorPassionComponents/SessionList';
 import PassionVideoList from 'components/PageEditorPassionComponents/VideoList';
 import PassionCourseList from 'components/PageEditorPassionComponents/CourseList';
@@ -24,13 +24,14 @@ NOTE: Old flag used in the React Components
   copyable: true,
 */
 
+// For components with custom configs, we'll initialize them separately for now
 const passionProductsListComponents = [
-  {
-    type: 'PassionSessionList',
-    name: 'Passion Session List',
-    component: PassionSessionList,
-    blockType: 'passion-session-list-block',
-  },
+  // {
+  //   type: 'PassionSessionList',
+  //   name: 'Passion Session List',
+  //   component: PassionSessionList,
+  //   blockType: 'passion-session-list-block',
+  // },
   {
     type: 'PassionVideoList',
     name: 'Passion Video List',
@@ -58,11 +59,119 @@ const passionProductsListComponents = [
 ];
 
 export default (editor) => {
+  editor.Components.addType('PassionSessionList', {
+    extend: 'react-component',
+    isComponent: (el) => el.tagName === 'PASSIONSESSIONLIST',
+    model: {
+      defaults: {
+        component: PassionSessionList,
+        ...fullyDisabledComponentFlags,
+        attributes: {
+          layout: sessionsLayout.GRID,
+        },
+      },
+    },
+  });
+
+  editor.Components.addType('passion-session-list-block', {
+    model: {
+      defaults: {
+        tagName: 'div',
+        name: 'Passion Sessions List',
+        droppable: false,
+        toolbar: defaultBlockToolbar,
+        attributes: {},
+        components: generateContainerWrapper([{ type: 'PassionSessionList' }]),
+        layout: sessionsLayout.GRID,
+        'show-image': false,
+        'show-desc': false,
+        traits: [
+          {
+            type: 'select',
+            name: 'layout',
+            changeProp: true,
+            options: Object.entries(sessionsLayout).map(([key, val]) => ({
+              id: val,
+              name: key,
+            })),
+          },
+        ],
+      },
+      init() {
+        this.handleLayoutChange();
+
+        this.on('change:layout', this.handleLayoutChange);
+        this.on('change:show-image', () => this.handleBooleanAttributeChange('show-image'));
+        this.on('change:show-desc', () => this.handleBooleanAttributeChange('show-desc'));
+      },
+      handleBooleanAttributeChange(attrName) {
+        const value = this.props()[attrName] ?? false;
+        const passionSessionList = this.findType('PassionSessionList')[0] ?? null;
+
+        if (passionSessionList) {
+          passionSessionList.setAttributes({
+            ...passionSessionList.getAttributes(),
+            [attrName]: value,
+          });
+        } else {
+          console.warn('No PassionSessionList Component Found!');
+        }
+      },
+      handleLayoutChange() {
+        const layoutVal = this.props()['layout'] ?? sessionsLayout.GRID;
+        const passionSessionList = this.findType('PassionSessionList')[0] ?? null;
+
+        let attrVal = { layout: layoutVal };
+
+        if (layoutVal === sessionsLayout.LIST) {
+          attrVal = {
+            ...attrVal,
+            'show-image': this.props()['show-image'] ?? false,
+            'show-desc': this.props()['show-desc'] ?? false,
+          };
+
+          this.addTrait([
+            {
+              type: 'checkbox',
+              name: 'show-image',
+              label: 'Show Image?',
+              changeProp: true,
+            },
+            {
+              type: 'checkbox',
+              name: 'show-desc',
+              label: 'Show Description?',
+              changeProp: true,
+            },
+          ]);
+
+          if (passionSessionList) {
+            passionSessionList.setAttributes({
+              ...passionSessionList.getAttributes(),
+              ...attrVal,
+            });
+          }
+        } else {
+          this.removeTrait(['show-image', 'show-desc']);
+          if (passionSessionList) {
+            passionSessionList.removeAttributes(['show-image', 'show-desc']);
+
+            passionSessionList.setAttributes({
+              ...passionSessionList.getAttributes(),
+              layout: layoutVal,
+            });
+          }
+        }
+      },
+    },
+  });
+
   passionProductsListComponents.forEach((comp) => {
     // NOTE: Initially, each component can be selected and we
     // can choose the layouts (GRID or Horizontal scroll, etc)
     editor.Components.addType(comp.type, {
       extend: 'react-component',
+      isComponent: (el) => el.tagName === comp.type.toUpperCase(),
       model: {
         defaults: {
           component: comp.component,
@@ -82,7 +191,6 @@ export default (editor) => {
           ],
         },
       },
-      isComponent: (el) => el.tagName === comp.type.toUpperCase(),
     });
 
     editor.Components.addType(comp.blockType, {

@@ -61,6 +61,13 @@
     font-weight: initial;
     gap: 4px;
 
+    &.gjs-trt-trait--checkbox {
+      .gjs-label-wrp {
+        width: 85%;
+        min-width: 85%;
+      }
+    }
+
     .gjs-field.gjs-field-select {
       background-color: map-get($map: $colors, $key: 'White');
       color: map-get($colors, 'Endeavour');
