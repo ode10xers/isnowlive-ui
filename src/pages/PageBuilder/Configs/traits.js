@@ -14,7 +14,65 @@ const generateTemplateHTML = (label = '') => `
   </div>
 `;
 
+// TODO: Separate these into different files
 export default (editor) => {
+  // NOTE: Passion Components CSS Vars Traits
+  editor.TraitManager.addType('css-vars-colors', {
+    noLabel: true,
+    templateInput({ trait }) {
+      return generateTemplateHTML(trait.get('label') || 'Component Colors');
+    },
+    createInput({ trait }) {
+      const optionsList = trait.get('options') ?? [];
+      const selectedComponent = editor.getSelected();
+
+      const el = document.createElement('div');
+
+      if (selectedComponent) {
+        this.reactMountContainers = optionsList.map((opt) => {
+          const containerEl = document.createElement('div');
+          containerEl.className = 'custom-trait-sub-layout';
+
+          const labelEl = document.createElement('div');
+          labelEl.className = 'custom-trait-sub-label';
+          labelEl.innerText = opt.label ?? opt.id ?? 'Label';
+
+          const inputEl = document.createElement('div');
+          inputEl.className = 'custom-trait-sub-input';
+          inputEl.id = opt.id;
+
+          const colorChangeHandler = (color) => {
+            console.log(color);
+            selectedComponent.setStyle({
+              ...selectedComponent.getStyle(),
+              [opt.id]: color,
+            });
+          };
+
+          ReactDOM.render(
+            <CustomColorPicker key={opt.id} initialColor="#000000" colorChangeCallback={colorChangeHandler} />,
+            inputEl
+          );
+
+          containerEl.appendChild(labelEl);
+          containerEl.appendChild(inputEl);
+
+          el.appendChild(containerEl);
+
+          return inputEl;
+        });
+      }
+
+      return el;
+    },
+    removed() {
+      const mountContainers = this.reactMountContainers ?? [];
+      mountContainers.forEach((el) => {
+        ReactDOM.unmountComponentAtNode(el);
+      });
+    },
+  });
+
   // NOTE : Flex Container Trait
   // On Flex Direction Columns, this will work to control vertical align
   editor.TraitManager.addType('container-justify-content', {

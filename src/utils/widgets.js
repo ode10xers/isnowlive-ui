@@ -4,6 +4,33 @@ import parseQueryString from 'utils/parseQueryString';
 
 export const localStoragePluginStylingKeyPrefix = 'passion_plugin_styling_';
 
+export const inventoryListCSSVars = [
+  {
+    key: '--inventory-list-plugin-month-font-color',
+    label: 'Month Heading Color',
+  },
+  {
+    key: '--inventory-list-plugin-inventory-font-color',
+    label: 'List Text Color',
+  },
+  {
+    key: '--inventory-list-plugin-date-heading-background-color',
+    label: 'Date Heading Background Color',
+  },
+  {
+    key: '--inventory-list-plugin-date-heading-font-color',
+    label: 'Date Heading Text Color',
+  },
+  {
+    key: '--inventory-list-plugin-cta-background-color',
+    label: 'Button Background Color',
+  },
+  {
+    key: '--inventory-list-plugin-cta-font-color',
+    label: 'Button Text Color',
+  },
+];
+
 export const widgetComponentsName = {
   CALENDAR: {
     value: 'calendar',
@@ -41,125 +68,25 @@ export const widgetComponentsName = {
     value: 'inventory-list',
     label: 'Sessions - List (Name only)',
     product: 'Session',
-    styling: [
-      {
-        key: '--inventory-list-plugin-month-font-color',
-        label: 'Month Heading Color',
-      },
-      {
-        key: '--inventory-list-plugin-inventory-font-color',
-        label: 'List Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-background-color',
-        label: 'Date Heading Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-font-color',
-        label: 'Date Heading Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-background-color',
-        label: 'Button Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-font-color',
-        label: 'Button Text Color',
-      },
-    ],
+    styling: inventoryListCSSVars,
   },
   INVENTORIES_WITH_IMAGE: {
     value: 'inventory-list-image',
     label: 'Sessions - List (Name and Image)',
     product: 'Session',
-    styling: [
-      {
-        key: '--inventory-list-plugin-month-font-color',
-        label: 'Month Heading Color',
-      },
-      {
-        key: '--inventory-list-plugin-inventory-font-color',
-        label: 'List Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-background-color',
-        label: 'Date Heading Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-font-color',
-        label: 'Date Heading Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-background-color',
-        label: 'Button Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-font-color',
-        label: 'Button Text Color',
-      },
-    ],
+    styling: inventoryListCSSVars,
   },
   INVENTORIES_WITH_DESC: {
     value: 'inventory-list-desc',
     label: 'Sessions - List (Name and Description)',
     product: 'Session',
-    styling: [
-      {
-        key: '--inventory-list-plugin-month-font-color',
-        label: 'Month Heading Color',
-      },
-      {
-        key: '--inventory-list-plugin-inventory-font-color',
-        label: 'List Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-background-color',
-        label: 'Date Heading Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-font-color',
-        label: 'Date Heading Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-background-color',
-        label: 'Button Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-font-color',
-        label: 'Button Text Color',
-      },
-    ],
+    styling: inventoryListCSSVars,
   },
   INVENTORIES_WITH_IMAGE_DESC: {
     value: 'inventory-list-image-desc',
     label: 'Sessions - List (Name, Image, and Description)',
     product: 'Session',
-    styling: [
-      {
-        key: '--inventory-list-plugin-month-font-color',
-        label: 'Month Heading Color',
-      },
-      {
-        key: '--inventory-list-plugin-inventory-font-color',
-        label: 'List Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-background-color',
-        label: 'Date Heading Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-date-heading-font-color',
-        label: 'Date Heading Text Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-background-color',
-        label: 'Button Background Color',
-      },
-      {
-        key: '--inventory-list-plugin-cta-font-color',
-        label: 'Button Text Color',
-      },
-    ],
+    styling: inventoryListCSSVars,
   },
   LIST: {
     value: 'list',

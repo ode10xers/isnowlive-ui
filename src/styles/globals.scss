@@ -67,12 +67,12 @@
   --availability-cta-font-color: #{map-get($map: $colors, $key: 'White')};
 
   // Inventory Plugin Variables
-  --inventory-list-plugin-month-font-color: #{map-get($colors, 'PrussianBlue')};
-  --inventory-list-plugin-inventory-font-color: #{map-get($colors, 'Black')};
-  --inventory-list-plugin-date-heading-background-color: #{map-get($colors, 'PrussianBlue')};
-  --inventory-list-plugin-date-heading-font-color: #{map-get($colors, 'White')};
-  --inventory-list-plugin-cta-background-color: #{map-get($colors, 'DodgerBlue')};
-  --inventory-list-plugin-cta-font-color: #{map-get($colors, 'White')};
+//   --inventory-list-plugin-month-font-color: #{map-get($colors, 'PrussianBlue')};
+//   --inventory-list-plugin-inventory-font-color: #{map-get($colors, 'Black')};
+//   --inventory-list-plugin-date-heading-background-color: #{map-get($colors, 'PrussianBlue')};
+//   --inventory-list-plugin-date-heading-font-color: #{map-get($colors, 'White')};
+//   --inventory-list-plugin-cta-background-color: #{map-get($colors, 'DodgerBlue')};
+//   --inventory-list-plugin-cta-font-color: #{map-get($colors, 'White')};
 }
 
 html {

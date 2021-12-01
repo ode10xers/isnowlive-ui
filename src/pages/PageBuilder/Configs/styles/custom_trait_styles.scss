@@ -1,12 +1,21 @@
 
 
 :global {
-  
   .custom-trait-layout {
     .custom-trait-label {
       margin-bottom: 12px;
       font-weight: 500;
       font-size: 13px;
+    }
+
+    .custom-trait-sub-layout {
+      margin-bottom: 8px;
+
+      .custom-trait-sub-label {
+        margin-bottom: 8px;
+        font-weight:normal;
+        font-size: 11px;
+      }
     }
   }
 
