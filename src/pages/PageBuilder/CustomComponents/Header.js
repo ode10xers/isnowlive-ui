@@ -1,6 +1,7 @@
 import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { contextualFontTraits } from '../Configs/common/trait_sets';
+import { generateContainerWrapper } from './Container';
 import { textPropHandlers } from './SimpleTextSection';
 
 // NOTE: In this case, the header is completely uninteractable (except selecting)
@@ -111,32 +112,10 @@ export default (editor) => {
         tagName: 'header',
         name: 'Navbar Header',
         ...fullyDisabledComponentFlags,
-        highlightable: true,
-        selectable: true,
-        hoverable: true,
-        badgable: true,
         layerable: true,
         attributes: {
           class: 'header-container',
         },
-        'bg-color': '#ffffff',
-        'brand-type': 'text',
-        traits: [
-          {
-            type: 'custom-color-picker',
-            label: 'Background color',
-            name: 'bg-color',
-            changeProp: 1,
-          },
-          {
-            type: 'brand-type-select',
-          },
-          {
-            type: 'nav-links',
-            id: 'nav-links',
-            value: false,
-          },
-        ],
         components: [
           {
             type: 'header-brand',
@@ -163,6 +142,39 @@ export default (editor) => {
             align-items: center;
           }
         `,
+      },
+    },
+  });
+
+  editor.Components.addType('passion-header-block', {
+    model: {
+      defaults: {
+        tagName: 'div',
+        name: 'Header',
+        components: generateContainerWrapper([{ type: 'navbar-header' }], true),
+        ...fullyDisabledComponentFlags,
+        highlightable: true,
+        selectable: true,
+        hoverable: true,
+        badgable: true,
+        'bg-color': '#ffffff',
+        'brand-type': 'text',
+        traits: [
+          {
+            type: 'custom-color-picker',
+            label: 'Background color',
+            name: 'bg-color',
+            changeProp: 1,
+          },
+          {
+            type: 'brand-type-select',
+          },
+          {
+            type: 'nav-links',
+            id: 'nav-links',
+            value: false,
+          },
+        ],
       },
       init() {
         // We put a listener that triggers when an attribute changes

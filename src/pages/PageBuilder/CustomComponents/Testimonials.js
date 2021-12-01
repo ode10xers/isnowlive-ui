@@ -1,7 +1,7 @@
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
-import { generateContainerWrapper } from '../Configs/blocks';
-import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
 import { genericFontTraits } from '../Configs/common/trait_sets';
+import { generateContainerWrapper } from '../CustomComponents/Container.js';
+import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 

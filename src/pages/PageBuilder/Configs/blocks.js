@@ -1,5 +1,4 @@
 // API Doc : https://grapesjs.com/docs/api/block.html#block
-import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 
 import sessionListIcon from 'assets/icons/page_editor_blocks/session_list.svg';
 import videoListIcon from 'assets/icons/page_editor_blocks/video_list.svg';
@@ -15,20 +14,6 @@ export const blockCategories = {
   SIMPLE_COMPONENTS: 'Simple Components',
   BASIC: 'Basic',
 };
-
-export const generateContainerWrapper = (innerComponents = []) => [
-  {
-    type: 'container',
-    ...fullyDisabledComponentFlags,
-    components: [
-      {
-        type: 'fixed-width-container',
-        ...fullyDisabledComponentFlags,
-        components: innerComponents,
-      },
-    ],
-  },
-];
 
 const passionProductListBlocks = [
   {

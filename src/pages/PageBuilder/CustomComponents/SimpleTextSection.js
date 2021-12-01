@@ -1,5 +1,5 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
-import { generateContainerWrapper } from '../Configs/blocks';
+
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import {
   backgroundTraits,
@@ -9,6 +9,8 @@ import {
 } from '../Configs/common/trait_sets';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
+
+import { generateContainerWrapper } from '../CustomComponents/Container.js';
 
 import websiteIcon from 'assets/icons/website/website.svg';
 import facebookIcon from 'assets/icons/facebook/facebook.svg';

@@ -23,6 +23,7 @@ import CustomCommands from '../Configs/commands';
 import ReactComponentHandler from '../CustomComponents/ReactComponentHandler.js';
 import LinkButton from '../CustomComponents/LinkButton.js';
 import Header from '../CustomComponents/Header.js';
+import Container from '../CustomComponents/Container.js';
 
 import { getLocalUserDetails } from 'utils/storage.js';
 import { websiteComponentTypes } from 'utils/constants.js';
@@ -103,7 +104,7 @@ const HeaderEditor = ({ match, history }) => {
       editor.StorageManager.setCurrent('local');
 
       // editor.loadData(headerTemplate);
-      editor.loadData({ components: [{ type: 'navbar-header' }] });
+      editor.loadData({ components: [{ type: 'passion-header-block' }] });
     };
 
     try {
@@ -216,7 +217,15 @@ const HeaderEditor = ({ match, history }) => {
       blockManager: {
         blocks: [],
       },
-      plugins: [ReactComponentHandler, LinkButton, Header, SimpleTextWithImage, CustomCommands, CustomTraits],
+      plugins: [
+        ReactComponentHandler,
+        Container,
+        LinkButton,
+        Header,
+        SimpleTextWithImage,
+        CustomCommands,
+        CustomTraits,
+      ],
     });
 
     customEditorInitializationLogic(editor);

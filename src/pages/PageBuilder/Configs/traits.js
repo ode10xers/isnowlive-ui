@@ -876,16 +876,31 @@ export default (editor) => {
       addNavBtn.classList.add(['button-trait-add']);
       addNavBtn.innerText = 'Add New Link';
       addNavBtn.onclick = () => {
-        component.append(
-          {
-            type: 'link-buttons',
-            toolbar: [],
-            removable: false,
-          },
-          {
-            at: (component.components().length ?? 1) - 1,
-          }
-        );
+        if (component.is('navbar-header')) {
+          component.append(
+            {
+              type: 'link-buttons',
+              toolbar: [],
+              removable: false,
+            },
+            {
+              at: (component.components().length ?? 1) - 1,
+            }
+          );
+        } else {
+          const targetComponent = component.findType('navbar-header')[0];
+
+          targetComponent.append(
+            {
+              type: 'link-buttons',
+              toolbar: [],
+              removable: false,
+            },
+            {
+              at: (targetComponent.components().length ?? 1) - 1,
+            }
+          );
+        }
         component.emitUpdate();
       };
 

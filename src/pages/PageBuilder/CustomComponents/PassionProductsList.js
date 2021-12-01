@@ -1,5 +1,5 @@
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
-import { generateContainerWrapper } from '../Configs/blocks';
+import { generateContainerWrapper } from '../CustomComponents/Container.js';
 
 import layouts from 'components/PageEditorPassionComponents/layouts';
 import PassionSessionList from 'components/PageEditorPassionComponents/SessionList';

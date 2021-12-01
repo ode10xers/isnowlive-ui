@@ -1,7 +1,7 @@
-import { generateContainerWrapper } from '../Configs/blocks';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { socialLinksTraits } from '../Configs/common/trait_sets';
 import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
+import { generateContainerWrapper } from '../CustomComponents/Container.js';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 
