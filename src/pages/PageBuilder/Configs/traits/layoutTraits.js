@@ -1,4 +1,5 @@
 import { generateTraitsLayout } from 'utils/pageEditor';
+import componentTypes from '../strings/componentTypes';
 import traitTypes from '../strings/traitTypes';
 
 export default (editor) => {
@@ -106,7 +107,7 @@ export default (editor) => {
       const inputType = elInput.querySelector('#image-position-select');
       const targetComponent =
         component.find('.text-image-section-container')[0] ??
-        component.findType('simple-text-image-section')[0] ??
+        component.findType(componentTypes.LAYOUTS.INNER.TEXT_IMAGE_SECTION_WRAPPER)[0] ??
         component;
 
       let classes = [];
@@ -126,7 +127,7 @@ export default (editor) => {
       // This is getting the trait value from the set classes
       const targetComponent =
         component.find('.text-image-section-container')[0] ??
-        component.findType('simple-text-image-section')[0] ??
+        component.findType(componentTypes.LAYOUTS.INNER.TEXT_IMAGE_SECTION_WRAPPER)[0] ??
         component;
 
       const layout =

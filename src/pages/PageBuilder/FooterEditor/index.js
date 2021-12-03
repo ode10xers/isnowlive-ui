@@ -32,6 +32,7 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
 import customCommands from '../Configs/strings/customCommands.js';
+import componentTypes from '../Configs/strings/componentTypes.js';
 
 const {
   BUILDER_CONTAINER_ID,
@@ -90,7 +91,7 @@ const FooterEditor = ({ match, history }) => {
       editor.StorageManager.setCurrent('local');
 
       // editor.loadData(footerTemplate);
-      editor.loadData({ components: [{ type: 'PassionFooter' }] });
+      editor.loadData({ components: [{ type: componentTypes.BLOCKS.FOOTER }] });
     };
 
     try {
@@ -458,6 +459,7 @@ const FooterEditor = ({ match, history }) => {
 
   //#endregion End of Editor Button Handlers
 
+  // TODO: This is still using the old UI, repaint once this editor is used later
   return (
     <Spin spinning={isLoading}>
       <div>

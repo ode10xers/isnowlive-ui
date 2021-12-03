@@ -1,14 +1,17 @@
 import { isValidCSSColor } from 'utils/colors';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
+import componentTypes from '../Configs/strings/componentTypes';
 import traitTypes from '../Configs/strings/traitTypes';
 
 export const generateContainerWrapper = (innerComponents = [], isCompact = false) => [
   {
-    type: 'container',
+    type: componentTypes.LAYOUTS.CONTAINER,
     ...fullyDisabledComponentFlags,
     components: [
       {
-        type: isCompact ? 'compact-fixed-width-container' : 'fixed-width-container',
+        type: isCompact
+          ? componentTypes.LAYOUTS.COMPACT_FIXED_WIDTH_CONTAINER
+          : componentTypes.LAYOUTS.FIXED_WIDTH_CONTAINER,
         ...fullyDisabledComponentFlags,
         components: innerComponents,
       },
@@ -18,7 +21,7 @@ export const generateContainerWrapper = (innerComponents = [], isCompact = false
 
 // TODO: Refactor these later
 export default (editor) => {
-  editor.DomComponents.addType('fixed-width-container', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.FIXED_WIDTH_CONTAINER, {
     model: {
       defaults: {
         tagName: 'div',
@@ -84,7 +87,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('compact-fixed-width-container', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.COMPACT_FIXED_WIDTH_CONTAINER, {
     model: {
       defaults: {
         tagName: 'div',
@@ -149,7 +152,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('container', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.CONTAINER, {
     model: {
       defaults: {
         tagName: 'div',

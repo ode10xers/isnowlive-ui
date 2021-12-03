@@ -1,5 +1,8 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
 
+import traitTypes from '../Configs/strings/traitTypes';
+import componentTypes from '../Configs/strings/componentTypes';
+import defaultBlockToolbar from '../Configs/common/toolbar.js';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import {
   backgroundTraits,
@@ -8,8 +11,6 @@ import {
   socialLinksTraits,
 } from '../Configs/common/trait_sets';
 
-import defaultBlockToolbar from '../Configs/common/toolbar.js';
-
 import { generateContainerWrapper } from '../CustomComponents/Container.js';
 
 import websiteIcon from 'assets/icons/website/website.svg';
@@ -17,13 +18,12 @@ import facebookIcon from 'assets/icons/facebook/facebook.svg';
 import linkedinIcon from 'assets/icons/linkedin/linkedin.svg';
 import instagramIcon from 'assets/icons/instagram/instagram.svg';
 import twitterIcon from 'assets/icons/twitter/twitter.svg';
-import traitTypes from '../Configs/strings/traitTypes';
 
 export const textPropHandlers = {
   handleFontChange() {
     const font = this.props()['font-family'];
 
-    const textSectionContainer = this.find('div.text-section-container') ?? [];
+    const textSectionContainer = this.findType(componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER) || [];
 
     if (textSectionContainer.length > 0) {
       textSectionContainer.forEach((innerComp) => {
@@ -49,7 +49,10 @@ export const textPropHandlers = {
   handleTextColorChange() {
     const textColor = this.props()['text-color'];
     const textSectionContainer =
-      this.find('div.text-section-container') ?? this.findType('text') ?? this.findType('textnode') ?? [];
+      this.findType(componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER) ||
+      this.findType('text') ||
+      this.findType('textnode') ||
+      [];
 
     if (textSectionContainer.length > 0) {
       textSectionContainer.forEach((innerComp) => {
@@ -79,7 +82,7 @@ export const textSectionPropHandlers = {
   handleBGStyleChange() {
     const bgStyle = this.props()['bg-color'];
 
-    const containerComponent = this.findType('container')[0];
+    const containerComponent = this.findType(componentTypes.LAYOUTS.CONTAINER)[0];
 
     if (containerComponent) {
       containerComponent.setStyle({
@@ -106,16 +109,16 @@ export const textSectionTraits = [
 
 const textSectionBaseComponents = [
   {
-    type: 'text-section-heading',
+    type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_HEADING,
   },
   {
-    type: 'text-section-content',
+    type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_CONTENT,
   },
 ];
 
 export default (editor) => {
   // Base Components
-  editor.DomComponents.addType('text-section-heading', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TEXT_SECTION_HEADING, {
     extend: 'text',
     model: {
       defaults: {
@@ -144,7 +147,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('text-section-content', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TEXT_SECTION_CONTENT, {
     extend: 'text',
     model: {
       defaults: {
@@ -177,7 +180,7 @@ export default (editor) => {
   });
 
   // Text Section
-  editor.DomComponents.addType('simple-text-section', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER, {
     model: {
       defaults: {
         tagName: 'div',
@@ -215,7 +218,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('simple-text-section-block', {
+  editor.DomComponents.addType(componentTypes.BLOCKS.LAYOUT_TEXT_SECTION, {
     model: {
       defaults: {
         tagName: 'div',
@@ -228,7 +231,7 @@ export default (editor) => {
           class: 'simple-text-section-block',
         },
         traits: textSectionTraits,
-        components: generateContainerWrapper([{ type: 'simple-text-section' }]),
+        components: generateContainerWrapper([{ type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER }]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -245,14 +248,14 @@ export default (editor) => {
   });
 
   // Text Section With Button
-  editor.DomComponents.addType('simple-text-section-with-button', {
-    extend: 'simple-text-section',
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TEXT_SECTION_WITH_BTN_WRAPPER, {
+    extend: componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER,
     model: {
       defaults: {
         components: [
           ...textSectionBaseComponents,
           {
-            type: 'text-section-link-button',
+            type: componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON,
             ...fullyDisabledComponentFlags,
             selectable: true,
             hoverable: true,
@@ -263,7 +266,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('simple-text-section-with-button-block', {
+  editor.DomComponents.addType(componentTypes.BLOCKS.LAYOUT_TEXT_BTN_SECTION, {
     model: {
       defaults: {
         tagName: 'div',
@@ -276,7 +279,7 @@ export default (editor) => {
           class: 'simple-text-section-block',
         },
         traits: [...textSectionTraits],
-        components: generateContainerWrapper([{ type: 'simple-text-section-with-button' }]),
+        components: generateContainerWrapper([{ type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_WITH_BTN_WRAPPER }]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -293,7 +296,7 @@ export default (editor) => {
   });
 
   // Bio Section with Links
-  editor.DomComponents.addType('social-media-links', {
+  editor.DomComponents.addType(componentTypes.CUSTOM_COMPONENTS.INNER.SOCIAL_MEDIA_LINKS, {
     model: {
       defaults: {
         tagName: 'div',
@@ -409,14 +412,14 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('simple-bio-section', {
-    extend: 'simple-text-section',
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.BIO_SECTION, {
+    extend: componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER,
     model: {
       defaults: {
         components: [
           ...textSectionBaseComponents,
           {
-            type: 'social-media-links',
+            type: componentTypes.CUSTOM_COMPONENTS.INNER.SOCIAL_MEDIA_LINKS,
             ...fullyDisabledComponentFlags,
           },
         ],

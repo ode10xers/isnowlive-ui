@@ -1,5 +1,6 @@
 import { message } from 'antd';
 import { isValidCSSStyle } from 'utils/colors';
+import componentTypes from './strings/componentTypes';
 import customCommands from './strings/customCommands';
 
 const supportedDeviceTypes = [
@@ -126,7 +127,7 @@ export default (editor) => {
           let isSet = false;
           const selected = editor.getSelected();
           if (selected) {
-            const closestImage = selected.findType('custom-image')[0] ?? null;
+            const closestImage = selected.findType(componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE)[0] ?? null;
 
             if (closestImage) {
               // closestImage.addAttributes({ src: asset.getSrc() });
@@ -136,7 +137,11 @@ export default (editor) => {
               });
               closestImage.set('src', asset.getSrc(), { silent: 1 });
               isSet = true;
-            } else if (selected.is('image') || selected.is('custom-image') || selected.is('image-item')) {
+            } else if (
+              selected.is('image') ||
+              selected.is(componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE) ||
+              selected.is('image-item')
+            ) {
               // selected.addAttributes({ src: asset.getSrc() });
               selected.setAttributes({
                 ...selected.getAttributes(),

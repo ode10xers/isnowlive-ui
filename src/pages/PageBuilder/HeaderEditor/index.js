@@ -36,6 +36,7 @@ import { useGlobalContext } from 'services/globalContext.js';
 import styles from './style.module.scss';
 import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 import customCommands from '../Configs/strings/customCommands.js';
+import componentTypes from '../Configs/strings/componentTypes.js';
 
 const { Text } = Typography;
 
@@ -90,7 +91,7 @@ const HeaderEditor = ({ match, history }) => {
       editor.StorageManager.setCurrent('local');
 
       // editor.loadData(headerTemplate);
-      editor.loadData({ components: [{ type: 'passion-header-block' }] });
+      editor.loadData({ components: [{ type: componentTypes.BLOCKS.HEADER }] });
     };
 
     try {

@@ -5,6 +5,7 @@ import { textPropHandlers } from './SimpleTextSection';
 
 import { imageTraits } from './SimpleTextWithImage.js';
 import traitTypes from '../Configs/strings/traitTypes';
+import componentTypes from '../Configs/strings/componentTypes';
 
 const containerBGHandler = {
   handleBGStyleChange() {
@@ -19,7 +20,7 @@ const containerBGHandler = {
 
 export default (editor) => {
   // NOTE : Container Components
-  editor.DomComponents.addType('flex-column-container', {
+  editor.DomComponents.addType(componentTypes.SIMPLE_COMPONENTS.FLEX_COLUMN_CONTAINER, {
     model: {
       defaults: {
         tagName: 'div',
@@ -67,7 +68,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('flex-column-item', {
+  editor.DomComponents.addType(componentTypes.SIMPLE_COMPONENTS.INNER.COLUMN_ITEM, {
     model: {
       defaults: {
         tagName: 'div',
@@ -79,7 +80,7 @@ export default (editor) => {
         },
         components: [
           {
-            type: 'flex-column-container',
+            type: componentTypes.SIMPLE_COMPONENTS.FLEX_COLUMN_CONTAINER,
           },
         ],
         styles: `
@@ -92,7 +93,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('two-column-container', {
+  editor.DomComponents.addType(componentTypes.SIMPLE_COMPONENTS.TWO_COLUMN_CONTAINER, {
     model: {
       defaults: {
         tagName: 'div',
@@ -115,10 +116,10 @@ export default (editor) => {
         'bg-style': '#ffffff',
         components: [
           {
-            type: 'flex-column-item',
+            type: componentTypes.SIMPLE_COMPONENTS.INNER.COLUMN_ITEM,
           },
           {
-            type: 'flex-column-item',
+            type: componentTypes.SIMPLE_COMPONENTS.INNER.COLUMN_ITEM,
           },
         ],
         traits: [
@@ -161,13 +162,14 @@ export default (editor) => {
   });
 
   // NOTE : Text & Image Components
-  editor.DomComponents.addType('text-item', {
+  editor.DomComponents.addType(componentTypes.SIMPLE_COMPONENTS.TEXT_ITEM, {
     extend: 'text',
     model: {
       defaults: {
         tagName: 'p',
         name: 'Text',
         editable: true,
+        // TODO: Redefine this droppable to be only droppbale at flex-column-container
         droppable: false,
         attributes: {
           class: 'text-item',
@@ -201,7 +203,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('image-item', {
+  editor.DomComponents.addType(componentTypes.SIMPLE_COMPONENTS.IMAGE_ITEM, {
     extend: 'image',
     model: {
       defaults: {

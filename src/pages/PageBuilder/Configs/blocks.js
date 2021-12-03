@@ -7,6 +7,7 @@ import passListIcon from 'assets/icons/page_editor_blocks/pass_list.svg';
 import membershipListIcon from 'assets/icons/page_editor_blocks/membership_list.svg';
 import textSectionIcon from 'assets/icons/page_editor_blocks/text_section.svg';
 import textWithImageIcon from 'assets/icons/page_editor_blocks/text_with_image.svg';
+import componentTypes from './strings/componentTypes';
 
 export const blockCategories = {
   LAYOUTS: 'Layouts',
@@ -19,156 +20,128 @@ const generateMediaIcon = (iconUrl = 'none') => `<img src="${iconUrl}" loading="
 
 const passionProductListBlocks = [
   {
-    id: 'passion-session-list-block',
-    label: '<b> Passion Session List </b>',
-    droppable: false,
-    resizable: false,
-    media: generateMediaIcon(sessionListIcon),
-    category: blockCategories.PASSION_COMPONENTS,
-    attributes: {
-      title: 'Click to add',
-    },
-    content: {
-      type: 'passion-session-list-block',
-    },
+    id: componentTypes.BLOCKS.PASSION_SESSION_LIST,
+    label: 'Passion Session List',
+    icon: sessionListIcon,
   },
   {
-    id: 'passion-video-list-block',
-    label: '<b> Passion Video List </b>',
-    droppable: false,
-    resizable: false,
-    media: generateMediaIcon(videoListIcon),
-    category: blockCategories.PASSION_COMPONENTS,
-    attributes: {
-      title: 'Click to add',
-    },
-    content: {
-      type: 'passion-video-list-block',
-    },
+    id: componentTypes.BLOCKS.PASSION_VIDEO_LIST,
+    label: 'Passion Video List',
+    media: videoListIcon,
   },
   {
-    id: 'passion-course-list-block',
-    label: '<b> Passion Course List </b>',
-    droppable: false,
-    resizable: false,
-    media: generateMediaIcon(courseListIcon),
-    category: blockCategories.PASSION_COMPONENTS,
-    content: {
-      type: 'passion-course-list-block',
-    },
+    id: componentTypes.BLOCKS.PASSION_COURSE_LIST,
+    label: 'Passion Course List',
+    media: courseListIcon,
   },
   {
-    id: 'passion-pass-list-block',
-    label: '<b> Passion Pass List </b>',
-    droppable: false,
-    resizable: false,
-    media: generateMediaIcon(passListIcon),
-    category: blockCategories.PASSION_COMPONENTS,
-    content: {
-      type: 'passion-pass-list-block',
-    },
+    id: componentTypes.BLOCKS.PASSION_PASS_LIST,
+    label: 'Passion Pass List',
+    media: passListIcon,
   },
   {
-    id: 'passion-subscription-list-block',
-    label: '<b> Passion Subscription List </b>',
-    droppable: false,
-    resizable: false,
-    media: generateMediaIcon(membershipListIcon),
-    category: blockCategories.PASSION_COMPONENTS,
-    content: {
-      type: 'passion-subscription-list-block',
-    },
+    id: componentTypes.BLOCKS.PASSION_SUBSCRIPTION_LIST,
+    label: 'Passion Subscription List',
+    media: membershipListIcon,
   },
-];
+].map((data) => ({
+  id: data.id,
+  label: `<b> ${data.label} </b>`,
+  droppable: false,
+  resizable: false,
+  media: generateMediaIcon(data.icon),
+  category: blockCategories.PASSION_COMPONENTS,
+  content: { type: data.id },
+}));
 
 const presetLayouts = [
   {
-    id: 'simple-text-section',
+    id: componentTypes.BLOCKS.LAYOUT_TEXT_SECTION,
     label: '<b> Simple Text Section </b>',
     media: generateMediaIcon(textSectionIcon),
     category: blockCategories.LAYOUTS,
     content: {
-      type: 'simple-text-section-block',
+      type: componentTypes.BLOCKS.LAYOUT_TEXT_SECTION,
     },
   },
   {
-    id: 'simple-text-with-image-section',
+    id: componentTypes.BLOCKS.LAYOUT_TEXT_IMAGE_SECTION,
     label: '<b> Simple Text with Image Section </b>',
     media: generateMediaIcon(textWithImageIcon),
     category: blockCategories.LAYOUTS,
     content: {
-      type: 'simple-text-with-image-block',
+      type: componentTypes.BLOCKS.LAYOUT_TEXT_IMAGE_SECTION,
     },
   },
   {
-    id: 'simple-text-with-button-section',
+    id: componentTypes.BLOCKS.LAYOUT_TEXT_BTN_SECTION,
     label: '<b> Simple Text with Button Section </b>',
     category: blockCategories.LAYOUTS,
     content: {
-      type: 'simple-text-section-with-button-block',
+      type: componentTypes.BLOCKS.LAYOUT_TEXT_BTN_SECTION,
     },
   },
   {
-    id: 'simple-text-image-button-section',
+    id: componentTypes.BLOCKS.LAYOUT_TEXT_BTN_IMAGE_SECTION,
     label: '<b> Simple Text Image with Button Section </b>',
     category: blockCategories.LAYOUTS,
     content: {
-      type: 'simple-text-button-with-image-block',
+      type: componentTypes.BLOCKS.LAYOUT_TEXT_BTN_IMAGE_SECTION,
     },
   },
   {
-    id: 'bio-with-links',
+    id: componentTypes.BLOCKS.LAYOUT_BIO,
     label: '<b> Simple Bio </b>',
     category: blockCategories.LAYOUTS,
     content: {
-      type: 'simple-bio-section-block',
+      type: componentTypes.BLOCKS.LAYOUT_BIO,
     },
   },
   {
-    id: 'testimonials',
+    id: componentTypes.BLOCKS.LAYOUT_TESTIMONIALS,
     label: '<b> Testimonials </b>',
     category: blockCategories.LAYOUTS,
     content: {
-      type: 'testimonials-block',
+      type: componentTypes.BLOCKS.LAYOUT_TESTIMONIALS,
     },
   },
 ];
 
 const simpleComponents = [
   {
-    id: 'flex-container',
+    id: componentTypes.SIMPLE_COMPONENTS.FLEX_COLUMN_CONTAINER,
     label: '<b> Single Column Container </b>',
     category: blockCategories.SIMPLE_COMPONENTS,
     select: true,
     content: {
-      type: 'flex-column-container',
+      type: componentTypes.SIMPLE_COMPONENTS.FLEX_COLUMN_CONTAINER,
     },
   },
   {
-    id: 'two-column-container',
+    id: componentTypes.SIMPLE_COMPONENTS.TWO_COLUMN_CONTAINER,
     label: '<b> Two Column Container </b>',
     category: blockCategories.SIMPLE_COMPONENTS,
     select: true,
     content: {
-      type: 'two-column-container',
+      type: componentTypes.SIMPLE_COMPONENTS.TWO_COLUMN_CONTAINER,
     },
   },
   {
-    id: 'text-item',
+    id: componentTypes.SIMPLE_COMPONENTS.TEXT_ITEM,
     label: '<b> Text </b>',
     category: blockCategories.SIMPLE_COMPONENTS,
     select: true,
     content: {
-      type: 'text-item',
+      type: componentTypes.SIMPLE_COMPONENTS.TEXT_ITEM,
     },
   },
   {
-    id: 'image-item',
+    id: componentTypes.SIMPLE_COMPONENTS.IMAGE_ITEM,
     label: '<b> Image </b>',
     category: blockCategories.SIMPLE_COMPONENTS,
     select: true,
     content: {
-      type: 'image-item',
+      type: componentTypes.SIMPLE_COMPONENTS.IMAGE_ITEM,
     },
   },
 ];

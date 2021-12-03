@@ -1,14 +1,18 @@
-import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { contextualFontTraits } from '../Configs/common/trait_sets';
+import componentTypes from '../Configs/strings/componentTypes';
 import traitTypes from '../Configs/strings/traitTypes';
+
+import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
+
 import { generateContainerWrapper } from './Container';
 import { textPropHandlers } from './SimpleTextSection';
 
 // NOTE: In this case, the header is completely uninteractable (except selecting)
 export default (editor) => {
-  editor.Components.addType('SignInButton', {
-    extend: 'react-component',
+  editor.Components.addType(componentTypes.CUSTOM_COMPONENTS.REACT_SIGN_IN_BUTTON, {
+    extend: componentTypes.REACT_COMPONENT_HANDLER,
+    isComponent: (el) => el.tagName === componentTypes.CUSTOM_COMPONENTS.REACT_SIGN_IN_BUTTON.toUpperCase(),
     model: {
       defaults: {
         component: SignInButton,
@@ -44,10 +48,9 @@ export default (editor) => {
         ],
       },
     },
-    isComponent: (el) => el.tagName === 'SIGNINBUTTON',
   });
 
-  editor.Components.addType('header-text-brand', {
+  editor.Components.addType(componentTypes.HEADER.INNER.TEXT_BRAND, {
     extend: 'text',
     model: {
       defaults: {
@@ -73,18 +76,18 @@ export default (editor) => {
     },
   });
 
-  editor.Components.addType('header-brand', {
+  editor.Components.addType(componentTypes.HEADER.INNER.BRAND_WRAPPER, {
     model: {
       defaults: {
         tagName: 'div',
         name: 'Header Brand',
         ...fullyDisabledComponentFlags,
         attributes: {
-          class: 'header-brand',
+          class: componentTypes.HEADER.INNER.BRAND_WRAPPER,
         },
         components: [
           {
-            type: 'header-text-brand',
+            type: componentTypes.HEADER.INNER.TEXT_BRAND,
           },
         ],
         styles: `
@@ -107,7 +110,7 @@ export default (editor) => {
     },
   });
 
-  editor.Components.addType('navbar-header', {
+  editor.Components.addType(componentTypes.HEADER.NAVBAR_WRAPPER, {
     model: {
       defaults: {
         tagName: 'header',
@@ -119,10 +122,10 @@ export default (editor) => {
         },
         components: [
           {
-            type: 'header-brand',
+            type: componentTypes.HEADER.INNER.BRAND_WRAPPER,
           },
           {
-            type: 'SignInButton',
+            type: componentTypes.CUSTOM_COMPONENTS.REACT_SIGN_IN_BUTTON,
             highlightable: true,
             selectable: true,
             hoverable: true,
@@ -147,12 +150,12 @@ export default (editor) => {
     },
   });
 
-  editor.Components.addType('passion-header-block', {
+  editor.Components.addType(componentTypes.BLOCKS.HEADER, {
     model: {
       defaults: {
         tagName: 'div',
         name: 'Header',
-        components: generateContainerWrapper([{ type: 'navbar-header' }], true),
+        components: generateContainerWrapper([{ type: componentTypes.HEADER.NAVBAR_WRAPPER }], true),
         ...fullyDisabledComponentFlags,
         highlightable: true,
         selectable: true,
@@ -212,14 +215,14 @@ export default (editor) => {
         let appendedComponent = null;
 
         if (brandType === 'text') {
-          childQuery = 'header-text-brand';
+          childQuery = componentTypes.HEADER.INNER.TEXT_BRAND;
           appendedComponent = {
-            type: 'header-text-brand',
+            type: componentTypes.HEADER.INNER.TEXT_BRAND,
           };
         } else if (brandType === 'image') {
-          childQuery = 'custom-image';
+          childQuery = componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE;
           appendedComponent = {
-            type: 'custom-image',
+            type: componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE,
             attributes: {
               class: 'brand-image',
             },
@@ -235,7 +238,7 @@ export default (editor) => {
           return;
         }
 
-        const brandContainer = this.findType('header-brand')[0] ?? null;
+        const brandContainer = this.findType(componentTypes.HEADER.INNER.BRAND_WRAPPER)[0] ?? null;
 
         if (brandContainer) {
           const componentList = brandContainer.findType(childQuery);

@@ -1,10 +1,10 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
+import componentTypes from '../Configs/strings/componentTypes';
 import traitTypes from '../Configs/strings/traitTypes';
 
-// TODO: Add filled button type here
 // TODO: Refactor and tidy up here
 export default (editor) => {
-  editor.DomComponents.addType('link-buttons', {
+  editor.DomComponents.addType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON, {
     model: {
       defaults: {
         tagName: 'a',
@@ -138,8 +138,8 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('text-section-link-button', {
-    extend: 'link-buttons',
+  editor.DomComponents.addType(componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON, {
+    extend: componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON,
     model: {
       defaults: {
         attributes: {

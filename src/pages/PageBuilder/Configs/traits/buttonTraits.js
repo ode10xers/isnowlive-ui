@@ -1,4 +1,5 @@
 import traitTypes from '../strings/traitTypes.js';
+import componentTypes from '../strings/componentTypes.js';
 
 import { generateTraitsLayout } from 'utils/pageEditor';
 
@@ -69,8 +70,8 @@ export default (editor) => {
     onEvent({ elInput, component, event }) {
       const inputLink = elInput.querySelector('#button-link-input');
       const targetComponent =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON)[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON)[0] ??
         component.find('a')[0] ??
         component.find('button')[0] ??
         component;
@@ -86,8 +87,8 @@ export default (editor) => {
     onUpdate({ elInput, component }) {
       // This is getting the trait value from the set classes
       const componentEl =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON)[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON)[0] ??
         component.find('a')[0] ??
         component.find('button')[0] ??
         component;
@@ -119,8 +120,8 @@ export default (editor) => {
     onEvent({ elInput, component, event }) {
       const inputLink = elInput.querySelector('#button-target-select');
       const targetComponent =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON)[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON)[0] ??
         component.find('a')[0] ??
         component;
 
@@ -135,8 +136,8 @@ export default (editor) => {
     onUpdate({ elInput, component }) {
       // This is getting the trait value from the set classes
       const componentEl =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON)[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON)[0] ??
         component.find('a')[0] ??
         component;
       const inputType = elInput.querySelector('#button-target-select');
@@ -160,8 +161,8 @@ export default (editor) => {
     onEvent({ elInput, component, event }) {
       const inputContent = elInput.querySelector('#button-content-input');
       const targetComponent =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON)[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON)[0] ??
         component.find('a')[0] ??
         component.find('button')[0] ??
         component;
@@ -176,8 +177,8 @@ export default (editor) => {
     onUpdate({ elInput, component }) {
       // This is getting the trait value from the set classes
       const componentEl =
-        component.findType('link-button')[0] ??
-        component.findType('text-section-link-button')[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON)[0] ??
+        component.findType(componentTypes.CUSTOM_COMPONENTS.INNER.TEXT_SECTION_BUTTON)[0] ??
         component.find('a')[0] ??
         component.find('button')[0] ??
         component;

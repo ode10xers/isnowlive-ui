@@ -2,6 +2,7 @@
 
 import ReactDOM from 'react-dom';
 import React from 'react';
+import componentTypes from '../Configs/strings/componentTypes';
 
 export default (editor) => {
   const domc = editor.Components;
@@ -10,7 +11,7 @@ export default (editor) => {
   const wrpChld = 'data-chld';
 
   // Main React component
-  domc.addType('react-component', {
+  domc.addType(componentTypes.REACT_COMPONENT_HANDLER, {
     model: {
       // TODO: If we can modify this so the ReactComponents
       // Return usable HTML directly we can work with it

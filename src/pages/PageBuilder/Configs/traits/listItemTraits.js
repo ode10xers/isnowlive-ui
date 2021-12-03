@@ -1,4 +1,5 @@
 import { generateTraitsLayout } from 'utils/pageEditor';
+import componentTypes from '../strings/componentTypes';
 import traitTypes from '../strings/traitTypes';
 
 export default (editor) => {
@@ -15,7 +16,7 @@ export default (editor) => {
 
     onUpdate({ elInput, component }) {
       // This is getting the trait value from the set classes
-      const linkButtons = component.findType('link-buttons') ?? [];
+      const linkButtons = component.findType(componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON) ?? [];
       // const elInput = elInput.querySelector('.button-list-container');
 
       elInput.innerHTML = '';
@@ -54,10 +55,10 @@ export default (editor) => {
       addNavBtn.classList.add(['button-trait-add']);
       addNavBtn.innerText = 'Add New Link';
       addNavBtn.onclick = () => {
-        if (component.is('navbar-header')) {
+        if (component.is(componentTypes.HEADER.NAVBAR_WRAPPER)) {
           component.append(
             {
-              type: 'link-buttons',
+              type: componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON,
               toolbar: [],
               removable: false,
             },
@@ -66,11 +67,11 @@ export default (editor) => {
             }
           );
         } else {
-          const targetComponent = component.findType('navbar-header')[0];
+          const targetComponent = component.findType(componentTypes.HEADER.NAVBAR_WRAPPER)[0];
 
           targetComponent.append(
             {
-              type: 'link-buttons',
+              type: componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON,
               toolbar: [],
               removable: false,
             },
@@ -99,7 +100,7 @@ export default (editor) => {
 
     onUpdate({ elInput, component }) {
       // This is getting the trait value from the set classes
-      const testimonialItems = component.findType('testimonial-item') ?? [];
+      const testimonialItems = component.findType(componentTypes.LAYOUTS.INNER.TESTIMONIAL_ITEM) ?? [];
       // const elInput = elInput.querySelector('.button-list-container');
 
       elInput.innerHTML = '';
@@ -110,7 +111,7 @@ export default (editor) => {
 
         const btnTraitContent = document.createElement('p');
         btnTraitContent.classList.add(['button-trait-content']);
-        const targetHeading = item.findType('text-section-heading')[0] ?? null;
+        const targetHeading = item.findType(componentTypes.LAYOUTS.INNER.TEXT_SECTION_HEADING)[0] ?? null;
         btnTraitContent.innerHTML =
           targetHeading?.get('content') || targetHeading?.findType('textnode')[0]?.get('content') || 'John Doe';
 
@@ -141,12 +142,12 @@ export default (editor) => {
       addNewBtn.innerText = 'Add New';
       addNewBtn.onclick = () => {
         // component.handleAddButtonLink();
-        const testimonialContainer = component.findType('testimonials')[0] ?? null;
+        const testimonialContainer = component.findType(componentTypes.LAYOUTS.INNER.TESTIMONIALS_WRAPPER)[0] ?? null;
 
         if (testimonialContainer) {
           testimonialContainer.append(
             {
-              type: 'testimonial-item',
+              type: componentTypes.LAYOUTS.INNER.TESTIMONIAL_ITEM,
             },
             {
               at: testimonialContainer.components().length ?? 1,

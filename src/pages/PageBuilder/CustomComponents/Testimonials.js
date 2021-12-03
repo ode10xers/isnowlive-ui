@@ -6,10 +6,11 @@ import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection'
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 import traitTypes from '../Configs/strings/traitTypes';
 import customCommands from '../Configs/strings/customCommands';
+import componentTypes from '../Configs/strings/componentTypes';
 
 export default (editor) => {
-  editor.DomComponents.addType('testimonial-item', {
-    extend: 'simple-text-image-section',
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TESTIMONIAL_ITEM, {
+    extend: componentTypes.LAYOUTS.INNER.TEXT_IMAGE_SECTION_WRAPPER,
     model: {
       defaults: {
         ...fullyDisabledComponentFlags,
@@ -37,18 +38,18 @@ export default (editor) => {
         ],
         components: [
           {
-            type: 'custom-image',
+            type: componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE,
           },
           {
-            type: 'simple-text-section',
+            type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER,
             components: [
               {
                 tagName: 'h2',
-                type: 'text-section-heading',
+                type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_HEADING,
                 content: 'John Doe',
               },
               {
-                type: 'text-section-content',
+                type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_CONTENT,
               },
             ],
           },
@@ -72,7 +73,7 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('testimonials', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TESTIMONIALS_WRAPPER, {
     model: {
       defaults: {
         tagName: 'div',
@@ -83,13 +84,13 @@ export default (editor) => {
         },
         components: [
           {
-            type: 'testimonial-item',
+            type: componentTypes.LAYOUTS.INNER.TESTIMONIAL_ITEM,
           },
           {
-            type: 'testimonial-item',
+            type: componentTypes.LAYOUTS.INNER.TESTIMONIAL_ITEM,
           },
           {
-            type: 'testimonial-item',
+            type: componentTypes.LAYOUTS.INNER.TESTIMONIAL_ITEM,
           },
         ],
         styles: `
@@ -115,7 +116,7 @@ export default (editor) => {
   });
 
   // Testimonials
-  editor.DomComponents.addType('testimonials-block', {
+  editor.DomComponents.addType(componentTypes.BLOCKS.LAYOUT_TESTIMONIALS, {
     model: {
       defaults: {
         tagName: 'div',
@@ -134,8 +135,8 @@ export default (editor) => {
           },
         ],
         components: generateContainerWrapper([
-          { type: 'text-section-heading', attributes: {} },
-          { type: 'testimonials' },
+          { type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_HEADING, attributes: {} },
+          { type: componentTypes.LAYOUTS.INNER.TESTIMONIALS_WRAPPER },
         ]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',
@@ -153,7 +154,7 @@ export default (editor) => {
         this.on('change:bg-color', this.handleBGStyleChange);
         this.on('change:font-family', this.handleFontChange);
 
-        const innerItemsList = this.findType('testimonials')[0] ?? null;
+        const innerItemsList = this.findType(componentTypes.LAYOUTS.INNER.TESTIMONIALS_WRAPPER)[0] ?? null;
         const componentCollection = innerItemsList ? innerItemsList.components() : this.components();
         this.listenTo(componentCollection, 'add remove change', this.handleComponentsChange);
       },

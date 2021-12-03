@@ -11,6 +11,7 @@ import PassionSubscriptionList from 'components/PageEditorPassionComponents/Subs
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 import { inventoryListCSSVars } from 'utils/widgets';
 import traitTypes from '../Configs/strings/traitTypes';
+import componentTypes from '../Configs/strings/componentTypes';
 
 /* 
 NOTE: Old flag used in the React Components 
@@ -28,42 +29,36 @@ NOTE: Old flag used in the React Components
 
 // For components with custom configs, we'll initialize them separately for now
 const passionProductsListComponents = [
-  // {
-  //   type: 'PassionSessionList',
-  //   name: 'Passion Session List',
-  //   component: PassionSessionList,
-  //   blockType: 'passion-session-list-block',
-  // },
   {
-    type: 'PassionVideoList',
+    type: componentTypes.PASSION_COMPONENTS.VIDEO_LIST,
     name: 'Passion Video List',
     component: PassionVideoList,
-    blockType: 'passion-video-list-block',
+    blockType: componentTypes.BLOCKS.PASSION_VIDEO_LIST,
   },
   {
-    type: 'PassionCourseList',
+    type: componentTypes.PASSION_COMPONENTS.COURSE_LIST,
     name: 'Passion Course List',
     component: PassionCourseList,
-    blockType: 'passion-course-list-block',
+    blockType: componentTypes.BLOCKS.PASSION_COURSE_LIST,
   },
   {
-    type: 'PassionPassList',
+    type: componentTypes.PASSION_COMPONENTS.PASS_LIST,
     name: 'Passion Pass List',
     component: PassionPassList,
-    blockType: 'passion-pass-list-block',
+    blockType: componentTypes.BLOCKS.PASSION_PASS_LIST,
   },
   {
-    type: 'PassionSubscriptionList',
+    type: componentTypes.PASSION_COMPONENTS.SUBSCRIPTION_LIST,
     name: 'Passion Subscription List',
     component: PassionSubscriptionList,
-    blockType: 'passion-subscription-list-block',
+    blockType: componentTypes.BLOCKS.PASSION_SUBSCRIPTION_LIST,
   },
 ];
 
 export default (editor) => {
-  editor.Components.addType('PassionSessionList', {
-    extend: 'react-component',
-    isComponent: (el) => el.tagName === 'PASSIONSESSIONLIST',
+  editor.Components.addType(componentTypes.PASSION_COMPONENTS.SESSION_LIST, {
+    extend: componentTypes.REACT_COMPONENT_HANDLER,
+    isComponent: (el) => el.tagName === componentTypes.PASSION_COMPONENTS.SESSION_LIST.toUpperCase(),
     model: {
       defaults: {
         component: PassionSessionList,
@@ -75,7 +70,7 @@ export default (editor) => {
     },
   });
 
-  editor.Components.addType('passion-session-list-block', {
+  editor.Components.addType(componentTypes.BLOCKS.PASSION_SESSION_LIST, {
     model: {
       defaults: {
         tagName: 'div',
@@ -83,7 +78,7 @@ export default (editor) => {
         droppable: false,
         toolbar: defaultBlockToolbar,
         attributes: {},
-        components: generateContainerWrapper([{ type: 'PassionSessionList' }]),
+        components: generateContainerWrapper([{ type: componentTypes.PASSION_COMPONENTS.SESSION_LIST }]),
         layout: sessionsLayout.GRID,
         'show-image': false,
         'show-desc': false,
@@ -108,7 +103,7 @@ export default (editor) => {
       },
       handleBooleanAttributeChange(attrName) {
         const value = this.props()[attrName] ?? false;
-        const passionSessionList = this.findType('PassionSessionList')[0] ?? null;
+        const passionSessionList = this.findType(componentTypes.PASSION_COMPONENTS.SESSION_LIST)[0] ?? null;
 
         if (passionSessionList) {
           passionSessionList.setAttributes({
@@ -116,12 +111,12 @@ export default (editor) => {
             [attrName]: value,
           });
         } else {
-          console.warn('No PassionSessionList Component Found!');
+          console.warn(`No ${componentTypes.PASSION_COMPONENTS.SESSION_LIST} Component Found!`);
         }
       },
       handleLayoutChange() {
         const layoutVal = this.props()['layout'] ?? sessionsLayout.GRID;
-        const passionSessionList = this.findType('PassionSessionList')[0] ?? null;
+        const passionSessionList = this.findType(componentTypes.PASSION_COMPONENTS.SESSION_LIST)[0] ?? null;
 
         let attrVal = { layout: layoutVal };
 
@@ -136,13 +131,13 @@ export default (editor) => {
             {
               type: 'checkbox',
               name: 'show-image',
-              label: 'Show Image?',
+              label: 'Show Image',
               changeProp: true,
             },
             {
               type: 'checkbox',
               name: 'show-desc',
-              label: 'Show Description?',
+              label: 'Show Description',
               changeProp: true,
             },
             {
@@ -181,7 +176,7 @@ export default (editor) => {
     // NOTE: Initially, each component can be selected and we
     // can choose the layouts (GRID or Horizontal scroll, etc)
     editor.Components.addType(comp.type, {
-      extend: 'react-component',
+      extend: componentTypes.REACT_COMPONENT_HANDLER,
       isComponent: (el) => el.tagName === comp.type.toUpperCase(),
       model: {
         defaults: {

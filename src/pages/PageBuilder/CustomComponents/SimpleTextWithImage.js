@@ -6,6 +6,7 @@ import { generateContainerWrapper } from '../CustomComponents/Container.js';
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 import traitTypes from '../Configs/strings/traitTypes';
 import customCommands from '../Configs/strings/customCommands';
+import componentTypes from '../Configs/strings/componentTypes';
 
 export const imageTraits = [
   {
@@ -30,7 +31,7 @@ const textSectionWithImageTraits = [
 ];
 
 export default (editor) => {
-  editor.DomComponents.addType('custom-image', {
+  editor.DomComponents.addType(componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE, {
     extend: 'image',
     model: {
       defaults: {
@@ -56,7 +57,7 @@ export default (editor) => {
   });
 
   // Text with Image Section
-  editor.DomComponents.addType('simple-text-image-section', {
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TEXT_IMAGE_SECTION_WRAPPER, {
     model: {
       defaults: {
         tagName: 'div',
@@ -66,10 +67,10 @@ export default (editor) => {
         },
         components: [
           {
-            type: 'simple-text-section',
+            type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_WRAPPER,
           },
           {
-            type: 'custom-image',
+            type: componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE,
           },
         ],
         styles: `
@@ -146,20 +147,19 @@ export default (editor) => {
     },
   });
 
-  editor.DomComponents.addType('simple-text-with-image-block', {
+  editor.DomComponents.addType(componentTypes.BLOCKS.LAYOUT_TEXT_IMAGE_SECTION, {
     model: {
       defaults: {
         tagName: 'div',
         name: 'Simple Text with Image Section',
         droppable: false,
         toolbar: defaultBlockToolbar,
-
         attributes: {
           layout: 'center',
           class: 'text-image-section-container',
         },
         traits: textSectionWithImageTraits,
-        components: generateContainerWrapper([{ type: 'simple-text-image-section' }]),
+        components: generateContainerWrapper([{ type: componentTypes.LAYOUTS.INNER.TEXT_IMAGE_SECTION_WRAPPER }]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -177,23 +177,23 @@ export default (editor) => {
   });
 
   // Text Button with Image Section
-  editor.DomComponents.addType('simple-text-image-button-section', {
-    extend: 'simple-text-image-section',
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.TEXT_IMAGE_BTN_SECTION_WRAPPER, {
+    extend: componentTypes.LAYOUTS.INNER.TEXT_IMAGE_SECTION_WRAPPER,
     model: {
       defaults: {
         components: [
           {
-            type: 'simple-text-section-with-button',
+            type: componentTypes.LAYOUTS.INNER.TEXT_SECTION_WITH_BTN_WRAPPER,
           },
           {
-            type: 'custom-image',
+            type: componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE,
           },
         ],
       },
     },
   });
 
-  editor.DomComponents.addType('simple-text-button-with-image-block', {
+  editor.DomComponents.addType(componentTypes.BLOCKS.LAYOUT_TEXT_BTN_IMAGE_SECTION, {
     model: {
       defaults: {
         tagName: 'div',
@@ -206,7 +206,7 @@ export default (editor) => {
           class: 'text-image-section-container',
         },
         traits: [...textSectionWithImageTraits],
-        components: generateContainerWrapper([{ type: 'simple-text-image-button-section' }]),
+        components: generateContainerWrapper([{ type: componentTypes.LAYOUTS.INNER.TEXT_IMAGE_BTN_SECTION_WRAPPER }]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -224,23 +224,23 @@ export default (editor) => {
   });
 
   // Bio section with image
-  editor.DomComponents.addType('simple-bio-with-image-section', {
-    extend: 'simple-text-image-section',
+  editor.DomComponents.addType(componentTypes.LAYOUTS.INNER.BIO_WITH_IMAGE_SECTION, {
+    extend: componentTypes.LAYOUTS.INNER.TEXT_IMAGE_SECTION_WRAPPER,
     model: {
       defaults: {
         components: [
           {
-            type: 'simple-bio-section',
+            type: componentTypes.LAYOUTS.INNER.BIO_SECTION,
           },
           {
-            type: 'custom-image',
+            type: componentTypes.CUSTOM_COMPONENTS.CUSTOM_IMAGE,
           },
         ],
       },
     },
   });
 
-  editor.DomComponents.addType('simple-bio-section-block', {
+  editor.DomComponents.addType(componentTypes.BLOCKS.LAYOUT_BIO, {
     model: {
       defaults: {
         tagName: 'div',
@@ -253,7 +253,7 @@ export default (editor) => {
           class: 'text-image-section-container',
         },
         traits: [...textSectionWithImageTraits, ...socialLinksTraits],
-        components: generateContainerWrapper([{ type: 'simple-bio-with-image-section' }]),
+        components: generateContainerWrapper([{ type: componentTypes.LAYOUTS.INNER.BIO_WITH_IMAGE_SECTION }]),
         'font-family': 'Times New Roman',
         'text-color': '#000000',
         'bg-color': '#ffffff',
@@ -289,7 +289,7 @@ export default (editor) => {
           'website-link': websiteLink,
         } = this.props();
 
-        const targetComponent = this.findType('social-media-links')[0] ?? null;
+        const targetComponent = this.findType(componentTypes.CUSTOM_COMPONENTS.INNER.SOCIAL_MEDIA_LINKS)[0] ?? null;
 
         if (targetComponent) {
           targetComponent.set({
