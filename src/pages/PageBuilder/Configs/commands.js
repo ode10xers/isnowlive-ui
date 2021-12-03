@@ -1,26 +1,26 @@
 import { message } from 'antd';
 import { isValidCSSStyle } from 'utils/colors';
+import customCommands from './strings/customCommands';
 
 const supportedDeviceTypes = [
   {
-    cmd: 'set-device-desktop',
+    cmd: customCommands.SET_DEVICE.DESKTOP,
     name: 'Desktop',
   },
   {
-    cmd: 'set-device-tablet',
+    cmd: customCommands.SET_DEVICE.TABLET,
     name: 'Tablet',
   },
   {
-    cmd: 'set-device-mobile',
+    cmd: customCommands.SET_DEVICE.MOBILE,
     name: 'Mobile',
   },
 ];
 
-// TODO: Separaate these into separate files
 export default (editor) => {
   // Previously we're overriding the "Exit" command, now we make it custom command
   // editor.Commands.add('core:component-exit', (editor) => {
-  editor.Commands.add('tlb-move-component-up', (editor) => {
+  editor.Commands.add(customCommands.COMPONENT.MOVE_UP, (editor) => {
     const selectedComponent = editor.getSelected();
     const selectedParent = selectedComponent.parent();
     const targetIndex = Math.max(0, selectedComponent.index() - 1);
@@ -29,7 +29,7 @@ export default (editor) => {
     editor.selectToggle(selectedComponent);
   });
 
-  editor.Commands.add('tlb-move-component-down', (editor) => {
+  editor.Commands.add(customCommands.COMPONENT.MOVE_DOWN, (editor) => {
     const selectedComponent = editor.getSelected();
     const selectedParent = selectedComponent.parent();
     const targetIndex = Math.min(selectedParent.components().length - 1, selectedComponent.index() + 1);
@@ -39,8 +39,7 @@ export default (editor) => {
   });
 
   // Override import command
-  editor.Commands.add('gjs-open-import-webpage', (editor) => {
-    // run: (editor) => {
+  editor.Commands.add(customCommands.WEBPAGE_PRESET_IMPORT_OVERRIDE, (editor) => {
     const templateData = {
       html: editor.getHtml(),
       css: editor.getCss(),
@@ -50,11 +49,10 @@ export default (editor) => {
 
     editor.StorageManager.store(templateData);
     message.success('Saved successfully!');
-    // },
   });
 
   // Make use of StoreManagerAPI to actually store things
-  editor.Commands.add('save-as-json', {
+  editor.Commands.add(customCommands.SAVE_AS_JSON, {
     run: (editor) => {
       editor.store(
         (dataResponse) => {
@@ -74,7 +72,7 @@ export default (editor) => {
   });
 
   // NOTE: This is the counter part of the one below
-  editor.Commands.add('remove-background-image', (editor) => {
+  editor.Commands.add(customCommands.IMAGE.REMOVE_BG, (editor) => {
     const selected = editor.getSelected();
     // NOTE: will be unused with new method
     // selected.removeClass(['with-background-image']);
@@ -85,7 +83,7 @@ export default (editor) => {
     });
   });
 
-  editor.Commands.add('set-background-image', {
+  editor.Commands.add(customCommands.IMAGE.SET_BG, {
     run: (editor) => {
       editor.AssetManager.open({
         types: ['image'],
@@ -120,7 +118,7 @@ export default (editor) => {
     },
   });
 
-  editor.Commands.add('set-image-url', {
+  editor.Commands.add(customCommands.IMAGE.SET_URL, {
     run: (editor) => {
       editor.AssetManager.open({
         types: ['image'],
@@ -149,13 +147,6 @@ export default (editor) => {
               isSet = true;
             }
           }
-          // else {
-          //   const closestImage = selected.find('img')[0] ?? null;
-          //   if (closestImage && closestImage.is('image')) {
-          //     closestImage.addAttributes({ src: asset.getSrc(), width: '100%' });
-          //     isSet = true;
-          //   }
-          // }
 
           // The default AssetManager UI will trigger `select(asset, false)` on asset click
           // and `select(asset, true)` on double-click

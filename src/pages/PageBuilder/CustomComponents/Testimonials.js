@@ -5,6 +5,7 @@ import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection'
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 import traitTypes from '../Configs/strings/traitTypes';
+import customCommands from '../Configs/strings/customCommands';
 
 export default (editor) => {
   editor.DomComponents.addType('testimonial-item', {
@@ -30,7 +31,7 @@ export default (editor) => {
             text: 'Click to set image',
             full: true,
             label: 'Set Image',
-            command: 'set-image-url',
+            command: customCommands.IMAGE.SET_URL,
           },
           ...genericFontTraits,
         ],

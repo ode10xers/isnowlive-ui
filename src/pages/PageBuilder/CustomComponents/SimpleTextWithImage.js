@@ -5,6 +5,7 @@ import { generateContainerWrapper } from '../CustomComponents/Container.js';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 import traitTypes from '../Configs/strings/traitTypes';
+import customCommands from '../Configs/strings/customCommands';
 
 export const imageTraits = [
   {
@@ -16,7 +17,7 @@ export const imageTraits = [
     text: 'Click to set image',
     full: true,
     label: 'Set Image',
-    command: 'set-image-url',
+    command: customCommands.IMAGE.SET_URL,
   },
 ];
 

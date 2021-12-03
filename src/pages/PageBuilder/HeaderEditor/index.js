@@ -35,6 +35,7 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
 import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
+import customCommands from '../Configs/strings/customCommands.js';
 
 const { Text } = Typography;
 
@@ -267,13 +268,13 @@ const HeaderEditor = ({ match, history }) => {
       setIsComponentSelected(false);
     });
 
-    editor.on('run:preview', () => {
+    editor.on(`run:${customCommands.EDITOR_DEFAULT.PREVIEW}`, () => {
       document.getElementById(RIGHT).style.display = 'none';
       document.getElementById(TOP).style.display = 'none';
       document.getElementById(LEFT).style.display = 'none';
     });
 
-    editor.on('stop:preview', () => {
+    editor.on(`stop:${customCommands.EDITOR_DEFAULT.PREVIEW}`, () => {
       document.getElementById(RIGHT).style.display = 'block';
       document.getElementById(TOP).style.display = 'block';
       document.getElementById(LEFT).style.display = 'block';
@@ -370,32 +371,32 @@ const HeaderEditor = ({ match, history }) => {
   };
 
   const handleSetDeviceDesktop = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-desktop');
+    runCommandAndToggleActiveStyles(e.target, customCommands.SET_DEVICE.DESKTOP);
   };
 
   const handleSetDeviceTablet = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-tablet');
+    runCommandAndToggleActiveStyles(e.target, customCommands.SET_DEVICE.TABLET);
   };
 
   const handleSetDeviceMobile = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
+    runCommandAndToggleActiveStyles(e.target, customCommands.SET_DEVICE.MOBILE);
   };
 
   const handlePreview = () => {
-    runSimpleCommand('preview');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.PREVIEW);
   };
 
   const handleUndo = () => {
-    runSimpleCommand('core:undo');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.UNDO);
   };
 
   const handleRedo = () => {
-    runSimpleCommand('core:redo');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.REDO);
   };
 
   const handleSaveTemplate = () => {
     // Custom defined command in Plugins/commands.js
-    runSimpleCommand('save-as-json');
+    runSimpleCommand(customCommands.SAVE_AS_JSON);
   };
 
   //#endregion End of Editor Button Handlers

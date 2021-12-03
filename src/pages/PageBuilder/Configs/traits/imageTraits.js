@@ -1,4 +1,5 @@
 import { generateTraitsLayout } from 'utils/pageEditor';
+import customCommands from '../strings/customCommands';
 import traitTypes from '../strings/traitTypes';
 
 export default (editor) => {
@@ -133,13 +134,13 @@ export default (editor) => {
       const setBtn = document.createElement('button');
       setBtn.innerText = 'Set BG Image';
       setBtn.addEventListener('click', () => {
-        editor.runCommand('set-background-image');
+        editor.runCommand(customCommands.IMAGE.SET_BG);
       });
 
       const resetBtn = document.createElement('button');
       resetBtn.innerText = 'Reset BG';
       resetBtn.addEventListener('click', () => {
-        editor.runCommand('remove-background-image');
+        editor.runCommand(customCommands.IMAGE.REMOVE_BG);
       });
 
       el.appendChild(setBtn);

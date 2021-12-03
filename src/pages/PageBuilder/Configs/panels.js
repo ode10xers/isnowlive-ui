@@ -1,28 +1,29 @@
 // NOTE: This is currently unused
 
+import customCommands from './strings/customCommands';
+
 // This is the default value
 // taken from https://github.com/artf/grapesjs/blob/master/src/panels/config/config.js
 
-const undo = 'core:undo';
-const redo = 'core:redo';
+const undo = customCommands.EDITOR_DEFAULT.UNDO;
+const redo = customCommands.EDITOR_DEFAULT.REDO;
 
-// const swv = 'sw-visibility';
+// const swv = customCommands.EDITOR_DEFAULT.HIGHLIGHT_COMPONENT_BORDERS;
 const expt = 'export-template';
 // const osm = 'open-sm';
 const otm = 'open-tm';
 const ola = 'open-layers';
 const obl = 'open-blocks';
-const ful = 'fullscreen';
-const prv = 'preview';
+const ful = customCommands.EDITOR_DEFAULT.FULLSCREEN;
+const prv = customCommands.EDITOR_DEFAULT.PREVIEW;
 
 // NOTE: This needs to match the cmd in Plugins/commands.js
-const sdm = 'set-device-mobile';
-const sdt = 'set-device-tablet';
-const sdd = 'set-device-desktop';
+const sdm = customCommands.SET_DEVICE.MOBILE;
+const sdt = customCommands.SET_DEVICE.TABLET;
+const sdd = customCommands.SET_DEVICE.DESKTOP;
 
-const saj = 'save-as-json';
+const saj = customCommands.SAVE_AS_JSON;
 
-// TODO: Add more commands later
 // Responsive select, export to JSON
 export default {
   stylePrefix: 'pn-',

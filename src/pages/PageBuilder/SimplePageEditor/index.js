@@ -47,6 +47,7 @@ import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
 import traitTypes from '../Configs/strings/traitTypes.js';
+import customCommands from '../Configs/strings/customCommands.js';
 
 const { Text } = Typography;
 
@@ -365,14 +366,14 @@ const SimplePageEditor = ({ match, history }) => {
       setIsComponentSelected(false);
     });
 
-    editor.on('run:preview', () => {
+    editor.on(`run:${customCommands.EDITOR_DEFAULT.PREVIEW}`, () => {
       document.getElementById(RIGHT).style.display = 'none';
       document.getElementById(TOP).style.display = 'none';
       document.getElementById(LEFT).style.display = 'none';
       document.getElementById(BUILDER_CONTAINER_ID).style.height = '100%';
     });
 
-    editor.on('stop:preview', () => {
+    editor.on(`stop:${customCommands.EDITOR_DEFAULT.PREVIEW}`, () => {
       document.getElementById(RIGHT).style.display = 'block';
       document.getElementById(TOP).style.display = 'block';
       document.getElementById(LEFT).style.display = 'block';
@@ -615,63 +616,32 @@ const SimplePageEditor = ({ match, history }) => {
   // };
 
   const handleSetDeviceDesktop = (e) => {
-    runCommandAndToggleActiveStyles(e.currentTarget, 'set-device-desktop');
-    // runCommandAndToggleActiveStyles(e.target, 'set-device-desktop');
+    runCommandAndToggleActiveStyles(e.currentTarget, customCommands.SET_DEVICE.DESKTOP);
   };
 
   const handleSetDeviceTablet = (e) => {
-    runCommandAndToggleActiveStyles(e.currentTarget, 'set-device-tablet');
-    // runCommandAndToggleActiveStyles(e.target, 'set-device-tablet');
+    runCommandAndToggleActiveStyles(e.currentTarget, customCommands.SET_DEVICE.TABLET);
   };
 
   const handleSetDeviceMobile = (e) => {
-    runCommandAndToggleActiveStyles(e.currentTarget, 'set-device-mobile');
-    // runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
+    runCommandAndToggleActiveStyles(e.currentTarget, customCommands.SET_DEVICE.MOBILE);
   };
-
-  // const handleSwitchVisibility = (e) => {
-  //   if (gjsEditor) {
-  //     const isVisibilityActive = gjsEditor.Commands.isActive('sw-visibility');
-
-  //     if (isVisibilityActive) {
-  //       gjsEditor.stopCommand('sw-visibility');
-  //       e.target.classList.remove('active');
-  //     } else {
-  //       gjsEditor.runCommand('sw-visibility');
-  //       e.target.classList.add('active');
-  //     }
-  //   }
-  // };
 
   const handlePreview = () => {
-    runSimpleCommand('preview');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.PREVIEW);
   };
 
-  // const handleToggleFullscreen = (e) => {
-  //   if (gjsEditor) {
-  //     const isInFullscreen = gjsEditor.Commands.isActive('fullscreen');
-
-  //     if (isInFullscreen) {
-  //       gjsEditor.stopCommand('fullscreen');
-  //       e.target.classList.remove('active');
-  //     } else {
-  //       gjsEditor.runCommand('fullscreen', { target: document.getElementById(EDITOR) });
-  //       e.target.classList.add(['active']);
-  //     }
-  //   }
-  // };
-
   const handleUndo = () => {
-    runSimpleCommand('core:undo');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.UNDO);
   };
 
   const handleRedo = () => {
-    runSimpleCommand('core:redo');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.REDO);
   };
 
   const handleSaveTemplate = () => {
     // Custom defined command in Plugins/commands.js
-    runSimpleCommand('save-as-json');
+    runSimpleCommand(customCommands.SAVE_AS_JSON);
   };
 
   // const handleCleanCanvas = () => {

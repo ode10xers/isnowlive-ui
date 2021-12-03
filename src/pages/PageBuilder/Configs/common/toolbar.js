@@ -1,25 +1,27 @@
+import customCommands from '../strings/customCommands';
+
 export const movableComponentsToolbarActions = [
   {
     attributes: { class: 'fa fa-arrow-up' },
-    command: 'tlb-move-component-up',
+    command: customCommands.COMPONENT.MOVE_UP,
   },
   {
     attributes: { class: 'fa fa-arrow-down' },
-    command: 'tlb-move-component-down',
+    command: customCommands.COMPONENT.MOVE_DOWN,
   },
 ];
 
 export const copyableComponentsToolbarActions = [
   {
     attributes: { class: 'fa fa-clone' },
-    command: 'tlb-clone',
+    command: customCommands.COMPONENT.DUPLICATE,
   },
 ];
 
 export const removableComponentsTooolbarActions = [
   {
     attributes: { class: 'fa fa-trash-o' },
-    command: 'tlb-delete',
+    command: customCommands.COMPONENT.REMOVE,
   },
 ];
 

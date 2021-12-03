@@ -31,6 +31,7 @@ import { customEditorInitializationLogic } from 'utils/pageEditor.js';
 import { useGlobalContext } from 'services/globalContext.js';
 
 import styles from './style.module.scss';
+import customCommands from '../Configs/strings/customCommands.js';
 
 const {
   BUILDER_CONTAINER_ID,
@@ -272,13 +273,13 @@ const FooterEditor = ({ match, history }) => {
       setIsComponentSelected(false);
     });
 
-    editor.on('run:preview', () => {
+    editor.on(`run:${customCommands.EDITOR_DEFAULT.PREVIEW}`, () => {
       document.getElementById(RIGHT).style.display = 'none';
       document.getElementById(TOP).style.display = 'none';
       document.getElementById(LEFT).style.display = 'none';
     });
 
-    editor.on('stop:preview', () => {
+    editor.on(`stop:${customCommands.EDITOR_DEFAULT.PREVIEW}`, () => {
       document.getElementById(RIGHT).style.display = 'block';
       document.getElementById(TOP).style.display = 'block';
       document.getElementById(LEFT).style.display = 'block';
@@ -290,7 +291,7 @@ const FooterEditor = ({ match, history }) => {
     });
     //#endregion Start of Asset Listener Definition
 
-    editor.runCommand('sw-visibility');
+    editor.runCommand(customCommands.EDITOR_DEFAULT.HIGHLIGHT_COMPONENT_BORDERS);
 
     setGjsEditor(editor);
     fetchCreatorWebsiteAssets(editor);
@@ -399,60 +400,60 @@ const FooterEditor = ({ match, history }) => {
   };
 
   const handleSetDeviceDesktop = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-desktop');
+    runCommandAndToggleActiveStyles(e.target, customCommands.SET_DEVICE.DESKTOP);
   };
 
   const handleSetDeviceTablet = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-tablet');
+    runCommandAndToggleActiveStyles(e.target, customCommands.SET_DEVICE.TABLET);
   };
 
   const handleSetDeviceMobile = (e) => {
-    runCommandAndToggleActiveStyles(e.target, 'set-device-mobile');
+    runCommandAndToggleActiveStyles(e.target, customCommands.SET_DEVICE.MOBILE);
   };
 
   const handleSwitchVisibility = (e) => {
     if (gjsEditor) {
-      const isVisibilityActive = gjsEditor.Commands.isActive('sw-visibility');
+      const isVisibilityActive = gjsEditor.Commands.isActive(customCommands.EDITOR_DEFAULT.HIGHLIGHT_COMPONENT_BORDERS);
 
       if (isVisibilityActive) {
-        gjsEditor.stopCommand('sw-visibility');
+        gjsEditor.stopCommand(customCommands.EDITOR_DEFAULT.HIGHLIGHT_COMPONENT_BORDERS);
         e.target.classList.remove('active');
       } else {
-        gjsEditor.runCommand('sw-visibility');
+        gjsEditor.runCommand(customCommands.EDITOR_DEFAULT.HIGHLIGHT_COMPONENT_BORDERS);
         e.target.classList.add('active');
       }
     }
   };
 
   const handlePreview = () => {
-    runSimpleCommand('preview');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.PREVIEW);
   };
 
   const handleToggleFullscreen = (e) => {
     if (gjsEditor) {
-      const isInFullscreen = gjsEditor.Commands.isActive('fullscreen');
+      const isInFullscreen = gjsEditor.Commands.isActive(customCommands.EDITOR_DEFAULT.FULLSCREEN);
 
       if (isInFullscreen) {
-        gjsEditor.stopCommand('fullscreen');
+        gjsEditor.stopCommand(customCommands.EDITOR_DEFAULT.FULLSCREEN);
         e.target.classList.remove('active');
       } else {
-        gjsEditor.runCommand('fullscreen', { target: document.getElementById(EDITOR) });
+        gjsEditor.runCommand(customCommands.EDITOR_DEFAULT.FULLSCREEN, { target: document.getElementById(EDITOR) });
         e.target.classList.add(['active']);
       }
     }
   };
 
   const handleUndo = () => {
-    runSimpleCommand('core:undo');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.UNDO);
   };
 
   const handleRedo = () => {
-    runSimpleCommand('core:redo');
+    runSimpleCommand(customCommands.EDITOR_DEFAULT.REDO);
   };
 
   const handleSaveTemplate = () => {
     // Custom defined command in Plugins/commands.js
-    runSimpleCommand('save-as-json');
+    runSimpleCommand(customCommands.SAVE_AS_JSON);
   };
 
   //#endregion End of Editor Button Handlers
