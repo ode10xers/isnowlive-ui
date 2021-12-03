@@ -1,4 +1,5 @@
 import { generateFontFamilyStylingText } from 'utils/helper.js';
+import traitTypes from '../Configs/strings/traitTypes';
 
 // TODO: Add filled button type here
 // TODO: Refactor and tidy up here
@@ -39,33 +40,33 @@ export default (editor) => {
             changeProp: 1,
           },
           {
-            type: 'font-size',
+            type: traitTypes.FONT.FONT_SIZE,
           },
           {
-            type: 'font-selector',
+            type: traitTypes.FONT.FONT_FAMILY_SELECTOR,
             name: 'font-family',
             changeProp: 1,
           },
           {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             label: 'Text color',
             name: 'text-color',
             changeProp: 1,
           },
           {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             label: 'Background color',
             name: 'bg-color',
             changeProp: 1,
           },
           {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             label: 'Border color',
             name: 'border-color',
             changeProp: 1,
           },
           {
-            type: 'border-radius-slider',
+            type: traitTypes.IMAGE.BORDER_RADIUS_SLIDER,
             name: 'border-radius',
             min: 0,
             max: 200,

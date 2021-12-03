@@ -1,12 +1,14 @@
+import traitTypes from '../strings/traitTypes';
+
 // NOTE: Needs a 'font-family' and 'text-color' prop
 export const genericFontTraits = [
   {
-    type: 'font-selector',
+    type: traitTypes.FONT.FONT_FAMILY_SELECTOR,
     name: 'font-family',
     changeProp: true,
   },
   {
-    type: 'custom-color-picker',
+    type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
     label: 'Text Color',
     name: 'text-color',
     changeProp: true,
@@ -16,18 +18,18 @@ export const genericFontTraits = [
 export const contextualFontTraits = [
   ...genericFontTraits,
   {
-    type: 'font-size',
+    type: traitTypes.FONT.FONT_SIZE,
   },
 ];
 
 export const spacingTraits = [
   {
-    type: 'padding-slider',
+    type: traitTypes.SPACING.PADDING_SLIDER,
     min: 0,
     max: 100,
   },
   {
-    type: 'margin-slider',
+    type: traitTypes.SPACING.MARGIN_SLIDER,
     min: 0,
     max: 100,
   },
@@ -36,10 +38,10 @@ export const spacingTraits = [
 //NOTE: Needs a 'bg-color' prop
 export const backgroundTraits = [
   {
-    type: 'background-image-picker',
+    type: traitTypes.IMAGE.BG_IMAGE_PICKER,
   },
   {
-    type: 'custom-color-picker',
+    type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
     label: 'Background color',
     name: 'bg-color',
     changeProp: true,
@@ -48,51 +50,42 @@ export const backgroundTraits = [
 
 export const innerButtonTraits = [
   {
-    type: 'button-link',
+    type: traitTypes.BUTTONS.BUTTON_LINK,
   },
   {
-    type: 'button-target',
+    type: traitTypes.BUTTONS.BUTTON_TARGET,
   },
   {
-    type: 'button-content',
+    type: traitTypes.BUTTONS.BUTTON_CONTENT,
   },
 ];
 
 // NOTE: need all of the names listed below as props
 export const socialLinksTraits = [
   {
-    type: 'text',
     name: 'facebook-link',
     label: 'Facebook',
-    placeholder: 'Your Facebook link',
-    changeProp: true,
   },
   {
-    type: 'text',
     name: 'instagram-link',
     label: 'Instagram',
-    placeholder: 'Your Instagram link',
-    changeProp: true,
   },
   {
-    type: 'text',
     name: 'linkedin-link',
     label: 'LinkedIn',
-    placeholder: 'Your LinkedIn Link',
-    changeProp: true,
   },
   {
-    type: 'text',
     name: 'twitter-link',
     label: 'Twitter',
-    placeholder: 'Your Twitter Link',
-    changeProp: true,
   },
   {
-    type: 'text',
     name: 'website-link',
     label: 'Website',
-    placeholder: 'Your website Link',
-    changeProp: true,
   },
-];
+].map((data) => ({
+  type: 'text',
+  name: data.name,
+  label: data.label,
+  placeholder: `Your ${data.label} link`,
+  changeProp: true,
+}));

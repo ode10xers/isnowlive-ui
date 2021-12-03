@@ -10,6 +10,7 @@ import PassionSubscriptionList from 'components/PageEditorPassionComponents/Subs
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
 import { inventoryListCSSVars } from 'utils/widgets';
+import traitTypes from '../Configs/strings/traitTypes';
 
 /* 
 NOTE: Old flag used in the React Components 
@@ -145,7 +146,7 @@ export default (editor) => {
               changeProp: true,
             },
             {
-              type: 'css-vars-colors',
+              type: traitTypes.CUSTOM_REACT_INPUTS.CSS_VARS_COLORS,
               label: 'Customize Colors',
               options: inventoryListCSSVars.map((vars) => ({
                 id: vars.key,
@@ -162,7 +163,7 @@ export default (editor) => {
           }
         } else {
           // TODO: Might want to remove the CSS vars by looping through options
-          this.removeTrait(['show-image', 'show-desc', 'css-vars-colors']);
+          this.removeTrait(['show-image', 'show-desc', traitTypes.CUSTOM_REACT_INPUTS.CSS_VARS_COLORS]);
           if (passionSessionList) {
             passionSessionList.removeAttributes(['show-image', 'show-desc']);
 

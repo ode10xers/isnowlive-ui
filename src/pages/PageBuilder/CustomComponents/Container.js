@@ -1,5 +1,6 @@
 import { isValidCSSColor } from 'utils/colors';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
+import traitTypes from '../Configs/strings/traitTypes';
 
 export const generateContainerWrapper = (innerComponents = [], isCompact = false) => [
   {
@@ -28,7 +29,7 @@ export default (editor) => {
         },
         traits: [
           {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             label: 'Background color',
             name: 'bg-style',
             changeProp: true,
@@ -70,7 +71,7 @@ export default (editor) => {
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
           childComp.updateTrait('bg-style', {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             value: isBackgroundColor ? bgStyle : 'transparent',
           });
         });
@@ -94,7 +95,7 @@ export default (editor) => {
         },
         traits: [
           {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             label: 'Background color',
             name: 'bg-style',
             changeProp: true,
@@ -135,7 +136,7 @@ export default (editor) => {
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
           childComp.updateTrait('bg-style', {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             value: isBackgroundColor ? bgStyle : 'transparent',
           });
         });
@@ -159,10 +160,10 @@ export default (editor) => {
         'bg-style': '#ffffff',
         traits: [
           {
-            type: 'padding-slider',
+            type: traitTypes.SPACING.PADDING_SLIDER,
           },
           {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             label: 'Background color',
             name: 'bg-style',
             changeProp: true,
@@ -195,7 +196,7 @@ export default (editor) => {
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
           childComp.updateTrait('bg-style', {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             value: isBackgroundColor ? bgStyle : 'transparent',
           });
         });

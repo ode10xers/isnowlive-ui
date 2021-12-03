@@ -17,6 +17,7 @@ import facebookIcon from 'assets/icons/facebook/facebook.svg';
 import linkedinIcon from 'assets/icons/linkedin/linkedin.svg';
 import instagramIcon from 'assets/icons/instagram/instagram.svg';
 import twitterIcon from 'assets/icons/twitter/twitter.svg';
+import traitTypes from '../Configs/strings/traitTypes';
 
 export const textPropHandlers = {
   handleFontChange() {
@@ -96,7 +97,7 @@ export const textSectionPropHandlers = {
 
 export const textSectionTraits = [
   {
-    type: 'text-section-layout',
+    type: traitTypes.LAYOUTS.TEXT_SECTION_LAYOUT,
     name: 'layout',
   },
   ...genericFontTraits,

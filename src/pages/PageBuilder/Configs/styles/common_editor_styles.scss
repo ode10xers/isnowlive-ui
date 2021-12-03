@@ -3,7 +3,7 @@
 @import '../styles/custom_trait_styles.scss';
 @import '../styles/gjs_override_styles.scss';
 
-// TODO: Manage hover/disabled state as required
+
 .primaryEditorButton {
   background-color: map-get($map: $colors, $key: 'Endeavour') !important;
   border-color: map-get($map: $colors, $key: 'Endeavour') !important;

@@ -15,13 +15,15 @@ export const blockCategories = {
   BASIC: 'Basic',
 };
 
+const generateMediaIcon = (iconUrl = 'none') => `<img src="${iconUrl}" loading="lazy" />`;
+
 const passionProductListBlocks = [
   {
     id: 'passion-session-list-block',
     label: '<b> Passion Session List </b>',
     droppable: false,
     resizable: false,
-    media: `<img src="${sessionListIcon}" loading="lazy" />`,
+    media: generateMediaIcon(sessionListIcon),
     category: blockCategories.PASSION_COMPONENTS,
     attributes: {
       title: 'Click to add',
@@ -35,7 +37,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Video List </b>',
     droppable: false,
     resizable: false,
-    media: `<img src="${videoListIcon}" loading="lazy" />`,
+    media: generateMediaIcon(videoListIcon),
     category: blockCategories.PASSION_COMPONENTS,
     attributes: {
       title: 'Click to add',
@@ -49,7 +51,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Course List </b>',
     droppable: false,
     resizable: false,
-    media: `<img src="${courseListIcon}" loading="lazy" />`,
+    media: generateMediaIcon(courseListIcon),
     category: blockCategories.PASSION_COMPONENTS,
     content: {
       type: 'passion-course-list-block',
@@ -60,7 +62,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Pass List </b>',
     droppable: false,
     resizable: false,
-    media: `<img src="${passListIcon}" loading="lazy" />`,
+    media: generateMediaIcon(passListIcon),
     category: blockCategories.PASSION_COMPONENTS,
     content: {
       type: 'passion-pass-list-block',
@@ -71,7 +73,7 @@ const passionProductListBlocks = [
     label: '<b> Passion Subscription List </b>',
     droppable: false,
     resizable: false,
-    media: `<img src="${membershipListIcon}" loading="lazy" />`,
+    media: generateMediaIcon(membershipListIcon),
     category: blockCategories.PASSION_COMPONENTS,
     content: {
       type: 'passion-subscription-list-block',
@@ -83,7 +85,7 @@ const presetLayouts = [
   {
     id: 'simple-text-section',
     label: '<b> Simple Text Section </b>',
-    media: `<img src="${textSectionIcon}" loading="lazy" />`,
+    media: generateMediaIcon(textSectionIcon),
     category: blockCategories.LAYOUTS,
     content: {
       type: 'simple-text-section-block',
@@ -92,7 +94,7 @@ const presetLayouts = [
   {
     id: 'simple-text-with-image-section',
     label: '<b> Simple Text with Image Section </b>',
-    media: `<img src="${textWithImageIcon}" loading="lazy" />`,
+    media: generateMediaIcon(textWithImageIcon),
     category: blockCategories.LAYOUTS,
     content: {
       type: 'simple-text-with-image-block',

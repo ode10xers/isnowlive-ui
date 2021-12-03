@@ -4,6 +4,7 @@ import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { textPropHandlers } from './SimpleTextSection';
 
 import { imageTraits } from './SimpleTextWithImage.js';
+import traitTypes from '../Configs/strings/traitTypes';
 
 const containerBGHandler = {
   handleBGStyleChange() {
@@ -40,7 +41,7 @@ export default (editor) => {
         'bg-style': '#ffffff',
         traits: [
           {
-            type: 'container-justify-content',
+            type: traitTypes.FLEX.CONTAINER_JUSTIFY_CONTENT,
             label: 'Vertical Align',
           },
           ...spacingTraits,
@@ -122,7 +123,7 @@ export default (editor) => {
         ],
         traits: [
           {
-            type: 'container-align-items',
+            type: traitTypes.FLEX.CONTAINER_ALIGN_ITEMS,
             label: 'Vertical Align',
           },
           ...spacingTraits,
@@ -179,7 +180,7 @@ export default (editor) => {
         `,
         traits: [
           {
-            type: 'text-section-layout',
+            type: traitTypes.LAYOUTS.TEXT_SECTION_LAYOUT,
           },
           ...spacingTraits,
           ...contextualFontTraits,
@@ -214,7 +215,7 @@ export default (editor) => {
         editable: true,
         traits: [
           {
-            type: 'flex-align-self',
+            type: traitTypes.FLEX.ITEMS_ALIGN_SELF,
           },
           ...spacingTraits,
           ...imageTraits,

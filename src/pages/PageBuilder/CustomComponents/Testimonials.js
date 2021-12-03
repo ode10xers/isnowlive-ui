@@ -4,6 +4,7 @@ import { generateContainerWrapper } from '../CustomComponents/Container.js';
 import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
+import traitTypes from '../Configs/strings/traitTypes';
 
 export default (editor) => {
   editor.DomComponents.addType('testimonial-item', {
@@ -22,7 +23,7 @@ export default (editor) => {
         'text-color': '#000000',
         traits: [
           {
-            type: 'image-cutout-select',
+            type: traitTypes.IMAGE.CUTOUT_SHAPE_SELECT,
           },
           {
             type: 'button',
@@ -126,8 +127,8 @@ export default (editor) => {
         traits: [
           ...textSectionTraits,
           {
-            type: 'testimonial-items-list',
-            id: 'testimonial-items-list',
+            type: traitTypes.LIST_ITEMS.TESTIMONIAL_ITEMS,
+            id: traitTypes.LIST_ITEMS.TESTIMONIAL_ITEMS,
             value: false,
           },
         ],
@@ -159,7 +160,7 @@ export default (editor) => {
       handleComponentsChange() {
         // Here we're simply toggling the value
         // to trigger the trait update
-        const targetTrait = 'testimonial-items-list';
+        const targetTrait = traitTypes.LIST_ITEMS.TESTIMONIAL_ITEMS;
         const prevValue = this.getTrait(targetTrait).get('value');
 
         this.updateTrait(targetTrait, {

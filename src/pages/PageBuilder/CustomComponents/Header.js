@@ -1,6 +1,7 @@
 import SignInButton from 'components/PageEditorPassionComponents/SignInButton';
 import { fullyDisabledComponentFlags } from '../Configs/common/component_flags';
 import { contextualFontTraits } from '../Configs/common/trait_sets';
+import traitTypes from '../Configs/strings/traitTypes';
 import { generateContainerWrapper } from './Container';
 import { textPropHandlers } from './SimpleTextSection';
 
@@ -161,17 +162,17 @@ export default (editor) => {
         'brand-type': 'text',
         traits: [
           {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             label: 'Background color',
             name: 'bg-color',
             changeProp: 1,
           },
           {
-            type: 'brand-type-select',
+            type: traitTypes.HEADER.BRAND_TYPE_SELECT,
           },
           {
-            type: 'nav-links',
-            id: 'nav-links',
+            type: traitTypes.LIST_ITEMS.NAV_LINKS,
+            id: traitTypes.LIST_ITEMS.NAV_LINKS,
             value: false,
           },
         ],
@@ -194,7 +195,7 @@ export default (editor) => {
         validChildList.forEach((childComp) => {
           // NOTE: Right now this only works if the prop name and trait name is same
           childComp.updateTrait('bg-color', {
-            type: 'custom-color-picker',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
             value: bgColor,
           });
         });
@@ -247,7 +248,7 @@ export default (editor) => {
       handleComponentsChange() {
         // Here we're simply toggling the value
         // to trigger the trait update
-        const targetTrait = 'nav-links';
+        const targetTrait = traitTypes.LIST_ITEMS.NAV_LINKS;
         const prevValue = this.getTrait(targetTrait).get('value');
 
         this.updateTrait(targetTrait, {

@@ -38,24 +38,9 @@ import SimpleTextWithImage from '../CustomComponents/SimpleTextWithImage.js';
 
 const { Text } = Typography;
 
-const {
-  BUILDER_CONTAINER_ID,
-  // SELECTOR_PANEL_ID,
-  // STYLES_PANEL_ID,
-  // BLOCKS_PANEL_ID,
-  TRAITS_PANEL_ID,
-  LAYERS_PANEL_ID,
-} = elementIds;
+const { BUILDER_CONTAINER_ID, TRAITS_PANEL_ID, LAYERS_PANEL_ID } = elementIds;
 
-const {
-  // EDITOR,
-  RIGHT,
-  // RIGHT_INNER,
-  TOP,
-  LEFT,
-  EMPTY,
-  // STYLING,
-} = sectionIds;
+const { RIGHT, TOP, LEFT, EMPTY } = sectionIds;
 
 const HeaderEditor = ({ match, history }) => {
   const {
@@ -481,16 +466,7 @@ const HeaderEditor = ({ match, history }) => {
           <Row className={styles.contentContainer}>
             <Col id={LEFT} flex="0 0 15%" className={styles.sidePanelContainer}>
               <Row gutter={[12, 12]}>
-                {/* <Col xs={24}>
-                <div className={styles.buttonsContainer}>
-                  <button className="active" onClick={handleClickBlocks}>
-                    Components
-                  </button>
-                  <button onClick={handleClickLayers}>Layer Blocks</button>
-                </div>
-              </Col> */}
                 <Col xs={24}>
-                  {/* <div id={BLOCKS_PANEL_ID}></div> */}
                   <div id={LAYERS_PANEL_ID}></div>
                 </Col>
               </Row>
@@ -503,16 +479,6 @@ const HeaderEditor = ({ match, history }) => {
                 <Col xs={24}>
                   <Text className={styles.sectionHeading}>Customization</Text>
                 </Col>
-                {/* <Col xs={24}>
-                <div className={styles.buttonsContainer}>
-                  <button className="active" onClick={handleClickTraits}>
-                    Basic Mode
-                  </button>
-                  <button onClick={handleClickStyles}>
-                    Advanced
-                  </button>
-                </div>
-              </Col> */}
                 <Col xs={24}>
                   <div id={EMPTY}>Please select a component first.</div>
                   <div id={TRAITS_PANEL_ID}></div>

@@ -6,9 +6,7 @@ import { LeftOutlined, FileTextOutlined } from '@ant-design/icons';
 // import 'ckeditor4';
 // NOTE : We can also take the scss approach, we'll see
 import 'grapesjs/dist/css/grapes.min.css';
-// import 'grapesjs-blocks-flexbox';
 import grapesjs from 'grapesjs';
-// import 'grapesjs-preset-webpage';
 import 'grapesjs-plugin-ckeditor';
 
 import apis from 'apis';
@@ -22,7 +20,6 @@ import elementIds from '../Configs/common/elementIds.js';
 import sectionIds from '../Configs/common/sectionIds';
 import commonEditorConfig from '../Configs/common/config';
 import definedBlocks from '../Configs/blocks.js';
-// import definedStylePanels from '../Configs/style_panel.js';
 
 // THese are to be put in plugins
 import CustomTraits from '../Configs/traits';
@@ -48,8 +45,8 @@ import { confirmDirtyCount, customEditorInitializationLogic } from 'utils/pageEd
 
 import { useGlobalContext } from 'services/globalContext.js';
 
-//eslint-disable-next-line
 import styles from './style.module.scss';
+import traitTypes from '../Configs/strings/traitTypes.js';
 
 const { Text } = Typography;
 
@@ -274,10 +271,10 @@ const SimplePageEditor = ({ match, history }) => {
     // padding also makes sense
     const wrapper = editor.getWrapper();
     wrapper.addTrait({
-      type: 'padding-slider',
+      type: traitTypes.SPACING.PADDING_SLIDER,
     });
     wrapper.addTrait({
-      type: 'custom-color-picker',
+      type: traitTypes.CUSTOM_REACT_INPUTS.CUSTOM_COLOR_PICKER,
       label: 'Background color',
       name: 'bg-color',
       changeProp: true,

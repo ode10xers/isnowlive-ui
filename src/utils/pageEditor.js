@@ -1,5 +1,17 @@
 import { googleFonts } from 'utils/constants.js';
 
+// NOTE : Helper used in traits
+
+export const generateTraitsLayout = (label = '') => `
+  <div class="custom-trait-layout">
+    <div class="custom-trait-label">
+      ${label}
+    </div>
+    <div class="custom-trait-input" data-input>
+    </div>
+  </div>
+`;
+
 // NOTE : using this on wrappers might cause nested wrappers, need to be careful with this
 const parseAsArray = (data) => {
   const parsedData = JSON.parse(data);

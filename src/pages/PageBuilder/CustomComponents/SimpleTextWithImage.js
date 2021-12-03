@@ -4,10 +4,11 @@ import { textSectionPropHandlers, textSectionTraits } from './SimpleTextSection'
 import { generateContainerWrapper } from '../CustomComponents/Container.js';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
+import traitTypes from '../Configs/strings/traitTypes';
 
 export const imageTraits = [
   {
-    type: 'image-cutout-select',
+    type: traitTypes.IMAGE.CUTOUT_SHAPE_SELECT,
   },
   {
     name: 'set-img-btn',
@@ -21,7 +22,7 @@ export const imageTraits = [
 
 const textSectionWithImageTraits = [
   {
-    type: 'image-position-layout',
+    type: traitTypes.LAYOUTS.IMAGE_POSITION_LAYOUT,
   },
   ...imageTraits,
   ...textSectionTraits,

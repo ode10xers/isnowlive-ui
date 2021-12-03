@@ -16,6 +16,7 @@ const supportedDeviceTypes = [
   },
 ];
 
+// TODO: Separaate these into separate files
 export default (editor) => {
   // Previously we're overriding the "Exit" command, now we make it custom command
   // editor.Commands.add('core:component-exit', (editor) => {
