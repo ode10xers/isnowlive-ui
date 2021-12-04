@@ -35,6 +35,7 @@ import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseV
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { saveGiftOrderData } from 'utils/storage';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
@@ -46,7 +47,7 @@ const {
 const CourseDetails = ({ match }) => {
   const courseId = match.params.course_id;
 
-  const { showPaymentPopup, showWaitlistPopup } = useGlobalContext();
+  const { showPaymentPopup, showWaitlistPopup, showGiftMessageModal } = useGlobalContext();
 
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +59,8 @@ const CourseDetails = ({ match }) => {
   const [expandedCourseModules, setExpandedCourseModules] = useState([]);
 
   const [shouldShowMoreCourseDetails, setShouldShowMoreCourseDetails] = useState(false);
+
+  const [purchaseAsGift, setPurchaseAsGift] = useState(false);
 
   const getCreatorProfileDetails = useCallback(async (creatorUsername) => {
     try {
@@ -238,6 +241,7 @@ const CourseDetails = ({ match }) => {
     // }
 
     let paymentPopupData = {
+      isGiftPurchase: purchaseAsGift,
       productId: course.id,
       productType: productType.COURSE,
       itemList: [
@@ -250,10 +254,11 @@ const CourseDetails = ({ match }) => {
       ],
     };
 
-    showPaymentPopup(paymentPopupData, buySingleCourse);
+    showPaymentPopup(paymentPopupData, (couponCode) => buySingleCourse(couponCode, purchaseAsGift));
+    setPurchaseAsGift(false);
   };
 
-  const buySingleCourse = async (couponCode = '') => {
+  const buySingleCourse = async (couponCode = '', isGift = false) => {
     if (!course) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
       return;
@@ -282,7 +287,15 @@ const CourseDetails = ({ match }) => {
             payment_order_id: data.course_order_id,
           };
         } else {
-          showPurchaseSingleCourseSuccessModal();
+          if (isGift) {
+            saveGiftOrderData({
+              ...data,
+              order_type: orderType.COURSE,
+            });
+            showGiftMessageModal();
+          } else {
+            showPurchaseSingleCourseSuccessModal();
+          }
           return {
             ...data,
             is_successful_order: false,
@@ -325,6 +338,18 @@ const CourseDetails = ({ match }) => {
       return;
     }
 
+    setShowAuthModal(true);
+  };
+
+  const handleGetCourseAsGift = (e) => {
+    preventDefaults(e);
+
+    if (!course) {
+      showErrorModal('Invalid course selected!');
+      return;
+    }
+
+    setPurchaseAsGift(true);
     setShowAuthModal(true);
   };
 
@@ -553,34 +578,53 @@ const CourseDetails = ({ match }) => {
   };
 
   const courseBuyButton = (
-    <Button
-      size="large"
-      type="primary"
-      className={classNames(
-        styles.courseBuyBtn,
-        isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-          ? styles.darkText
-          : styles.lightText,
-        !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
-          ? styles.disabled
-          : undefined
-      )}
-      onClick={handleCourseBuyClicked}
-      disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
-    >
-      {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
-        `Course has reached max capacity`
-      ) : !course?.modules ? (
-        // NOTE : Empty here means that there is no modules at all
-        // There can be a case where the modules are all outlines
-        `Cannot purchase an empty course`
-      ) : (
-        <>
-          {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
-          {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
-        </>
-      )}
-    </Button>
+    <Row gutter={[8, 8]} wrap={true} justify="center">
+      <Col>
+        <Button
+          size="large"
+          type="primary"
+          className={classNames(
+            styles.courseBuyBtn,
+            isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+              ? styles.darkText
+              : styles.lightText,
+            !course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules
+              ? styles.disabled
+              : undefined
+          )}
+          onClick={handleCourseBuyClicked}
+          disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
+        >
+          {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
+            `Course has reached max capacity`
+          ) : !course?.modules ? (
+            // NOTE : Empty here means that there is no modules at all
+            // There can be a case where the modules are all outlines
+            `Cannot purchase an empty course`
+          ) : (
+            <>
+              {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
+              {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
+            </>
+          )}
+        </Button>
+      </Col>
+      <Col>
+        <Button
+          type="primary"
+          className={styles.greenBtn}
+          size="large"
+          onClick={handleGetCourseAsGift}
+          disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
+        >
+          {course?.type !== 'VIDEO' && course?.current_capacity <= 0
+            ? `Course has reached max capacity`
+            : !course?.modules
+            ? `Cannot gift an empty course`
+            : 'Give it as a gift'}
+        </Button>
+      </Col>
+    </Row>
   );
 
   const waitlistSection = (
@@ -656,8 +700,8 @@ const CourseDetails = ({ match }) => {
                       <Title level={3} className={styles.courseName}>
                         {course?.name}
                       </Title>
-                      {course?.description &&
-                        (shouldShowMoreCourseDetails ? (
+                      {course?.description ? (
+                        shouldShowMoreCourseDetails ? (
                           <div className={styles.courseDescExpanded}>{ReactHtmlParser(course?.description)}</div>
                         ) : (
                           <div>
@@ -666,7 +710,10 @@ const CourseDetails = ({ match }) => {
                               Read More <DownOutlined />
                             </div>
                           </div>
-                        ))}
+                        )
+                      ) : (
+                        <div className={styles.courseDesc} />
+                      )}
                       {course?.waitlist ? waitlistSection : courseBuyButton}
                     </Space>
                   </div>

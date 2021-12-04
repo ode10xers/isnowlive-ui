@@ -124,7 +124,8 @@ const GiftMessageModal = () => {
       closable={true}
       centered={true}
       footer={null}
-      onCancel={resetBodyStyle}
+      afterClose={resetBodyStyle}
+      onCancel={hideGiftMessageModal}
       width={640}
     >
       <Spin spinning={isLoading} tip="Processing...">
