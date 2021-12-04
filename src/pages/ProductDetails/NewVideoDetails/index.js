@@ -32,7 +32,7 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 
 import dateUtil from 'utils/date';
 import { getUsernameFromUrl } from 'utils/url';
-import { getLocalUserDetails } from 'utils/storage';
+import { getLocalUserDetails, saveGiftOrderData } from 'utils/storage';
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
@@ -56,6 +56,7 @@ const paymentInstruments = {
   ONE_OFF: 'one-off',
   PASS: 'pass',
   SUBSCRIPTION: 'subscription',
+  GIFT: 'gift',
 };
 
 const NewVideoDetails = ({ match }) => {
@@ -63,6 +64,7 @@ const NewVideoDetails = ({ match }) => {
 
   const {
     showPaymentPopup,
+    showGiftMessageModal,
     state: { userDetails },
   } = useGlobalContext();
   const { xs, sm, md, lg } = useBreakpoint();
@@ -322,7 +324,7 @@ const NewVideoDetails = ({ match }) => {
 
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
-  const buySingleVideo = async (couponCode = '', priceAmount = 5) => {
+  const buySingleVideo = async (couponCode = '', priceAmount = 5, isGift = false) => {
     setIsLoading(true);
 
     try {
@@ -350,7 +352,15 @@ const NewVideoDetails = ({ match }) => {
             payment_order_type: orderType.VIDEO,
           };
         } else {
-          showPurchaseSingleVideoSuccessModal(data.payment_order_id);
+          if (isGift) {
+            saveGiftOrderData({
+              ...data,
+              order_type: orderType.VIDEO,
+            });
+            showGiftMessageModal();
+          } else {
+            showPurchaseSingleVideoSuccessModal(data.payment_order_id);
+          }
 
           return {
             ...data,
@@ -580,7 +590,35 @@ const NewVideoDetails = ({ match }) => {
 
     const videoDesc = `Can be watched up to ${videoData?.watch_limit} times, valid for ${videoData?.validity} days`;
 
-    if (selectedPaymentInstrument === paymentInstruments.SUBSCRIPTION && videoData?.total_price > 0) {
+    if (selectedPaymentInstrument === paymentInstruments.GIFT) {
+      // Buy as gift
+      let flexiblePaymentDetails = null;
+
+      if (videoData?.pay_what_you_want) {
+        flexiblePaymentDetails = {
+          enabled: true,
+          minimumPrice: videoData?.total_price,
+        };
+      }
+
+      const paymentPopupData = {
+        isGiftPurchase: true,
+        productId: videoData?.external_id,
+        productType: productType.VIDEO,
+        itemList: [
+          {
+            name: videoData?.title,
+            description: videoDesc,
+            currency: videoData?.currency,
+            price: videoData?.total_price,
+            pay_what_you_want: videoData?.pay_what_you_want,
+          },
+        ],
+        flexiblePaymentDetails,
+      };
+
+      showPaymentPopup(paymentPopupData, (couponCode, price) => buySingleVideo(couponCode, price, true));
+    } else if (selectedPaymentInstrument === paymentInstruments.SUBSCRIPTION && videoData?.total_price > 0) {
       if (userPurchasedSubscription) {
         // Buy Video using Membership Flow
         // If user have a subscription usable for purchasing this product
@@ -746,6 +784,12 @@ const NewVideoDetails = ({ match }) => {
     handleBuy();
   };
 
+  const handleBuyAsGiftClicked = (e) => {
+    preventDefaults(e);
+    setSelectedPaymentInstrument(paymentInstruments.GIFT);
+    handleBuy();
+  };
+
   const handleBuyVideoUsingPassClicked = (e) => {
     if (!usablePass) {
       message.error('You need a valid credit pass first!');
@@ -897,8 +941,37 @@ const NewVideoDetails = ({ match }) => {
   };
 
   const renderDynamicBuyButton = () => {
+    let normalBuyBtn = (
+      <Button
+        className={classNames(
+          styles.videoBuyBtn,
+          !isInIframeWidget() && isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+            ? styles.darkText
+            : styles.lightText
+        )}
+        size="large"
+        type="primary"
+        onClick={handleVideoBuyClicked}
+      >
+        <Space
+          align="center"
+          split={<Divider type="vertical" className={styles.buyBtnDivider} />}
+          className={styles.buyBtnTextContainer}
+        >
+          <Text className={styles.buyBtnText}>BUY THIS VIDEO</Text>
+          <Text className={styles.buyBtnText}>
+            {videoData?.pay_what_you_want
+              ? 'Flexible'
+              : videoData?.total_price > 0
+              ? `${videoData?.currency?.toUpperCase() ?? ''} ${videoData?.total_price ?? 0}`
+              : 'Free'}
+          </Text>
+        </Space>
+      </Button>
+    );
+
     if (usableSubscription && videoData?.total_price > 0) {
-      return (
+      normalBuyBtn = (
         <div className={styles.buyUsingMembershipContainer}>
           <Space direction="vertical" className={styles.w100}>
             <Button
@@ -959,7 +1032,7 @@ const NewVideoDetails = ({ match }) => {
         </div>
       );
     } else if (usablePass && videoData?.total_price > 0) {
-      return (
+      normalBuyBtn = (
         <div className={styles.buyUsingPassContainer}>
           <Space direction="vertical" className={styles.w100}>
             <Button
@@ -1012,33 +1085,17 @@ const NewVideoDetails = ({ match }) => {
       );
     }
 
-    return (
-      <Button
-        className={classNames(
-          styles.videoBuyBtn,
-          !isInIframeWidget() && isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
-            ? styles.darkText
-            : styles.lightText
-        )}
-        size="large"
-        type="primary"
-        onClick={handleVideoBuyClicked}
-      >
-        <Space
-          align="center"
-          split={<Divider type="vertical" className={styles.buyBtnDivider} />}
-          className={styles.buyBtnTextContainer}
-        >
-          <Text className={styles.buyBtnText}>BUY THIS VIDEO</Text>
-          <Text className={styles.buyBtnText}>
-            {videoData?.pay_what_you_want
-              ? 'Flexible'
-              : videoData?.total_price > 0
-              ? `${videoData?.currency?.toUpperCase() ?? ''} ${videoData?.total_price ?? 0}`
-              : 'Free'}
-          </Text>
-        </Space>
+    const giftBuyBtn = (
+      <Button className={styles.giftBtn} size="large" type="primary" onClick={handleBuyAsGiftClicked}>
+        Give it as a gift
       </Button>
+    );
+
+    return (
+      <Row gutter={[8, 8]} wrap={true}>
+        <Col>{normalBuyBtn}</Col>
+        <Col>{giftBuyBtn}</Col>
+      </Row>
     );
   };
 

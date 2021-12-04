@@ -148,6 +148,15 @@
   }
 }
 
+.giftBtn{
+  @extend .greenBtn;
+
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  height: 100%;
+}
+
 .videoBuyBtn {
   padding: 8px 16px;
   height: 100%;

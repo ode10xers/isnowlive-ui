@@ -14,6 +14,7 @@ import { useGlobalContext } from 'services/globalContext';
 import apis from 'apis';
 import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 import { isAPISuccess } from 'utils/helper';
+import { generatePath } from 'react-router-dom';
 
 const formInitialValues = {
   subject: `Hey there! Here's a gift for you!`,
@@ -38,7 +39,9 @@ const GiftMessageModal = () => {
 
     switch (orderData.order_type) {
       case orderType.CLASS:
-        targetPath = Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.sessions;
+        targetPath =
+          Routes.attendeeDashboard.rootPath +
+          generatePath(Routes.attendeeDashboard.sessions, { session_type: 'upcoming' });
         break;
       case orderType.VIDEO:
         targetPath = Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos;
