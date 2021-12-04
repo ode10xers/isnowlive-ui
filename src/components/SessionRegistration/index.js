@@ -23,7 +23,7 @@ import {
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { getLocalUserDetails } from 'utils/storage';
+import { getLocalUserDetails, saveGiftOrderData } from 'utils/storage';
 import { isUnapprovedUserError, isAPISuccess } from 'utils/helper';
 import { getUsernameFromUrl, generateUrlFromUsername } from 'utils/url';
 import { paymentSource, orderType, productType } from 'utils/constants';
@@ -59,6 +59,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     logIn,
     logOut,
     showPaymentPopup,
+    showGiftMessageModal,
   } = useGlobalContext();
   const { lg } = useBreakpoint();
   const [form] = Form.useForm();
@@ -766,7 +767,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  const buySingleClass = async (payload, couponCode = '', priceAmount) => {
+  const buySingleClass = async (payload, couponCode = '', priceAmount, isGift = false) => {
     setIsLoading(true);
 
     try {
@@ -791,7 +792,16 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             inventory_id: inventoryId,
           };
         } else {
-          showBookSingleSessionSuccessModal(inventoryId);
+          if (isGift) {
+            saveGiftOrderData({
+              ...data,
+              inventory_id: inventoryId,
+              order_type: orderType.CLASS,
+            });
+            showGiftMessageModal();
+          } else {
+            showBookSingleSessionSuccessModal(inventoryId);
+          }
           return {
             ...data,
             is_successful_order: false,
@@ -1101,7 +1111,6 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
   };
 
   const showPurchaseGiftPopup = () => {
-    console.log('HERE');
     let paymentPopupData = null;
     if (!usableUserSubscription && userPasses.length === 0 && availablePasses.length === 0) {
       // In this case, the UI will be simple and won't show some table and input
@@ -1161,7 +1170,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     showPaymentPopup(
       paymentPopupData,
       async (couponCode = '', priceAmount = undefined) =>
-        await buySingleClass(payload, couponCode, priceAmount ?? inputPrice ?? classDetails.price)
+        await buySingleClass(payload, couponCode, priceAmount ?? inputPrice ?? classDetails.price, true)
     );
   };
 

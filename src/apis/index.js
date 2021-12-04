@@ -31,6 +31,7 @@ export default {
     getCreatorDetailsByCustomDomain: (customDomain) => http.get(`/domain/${customDomain}/creator-profile`),
     updateCustomDomainForCreator: (payload) => http.post('/secure/creator/profile/custom-domain', payload),
     updateCreatorFeeSettings: (payload) => http.post('/secure/creator/settings/platform-fee', payload),
+    sendGiftMessage: (payload) => http.post('/secure/customer/email', payload),
   },
   waitlist: {
     joinCourseWaitlist: (courseId) => http.post(`/secure/customer/waitlist/courses/${courseId}`),

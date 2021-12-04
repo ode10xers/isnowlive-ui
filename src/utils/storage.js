@@ -33,13 +33,34 @@ export const storeCreatorDetailsToLS = (creatorDetails) => {
 // TODO: Can also opt to temporarily store receiver auth token in LS
 const GIFT_RECEIVER_AUTH_TOKEN_LS_KEY = 'gift-receiver-auth-token';
 
-export const saveReceiverAuthToken = (authToken) => {
-  if (authToken) {
-    localStorage.setItem(GIFT_RECEIVER_AUTH_TOKEN_LS_KEY, authToken);
+export const saveGiftReceiverData = (userData) => {
+  if (userData) {
+    localStorage.setItem(GIFT_RECEIVER_AUTH_TOKEN_LS_KEY, JSON.stringify(userData));
   }
 };
 
-export const getReceiverAuthToken = () => {
-  const authToken = localStorage.getItem(GIFT_RECEIVER_AUTH_TOKEN_LS_KEY);
-  return authToken ?? null;
+export const getGiftReceiverData = () => {
+  const minimalUserData = JSON.parse(localStorage.getItem(GIFT_RECEIVER_AUTH_TOKEN_LS_KEY));
+  return minimalUserData ?? null;
+};
+
+export const removeGiftReceiverData = () => {
+  localStorage.removeItem(GIFT_RECEIVER_AUTH_TOKEN_LS_KEY);
+};
+
+const GIFT_ORDER_DATA_KEY = 'gift-order-data';
+
+export const saveGiftOrderData = (orderData) => {
+  if (orderData) {
+    localStorage.setItem(GIFT_ORDER_DATA_KEY, JSON.stringify(orderData));
+  }
+};
+
+export const getGiftOrderData = () => {
+  const orderData = JSON.parse(localStorage.getItem(GIFT_ORDER_DATA_KEY));
+  return orderData ?? null;
+};
+
+export const removeGiftOrderData = () => {
+  localStorage.removeItem(GIFT_ORDER_DATA_KEY);
 };

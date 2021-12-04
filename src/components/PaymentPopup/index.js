@@ -23,7 +23,7 @@ import {
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { getUsernameFromUrl } from 'utils/url';
-import { getLocalUserDetails, saveReceiverAuthToken } from 'utils/storage';
+import { getGiftReceiverData, getLocalUserDetails, saveGiftReceiverData, saveGiftOrderData } from 'utils/storage';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 import { isAPISuccess, isInCreatorDashboard, isUnapprovedUserError } from 'utils/helper';
 import {
@@ -83,6 +83,7 @@ const PaymentPopup = () => {
   const {
     state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData, userDetails },
     hidePaymentPopup,
+    showGiftMessageModal,
   } = useGlobalContext();
 
   const [couponCode, setCouponCode] = useState('');
@@ -204,7 +205,6 @@ const PaymentPopup = () => {
   }, [flexiblePaymentDetails]);
 
   useEffect(() => {
-    console.log('Set here');
     setGiftFormValid(!isGiftPurchase);
   }, [isGiftPurchase]);
 
@@ -287,9 +287,11 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(false);
     setShowCouponField(false);
     setPriceAmount(0);
+    setGiftFormValid(false);
     resetBodyStyle();
 
     form.resetFields();
+    giftForm.resetFields();
 
     hidePaymentPopup();
   };
@@ -320,12 +322,10 @@ const PaymentPopup = () => {
         timezone_info: getTimezoneLocation(),
       };
 
-      console.log(payload);
-
       const { status, data } = await apis.user.signup(payload);
 
       if (isAPISuccess(status) && data) {
-        return data.auth_token;
+        return data;
       }
     } catch (error) {
       console.error(error);
@@ -342,14 +342,14 @@ const PaymentPopup = () => {
     const appliedCouponCode = couponApplied ? couponCode : '';
 
     if (isGiftPurchase) {
-      const receiverAuthToken = await handleSignupReceiver();
+      const receiverData = await handleSignupReceiver();
 
-      if (receiverAuthToken) {
-        http.setAuthToken(receiverAuthToken, false);
+      if (receiverData) {
+        http.setAuthToken(receiverData.auth_token, false);
         // NOTE: We save it in LS here in case we need to use is later
         // Most cases won't need it, except for ones where we redirect
         // and need to do followup booking (e.g. iDeal)
-        saveReceiverAuthToken(receiverAuthToken);
+        saveGiftReceiverData(receiverData);
 
         if (flexiblePaymentDetails?.enabled) {
           // PWYW can't be used with coupons
@@ -375,7 +375,16 @@ const PaymentPopup = () => {
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
     // NOTE : is_successful_order can also be false if the product is a free product
     if (orderResponse && orderResponse?.is_successful_order) {
-      if (verifyOrderRes === orderType.PASS) {
+      if (isGiftPurchase) {
+        const receiverData = getGiftReceiverData();
+
+        if (receiverData) {
+          saveGiftOrderData({ ...orderResponse, order_type: verifyOrderRes });
+          showGiftMessageModal();
+        } else {
+          message.error('No Gift Receiver Data Found!');
+        }
+      } else if (verifyOrderRes === orderType.PASS) {
         /*
           In pass order, there can be follow up bookings
           If a follow up booking is required, orderResponse 
