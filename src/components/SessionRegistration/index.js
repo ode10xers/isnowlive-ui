@@ -167,7 +167,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     setUser(null);
   };
 
-  const signupUser = async (values) => {
+  const signupUser = async (values, callback = showConfirmPaymentPopup) => {
     const referenceCode = JSON.parse(localStorage.getItem('invite'));
     try {
       const { data } = await apis.user.signup({
@@ -181,7 +181,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       if (data) {
         setIsLoading(false);
         logIn(data, true);
-        showConfirmPaymentPopup();
+        callback();
         localStorage.removeItem('invite');
       }
     } catch (error) {
@@ -1100,6 +1100,71 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     }
   };
 
+  const showPurchaseGiftPopup = () => {
+    console.log('HERE');
+    let paymentPopupData = null;
+    if (!usableUserSubscription && userPasses.length === 0 && availablePasses.length === 0) {
+      // In this case, the UI will be simple and won't show some table and input
+      // so we need to pass the information to PaymentPopup to tell it that
+      // they should handle the price input (if it's a PWYW session)
+      let flexiblePaymentDetails = null;
+
+      if (classDetails.pay_what_you_want) {
+        flexiblePaymentDetails = {
+          enabled: true,
+          minimumPrice: classDetails.total_price,
+        };
+      }
+
+      paymentPopupData = {
+        isGiftPurchase: true,
+        productId: classDetails.session_external_id,
+        productType: productType.CLASS,
+        itemList: [
+          {
+            name: classDetails.name,
+            description: toLongDateWithTime(selectedInventory.start_time),
+            currency: classDetails.currency,
+            price: classDetails.total_price,
+            pay_what_you_want: classDetails.pay_what_you_want,
+          },
+        ],
+        flexiblePaymentDetails,
+      };
+    } else {
+      // Else the price input will be handled in the page
+      // So just show usual PaymentPopup
+      paymentPopupData = {
+        isGiftPurchase: true,
+        productId: classDetails.session_external_id,
+        productType: productType.CLASS,
+        itemList: [
+          {
+            name: classDetails.name,
+            description: toLongDateWithTime(selectedInventory.start_time),
+            currency: classDetails.currency,
+            price: inputPrice || classDetails.total_price,
+          },
+        ],
+      };
+    }
+
+    // Default case, book single class;
+    const payload = {
+      inventory_id: parseInt(selectedInventory.inventory_id),
+      user_timezone_offset: new Date().getTimezoneOffset(),
+      user_timezone_location: getTimezoneLocation(),
+      user_timezone: getCurrentLongTimezone(),
+      payment_source: paymentSource.GATEWAY,
+    };
+
+    showPaymentPopup(
+      paymentPopupData,
+      async (couponCode = '', priceAmount = undefined) =>
+        await buySingleClass(payload, couponCode, priceAmount ?? inputPrice ?? classDetails.price)
+    );
+  };
+
   const submitForm = async (values) => {
     setIsLoading(true);
     try {
@@ -1142,6 +1207,23 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     }
 
     submitForm(values);
+  };
+
+  const handleGiftPurchase = async () => {
+    try {
+      const values = await form.validateFields();
+
+      if (userDetails) {
+        // User already logged in, proceed to session booking
+        showPurchaseGiftPopup();
+      } else {
+        // Sign Up Process
+        signupUser(values, showPurchaseGiftPopup);
+      }
+    } catch (error) {
+      console.error(error);
+      message.error('Please fill the form correctly!');
+    }
   };
 
   //#endregion END OF Business Logic
@@ -1388,6 +1470,21 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                                   !usableUserSubscription
                                     ? 'Buy'
                                     : 'Register'}
+                                </Button>
+                              </Col>
+                              <Col xs={fullWidth ? 24 : 10} md={fullWidth ? 24 : 10} xl={fullWidth ? 24 : 8}>
+                                <Button
+                                  block
+                                  className={styles.giftBtn}
+                                  size="large"
+                                  type="primary"
+                                  onClick={handleGiftPurchase}
+                                  disabled={
+                                    !selectedInventory ||
+                                    (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass)
+                                  }
+                                >
+                                  Give it as a gift
                                 </Button>
                               </Col>
                               {!selectedInventory && (

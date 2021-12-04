@@ -12,7 +12,8 @@
     "import/prefer-default-export": [0],
     "no-unused-expressions": [1, { "allowShortCircuit": true }],
     "object-curly-newline": [0],
-    "array-callback-return": [0]
+    "array-callback-return": [0],
+    "import/no-anonymous-default-export": [0]
   },
   "settings": {
     "import/resolver": {

@@ -5,7 +5,6 @@
 }
 
 .sessionRegistrationWrapper {
-  // background: var(--passion-profile-light-color, #{map-get($colors, 'White1')});
   background: map-get($colors, 'White1');
 
   border-radius: 6px;
@@ -20,14 +19,6 @@
 
 .formContainer {
   margin-top: 20px;
-
-  // :global {
-  //   .ant-form-item-label {
-  //     label {
-  //       color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
-  //     }
-  //   }
-  // }
 }
 
 .pwywInputWrapper {
@@ -102,6 +93,15 @@
 .bookBtn {
   background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+
+  &:disabled {
+    opacity: 0.7;
+  }
+}
+
+.giftBtn {
+  background-color: map-get($colors, 'KellyGreen') !important;
+  border-color: map-get($colors, 'KellyGreen') !important;
 
   &:disabled {
     opacity: 0.7;

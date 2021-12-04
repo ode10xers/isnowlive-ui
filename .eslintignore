@@ -1,4 +1,5 @@
 # Ignore the scripts in webflow directory
 
 webflow/scripts/*
+public/*.js
 old/
