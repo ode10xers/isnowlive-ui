@@ -56,7 +56,6 @@ const paymentInstruments = {
   ONE_OFF: 'one-off',
   PASS: 'pass',
   SUBSCRIPTION: 'subscription',
-  GIFT: 'gift',
 };
 
 const NewVideoDetails = ({ match }) => {
@@ -88,6 +87,8 @@ const NewVideoDetails = ({ match }) => {
   const [selectedPaymentInstrument, setSelectedPaymentInstrument] = useState(paymentInstruments.ONE_OFF);
   const [selectedPass, setSelectedPass] = useState(null);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
+
+  const [purchaseAsGift, setPurchaseAsGift] = useState(false);
 
   //#region Start of API Calls
 
@@ -313,10 +314,10 @@ const NewVideoDetails = ({ match }) => {
 
   useEffect(() => {
     if (shouldFollowUpGetVideo) {
-      showConfirmPaymentPopup();
+      showConfirmPaymentPopup(purchaseAsGift);
     }
     //eslint-disable-next-line
-  }, [shouldFollowUpGetVideo]);
+  }, [shouldFollowUpGetVideo, purchaseAsGift]);
 
   //#endregion End of Use Effects
 
@@ -571,7 +572,7 @@ const NewVideoDetails = ({ match }) => {
     };
   };
 
-  const showConfirmPaymentPopup = async () => {
+  const showConfirmPaymentPopup = async (purchaseAsGift = false) => {
     let userPurchasedPass = usablePass;
     let userPurchasedSubscription = usableSubscription;
 
@@ -590,7 +591,7 @@ const NewVideoDetails = ({ match }) => {
 
     const videoDesc = `Can be watched up to ${videoData?.watch_limit} times, valid for ${videoData?.validity} days`;
 
-    if (selectedPaymentInstrument === paymentInstruments.GIFT) {
+    if (purchaseAsGift) {
       // Buy as gift
       let flexiblePaymentDetails = null;
 
@@ -742,6 +743,8 @@ const NewVideoDetails = ({ match }) => {
 
       showPaymentPopup(paymentPopupData, buySingleVideo);
     }
+
+    setPurchaseAsGift(false);
   };
 
   //#endregion End of Business Logics
@@ -781,16 +784,22 @@ const NewVideoDetails = ({ match }) => {
   const handleVideoBuyClicked = (e) => {
     preventDefaults(e);
     setSelectedPaymentInstrument(paymentInstruments.ONE_OFF);
+    setPurchaseAsGift(false);
     handleBuy();
   };
 
   const handleBuyAsGiftClicked = (e) => {
     preventDefaults(e);
-    setSelectedPaymentInstrument(paymentInstruments.GIFT);
-    handleBuy();
+    setPurchaseAsGift(true);
+    if (userDetails) {
+      showConfirmPaymentPopup(true);
+    } else {
+      setShowAuthModal(true);
+    }
   };
 
   const handleBuyVideoUsingPassClicked = (e) => {
+    setPurchaseAsGift(false);
     if (!usablePass) {
       message.error('You need a valid credit pass first!');
     } else {
@@ -800,6 +809,7 @@ const NewVideoDetails = ({ match }) => {
   };
 
   const handleBuyVideoUsingSubscriptionClicked = (e) => {
+    setPurchaseAsGift(false);
     if (!usableSubscription) {
       message.error('You need a valid subscription first!');
     } else {
@@ -809,6 +819,7 @@ const NewVideoDetails = ({ match }) => {
   };
 
   const handleBuyPassAndVideoClicked = (e) => {
+    setPurchaseAsGift(false);
     if (!selectedPass) {
       message.error('Please select a pass!');
     } else {
@@ -818,6 +829,7 @@ const NewVideoDetails = ({ match }) => {
   };
 
   const handleBuySubscriptionAndVideoClicked = (e) => {
+    setPurchaseAsGift(false);
     if (!selectedSubscription) {
       message.error('Please select a membership!');
     } else {
