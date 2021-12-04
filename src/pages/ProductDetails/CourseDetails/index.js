@@ -338,6 +338,7 @@ const CourseDetails = ({ match }) => {
       return;
     }
 
+    setPurchaseAsGift(false);
     setShowAuthModal(true);
   };
 
