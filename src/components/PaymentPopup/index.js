@@ -369,11 +369,13 @@ const PaymentPopup = () => {
       }
     }
 
-    saveGiftOrderData({
-      ...result,
-      order_type: result.payment_order_type ?? result.order_type,
-      product_name: itemList[0]?.name,
-    });
+    if (result.is_successful_order) {
+      saveGiftOrderData({
+        ...result,
+        order_type: result.payment_order_type ?? result.order_type,
+        product_name: itemList[0]?.name,
+      });
+    }
     return result;
   };
 

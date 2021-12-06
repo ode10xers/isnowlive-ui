@@ -358,6 +358,7 @@ const NewVideoDetails = ({ match }) => {
             saveGiftOrderData({
               ...data,
               order_type: orderType.VIDEO,
+              product_name: videoData?.title,
             });
             showGiftMessageModal();
           } else {

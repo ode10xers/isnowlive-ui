@@ -797,6 +797,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               ...data,
               inventory_id: inventoryId,
               order_type: orderType.CLASS,
+              product_name: classDetails.name,
             });
             showGiftMessageModal();
           } else {

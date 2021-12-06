@@ -292,6 +292,7 @@ const CourseDetails = ({ match }) => {
             saveGiftOrderData({
               ...data,
               order_type: orderType.COURSE,
+              product_name: course.name,
             });
             showGiftMessageModal();
           } else {
