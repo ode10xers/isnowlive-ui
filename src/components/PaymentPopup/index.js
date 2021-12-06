@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button, InputNumber, Tooltip, Form } from 'antd';
+import { Row, Col, Typography, Input, List, Modal, Button, InputNumber, Tooltip, Form, message } from 'antd';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
@@ -23,7 +23,7 @@ import {
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { getUsernameFromUrl } from 'utils/url';
-import { getLocalUserDetails } from 'utils/storage';
+import { getGiftReceiverData, getLocalUserDetails, saveGiftReceiverData, saveGiftOrderData } from 'utils/storage';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 import { isAPISuccess, isInCreatorDashboard, isUnapprovedUserError } from 'utils/helper';
 import {
@@ -35,6 +35,7 @@ import {
 } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
+import http from 'services/http';
 
 import styles from './styles.module.scss';
 
@@ -66,6 +67,7 @@ const {
       enabled: Boolean,
       minimumPrice: Integer,
     },
+    isGiftPurchase: Boolean -> for triggering gift flow
   }
 
   Possible Product Type values : 'SESSION' | 'VIDEO' | 'PASS' | 'COURSE' | 'SUBSCRIPTION'
@@ -77,9 +79,11 @@ const {
 // child components can access directly
 const PaymentPopup = () => {
   const [form] = Form.useForm();
+  const [giftForm] = Form.useForm();
   const {
-    state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData },
+    state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData, userDetails },
     hidePaymentPopup,
+    showGiftMessageModal,
   } = useGlobalContext();
 
   const [couponCode, setCouponCode] = useState('');
@@ -96,12 +100,15 @@ const PaymentPopup = () => {
   const [creatorPaymentProvider, setCreatorPaymentProvider] = useState(null);
   const [stripePromise, setStripePromise] = useState(null);
 
+  const [giftFormValid, setGiftFormValid] = useState(false);
+
   const {
     itemList = [],
     productId = null,
     productType = null,
     paymentInstrumentDetails = null,
     flexiblePaymentDetails = null,
+    isGiftPurchase = false,
   } = paymentPopupData || {};
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0) || 0;
 
@@ -197,6 +204,10 @@ const PaymentPopup = () => {
     //eslint-disable-next-line
   }, [flexiblePaymentDetails]);
 
+  useEffect(() => {
+    setGiftFormValid(!isGiftPurchase);
+  }, [isGiftPurchase]);
+
   const handleCouponCodeChange = (e) => {
     if (couponErrorText) {
       setCouponErrorText(null);
@@ -276,9 +287,11 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(false);
     setShowCouponField(false);
     setPriceAmount(0);
+    setGiftFormValid(false);
     resetBodyStyle();
 
     form.resetFields();
+    giftForm.resetFields();
 
     hidePaymentPopup();
   };
@@ -294,26 +307,90 @@ const PaymentPopup = () => {
     setShowCouponField(!showCouponField);
   };
 
+  // This function is used to signup the receiver
+  // in case this is a gift purchase
+  const handleSignupReceiver = async () => {
+    try {
+      const values = giftForm.getFieldsValue();
+
+      const payload = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        is_creator: false,
+        referrer: userDetails.external_id,
+        timezone_info: getTimezoneLocation(),
+      };
+
+      const { status, data } = await apis.user.signup(payload);
+
+      if (isAPISuccess(status) && data) {
+        return data;
+      }
+    } catch (error) {
+      console.error(error);
+      message.error(error?.response?.data?.message || 'Failed to sign up receiver account!');
+    }
+
+    return null;
+  };
+
   // This will run the callback (we will populate this with order creation functions)
   // and return the order response object
   const handleBeforePayment = async () => {
     let result = null;
     const appliedCouponCode = couponApplied ? couponCode : '';
 
-    if (flexiblePaymentDetails?.enabled) {
-      // PWYW can't be used with coupons
-      result = await paymentPopupCallback('', priceAmount);
+    if (isGiftPurchase) {
+      const receiverData = await handleSignupReceiver();
+
+      if (receiverData) {
+        http.setAuthToken(receiverData.auth_token, false);
+        // NOTE: We save it in LS here in case we need to use is later
+        // Most cases won't need it, except for ones where we redirect
+        // and need to do followup booking (e.g. iDeal)
+        saveGiftReceiverData(receiverData);
+
+        if (flexiblePaymentDetails?.enabled) {
+          // PWYW can't be used with coupons
+          result = await paymentPopupCallback('', priceAmount);
+        } else {
+          result = await paymentPopupCallback(appliedCouponCode);
+        }
+
+        http.setAuthToken(userDetails.auth_token, false);
+      }
     } else {
-      result = await paymentPopupCallback(appliedCouponCode);
+      if (flexiblePaymentDetails?.enabled) {
+        // PWYW can't be used with coupons
+        result = await paymentPopupCallback('', priceAmount);
+      } else {
+        result = await paymentPopupCallback(appliedCouponCode);
+      }
     }
 
+    if (result.is_successful_order) {
+      saveGiftOrderData({
+        ...result,
+        order_type: result.payment_order_type ?? result.order_type,
+        product_name: itemList[0]?.name,
+      });
+    }
     return result;
   };
 
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
     // NOTE : is_successful_order can also be false if the product is a free product
     if (orderResponse && orderResponse?.is_successful_order) {
-      if (verifyOrderRes === orderType.PASS) {
+      if (isGiftPurchase) {
+        const receiverData = getGiftReceiverData();
+
+        if (receiverData) {
+          showGiftMessageModal();
+        } else {
+          message.error('No Gift Receiver Data Found!');
+        }
+      } else if (verifyOrderRes === orderType.PASS) {
         /*
           In pass order, there can be follow up bookings
           If a follow up booking is required, orderResponse 
@@ -462,6 +539,17 @@ const PaymentPopup = () => {
 
   const isPriceLessThanMinimum = () => (flexiblePaymentDetails?.enabled ? priceAmount < getMinimumPrice() : false);
 
+  const handleGiftFormChanged = async (changedValues, allValues) => {
+    try {
+      const validatedValues = await giftForm.validateFields();
+      console.log(validatedValues);
+      setGiftFormValid(true);
+    } catch (error) {
+      console.error(error);
+      setGiftFormValid(error.errorFields.length <= 0);
+    }
+  };
+
   const getAmountForPaymentRequest = () => {
     if (flexiblePaymentDetails?.enabled) {
       const minimumPrice = getMinimumPrice();
@@ -593,6 +681,39 @@ const PaymentPopup = () => {
           </Col>
         )}
 
+        {isGiftPurchase && (
+          <Col xs={24} className={styles.topBorder}>
+            <Form
+              onValuesChange={handleGiftFormChanged}
+              form={giftForm}
+              layout="vertical"
+              labelAlign="left"
+              scrollToFirstError={true}
+            >
+              <Row gutter={[8, 8]}>
+                <Col xs={24}>
+                  <Text strong>Who are you gifting this to?</Text>
+                </Col>
+                <Col xs={12}>
+                  <Form.Item label="Recipient First Name" name="first_name" rules={validationRules.requiredValidation}>
+                    <Input placeholder="Recipient's First Name" disabled={!isGiftPurchase} />
+                  </Form.Item>
+                </Col>
+                <Col xs={12}>
+                  <Form.Item label="Recipient Last Name" name="last_name" rules={validationRules.requiredValidation}>
+                    <Input placeholder="Recipient's Last Name" disabled={!isGiftPurchase} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24}>
+                  <Form.Item label="Recipient Email" name="email" rules={validationRules.emailValidation}>
+                    <Input type="email" placeholder="Recipient email address" disabled={!isGiftPurchase} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </Col>
+        )}
+
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={[8, 12]} justify="center">
             {isFree() ? (
@@ -605,6 +726,7 @@ const PaymentPopup = () => {
                       type="primary"
                       className={styles.greenBtn}
                       onClick={handlePurchaseFreeProduct}
+                      disabled={isGiftPurchase && !giftFormValid}
                     >
                       Get
                     </Button>
@@ -617,7 +739,7 @@ const PaymentPopup = () => {
                   onBeforePayment={handleBeforePayment}
                   onAfterPayment={handleAfterPayment}
                   creatorCurrency={creatorCurrency}
-                  buttonDisabled={isPriceLessThanMinimum()}
+                  buttonDisabled={isPriceLessThanMinimum() || (isGiftPurchase && !giftFormValid)}
                 />
               </Col>
             ) : (
@@ -630,7 +752,7 @@ const PaymentPopup = () => {
                       // Currently, only subscriptions need payment details to be saved
                       // so we can use the saved details to charge them offline for recurring payment
                       shouldSavePaymentDetails={productType === productTypeConstants.SUBSCRIPTION}
-                      minimumPriceRequirementFulfilled={isPriceLessThanMinimum()}
+                      minimumPriceRequirementFulfilled={isPriceLessThanMinimum() || (isGiftPurchase && !giftFormValid)}
                       creatorDetails={creatorDetails}
                       amount={getAmountForPaymentRequest()}
                     />

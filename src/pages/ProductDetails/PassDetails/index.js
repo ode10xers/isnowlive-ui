@@ -59,6 +59,8 @@ const PassDetails = ({ match }) => {
   const [moreView, setMoreView] = useState('sessions');
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
 
+  // const [purchaseAsGift, setPurchaseAsGift] = useState(false);
+
   //#region Start of API Call Methods
 
   const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
@@ -156,6 +158,7 @@ const PassDetails = ({ match }) => {
 
   //#region Start of purchase logic
 
+  // const createOrder = async (couponCode = '', isGift = false) => {
   const createOrder = async (couponCode = '') => {
     if (!selectedPassDetails) {
       showErrorModal('Something went wrong', 'Invalid Pass Selected');
@@ -182,8 +185,17 @@ const PassDetails = ({ match }) => {
             payment_order_id: data.pass_order_id,
           };
         } else {
-          showPurchasePassSuccessModal(data.pass_order_id);
+          // if (isGift) {
+          //   saveGiftOrderData({
+          //     ...data,
+          //     order_type: orderType.PASS,
+          //   });
+          //   showGiftMessageModal();
+          // } else {
+          //   showPurchasePassSuccessModal(data.pass_order_id);
+          // }
 
+          showPurchasePassSuccessModal(data.pass_order_id);
           return {
             ...data,
             is_successful_order: false,
@@ -210,9 +222,12 @@ const PassDetails = ({ match }) => {
       return;
     }
 
-    const desc = `${selectedPassDetails.class_count} Credits, Valid for ${selectedPassDetails.validity} days`;
+    const desc = `${selectedPassDetails?.limited ? selectedPassDetails.class_count : 'Unlimited'} Credits, Valid for ${
+      selectedPassDetails.validity
+    } days`;
 
     const paymentPopupData = {
+      // isGiftPurchase: purchaseAsGift,
       productId: selectedPassDetails.external_id,
       productType: productType.PASS,
       itemList: [
@@ -225,7 +240,9 @@ const PassDetails = ({ match }) => {
       ],
     };
 
+    // showPaymentPopup(paymentPopupData, (couponCode) => createOrder(couponCode, purchaseAsGift));
     showPaymentPopup(paymentPopupData, createOrder);
+    // setPurchaseAsGift(false);
   };
 
   //#endregion End of purchase logic
@@ -244,8 +261,19 @@ const PassDetails = ({ match }) => {
       return;
     }
 
+    // setPurchaseAsGift(false);
     setAuthModalVisible(true);
   };
+
+  // const handleBuyAsGiftClicked = () => {
+  //   if (!selectedPassDetails) {
+  //     showErrorModal('Invalid pass selected');
+  //     return;
+  //   }
+
+  //   setPurchaseAsGift(true);
+  //   setAuthModalVisible(true);
+  // };
 
   const handleSeeMoreSessions = () => {
     setMoreView('sessions');
@@ -633,7 +661,7 @@ const PassDetails = ({ match }) => {
           </>
         ) : null}
         <Col xs={0} lg={24}>
-          <Row justify="center">
+          <Row gutter={[8, 8]} justify="center" wrap={true}>
             <Col>
               <Button size="large" type="primary" className={styles.buyPassButton} onClick={handleBuyPassClicked}>
                 <Text
@@ -649,6 +677,11 @@ const PassDetails = ({ match }) => {
                 </Text>
               </Button>
             </Col>
+            {/* <Col>
+              <Button size="large" type="primary" className={styles.greenBtn} onClick={handleBuyAsGiftClicked}>
+                Buy as gift
+              </Button>
+            </Col> */}
           </Row>
         </Col>
       </Row>
@@ -770,7 +803,7 @@ const PassDetails = ({ match }) => {
       <div className={styles.mobileBuyButtonContainer}>
         <div className={styles.mobileBuyButton}>
           <Row gutter={[8, 12]} align="middle">
-            <Col xs={14} md={10}>
+            <Col xs={10} md={10}>
               <Title
                 level={5}
                 className={classNames(
@@ -791,20 +824,25 @@ const PassDetails = ({ match }) => {
                 <Text className={styles.passDetailItem}>{renderPassValidity(selectedPassDetails)}</Text>
               </Space>
             </Col>
-            <Col xs={10} md={6} className={styles.textAlignRight}>
-              <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
-                <Text
-                  className={
-                    isBrightColorShade(convertHexToRGB(creatorProfileColor || '#1890ff'))
-                      ? styles.darkText
-                      : styles.whiteText
-                  }
-                >
-                  {selectedPassDetails?.total_price > 0
-                    ? `Buy for ${renderPassPrice(selectedPassDetails)}`
-                    : 'Get for free'}
-                </Text>
-              </Button>
+            <Col xs={14} md={6} className={styles.textAlignRight}>
+              <Space size={2}>
+                {/* <Button type="primary" className={styles.greenBtn} onClick={handleBuyAsGiftClicked}>
+                  Gift
+                </Button> */}
+                <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
+                  <Text
+                    className={
+                      isBrightColorShade(convertHexToRGB(creatorProfileColor || '#1890ff'))
+                        ? styles.darkText
+                        : styles.whiteText
+                    }
+                  >
+                    {selectedPassDetails?.total_price > 0
+                      ? `Buy for ${renderPassPrice(selectedPassDetails)}`
+                      : 'Get for free'}
+                  </Text>
+                </Button>
+              </Space>
             </Col>
           </Row>
         </div>
