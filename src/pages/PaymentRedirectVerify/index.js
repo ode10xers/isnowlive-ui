@@ -151,15 +151,8 @@ const PaymentRedirectVerify = () => {
     }
 
     setIsLoading(false);
-  }, [
-    order_id,
-    order_type,
-    transaction_id,
-    is_gift,
-    showGiftMessageModal,
-    showProductPurchaseSuccessModals,
-    handleError,
-  ]);
+    // eslint-disable-next-line
+  }, [order_id, order_type, transaction_id, is_gift, showProductPurchaseSuccessModals, handleError]);
 
   useEffect(() => {
     if (stripe) {
