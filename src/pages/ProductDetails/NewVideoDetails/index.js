@@ -1099,7 +1099,7 @@ const NewVideoDetails = ({ match }) => {
 
     const giftBuyBtn = (
       <Button className={styles.giftBtn} size="large" type="primary" onClick={handleBuyAsGiftClicked}>
-        Give it as a gift
+        Buy as gift
       </Button>
     );
 

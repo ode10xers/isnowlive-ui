@@ -622,7 +622,7 @@ const CourseDetails = ({ match }) => {
             ? `Course has reached max capacity`
             : !course?.modules
             ? `Cannot gift an empty course`
-            : 'Give it as a gift'}
+            : 'Buy as gift'}
         </Button>
       </Col>
     </Row>

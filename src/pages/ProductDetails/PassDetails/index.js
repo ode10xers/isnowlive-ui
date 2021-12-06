@@ -677,7 +677,7 @@ const PassDetails = ({ match }) => {
             </Col>
             <Col>
               <Button size="large" type="primary" className={styles.greenBtn} onClick={handleBuyAsGiftClicked}>
-                Give it as a gift
+                Buy as gift
               </Button>
             </Col>
           </Row>

@@ -1493,7 +1493,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                                     (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass)
                                   }
                                 >
-                                  Give it as a gift
+                                  Buy as gift
                                 </Button>
                               </Col>
                               {!selectedInventory && (

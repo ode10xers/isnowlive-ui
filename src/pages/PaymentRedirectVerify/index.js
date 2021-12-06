@@ -23,7 +23,7 @@ import parseQueryString from 'utils/parseQueryString';
 import { verifyPaymentForOrder } from 'utils/payment';
 import { orderType, productType, paymentSource } from 'utils/constants';
 import { followUpBookSession, followUpGetVideo } from 'utils/orderHelper';
-import { getGiftReceiverData, saveGiftOrderData } from 'utils/storage';
+import { getGiftReceiverData } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -138,7 +138,6 @@ const PaymentRedirectVerify = () => {
           const receiverData = getGiftReceiverData();
 
           if (receiverData) {
-            saveGiftOrderData({ order_id, order_type, transaction_id });
             showGiftMessageModal();
           } else {
             message.error('No Gift Receiver Data Found!');

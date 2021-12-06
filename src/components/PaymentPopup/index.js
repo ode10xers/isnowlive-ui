@@ -369,6 +369,11 @@ const PaymentPopup = () => {
       }
     }
 
+    saveGiftOrderData({
+      ...result,
+      order_type: result.payment_order_type ?? result.order_type,
+      product_name: itemList[0]?.name,
+    });
     return result;
   };
 
@@ -379,7 +384,6 @@ const PaymentPopup = () => {
         const receiverData = getGiftReceiverData();
 
         if (receiverData) {
-          saveGiftOrderData({ ...orderResponse, order_type: verifyOrderRes });
           showGiftMessageModal();
         } else {
           message.error('No Gift Receiver Data Found!');
@@ -689,18 +693,18 @@ const PaymentPopup = () => {
                   <Text strong>Who are you gifting this to?</Text>
                 </Col>
                 <Col xs={12}>
-                  <Form.Item label="First Name" name="first_name" rules={validationRules.requiredValidation}>
-                    <Input placeholder="First Name" disabled={!isGiftPurchase} />
+                  <Form.Item label="Recipient First Name" name="first_name" rules={validationRules.requiredValidation}>
+                    <Input placeholder="Recipient's First Name" disabled={!isGiftPurchase} />
                   </Form.Item>
                 </Col>
                 <Col xs={12}>
-                  <Form.Item label="Last Name" name="last_name" rules={validationRules.requiredValidation}>
-                    <Input placeholder="Last Name" disabled={!isGiftPurchase} />
+                  <Form.Item label="Recipient Last Name" name="last_name" rules={validationRules.requiredValidation}>
+                    <Input placeholder="Recipient's Last Name" disabled={!isGiftPurchase} />
                   </Form.Item>
                 </Col>
                 <Col xs={24}>
-                  <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                    <Input type="email" placeholder="Enter your email" disabled={!isGiftPurchase} />
+                  <Form.Item label="Recipient Email" name="email" rules={validationRules.emailValidation}>
+                    <Input type="email" placeholder="Recipient email address" disabled={!isGiftPurchase} />
                   </Form.Item>
                 </Col>
               </Row>

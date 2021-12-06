@@ -73,16 +73,16 @@ const GiftMessageModal = () => {
       }
     } else {
       setReceiverData(null);
-      removeGiftReceiverData();
-      removeGiftOrderData();
     }
   }, [giftModalVisible]);
 
   useEffect(() => {
     if (receiverData) {
+      const orderData = getGiftOrderData();
+
       form.setFieldsValue({
-        subject: `Hi ${receiverData.first_name ?? ''}! You have received a gift from ${userDetails.first_name ?? ''} ${
-          userDetails.last_name ?? ''
+        subject: `${userDetails.first_name ?? ''} has gifted you ${
+          orderData?.product_name ?? `a ${orderData?.order_type?.toLowerCase() ?? 'product in Passion.do'}`
         }`,
         body: `${userDetails.first_name ?? ''} has bought you a gift in Passion.do!`,
       });
@@ -118,6 +118,12 @@ const GiftMessageModal = () => {
     setIsLoading(false);
   };
 
+  const handleCloseGiftMessageModal = () => {
+    removeGiftReceiverData();
+    removeGiftOrderData();
+    hideGiftMessageModal();
+  };
+
   return (
     <Modal
       title={<Title level={5}>Send a message</Title>}
@@ -126,7 +132,7 @@ const GiftMessageModal = () => {
       centered={true}
       footer={null}
       afterClose={resetBodyStyle}
-      onCancel={hideGiftMessageModal}
+      onCancel={handleCloseGiftMessageModal}
       width={640}
     >
       <Spin spinning={isLoading} tip="Processing...">
