@@ -63,6 +63,8 @@ const CourseDetails = ({ match }) => {
 
   const [purchaseAsGift, setPurchaseAsGift] = useState(false);
 
+  const [isGiftEnabled, setIsGiftEnabled] = useState(false);
+
   const getCreatorProfileDetails = useCallback(async (creatorUsername) => {
     try {
       const { data } = creatorUsername
@@ -71,6 +73,7 @@ const CourseDetails = ({ match }) => {
       if (data) {
         setCreatorProfile(data);
         setCreatorImageUrl(data.profile_image_url);
+        setIsGiftEnabled(data?.profile?.allow_gifting_products ?? false);
         setIsLoading(false);
       }
     } catch (error) {
@@ -612,22 +615,24 @@ const CourseDetails = ({ match }) => {
           )}
         </Button>
       </Col>
-      <Col>
-        <Button
-          type="primary"
-          className={styles.giftProductBtn}
-          size="large"
-          onClick={handleGetCourseAsGift}
-          icon={<GiftOutlined />}
-          disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
-        >
-          {course?.type !== 'VIDEO' && course?.current_capacity <= 0
-            ? `Course has reached max capacity`
-            : !course?.modules
-            ? `Cannot gift an empty course`
-            : 'Buy as gift'}
-        </Button>
-      </Col>
+      {isGiftEnabled && (
+        <Col>
+          <Button
+            type="primary"
+            className={styles.giftProductBtn}
+            size="large"
+            onClick={handleGetCourseAsGift}
+            icon={<GiftOutlined />}
+            disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
+          >
+            {course?.type !== 'VIDEO' && course?.current_capacity <= 0
+              ? `Course has reached max capacity`
+              : !course?.modules
+              ? `Cannot gift an empty course`
+              : 'Buy as gift'}
+          </Button>
+        </Col>
+      )}
     </Row>
   );
 

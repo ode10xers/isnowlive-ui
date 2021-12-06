@@ -90,6 +90,7 @@ const NewVideoDetails = ({ match }) => {
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
   const [purchaseAsGift, setPurchaseAsGift] = useState(false);
+  const [isGiftEnabled, setIsGiftEnabled] = useState(false);
 
   //#region Start of API Calls
 
@@ -248,6 +249,7 @@ const NewVideoDetails = ({ match }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfile(data);
+        setIsGiftEnabled(data?.profile?.allow_gifting_products);
       }
     } catch (error) {
       console.error(error);
@@ -1114,7 +1116,7 @@ const NewVideoDetails = ({ match }) => {
     return (
       <Row gutter={[8, 8]} wrap={true}>
         <Col>{normalBuyBtn}</Col>
-        <Col>{giftBuyBtn}</Col>
+        {isGiftEnabled && <Col>{giftBuyBtn}</Col>}
       </Row>
     );
   };
