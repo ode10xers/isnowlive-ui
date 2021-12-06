@@ -30,7 +30,6 @@ export const storeCreatorDetailsToLS = (creatorDetails) => {
   }
 };
 
-// TODO: Can also opt to temporarily store receiver auth token in LS
 const GIFT_RECEIVER_AUTH_TOKEN_LS_KEY = 'gift-receiver-auth-token';
 
 export const saveGiftReceiverData = (userData) => {

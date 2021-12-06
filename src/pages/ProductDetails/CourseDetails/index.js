@@ -26,6 +26,7 @@ import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
 import { showErrorModal, showAlreadyBookedModal, showPurchaseSingleCourseSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { saveGiftOrderData } from 'utils/storage';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
 import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
 import { orderType, productType, videoSourceType, paymentSource } from 'utils/constants';
@@ -36,7 +37,6 @@ import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseV
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { saveGiftOrderData } from 'utils/storage';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;

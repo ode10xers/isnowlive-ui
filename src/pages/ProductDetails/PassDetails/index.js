@@ -265,15 +265,15 @@ const PassDetails = ({ match }) => {
     setAuthModalVisible(true);
   };
 
-  const handleBuyAsGiftClicked = () => {
-    if (!selectedPassDetails) {
-      showErrorModal('Invalid pass selected');
-      return;
-    }
+  // const handleBuyAsGiftClicked = () => {
+  //   if (!selectedPassDetails) {
+  //     showErrorModal('Invalid pass selected');
+  //     return;
+  //   }
 
-    // setPurchaseAsGift(true);
-    setAuthModalVisible(true);
-  };
+  //   setPurchaseAsGift(true);
+  //   setAuthModalVisible(true);
+  // };
 
   const handleSeeMoreSessions = () => {
     setMoreView('sessions');
@@ -677,6 +677,11 @@ const PassDetails = ({ match }) => {
                 </Text>
               </Button>
             </Col>
+            {/* <Col>
+              <Button size="large" type="primary" className={styles.greenBtn} onClick={handleBuyAsGiftClicked}>
+                Buy as gift
+              </Button>
+            </Col> */}
           </Row>
         </Col>
       </Row>
@@ -821,9 +826,9 @@ const PassDetails = ({ match }) => {
             </Col>
             <Col xs={14} md={6} className={styles.textAlignRight}>
               <Space size={2}>
-                <Button type="primary" className={styles.greenBtn} onClick={handleBuyAsGiftClicked}>
+                {/* <Button type="primary" className={styles.greenBtn} onClick={handleBuyAsGiftClicked}>
                   Gift
-                </Button>
+                </Button> */}
                 <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
                   <Text
                     className={

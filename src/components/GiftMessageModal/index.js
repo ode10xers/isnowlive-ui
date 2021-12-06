@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { Row, Col, Button, Typography, Spin, Modal, Form, Input, message } from 'antd';
 
+import apis from 'apis';
 import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 
 import { orderType } from 'utils/constants';
+import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
 import { getGiftOrderData, getGiftReceiverData, removeGiftOrderData, removeGiftReceiverData } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
-import apis from 'apis';
-import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
-import { isAPISuccess } from 'utils/helper';
-import { generatePath } from 'react-router-dom';
 
 const formInitialValues = {
   subject: `Hey there! Here's a gift for you!`,
@@ -37,7 +37,7 @@ const GiftMessageModal = () => {
   const getButtonUrlForOrder = useCallback((orderData) => {
     let targetPath = Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage;
 
-    // NOTE: Currently we don't support gifting membership
+    // NOTE: Currently we don't support gifting membership or passes
     switch (orderData.order_type) {
       case orderType.CLASS:
         targetPath =
@@ -50,10 +50,6 @@ const GiftMessageModal = () => {
 
       case orderType.COURSE:
         targetPath = Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses;
-        break;
-
-      case orderType.PASS:
-        targetPath = Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes;
         break;
 
       default:
@@ -91,6 +87,12 @@ const GiftMessageModal = () => {
     }
   }, [receiverData, form, userDetails]);
 
+  const handleCloseGiftMessageModal = () => {
+    removeGiftReceiverData();
+    removeGiftOrderData();
+    hideGiftMessageModal();
+  };
+
   const handleFormFinish = async (values) => {
     if (!receiverData) {
       message.error('No Gift Receiver Data found!');
@@ -109,19 +111,13 @@ const GiftMessageModal = () => {
 
       if (isAPISuccess(status)) {
         message.success('Your message has been successfully sent!');
-        hideGiftMessageModal();
+        handleCloseGiftMessageModal();
       }
     } catch (error) {
       console.error(error);
       showErrorModal('Failed to send gift message!', error?.response?.data?.message || 'Something went wrong.');
     }
     setIsLoading(false);
-  };
-
-  const handleCloseGiftMessageModal = () => {
-    removeGiftReceiverData();
-    removeGiftOrderData();
-    hideGiftMessageModal();
   };
 
   return (
