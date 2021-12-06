@@ -37,6 +37,7 @@ const GiftMessageModal = () => {
   const getButtonUrlForOrder = useCallback((orderData) => {
     let targetPath = Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage;
 
+    // NOTE: Currently we don't support gifting membership
     switch (orderData.order_type) {
       case orderType.CLASS:
         targetPath =

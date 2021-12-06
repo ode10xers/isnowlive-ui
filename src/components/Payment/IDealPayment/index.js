@@ -56,7 +56,7 @@ const formInitialValue = { name: null };
 // It's just that sometimes the required data and the method used is different
 const IDealPayment = ({ disabled = false, onBeforePayment, onAfterPayment, paymentMethodType = 'ideal' }) => {
   const {
-    state: { userDetails, paymentPopupVisible },
+    state: { userDetails, paymentPopupVisible, paymentPopupData },
   } = useGlobalContext();
 
   const [form] = Form.useForm();
@@ -129,6 +129,7 @@ const IDealPayment = ({ disabled = false, onBeforePayment, onAfterPayment, payme
           order_type: orderResponse.payment_order_type,
           order_id: orderResponse.payment_order_id,
           transaction_id: paymentSessionRes.transaction_id,
+          is_gift: paymentPopupData?.isGiftPurchase ?? false,
         };
 
         if (orderResponse.payment_order_type === orderType.CLASS) {

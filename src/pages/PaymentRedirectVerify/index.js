@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+
 import { useStripe, Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
-import { Row } from 'antd';
+import { Row, message } from 'antd';
 
 import config from 'config';
 
@@ -22,6 +23,9 @@ import parseQueryString from 'utils/parseQueryString';
 import { verifyPaymentForOrder } from 'utils/payment';
 import { orderType, productType, paymentSource } from 'utils/constants';
 import { followUpBookSession, followUpGetVideo } from 'utils/orderHelper';
+import { getGiftReceiverData, saveGiftOrderData } from 'utils/storage';
+
+import { useGlobalContext } from 'services/globalContext';
 
 // Taken from the link below
 // https://stripe.com/docs/payments/payment-intents/verifying-status#checking-status-retrieve
@@ -44,6 +48,8 @@ const PaymentRedirectVerify = () => {
   const stripe = useStripe();
   const location = useLocation();
 
+  const { showGiftMessageModal } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
 
   const {
@@ -54,6 +60,7 @@ const PaymentRedirectVerify = () => {
     inventory_id,
     additional_product,
     additional_product_id,
+    is_gift,
   } = parseQueryString(location.search);
 
   const handleError = useCallback((errorMessage, errorTitle = 'An error occurred') => {
@@ -127,37 +134,36 @@ const PaymentRedirectVerify = () => {
       if (!verifyOrderRes) {
         handleError('Failed to verify payment for order');
       } else {
-        await showProductPurchaseSuccessModals(verifyOrderRes);
+        if (is_gift) {
+          const receiverData = getGiftReceiverData();
+
+          if (receiverData) {
+            saveGiftOrderData({ order_id, order_type, transaction_id });
+            showGiftMessageModal();
+          } else {
+            message.error('No Gift Receiver Data Found!');
+          }
+        } else {
+          await showProductPurchaseSuccessModals(verifyOrderRes);
+        }
       }
     } catch (error) {
       handleError(error?.response?.data?.message);
     }
 
     setIsLoading(false);
-  }, [order_id, order_type, transaction_id, showProductPurchaseSuccessModals, handleError]);
+  }, [
+    order_id,
+    order_type,
+    transaction_id,
+    is_gift,
+    showGiftMessageModal,
+    showProductPurchaseSuccessModals,
+    handleError,
+  ]);
 
   useEffect(() => {
     if (stripe) {
-      // const verifyStripePayment = async () => {
-      //   setIsLoading(true);
-
-      //   try {
-      //     const { paymentIntent, error: stripeError } = await stripe.retrievePaymentIntent(clientSecret);
-
-      //     if (paymentIntent && paymentIntent.status === STRIPE_PAYMENT_STATUS.SUCCESS) {
-      //       // Handle successful payment here
-      //       await verifyOrderStatus();
-      //     } else {
-      //       // Handle unsuccessful, processing, or canceled payments and API errors here
-      //       console.error(stripeError);
-      //       handleError(stripeError.message);
-      //     }
-      //   } catch (error) {
-      //     handleError(error?.response?.data?.message);
-      //   }
-      // };
-
-      // verifyStripePayment();
       verifyOrderStatus();
     }
   }, [stripe, verifyOrderStatus]);
