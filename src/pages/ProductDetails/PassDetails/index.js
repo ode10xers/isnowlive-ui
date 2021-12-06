@@ -30,7 +30,6 @@ import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { saveGiftOrderData } from 'utils/storage';
 
 const {
   formatDate: { toMonthYear },
@@ -40,7 +39,7 @@ const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
 const PassDetails = ({ match }) => {
-  const { showPaymentPopup, showGiftMessageModal } = useGlobalContext();
+  const { showPaymentPopup } = useGlobalContext();
   const { lg } = useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +59,7 @@ const PassDetails = ({ match }) => {
   const [moreView, setMoreView] = useState('sessions');
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
 
-  const [purchaseAsGift, setPurchaseAsGift] = useState(false);
+  // const [purchaseAsGift, setPurchaseAsGift] = useState(false);
 
   //#region Start of API Call Methods
 
@@ -159,7 +158,8 @@ const PassDetails = ({ match }) => {
 
   //#region Start of purchase logic
 
-  const createOrder = async (couponCode = '', isGift = false) => {
+  // const createOrder = async (couponCode = '', isGift = false) => {
+  const createOrder = async (couponCode = '') => {
     if (!selectedPassDetails) {
       showErrorModal('Something went wrong', 'Invalid Pass Selected');
       return null;
@@ -185,16 +185,17 @@ const PassDetails = ({ match }) => {
             payment_order_id: data.pass_order_id,
           };
         } else {
-          if (isGift) {
-            saveGiftOrderData({
-              ...data,
-              order_type: orderType.PASS,
-            });
-            showGiftMessageModal();
-          } else {
-            showPurchasePassSuccessModal(data.pass_order_id);
-          }
+          // if (isGift) {
+          //   saveGiftOrderData({
+          //     ...data,
+          //     order_type: orderType.PASS,
+          //   });
+          //   showGiftMessageModal();
+          // } else {
+          //   showPurchasePassSuccessModal(data.pass_order_id);
+          // }
 
+          showPurchasePassSuccessModal(data.pass_order_id);
           return {
             ...data,
             is_successful_order: false,
@@ -226,7 +227,7 @@ const PassDetails = ({ match }) => {
     } days`;
 
     const paymentPopupData = {
-      isGiftPurchase: purchaseAsGift,
+      // isGiftPurchase: purchaseAsGift,
       productId: selectedPassDetails.external_id,
       productType: productType.PASS,
       itemList: [
@@ -239,8 +240,9 @@ const PassDetails = ({ match }) => {
       ],
     };
 
-    showPaymentPopup(paymentPopupData, (couponCode) => createOrder(couponCode, purchaseAsGift));
-    setPurchaseAsGift(false);
+    // showPaymentPopup(paymentPopupData, (couponCode) => createOrder(couponCode, purchaseAsGift));
+    showPaymentPopup(paymentPopupData, createOrder);
+    // setPurchaseAsGift(false);
   };
 
   //#endregion End of purchase logic
@@ -259,7 +261,7 @@ const PassDetails = ({ match }) => {
       return;
     }
 
-    setPurchaseAsGift(false);
+    // setPurchaseAsGift(false);
     setAuthModalVisible(true);
   };
 
@@ -269,7 +271,7 @@ const PassDetails = ({ match }) => {
       return;
     }
 
-    setPurchaseAsGift(true);
+    // setPurchaseAsGift(true);
     setAuthModalVisible(true);
   };
 
@@ -673,11 +675,6 @@ const PassDetails = ({ match }) => {
                     ? `Proceed to Pay ${renderPassPrice(selectedPassDetails)}`
                     : 'Get Pass'}
                 </Text>
-              </Button>
-            </Col>
-            <Col>
-              <Button size="large" type="primary" className={styles.greenBtn} onClick={handleBuyAsGiftClicked}>
-                Buy as gift
               </Button>
             </Col>
           </Row>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 
 import { Row, Col, Button, Form, Input, Typography, Tag, Grid, Card, InputNumber, message } from 'antd';
-import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
+import { DownOutlined, UpOutlined, CheckCircleTwoTone, GiftOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -1484,9 +1484,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                               <Col xs={fullWidth ? 24 : 10} md={fullWidth ? 24 : 10} xl={fullWidth ? 24 : 8}>
                                 <Button
                                   block
-                                  className={styles.giftBtn}
+                                  className={styles.giftProductBtn}
                                   size="large"
                                   type="primary"
+                                  icon={<GiftOutlined />}
                                   onClick={handleGiftPurchase}
                                   disabled={
                                     !selectedInventory ||

@@ -9,6 +9,7 @@ import {
   PlusCircleFilled,
   PlusOutlined,
   DownloadOutlined,
+  GiftOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -1098,7 +1099,13 @@ const NewVideoDetails = ({ match }) => {
     }
 
     const giftBuyBtn = (
-      <Button className={styles.giftBtn} size="large" type="primary" onClick={handleBuyAsGiftClicked}>
+      <Button
+        icon={<GiftOutlined />}
+        className={styles.giftBtn}
+        size="large"
+        type="primary"
+        onClick={handleBuyAsGiftClicked}
+      >
         Buy as gift
       </Button>
     );

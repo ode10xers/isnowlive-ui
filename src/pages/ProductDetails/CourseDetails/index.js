@@ -15,6 +15,7 @@ import {
   FilePdfOutlined,
   LeftOutlined,
   RightOutlined,
+  GiftOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -613,9 +614,10 @@ const CourseDetails = ({ match }) => {
       <Col>
         <Button
           type="primary"
-          className={styles.greenBtn}
+          className={styles.giftProductBtn}
           size="large"
           onClick={handleGetCourseAsGift}
+          icon={<GiftOutlined />}
           disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
         >
           {course?.type !== 'VIDEO' && course?.current_capacity <= 0
