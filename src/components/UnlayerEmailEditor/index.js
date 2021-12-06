@@ -57,11 +57,6 @@ const initialEditorBodyTemplate = {
 // so we can programmatically reset it
 // You can see examples of using this ref in SendAudienceEmailModal
 const UnlayerEmailEditor = React.forwardRef((props, ref) => {
-  if (!ref) {
-    console.error('A ref is required to use this component');
-    return null;
-  }
-
   const resetEditorContent = useCallback(() => {
     if (ref.current?.editor) {
       ref.current.editor.loadBlank(initialEditorBodyTemplate);
@@ -102,6 +97,11 @@ const UnlayerEmailEditor = React.forwardRef((props, ref) => {
       ref.current.resetEditorContent = resetEditorContent;
     }
   }, [ref, resetEditorContent]);
+
+  if (!ref) {
+    console.error('A ref is required to use this component');
+    return null;
+  }
 
   return (
     <EmailEditor

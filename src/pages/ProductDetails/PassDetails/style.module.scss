@@ -439,7 +439,7 @@
       background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
       border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
 
-      @media screen and (max-width: 993px) and (min-width: 576px) {
+      @media screen  and (min-width: 576px) {
         margin-right: 60px !important;
       }
 

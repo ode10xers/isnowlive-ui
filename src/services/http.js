@@ -52,8 +52,11 @@ class HttpService {
     );
   }
 
-  setAuthToken(authToken) {
-    setAuthCookie(authToken);
+  setAuthToken(authToken, shouldSetCookie = true) {
+    if (shouldSetCookie) {
+      setAuthCookie(authToken);
+    }
+
     this.authToken = authToken;
     this.axios = axios.create({
       baseURL: this.baseURL,
