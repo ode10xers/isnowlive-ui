@@ -87,6 +87,16 @@ const reducer = (state, action) => {
         waitlistPopupVisible: false,
         waitlistPopupData: null,
       };
+    case 'SHOW_GIFT_MESSAGE_MODAL':
+      return {
+        ...state,
+        giftModalVisible: true,
+      };
+    case 'HIDE_GIFT_MESSAGE_MODAL':
+      return {
+        ...state,
+        giftModalVisible: false,
+      };
     default:
       return state;
   }
@@ -114,6 +124,7 @@ const GlobalDataProvider = ({ children }) => {
     },
     waitlistPopupVisible: false,
     waitlistPopupData: null,
+    giftModalVisible: false,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -179,6 +190,14 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'HIDE_SEND_EMAIL_POPUP' });
   }
 
+  function showGiftMessageModal() {
+    dispatch({ type: 'SHOW_GIFT_MESSAGE_MODAL' });
+  }
+
+  function hideGiftMessageModal() {
+    dispatch({ type: 'HIDE_GIFT_MESSAGE_MODAL' });
+  }
+
   function logOut(history, shouldRedirect = false) {
     if (shouldRedirect) {
       history.push(Routes.login);
@@ -205,6 +224,8 @@ const GlobalDataProvider = ({ children }) => {
     hideSendEmailPopup,
     showWaitlistPopup,
     hideWaitlistPopup,
+    showGiftMessageModal,
+    hideGiftMessageModal,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

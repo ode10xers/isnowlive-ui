@@ -148,6 +148,16 @@
   }
 }
 
+.giftBtn{
+  @extend .giftProductBtn;
+
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  height: 100%;
+  max-height: 44px;
+}
+
 .videoBuyBtn {
   padding: 8px 16px;
   height: 100%;
