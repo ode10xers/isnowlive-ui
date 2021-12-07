@@ -172,7 +172,7 @@ const InventoryDateList = ({ inventories = [], showImage = false, showDesc = fal
   );
 
   return (
-    <Row>
+    <Row className={styles.inventoryListWrapper}>
       {inventories.length > 0 ? (
         <>
           <Col xs={24} className={styles.textAlignCenter}>

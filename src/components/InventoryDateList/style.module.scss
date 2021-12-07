@@ -1,5 +1,9 @@
 @import '../../styles/variables.scss';
 
+.inventoryListWrapper {
+  font-family: var(--inventory-list-custom-font, inherit);
+}
+
 .helperText {
   color: var(--inventory-list-plugin-inventory-font-color, #{map-get($colors, 'Black')}) !important;
 }

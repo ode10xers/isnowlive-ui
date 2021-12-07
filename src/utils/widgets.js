@@ -31,6 +31,33 @@ export const inventoryListCSSVars = [
   },
 ];
 
+export const sessionCardsCSSVars = [
+  {
+    key: '--session-list-card-background-color',
+    label: 'Card Background',
+  },
+  {
+    key: '--session-list-card-font-color',
+    label: 'Card Text Color',
+  },
+];
+
+const sessionCardPluginsCSSVars = [
+  ...sessionCardsCSSVars,
+  {
+    key: '--session-list-bar-color',
+    label: 'Top Bar Color',
+  },
+  {
+    key: '--session-list-date-font-color',
+    label: 'Date Color',
+  },
+  {
+    key: '--session-list-widget-background-color',
+    label: 'Plugin Background',
+  },
+];
+
 export const widgetComponentsName = {
   CALENDAR: {
     value: 'calendar',
@@ -92,28 +119,7 @@ export const widgetComponentsName = {
     value: 'list',
     label: 'Sessions - Cards',
     product: 'Session',
-    styling: [
-      {
-        key: '--session-list-card-background-color',
-        label: 'Card Background',
-      },
-      {
-        key: '--session-list-card-font-color',
-        label: 'Card Text Color',
-      },
-      {
-        key: '--session-list-bar-color',
-        label: 'Top Bar Color',
-      },
-      {
-        key: '--session-list-date-font-color',
-        label: 'Date Color',
-      },
-      {
-        key: '--session-list-widget-background-color',
-        label: 'Plugin Background',
-      },
-    ],
+    styling: sessionCardPluginsCSSVars,
   },
   AVAILABILITY: {
     value: 'availability',

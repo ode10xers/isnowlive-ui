@@ -9,9 +9,10 @@ import PassionPassList from 'components/PageEditorPassionComponents/PassList';
 import PassionSubscriptionList from 'components/PageEditorPassionComponents/SubscriptionList';
 
 import defaultBlockToolbar from '../Configs/common/toolbar.js';
-import { inventoryListCSSVars } from 'utils/widgets';
+import { inventoryListCSSVars, sessionCardsCSSVars } from 'utils/widgets';
 import traitTypes from '../Configs/strings/traitTypes';
 import componentTypes from '../Configs/strings/componentTypes';
+import { generateFontFamilyStylingText } from 'utils/helper';
 
 /* 
 NOTE: Old flag used in the React Components 
@@ -82,6 +83,7 @@ export default (editor) => {
         layout: sessionsLayout.GRID,
         'show-image': false,
         'show-desc': false,
+        'font-family': 'Segoe UI',
         traits: [
           {
             type: 'select',
@@ -92,12 +94,27 @@ export default (editor) => {
               name: key,
             })),
           },
+          {
+            type: traitTypes.FONT.FONT_FAMILY_SELECTOR,
+            name: 'font-family',
+            changeProp: 1,
+          },
+          {
+            id: 'colors',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CSS_VARS_COLORS,
+            label: 'Customize Colors',
+            options: sessionCardsCSSVars.map((vars) => ({
+              id: vars.key,
+              label: vars.label,
+            })),
+          },
         ],
       },
       init() {
         this.handleLayoutChange();
 
         this.on('change:layout', this.handleLayoutChange);
+        this.on('change:font-family', this.handleFontFamilyChange);
         this.on('change:show-image', () => this.handleBooleanAttributeChange('show-image'));
         this.on('change:show-desc', () => this.handleBooleanAttributeChange('show-desc'));
       },
@@ -127,6 +144,8 @@ export default (editor) => {
             'show-desc': this.props()['show-desc'] ?? false,
           };
 
+          this.removeTrait(['colors']);
+
           this.addTrait([
             {
               type: 'checkbox',
@@ -141,6 +160,7 @@ export default (editor) => {
               changeProp: true,
             },
             {
+              id: 'colors',
               type: traitTypes.CUSTOM_REACT_INPUTS.CSS_VARS_COLORS,
               label: 'Customize Colors',
               options: inventoryListCSSVars.map((vars) => ({
@@ -158,7 +178,16 @@ export default (editor) => {
           }
         } else {
           // TODO: Might want to remove the CSS vars by looping through options
-          this.removeTrait(['show-image', 'show-desc', traitTypes.CUSTOM_REACT_INPUTS.CSS_VARS_COLORS]);
+          this.removeTrait(['show-image', 'show-desc', 'colors']);
+          this.addTrait({
+            id: 'colors',
+            type: traitTypes.CUSTOM_REACT_INPUTS.CSS_VARS_COLORS,
+            label: 'Customize Colors',
+            options: sessionCardsCSSVars.map((vars) => ({
+              id: vars.key,
+              label: vars.label,
+            })),
+          });
           if (passionSessionList) {
             passionSessionList.removeAttributes(['show-image', 'show-desc']);
 
@@ -168,6 +197,16 @@ export default (editor) => {
             });
           }
         }
+      },
+      handleFontFamilyChange() {
+        const font = this.props()['font-family'];
+
+        const cssVarName = '--inventory-list-custom-font';
+
+        this.setStyle({
+          ...this.getStyle(),
+          [cssVarName]: generateFontFamilyStylingText(font),
+        });
       },
     },
   });

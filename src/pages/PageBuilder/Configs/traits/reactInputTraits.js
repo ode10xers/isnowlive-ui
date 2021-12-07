@@ -43,8 +43,10 @@ export default (editor) => {
             });
           };
 
+          const initColor = selectedComponent.getStyle()[opt.id] ?? '#000000';
+
           ReactDOM.render(
-            <CustomColorPicker key={opt.id} initialColor="#000000" colorChangeCallback={colorChangeHandler} />,
+            <CustomColorPicker key={opt.id} initialColor={initColor} colorChangeCallback={colorChangeHandler} />,
             inputEl
           );
 

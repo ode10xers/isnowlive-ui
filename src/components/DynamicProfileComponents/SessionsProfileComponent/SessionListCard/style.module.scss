@@ -3,6 +3,7 @@
 $card-border-radius: 8px;
 
 .sessionListCard {
+  font-family: var(--inventory-list-custom-font, inherit);
   border-radius: $card-border-radius !important;
   cursor: pointer;
   background-color: var(--session-list-card-background-color, #{map-get($map: $colors, $key: 'White')}) !important;
