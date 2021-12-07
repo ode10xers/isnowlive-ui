@@ -212,6 +212,7 @@ const InventoryDetails = ({ match, history }) => {
                   availablePasses={availablePasses}
                   classDetails={session}
                   isInventoryDetails={true}
+                  isGiftEnabled={creator?.profile?.allow_gifting_products}
                 />
               )}
           </Col>
