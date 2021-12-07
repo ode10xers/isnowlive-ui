@@ -446,6 +446,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                   availablePasses={availabilityPasses}
                   classDetails={{ ...selectedInventory, ...availability }}
                   isInventoryDetails={true}
+                  isGiftEnabled={creatorProfile?.profile?.allow_gifting_products}
                 />
               )}
             </Loader>

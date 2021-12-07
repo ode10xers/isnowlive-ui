@@ -53,7 +53,13 @@ const formInitialValues = {
   pwyw_price: null,
 };
 
-const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDetails = false, fullWidth = false }) => {
+const SessionRegistration = ({
+  availablePasses = [],
+  classDetails,
+  isInventoryDetails = false,
+  fullWidth = false,
+  isGiftEnabled = true,
+}) => {
   const {
     state: { userDetails },
     logIn,
@@ -1482,22 +1488,26 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                                     : 'Register'}
                                 </Button>
                               </Col>
-                              <Col xs={fullWidth ? 24 : 10} md={fullWidth ? 24 : 10} xl={fullWidth ? 24 : 8}>
-                                <Button
-                                  block
-                                  className={styles.giftProductBtn}
-                                  size="large"
-                                  type="primary"
-                                  icon={<GiftOutlined />}
-                                  onClick={handleGiftPurchase}
-                                  disabled={
-                                    !selectedInventory ||
-                                    (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass)
-                                  }
-                                >
-                                  Buy as gift
-                                </Button>
-                              </Col>
+                              {isGiftEnabled && (
+                                <Col xs={fullWidth ? 24 : 10} md={fullWidth ? 24 : 10} xl={fullWidth ? 24 : 8}>
+                                  <Button
+                                    block
+                                    className={styles.giftProductBtn}
+                                    size="large"
+                                    type="primary"
+                                    icon={<GiftOutlined />}
+                                    onClick={handleGiftPurchase}
+                                    disabled={
+                                      !selectedInventory ||
+                                      (classDetails?.type === 'AVAILABILITY' &&
+                                        classDetails?.is_course &&
+                                        !selectedPass)
+                                    }
+                                  >
+                                    Buy as gift
+                                  </Button>
+                                </Col>
+                              )}
                               {!selectedInventory && (
                                 <Col xs={24}>
                                   <Paragraph>

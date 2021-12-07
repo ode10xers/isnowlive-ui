@@ -202,7 +202,11 @@ const SessionDetails = ({ match, history }) => {
         )
       ) : (
         <>
-          <SessionRegistration availablePasses={availablePasses} classDetails={session} />
+          <SessionRegistration
+            availablePasses={availablePasses}
+            classDetails={session}
+            isGiftEnabled={creator?.profile?.allow_gifting_products}
+          />
           {sessionVideos?.length > 0 && (
             <Row justify="space-between" className={styles.mt20}>
               <Col xs={24}>
