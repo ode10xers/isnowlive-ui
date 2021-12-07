@@ -73,7 +73,7 @@ const CourseDetails = ({ match }) => {
       if (data) {
         setCreatorProfile(data);
         setCreatorImageUrl(data.profile_image_url);
-        setIsGiftEnabled(data?.profile?.allow_gifting_products ?? false);
+        setIsGiftEnabled(data?.profile?.allow_gifting_products ?? true);
         setIsLoading(false);
       }
     } catch (error) {

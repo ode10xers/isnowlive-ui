@@ -249,7 +249,7 @@ const NewVideoDetails = ({ match }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfile(data);
-        setIsGiftEnabled(data?.profile?.allow_gifting_products);
+        setIsGiftEnabled(data?.profile?.allow_gifting_products ?? true);
       }
     } catch (error) {
       console.error(error);
