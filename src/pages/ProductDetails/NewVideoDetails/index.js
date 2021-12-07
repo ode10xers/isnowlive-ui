@@ -90,7 +90,7 @@ const NewVideoDetails = ({ match }) => {
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
   const [purchaseAsGift, setPurchaseAsGift] = useState(false);
-  const [isGiftEnabled, setIsGiftEnabled] = useState(false);
+  const [isGiftEnabled, setIsGiftEnabled] = useState(true);
 
   //#region Start of API Calls
 

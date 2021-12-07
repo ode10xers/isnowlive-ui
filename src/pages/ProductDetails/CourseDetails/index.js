@@ -63,7 +63,7 @@ const CourseDetails = ({ match }) => {
 
   const [purchaseAsGift, setPurchaseAsGift] = useState(false);
 
-  const [isGiftEnabled, setIsGiftEnabled] = useState(false);
+  const [isGiftEnabled, setIsGiftEnabled] = useState(true);
 
   const getCreatorProfileDetails = useCallback(async (creatorUsername) => {
     try {
