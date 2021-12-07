@@ -38,6 +38,9 @@ const {
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
+// NOTE: We don't currrently support pass for gifts
+// but later on if we do, make sure to add the isGiftEnabled flag just
+// like in other products (sessions, course, video)
 const PassDetails = ({ match }) => {
   const { showPaymentPopup } = useGlobalContext();
   const { lg } = useBreakpoint();
