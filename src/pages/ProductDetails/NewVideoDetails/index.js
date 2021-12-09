@@ -191,10 +191,9 @@ const NewVideoDetails = ({ match }) => {
     }
   }, []);
 
-  // TODO: Test this case later
   const getCourseDetailsForVideo = useCallback(async (videoExternalId) => {
     try {
-      const { status, data } = await apis.courses.getVideoCoursesByVideoId(videoExternalId);
+      const { status, data } = await apis.courses.getCoursesByVideoId(videoExternalId);
 
       if (isAPISuccess(status) && data) {
         setRelatedCourses(data);
