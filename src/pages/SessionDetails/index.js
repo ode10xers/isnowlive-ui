@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
-import { Row, Col, Image, Typography, Tabs, Grid, message } from 'antd';
+import { Row, Col, Image, Typography, Tabs, Grid, Button, message } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -13,7 +13,7 @@ import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import PublicVideoList from 'components/PublicVideoList';
 import SessionRegistration from 'components/SessionRegistration';
-import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+// import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import { reservedDomainName } from 'utils/constants';
 import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/url';
@@ -30,7 +30,7 @@ const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
-  const [courses, setCourses] = useState([]);
+  // const [courses, setCourses] = useState([]);
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
   const [availablePasses, setAvailablePasses] = useState([]);
@@ -63,15 +63,15 @@ const SessionDetails = ({ match, history }) => {
             console.error('Failed to fetch creator for session', creatorDetailsResponse);
           }
 
-          if (sessionDetails.is_course) {
-            const courseDetailsResponse = await apis.courses.getCoursesBySessionId(session_id);
+          // if (sessionDetails.is_course) {
+          //   const courseDetailsResponse = await apis.courses.getCoursesBySessionId(session_id);
 
-            if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
-              setCourses(courseDetailsResponse.data || []);
-            } else {
-              console.error('Failed to fetch courses for session', courseDetailsResponse);
-            }
-          }
+          //   if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
+          //     setCourses(courseDetailsResponse.data || []);
+          //   } else {
+          //     console.error('Failed to fetch courses for session', courseDetailsResponse);
+          //   }
+          // }
 
           const passesResponse = await apis.passes.getPassesBySessionId(session_id);
 
@@ -109,6 +109,10 @@ const SessionDetails = ({ match, history }) => {
 
     //eslint-disable-next-line
   }, [match.params.session_id]);
+
+  const handleRedirectToCourses = () => {
+    history.push(Routes.list.courses);
+  };
 
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
@@ -187,19 +191,40 @@ const SessionDetails = ({ match, history }) => {
           {creator && <HostDetails host={creator} />}
         </Col>
       </Row>
-      {session?.is_course && courses ? (
-        courses?.length > 0 && (
-          <div className={classNames(styles.mb50, styles.mt20)}>
-            <Row gutter={[8, 16]}>
-              <Col xs={24}>
-                <Title level={5}> This session can only be attended by doing this course </Title>
-              </Col>
-              <Col xs={24}>
-                <ShowcaseCourseCard courses={courses} />
-              </Col>
-            </Row>
-          </div>
-        )
+      {session?.is_course ? (
+        // courses?.length > 0 && (
+        //   <div className={classNames(styles.mb50, styles.mt20)}>
+        //     <Row gutter={[8, 16]}>
+        //       <Col xs={24}>
+        //         <Title level={5}> This session can only be attended by doing this course </Title>
+        //       </Col>
+        //       <Col xs={24}>
+        //         <ShowcaseCourseCard courses={courses} />
+        //       </Col>
+        //     </Row>
+        //   </div>
+        // )
+        <div className={classNames(styles.mb50, styles.mt20)}>
+          <Row gutter={[8, 16]}>
+            <Col xs={24}>
+              <Title level={5}> This session can only be attended by purchasing a course </Title>
+            </Col>
+            <Col xs={24}>
+              <Row justify="center">
+                <Col>
+                  <Button
+                    className={styles.courseRedirectBtn}
+                    type="primary"
+                    size="large"
+                    onClick={handleRedirectToCourses}
+                  >
+                    Show me courses
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </div>
       ) : (
         <>
           <SessionRegistration
