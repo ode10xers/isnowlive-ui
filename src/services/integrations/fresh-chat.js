@@ -1,8 +1,24 @@
 import config from 'config';
 
+export const setFreshChatWidgetVisibility = (visible = false) => {
+  if (window.fcWidget && window.fcWidget.isInitialized()) {
+    window.fcWidget.setConfig({
+      headerProperty: {
+        hideChatButton: !visible,
+      },
+      cssNames: {
+        widget: 'custom_fc_frame',
+      },
+    });
+  }
+};
+
 export const initFreshChatWidget = (userData = null) => {
   let freshChatConfig = {
     config: {
+      headerProperty: {
+        hideChatButton: true,
+      },
       cssNames: {
         widget: 'custom_fc_frame',
       },
