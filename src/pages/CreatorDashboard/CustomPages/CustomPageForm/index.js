@@ -136,7 +136,7 @@ const CustomPageForm = ({ match, location, history }) => {
 
       if (isAPISuccess(status) && data) {
         setTemplates(data);
-        setSelectedTemplate(data[0] ?? null);
+        setSelectedTemplate(data[0] ?? blankPageTemplate);
       }
     } catch (error) {
       console.error(error);

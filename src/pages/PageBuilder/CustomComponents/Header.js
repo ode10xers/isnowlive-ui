@@ -76,14 +76,38 @@ export default (editor) => {
     },
   });
 
-  editor.Components.addType(componentTypes.HEADER.INNER.BRAND_WRAPPER, {
+  editor.Components.addType(componentTypes.HEADER.INNER.BRAND_CONTAINER, {
     model: {
       defaults: {
         tagName: 'div',
+        name: 'Header Brand Container',
+        ...fullyDisabledComponentFlags,
+        attributes: {
+          class: componentTypes.HEADER.INNER.BRAND_CONTAINER,
+        },
+        components: [
+          {
+            type: componentTypes.HEADER.INNER.BRAND_WRAPPER,
+          },
+        ],
+        styles: `
+        .${componentTypes.HEADER.INNER.BRAND_CONTAINER} {
+          flex: 1 1 auto;
+          padding: 8px;
+        }`,
+      },
+    },
+  });
+
+  editor.Components.addType(componentTypes.HEADER.INNER.BRAND_WRAPPER, {
+    model: {
+      defaults: {
+        tagName: 'a',
         name: 'Header Brand',
         ...fullyDisabledComponentFlags,
         attributes: {
           class: componentTypes.HEADER.INNER.BRAND_WRAPPER,
+          href: '/',
         },
         components: [
           {
@@ -91,11 +115,6 @@ export default (editor) => {
           },
         ],
         styles: `
-          .header-brand {
-            flex: 1 1 auto;
-            padding: 8px;
-          }
-
           .header-brand .brand-text {
             font-size: 20px;
             font-weight: 500;
@@ -122,7 +141,7 @@ export default (editor) => {
         },
         components: [
           {
-            type: componentTypes.HEADER.INNER.BRAND_WRAPPER,
+            type: componentTypes.HEADER.INNER.BRAND_CONTAINER,
           },
           {
             type: componentTypes.CUSTOM_COMPONENTS.REACT_SIGN_IN_BUTTON,
@@ -226,11 +245,6 @@ export default (editor) => {
             attributes: {
               class: 'brand-image',
             },
-            highlightable: true,
-            selectable: true,
-            hoverable: true,
-            editable: true,
-            badgable: true,
           };
         }
 

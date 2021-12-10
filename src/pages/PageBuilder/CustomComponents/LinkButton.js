@@ -10,7 +10,7 @@ export default (editor) => {
         tagName: 'a',
         name: 'Button',
         attributes: {
-          href: '#',
+          href: '',
           target: '_blank',
           class: 'link-btn',
         },

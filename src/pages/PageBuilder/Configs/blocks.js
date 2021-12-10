@@ -27,22 +27,22 @@ const passionProductListBlocks = [
   {
     id: componentTypes.BLOCKS.PASSION_VIDEO_LIST,
     label: 'Passion Video List',
-    media: videoListIcon,
+    icon: videoListIcon,
   },
   {
     id: componentTypes.BLOCKS.PASSION_COURSE_LIST,
     label: 'Passion Course List',
-    media: courseListIcon,
+    icon: courseListIcon,
   },
   {
     id: componentTypes.BLOCKS.PASSION_PASS_LIST,
     label: 'Passion Pass List',
-    media: passListIcon,
+    icon: passListIcon,
   },
   {
     id: componentTypes.BLOCKS.PASSION_SUBSCRIPTION_LIST,
     label: 'Passion Subscription List',
-    media: membershipListIcon,
+    icon: membershipListIcon,
   },
 ].map((data) => ({
   id: data.id,

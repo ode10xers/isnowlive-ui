@@ -88,6 +88,7 @@ export default {
     INNER: {
       TEXT_BRAND: 'header-text-brand',
       BRAND_WRAPPER: 'header-brand',
+      BRAND_CONTAINER: 'header-brand-container',
     },
   },
 

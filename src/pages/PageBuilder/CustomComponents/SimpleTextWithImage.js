@@ -47,8 +47,10 @@ export default (editor) => {
     view: {
       events: {
         // We reverse click and dblclick event
-        dblclick: 'initResize',
-        click: 'onActive',
+        // NOTE: If we reverse it the behavior when changing
+        // header brand into image might not work properly
+        click: 'initResize',
+        dblclick: 'onActive',
         error: 'onError',
         load: 'onLoad',
         dragstart: 'noDrag',

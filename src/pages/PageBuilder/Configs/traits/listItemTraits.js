@@ -59,6 +59,7 @@ export default (editor) => {
           component.append(
             {
               type: componentTypes.CUSTOM_COMPONENTS.LINK_BUTTON,
+              content: 'Change this into the link title',
               toolbar: [],
               removable: false,
             },
