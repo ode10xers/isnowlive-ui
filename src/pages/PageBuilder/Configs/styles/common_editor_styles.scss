@@ -3,7 +3,6 @@
 @import '../styles/custom_trait_styles.scss';
 @import '../styles/gjs_override_styles.scss';
 
-
 .primaryEditorButton {
   background-color: map-get($map: $colors, $key: 'Endeavour') !important;
   border-color: map-get($map: $colors, $key: 'Endeavour') !important;
@@ -32,11 +31,11 @@
       &::-webkit-scrollbar-track {
         background: transparent;
       }
-      
+
       &::-webkit-scrollbar-thumb {
         background-color: rgba(255, 255, 255, 0.2);
       }
-      
+
       &::-webkit-scrollbar {
         width: 8px;
       }
@@ -53,14 +52,14 @@
   overflow-y: scroll;
 
   &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.8)
+    background: rgba(255, 255, 255, 0.8);
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background-color: map-get($map: $colors, $key: 'Endeavour');
     border-radius: 8px;
   }
-  
+
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -86,7 +85,7 @@
       color: map-get($map: $colors, $key: 'Mako');
       font-size: 11px;
       font-weight: 500;
-      
+
       &:hover {
         transition: 0.3s;
         color: map-get($map: $colors, $key: 'Endeavour');
@@ -182,7 +181,7 @@
   }
 
   .devicesContainer {
-    display:flex;
+    display: flex;
     width: 100%;
     max-width: 180px;
     justify-content: space-around;
@@ -200,7 +199,8 @@
         color: map-get($map: $colors, $key: 'Endeavour');
       }
 
-      .device-button.active, .device-button:hover {
+      .device-button.active,
+      .device-button:hover {
         background-color: map-get($map: $colors, $key: 'Endeavour');
         color: map-get($map: $colors, $key: 'White');
         border-radius: 8px;

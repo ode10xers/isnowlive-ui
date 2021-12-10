@@ -75,7 +75,7 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
                   <Text className={styles.availabilityInfoSeparator}>{' ● '}</Text>
                   <Text className={styles.availabilityInfo}>
                     {/* @ts-ignore */}
-                    {getTimeDiff(moment(availability.inventory[0]?.end_time), moment(availability.inventory[0]?.start_time),'minutes')}{' '}
+                    {getTimeDiff(moment(availability.inventory[0]?.end_time), moment(availability.inventory[0]?.start_time), 'minutes')}{' '}
                     mins
                   </Text>
                 </>

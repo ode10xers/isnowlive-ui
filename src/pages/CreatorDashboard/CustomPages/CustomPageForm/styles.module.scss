@@ -25,7 +25,8 @@
 
 .selectedTemplate {
   :global {
-    .ant-card, .ant-card:hover {
+    .ant-card,
+    .ant-card:hover {
       border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
     }
 

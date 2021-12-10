@@ -82,7 +82,7 @@
 
     .bio * {
       // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-        // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
       background-color: transparent !important;
       color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
@@ -93,10 +93,10 @@
     }
 
     .collapsedBio * {
-        // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-          // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        background-color: transparent !important;
-        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+      // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+      // sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background-color: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
 
     .readMoreBio {
