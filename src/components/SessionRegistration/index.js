@@ -42,7 +42,7 @@ const { Item } = Form;
 const {
   formatDate: { toShortDate, toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
-  timeCalculation: { isBeforeDate },
+  timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 
 const formInitialValues = {
@@ -215,7 +215,7 @@ const SessionRegistration = ({
         }
       } else {
         const latestInventories = classDetails.inventory
-          .filter((inventory) => isBeforeDate(inventory.end_time))
+          .filter((inventory) => isPresentOrFuture(inventory.end_time))
           .filter((inventory) => inventory.num_participants < classDetails.max_participants)
           .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
         setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);

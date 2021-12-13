@@ -1,5 +1,11 @@
 @import '../../styles/variables.scss';
 
+.courseRedirectBtn {
+  min-height: 54px;
+  min-width: 80px;
+  font-size: 20px;
+}
+
 .coverImage {
   img {
     border-radius: 8px;
