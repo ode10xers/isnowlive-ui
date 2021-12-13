@@ -128,7 +128,7 @@ const initialSession = {
   refund_before_hours: 0,
   prerequisites: '',
   color_code: initialColor,
-  is_course: false,
+  bundle_only: false,
   session_tag_type: 'anyone',
   is_offline: 'false',
   offline_event_address: '',
@@ -253,7 +253,7 @@ const Session = ({ match, history }) => {
             refund_before_hours: data?.refund_before_hours || 0,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
             color_code: data?.color_code || whiteColor,
-            session_course_type: data?.is_course ? 'course' : 'normal',
+            session_course_type: data?.bundle_only ? 'course' : 'normal',
             document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
             session_tag_type: data?.tags?.length > 0 ? 'selected' : 'anyone',
             selected_member_tags: data?.tags?.map((tag) => tag.external_id) || [],
@@ -274,7 +274,7 @@ const Session = ({ match, history }) => {
           setRefundBeforeHours(data?.refund_before_hours || 0);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setColorCode(data?.color_code || whiteColor);
-          setIsCourseSession(data?.is_course || false);
+          setIsCourseSession(data?.bundle_only || false);
           setSelectedTagType(data?.tags?.length > 0 ? 'selected' : 'anyone');
           setOnlineMeetingType(
             data?.meeting_type === sessionMeetingTypes.SYSTEM_GENERATED
@@ -392,10 +392,10 @@ const Session = ({ match, history }) => {
           type: 'Group',
           max_participants: 2,
         });
-        setSession({ ...session, is_course: true, max_participants: 2 });
+        setSession({ ...session, bundle_only: true, max_participants: 2 });
       } else {
         form.setFieldsValue({ ...form.getFieldsValue(), session_course_type: 'course', type: 'Group' });
-        setSession({ ...session, is_course: true });
+        setSession({ ...session, bundle_only: true });
       }
       setIsSessionTypeGroup(true);
     }
@@ -719,7 +719,7 @@ const Session = ({ match, history }) => {
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
-        is_course: isCourseSession,
+        bundle_only: isCourseSession,
         tag_ids:
           selectedTagType === 'anyone'
             ? []

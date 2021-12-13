@@ -78,7 +78,7 @@ const SessionsInventories = ({ match }) => {
           refund_amount: i?.refund_amount || 0,
           is_refundable: i?.is_refundable || false,
           refund_before_hours: i?.refund_before_hours || 24,
-          is_course: i?.is_course,
+          bundle_only: i?.bundle_only,
           color_code: i?.color_code || whiteColor,
           is_offline: i?.is_offline,
           offline_event_address: i?.offline_event_address,
@@ -309,7 +309,7 @@ const SessionsInventories = ({ match }) => {
             children: (
               <>
                 <Text className={styles.sessionNameWrapper}>{record.name}</Text>{' '}
-                {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+                {record.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </>
             ),
           };
@@ -473,7 +473,7 @@ const SessionsInventories = ({ match }) => {
           <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
             {'  '}
-            {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
         actions={

@@ -356,7 +356,7 @@ const DashboardPage = ({ history }) => {
         },
         children: (
           <>
-            <Text>{record.name}</Text> {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            <Text>{record.name}</Text> {record.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </>
         ),
       }),
@@ -536,7 +536,7 @@ const DashboardPage = ({ history }) => {
           title={
             <div onClick={() => redirectToInventoryPage(item)}>
               <Text>{item.name}</Text>
-              {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+              {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
             </div>
           }
           actions={[

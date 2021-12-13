@@ -62,7 +62,7 @@ const InventoryDetails = ({ match, history }) => {
             console.error('Failed to fetch creator of inventory', creatorDetailsResponse);
           }
 
-          if (inventoryDetails.is_course) {
+          if (inventoryDetails.bundle_only) {
             const courseDetailsResponse = await apis.courses.getCoursesBySessionId(inventoryDetails.session_id);
 
             if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
@@ -189,7 +189,7 @@ const InventoryDetails = ({ match, history }) => {
         <Col xs={24} lg={{ span: 8, offset: 1 }} className={!lg ? styles.mt20 : undefined}>
           <HostDetails host={creator} />
         </Col>
-        {session?.is_course && courses ? (
+        {session?.bundle_only && courses ? (
           courses?.length > 0 && (
             <Col xs={24}>
               <div className={classNames(styles.mb50, styles.mt20)}>

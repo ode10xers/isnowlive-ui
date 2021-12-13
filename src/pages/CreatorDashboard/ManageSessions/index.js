@@ -434,14 +434,14 @@ const ManageSessions = () => {
           {md ? (
             <Table
               columns={generateSessionColumns()}
-              data={sessions?.filter((session) => !session.is_course && isPresentOrFuture(session.expiry))}
+              data={sessions?.filter((session) => !session.bundle_only && isPresentOrFuture(session.expiry))}
               loading={isLoading}
             />
           ) : (
             <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}>
-              {sessions?.filter((session) => !session.is_course && isPresentOrFuture(session.expiry)).length > 0 ? (
+              {sessions?.filter((session) => !session.bundle_only && isPresentOrFuture(session.expiry)).length > 0 ? (
                 sessions
-                  ?.filter((session) => !session.is_course && isPresentOrFuture(session.expiry))
+                  ?.filter((session) => !session.bundle_only && isPresentOrFuture(session.expiry))
                   .map(renderSessionItem)
               ) : (
                 <div className="text-empty"> No Normal {isAvailability ? 'Availabilities' : 'Sessions'} Found </div>
@@ -456,14 +456,14 @@ const ManageSessions = () => {
           {md ? (
             <Table
               columns={generateSessionColumns()}
-              data={sessions?.filter((session) => session.is_course && isPresentOrFuture(session.expiry))}
+              data={sessions?.filter((session) => session.bundle_only && isPresentOrFuture(session.expiry))}
               loading={isLoading}
             />
           ) : (
             <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availability' : 'session'}`}>
-              {sessions?.filter((session) => session.is_course && isPresentOrFuture(session.expiry)).length > 0 ? (
+              {sessions?.filter((session) => session.bundle_only && isPresentOrFuture(session.expiry)).length > 0 ? (
                 sessions
-                  ?.filter((session) => session.is_course && isPresentOrFuture(session.expiry))
+                  ?.filter((session) => session.bundle_only && isPresentOrFuture(session.expiry))
                   .map(renderSessionItem)
               ) : (
                 <div className="text-empty">

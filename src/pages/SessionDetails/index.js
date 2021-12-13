@@ -63,7 +63,7 @@ const SessionDetails = ({ match, history }) => {
             console.error('Failed to fetch creator for session', creatorDetailsResponse);
           }
 
-          if (sessionDetails.is_course) {
+          if (sessionDetails.bundle_only) {
             const courseDetailsResponse = await apis.courses.getCoursesBySessionId(session_id);
 
             if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
@@ -187,7 +187,7 @@ const SessionDetails = ({ match, history }) => {
           {creator && <HostDetails host={creator} />}
         </Col>
       </Row>
-      {session?.is_course && courses ? (
+      {session?.bundle_only && courses ? (
         courses?.length > 0 && (
           <div className={classNames(styles.mb50, styles.mt20)}>
             <Row gutter={[8, 16]}>

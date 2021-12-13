@@ -1208,7 +1208,7 @@ const SessionRegistration = ({
       return;
     }
 
-    if (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass) {
+    if (classDetails?.type === 'AVAILABILITY' && classDetails?.bundle_only && !selectedPass) {
       showErrorModal(
         'Please select a pass',
         <>
@@ -1404,7 +1404,7 @@ const SessionRegistration = ({
                         <>
                           {availablePasses.length > 0 ? (
                             <>
-                              {classDetails?.type === 'AVAILABILITY' && classDetails?.is_course ? null : (
+                              {classDetails?.type === 'AVAILABILITY' && classDetails?.bundle_only ? null : (
                                 <div>
                                   <Title level={5}>
                                     Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
@@ -1443,7 +1443,7 @@ const SessionRegistration = ({
                                 )}
                               </div>
                             </>
-                          ) : classDetails?.type === 'AVAILABILITY' && classDetails?.is_course ? (
+                          ) : classDetails?.type === 'AVAILABILITY' && classDetails?.bundle_only ? (
                             <Item {...sessionRegistrationTailLayout}>
                               <Title level={5} className={styles.bookingHelpText}>
                                 You can only book this availability using a pass because it's a bundled availability.
@@ -1463,7 +1463,7 @@ const SessionRegistration = ({
                       )}
 
                       {classDetails?.type === 'AVAILABILITY' &&
-                      classDetails?.is_course &&
+                      classDetails?.bundle_only &&
                       userPasses.length <= 0 &&
                       availablePasses.length <= 0 ? null : (
                         <div className={styles.mt10}>
@@ -1478,7 +1478,9 @@ const SessionRegistration = ({
                                   htmlType="submit"
                                   disabled={
                                     !selectedInventory ||
-                                    (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass)
+                                    (classDetails?.type === 'AVAILABILITY' &&
+                                      classDetails?.bundle_only &&
+                                      !selectedPass)
                                   }
                                 >
                                   {user &&
@@ -1501,7 +1503,7 @@ const SessionRegistration = ({
                                     disabled={
                                       !selectedInventory ||
                                       (classDetails?.type === 'AVAILABILITY' &&
-                                        classDetails?.is_course &&
+                                        classDetails?.bundle_only &&
                                         !selectedPass)
                                     }
                                   >

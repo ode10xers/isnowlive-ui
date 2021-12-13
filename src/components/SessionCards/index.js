@@ -72,7 +72,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                         </Col>
                         <Col xs={24}>
                           <Title ellipsis={{ rows: 1 }} level={5}>
-                            {session.name} {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+                            {session.name} {session.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                           </Title>
                         </Col>
                         <Col xs={24}>
@@ -116,7 +116,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                           <Row>
                             <Col xs={24}>
                               <Title ellipsis={{ rows: 1 }} level={5}>
-                                {session.name} {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+                                {session.name} {session.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                               </Title>
                             </Col>
                             <Col xs={24}>
