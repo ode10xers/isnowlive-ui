@@ -51,7 +51,7 @@ const timeCalculation = {
   // For now the limit is 21 daus
   isNewUserBasedOnSignupDate: (signupDate) => (signupDate ? moment().diff(moment(signupDate), 'days') <= 21 : false),
   dateIsBeforeDate: (startDate, endDate) => moment(startDate).isSameOrBefore(moment(endDate)),
-  isBeforeDate: (date) => moment().isSameOrBefore(moment(date)),
+  isPresentOrFuture: (date) => moment().isSameOrBefore(moment(date)),
   isSameOrBeforeToday: (date) => moment(date).endOf('day').isSameOrBefore(moment().startOf('day')),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
   createRange: (startTime, endTime) => moment.range(startTime, endTime).snapTo('day'),

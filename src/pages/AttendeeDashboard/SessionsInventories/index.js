@@ -29,7 +29,7 @@ import styles from './styles.module.scss';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLocaleDate, toLongDateWithLongDay },
-  timeCalculation: { isBeforeLimitHours, isBeforeDate },
+  timeCalculation: { isBeforeLimitHours, isPresentOrFuture },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { useBreakpoint } = Grid;
@@ -400,11 +400,13 @@ const SessionsInventories = ({ match }) => {
                       size="small"
                       block
                       className={
-                        !record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))
+                        !record.join_url || isPresentOrFuture(moment(record.start_time).subtract(15, 'minutes'))
                           ? styles.disabledSuccess
                           : styles.success
                       }
-                      disabled={!record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))}
+                      disabled={
+                        !record.join_url || isPresentOrFuture(moment(record.start_time).subtract(15, 'minutes'))
+                      }
                       onClick={() => trackAndJoinSession(record)}
                     >
                       Join
@@ -500,11 +502,11 @@ const SessionsInventories = ({ match }) => {
                     size="small"
                     block
                     className={
-                      !item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))
+                      !item.join_url || isPresentOrFuture(moment(item.start_time).subtract(15, 'minutes'))
                         ? styles.disabledSuccess
                         : styles.success
                     }
-                    disabled={!item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))}
+                    disabled={!item.join_url || isPresentOrFuture(moment(item.start_time).subtract(15, 'minutes'))}
                     onClick={() => trackAndJoinSession(item)}
                   >
                     Join

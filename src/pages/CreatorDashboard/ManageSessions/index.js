@@ -28,7 +28,7 @@ import styles from './styles.module.scss';
 
 const {
   formatDate: { toLongDateWithDay },
-  timeCalculation: { isBeforeDate },
+  timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
@@ -434,13 +434,15 @@ const ManageSessions = () => {
           {md ? (
             <Table
               columns={generateSessionColumns()}
-              data={sessions?.filter((session) => !session.is_course && isBeforeDate(session.expiry))}
+              data={sessions?.filter((session) => !session.is_course && isPresentOrFuture(session.expiry))}
               loading={isLoading}
             />
           ) : (
             <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}>
-              {sessions?.filter((session) => !session.is_course && isBeforeDate(session.expiry)).length > 0 ? (
-                sessions?.filter((session) => !session.is_course && isBeforeDate(session.expiry)).map(renderSessionItem)
+              {sessions?.filter((session) => !session.is_course && isPresentOrFuture(session.expiry)).length > 0 ? (
+                sessions
+                  ?.filter((session) => !session.is_course && isPresentOrFuture(session.expiry))
+                  .map(renderSessionItem)
               ) : (
                 <div className="text-empty"> No Normal {isAvailability ? 'Availabilities' : 'Sessions'} Found </div>
               )}
@@ -454,13 +456,15 @@ const ManageSessions = () => {
           {md ? (
             <Table
               columns={generateSessionColumns()}
-              data={sessions?.filter((session) => session.is_course && isBeforeDate(session.expiry))}
+              data={sessions?.filter((session) => session.is_course && isPresentOrFuture(session.expiry))}
               loading={isLoading}
             />
           ) : (
             <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availability' : 'session'}`}>
-              {sessions?.filter((session) => session.is_course && isBeforeDate(session.expiry)).length > 0 ? (
-                sessions?.filter((session) => session.is_course && isBeforeDate(session.expiry)).map(renderSessionItem)
+              {sessions?.filter((session) => session.is_course && isPresentOrFuture(session.expiry)).length > 0 ? (
+                sessions
+                  ?.filter((session) => session.is_course && isPresentOrFuture(session.expiry))
+                  .map(renderSessionItem)
               ) : (
                 <div className="text-empty">
                   No {isAvailability ? 'Bundled Availabilities' : 'Course Sessions'} Found
@@ -473,7 +477,7 @@ const ManageSessions = () => {
           {md ? (
             <Table
               columns={generateSessionColumns()}
-              data={sessions?.filter((session) => !isBeforeDate(session.expiry))}
+              data={sessions?.filter((session) => !isPresentOrFuture(session.expiry))}
               loading={isLoading}
             />
           ) : (
@@ -482,8 +486,8 @@ const ManageSessions = () => {
               size="large"
               text={`Loading expired ${isAvailability ? 'availability' : 'session'}`}
             >
-              {sessions?.filter((session) => !isBeforeDate(session.expiry)).length > 0 ? (
-                sessions?.filter((session) => !isBeforeDate(session.expiry)).map(renderSessionItem)
+              {sessions?.filter((session) => !isPresentOrFuture(session.expiry)).length > 0 ? (
+                sessions?.filter((session) => !isPresentOrFuture(session.expiry)).map(renderSessionItem)
               ) : (
                 <div className="text-empty">No Expired {isAvailability ? 'Availabilities' : 'Sessions'} Found</div>
               )}

@@ -70,7 +70,7 @@ const { useBreakpoint } = Grid;
 const { Option } = Select;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
-  timeCalculation: { createWeekRange, getRangeDiff, createRange },
+  timeCalculation: { createWeekRange, getRangeDiff, createRange, isPresentOrFuture },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -530,8 +530,17 @@ const Session = ({ match, history }) => {
     });
   };
 
+  const isPastInventory = (inventoryId) => {
+    const targetInv = session?.inventory?.find((inv) => inv.inventory_id === inventoryId);
+    return targetInv ? !isPresentOrFuture(targetInv.start_time) : false;
+  };
+
   const handleSlotDelete = (value) => {
     let tempDeleteSlots = deleteSlot;
+    if (isPastInventory(value)) {
+      return;
+    }
+
     tempDeleteSlots.push(value);
     tempDeleteSlots = [...new Set(tempDeleteSlots)];
     setDeleteSlot(tempDeleteSlots);
@@ -839,6 +848,12 @@ const Session = ({ match, history }) => {
   const trackAndNavigate = (destination, eventTag) => {
     trackSimpleEvent(eventTag);
     history.push(destination);
+  };
+
+  // NOTE: By valid here, we mean it's not in the past
+  // Because we don't want to do anything with the past inventories
+  const getValidInventories = (inventories) => {
+    return inventories.filter((inv) => isPresentOrFuture(inv.start_time));
   };
 
   return (
@@ -1351,12 +1366,12 @@ const Session = ({ match, history }) => {
             <Row justify="center">
               <Col flex={4}>
                 <Title level={4} className={styles.scheduleCount}>
-                  {session?.inventory?.length > maxInventoryLimitPerRequest
+                  {getValidInventories(session?.inventory ?? []).length > maxInventoryLimitPerRequest
                     ? maxInventoryLimitPerRequest
-                    : session?.inventory?.length || 0}{' '}
+                    : getValidInventories(session?.inventory ?? []).length || 0}{' '}
                   Schedules will be created
                 </Title>
-                {session?.inventory?.length > maxInventoryLimitPerRequest && (
+                {getValidInventories(session?.inventory ?? []).length > maxInventoryLimitPerRequest && (
                   <Text type="danger">
                     For safety reasons, we limit the number of schedules you can set at one time to{' '}
                     {maxInventoryLimitPerRequest} schedules.
