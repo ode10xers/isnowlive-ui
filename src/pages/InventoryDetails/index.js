@@ -63,7 +63,9 @@ const InventoryDetails = ({ match, history }) => {
           }
 
           if (inventoryDetails.is_course) {
-            const courseDetailsResponse = await apis.courses.getCoursesBySessionId(inventoryDetails.session_id);
+            const courseDetailsResponse = await apis.courses.getCoursesByInventoryId(
+              inventoryDetails.inventory_external_id
+            );
 
             if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
               setCourses(courseDetailsResponse.data || []);
