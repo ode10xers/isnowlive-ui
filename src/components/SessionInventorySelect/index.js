@@ -54,9 +54,10 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
   useEffect(() => {
     if (selectedSlot) {
       handleOnSelect(moment(selectedSlot.start_time));
-    } else {
-      handleOnSelect(moment());
     }
+    // else {
+    //   handleOnSelect(moment());
+    // }
   }, [handleOnSelect, selectedSlot]);
 
   const dateCellRender = (date) => {

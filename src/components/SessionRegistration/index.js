@@ -1354,7 +1354,7 @@ const SessionRegistration = ({
                         // Render help text that this session will be booked using user's subscription
                         <Row>
                           <Paragraph className={styles.bookingHelpText}>
-                            Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                            Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                             {classDetails.type === 'NORMAL' ? 'class' : 'time slot'} for{' '}
                             <Text delete>
                               {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
@@ -1386,7 +1386,7 @@ const SessionRegistration = ({
                           {selectedInventory && selectedPass && (
                             <Row>
                               <Paragraph className={styles.bookingHelpText}>
-                                Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                                Booki {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                                 {classDetails.type === 'NORMAL' ? 'class' : 'time slot'} for{' '}
                                 <Text delete>
                                   {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
