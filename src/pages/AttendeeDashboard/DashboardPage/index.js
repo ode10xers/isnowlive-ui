@@ -45,7 +45,7 @@ import styles from './styles.module.scss';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLongDateWithDayTime },
-  timeCalculation: { isBeforeDate, isBeforeLimitHours },
+  timeCalculation: { isPresentOrFuture, isBeforeLimitHours },
 } = dateUtil;
 
 const { Text, Title } = Typography;
@@ -356,7 +356,7 @@ const DashboardPage = ({ history }) => {
         },
         children: (
           <>
-            <Text>{record.name}</Text> {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            <Text>{record.name}</Text> {record.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </>
         ),
       }),
@@ -427,11 +427,11 @@ const DashboardPage = ({ history }) => {
                   size="small"
                   block
                   className={
-                    !record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))
+                    !record.join_url || isPresentOrFuture(moment(record.start_time).subtract(15, 'minutes'))
                       ? styles.disabledSuccess
                       : styles.success
                   }
-                  disabled={!record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))}
+                  disabled={!record.join_url || isPresentOrFuture(moment(record.start_time).subtract(15, 'minutes'))}
                   onClick={() => window.open(record.join_url)}
                 >
                   Join
@@ -536,7 +536,7 @@ const DashboardPage = ({ history }) => {
           title={
             <div onClick={() => redirectToInventoryPage(item)}>
               <Text>{item.name}</Text>
-              {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+              {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
             </div>
           }
           actions={[
@@ -555,10 +555,10 @@ const DashboardPage = ({ history }) => {
             ) : (
               <Button
                 type="text"
-                disabled={!item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))}
+                disabled={!item.join_url || isPresentOrFuture(moment(item.start_time).subtract(15, 'minutes'))}
                 onClick={() => window.open(item.join_url)}
                 className={
-                  !item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))
+                  !item.join_url || isPresentOrFuture(moment(item.start_time).subtract(15, 'minutes'))
                     ? styles.disabledSuccess
                     : styles.success
                 }

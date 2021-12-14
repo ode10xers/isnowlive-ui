@@ -290,7 +290,7 @@ const SessionsDetails = ({ match }) => {
                     xs={24}
                     lg={{
                       span: 8,
-                      offset: session?.is_course ? 8 : 16,
+                      offset: session?.bundle_only ? 8 : 16,
                     }}
                   >
                     {isEditingDocuments ? (

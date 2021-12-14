@@ -29,7 +29,7 @@ import styles from './style.module.scss';
 const { Text, Title } = Typography;
 
 const {
-  timeCalculation: { isBeforeDate },
+  timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 
 const VideoDetails = ({ match, history }) => {
@@ -94,7 +94,7 @@ const VideoDetails = ({ match, history }) => {
       const { status, data } = await apis.videos.getAttendeeVideoOrderDetails(videoOrderId);
 
       if (isAPISuccess(status) && data) {
-        const orderExpired = !isBeforeDate(data.expiry);
+        const orderExpired = !isPresentOrFuture(data.expiry);
         setVideoOrderDetails({ ...data, isExpired: orderExpired });
         setVideoToken(null);
         setStartVideo(false);

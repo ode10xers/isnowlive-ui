@@ -580,13 +580,13 @@ const CreateSubscriptionCard = ({
                           key={session.session_external_id}
                           label={
                             <>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              {session.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </>
                           }
                         >
                           <Row gutter={[8, 8]}>
                             <Col xs={17} className={styles.productName}>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              {session.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
                               {session.pay_what_you_want
@@ -628,13 +628,13 @@ const CreateSubscriptionCard = ({
                           key={session.session_external_id}
                           label={
                             <>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              {session.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </>
                           }
                         >
                           <Row gutter={[8, 8]}>
                             <Col xs={17} className={styles.productName}>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              {session.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
                               {session.pay_what_you_want

@@ -30,7 +30,7 @@ const { Option } = Select;
 const { Paragraph, Text } = Typography;
 const {
   formatDate: { toLocaleTime, toLocaleDate, toShortTimeWithPeriod, toLongDate, toDayOfWeek, getTimeDiff },
-  timeCalculation: { isBeforeDate },
+  timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
@@ -61,13 +61,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   useEffect(() => {
     const sortedSessionSlots = (sessionSlots ?? [])
-      .filter((slot) => isBeforeDate(slot.start_time))
+      .filter((slot) => isPresentOrFuture(slot.start_time))
       .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
     if (sortedSessionSlots.length > 0) {
       setDate(moment(sortedSessionSlots[0].start_time));
     } else {
       if (recurring && recurringDatesRange && recurringDatesRange.length) {
-        if (isBeforeDate(recurringDatesRange[0])) {
+        if (isPresentOrFuture(recurringDatesRange[0])) {
           setDate(moment(recurringDatesRange[0]));
         } else {
           setDate(moment());
@@ -154,7 +154,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           itemLayout="vertical"
           dataSource={slotsForDate}
           renderItem={(item) => (
-            <List.Item className={isBeforeDate(item['end_time']) ? styles.slot : styles.pastSlot}>
+            <List.Item className={isPresentOrFuture(item['end_time']) ? styles.slot : styles.pastSlot}>
               {toLocaleTime(item['start_time'])}
               {' - '} {toLocaleTime(item['end_time'])}
             </List.Item>

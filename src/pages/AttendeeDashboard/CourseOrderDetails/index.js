@@ -54,7 +54,7 @@ const { Panel } = Collapse;
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
-  timeCalculation: { isBeforeDate },
+  timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 
 const CourseOrderDetails = ({ match, history }) => {
@@ -253,7 +253,7 @@ const CourseOrderDetails = ({ match, history }) => {
             }`,
           }}
         />
-        {isBeforeDate(content.product_data?.end_time) ? (
+        {isPresentOrFuture(content.product_data?.end_time) ? (
           !content?.join_url ? (
             <Popover
               arrowPointAtCenter
@@ -271,7 +271,8 @@ const CourseOrderDetails = ({ match, history }) => {
               size="small"
               className={styles.buyBtn}
               disabled={
-                !content?.join_url || isBeforeDate(moment(content.product_data?.start_time).subtract(15, 'minutes'))
+                !content?.join_url ||
+                isPresentOrFuture(moment(content.product_data?.start_time).subtract(15, 'minutes'))
               }
               onClick={() => window.open(content.join_url)}
             >
@@ -328,7 +329,7 @@ const CourseOrderDetails = ({ match, history }) => {
                     }}
                   />
                 </div>,
-                isBeforeDate(content.product_data?.end_time) ? (
+                isPresentOrFuture(content.product_data?.end_time) ? (
                   content?.product_data?.is_offline ? (
                     <Popover
                       arrowPointAtCenter
@@ -348,7 +349,7 @@ const CourseOrderDetails = ({ match, history }) => {
                       className={styles.buyBtn}
                       disabled={
                         !content?.join_url ||
-                        isBeforeDate(moment(content.product_data?.start_time).subtract(15, 'minutes'))
+                        isPresentOrFuture(moment(content.product_data?.start_time).subtract(15, 'minutes'))
                       }
                       onClick={() => window.open(content?.join_url)}
                     >
