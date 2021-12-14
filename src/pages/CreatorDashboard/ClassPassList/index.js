@@ -34,7 +34,7 @@ const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 const {
   formatDate: { toDateAndTime },
-  timeCalculation: { isBeforeDate },
+  timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 
 const ClassPassList = () => {
@@ -61,7 +61,7 @@ const ClassPassList = () => {
       // (after it expires), we put checks here
       pass.buyers.forEach((buyer) => {
         if (!userIdMap.has(buyer.external_id)) {
-          let isActive = isBeforeDate(buyer.expiry_date);
+          let isActive = isPresentOrFuture(buyer.expiry_date);
           if (isActive) {
             const foundBuyer = activeRecipients.find((recipient) => recipient.external_id === buyer.external_id);
 
@@ -92,7 +92,7 @@ const ClassPassList = () => {
           // If the user in the map is expired user
           // We check if the current data is an active
           // if it is we update the data in the map
-          if (isBeforeDate(buyer.expiry_date)) {
+          if (isPresentOrFuture(buyer.expiry_date)) {
             userIdMap.set(buyer.external_id, {
               ...buyer,
               isActive: true,

@@ -23,33 +23,39 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
-import { couponTypes } from 'utils/constants';
+import { couponProductTypes, couponTypes } from 'utils/constants';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import { isAvailabilityCoupon } from 'utils/coupon';
 
 const { Text } = Typography;
 
 // Just add the products here as necessary
 const creatorProductInfo = [
   {
-    key: 'COURSE',
+    key: couponProductTypes.COURSE,
     name: 'Courses',
     apiMethod: apis.courses.getCreatorCourses,
   },
   {
-    key: 'SESSION',
+    key: couponProductTypes.SESSION,
     name: 'Sessions',
     apiMethod: apis.session.getSession,
   },
   {
-    key: 'PASS',
+    key: couponProductTypes.AVAILABILITY,
+    name: 'Availabilities (1-on-1 appointments)',
+    apiMethod: apis.availabilities.getAvailabilities,
+  },
+  {
+    key: couponProductTypes.PASS,
     name: 'Passes',
     apiMethod: apis.passes.getCreatorPasses,
   },
   {
-    key: 'VIDEO',
+    key: couponProductTypes.VIDEO,
     name: 'Videos',
     apiMethod: apis.videos.getCreatorVideos,
   },
@@ -72,6 +78,9 @@ const formInitialValues = {
 };
 
 // ! Coupons API will use external IDs, so for SESSION and PASS need to use external_id
+// NOTE: In the BE, there's actually no AVAILABILITY coupons (it's stored as SESSION Coupon)
+// So FE checks "products" key and check the contents inside, if there's a session with type = AVAILABILITY
+// then FE recognizes that it's AVAILABILITY Coupon
 const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   const [form] = Form.useForm();
 
@@ -86,13 +95,15 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   // For products that have different keys for names/id
   const getProductId = (productType, productData) => {
     switch (productType) {
-      case 'course':
+      case couponProductTypes.COURSE.toLowerCase():
         return productData['id'];
-      case 'session':
+      case couponProductTypes.SESSION.toLowerCase():
         return productData['session_external_id'];
-      case 'pass':
+      case couponProductTypes.AVAILABILITY.toLowerCase():
+        return productData['session_external_id'];
+      case couponProductTypes.PASS.toLowerCase():
         return productData['external_id'];
-      case 'video':
+      case couponProductTypes.VIDEO.toLowerCase():
         return productData['external_id'];
       default:
         break;
@@ -103,13 +114,15 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
 
   const getProductName = (productType, productData) => {
     switch (productType) {
-      case 'course':
+      case couponProductTypes.COURSE.toLowerCase():
         return productData['name'];
-      case 'session':
+      case couponProductTypes.SESSION.toLowerCase():
         return productData['name'];
-      case 'pass':
+      case couponProductTypes.AVAILABILITY.toLowerCase():
         return productData['name'];
-      case 'video':
+      case couponProductTypes.PASS.toLowerCase():
+        return productData['name'];
+      case couponProductTypes.VIDEO.toLowerCase():
         return productData['title'];
       default:
         break;
@@ -142,16 +155,20 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   useEffect(() => {
     if (visible) {
       if (editedCoupon) {
+        const targetProductType = isAvailabilityCoupon(editedCoupon)
+          ? couponProductTypes.AVAILABILITY.toLowerCase()
+          : editedCoupon.product_type?.toLowerCase() ?? null;
+
         form.setFieldsValue({
           discountCode: editedCoupon.code,
           couponType: editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value,
           couponValue: editedCoupon.value ?? 1,
-          selectedProductType: editedCoupon.product_type?.toLowerCase() ?? null,
+          selectedProductType: targetProductType,
           selectedProducts: editedCoupon.product_ids ?? [],
         });
 
         setSelectedCouponType(editedCoupon.coupon_type ?? formCouponTypes.ABSOLUTE.value);
-        setSelectedProductType(editedCoupon.product_type?.toLowerCase() ?? null);
+        setSelectedProductType(targetProductType);
         setSelectedProductIds(editedCoupon.product_ids);
       } else {
         form.resetFields();
@@ -199,11 +216,14 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
     setSubmitting(true);
 
     try {
+      const targetProductType = selectedProductType?.toUpperCase() ?? values.selectedProductType?.toUpperCase() ?? '';
+
       const payload = {
         code: values.discountCode,
         coupon_type: selectedCouponType ?? formCouponTypes.ABSOLUTE.value,
         value: values.couponValue ?? 1,
-        product_type: selectedProductType?.toUpperCase() ?? values.selectedProductType?.toUpperCase() ?? '',
+        product_type:
+          targetProductType === couponProductTypes.AVAILABILITY ? couponProductTypes.SESSION : targetProductType,
         product_ids: selectedProductIds ?? values.selectedProducts ?? [],
       };
 

@@ -84,7 +84,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
                 start_url: item.start_url,
               })),
               is_active: items[0].is_active,
-              is_course: items[0].is_course,
+              bundle_only: items[0].bundle_only,
               is_offline: items[0].is_offline,
               is_refundable: items[0].is_refundable,
               max_participants: items[0].max_participants,

@@ -16,6 +16,7 @@ import { fetchCreatorCurrency } from 'utils/payment';
 import { couponTypes } from 'utils/constants';
 
 import styles from './styles.module.scss';
+import { isAvailabilityCoupon } from 'utils/coupon';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -196,7 +197,7 @@ const Coupons = () => {
       align: 'center',
       width: '150px',
       render: (text, record) => {
-        const key = record.product_type.toLowerCase();
+        const key = isAvailabilityCoupon(record) ? 'availability' : record.product_type.toLowerCase();
         const productName = `${key.charAt(0).toUpperCase()}${key.slice(1)}`;
 
         return (
@@ -300,7 +301,7 @@ const Coupons = () => {
       </Row>
     );
 
-    const productKey = coupon.product_type.toLowerCase();
+    const productKey = isAvailabilityCoupon(coupon) ? 'availability' : coupon.product_type.toLowerCase();
     const productName = `${productKey.charAt(0).toUpperCase()}${productKey.slice(1)}`;
     const productListBtn = (
       <Popover

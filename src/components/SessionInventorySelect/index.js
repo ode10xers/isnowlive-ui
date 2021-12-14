@@ -14,7 +14,7 @@ const { Title, Text } = Typography;
 
 const {
   formatDate: { toLongDate, toLocaleDate, toLocaleTime },
-  timeCalculation: { isSameOrBeforeToday, isBeforeDate },
+  timeCalculation: { isSameOrBeforeToday, isPresentOrFuture },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
@@ -24,7 +24,8 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
 
   const filterSessionByDate = useCallback(
     (date) =>
-      inventories?.filter((i) => toLocaleDate(i.start_time) === toLocaleDate(date) && isBeforeDate(i.end_time)) || [],
+      inventories?.filter((i) => toLocaleDate(i.start_time) === toLocaleDate(date) && isPresentOrFuture(i.end_time)) ||
+      [],
     [inventories]
   );
 
@@ -53,9 +54,10 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
   useEffect(() => {
     if (selectedSlot) {
       handleOnSelect(moment(selectedSlot.start_time));
-    } else {
-      handleOnSelect(moment());
     }
+    // else {
+    //   handleOnSelect(moment());
+    // }
   }, [handleOnSelect, selectedSlot]);
 
   const dateCellRender = (date) => {

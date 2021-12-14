@@ -14,7 +14,7 @@ export interface UpcomingSessionInventory {
   inventory_external_id: UUID;
   inventory_id: number;
   is_active: boolean;
-  is_course: boolean;
+  bundle_only: boolean;
   is_offline: boolean;
   is_published: boolean;
   is_refundable: boolean;
@@ -52,7 +52,7 @@ export interface Session {
   group: boolean;
   inventory: SessionInventory[];
   is_active: boolean;
-  is_course: boolean;
+  bundle_only: boolean;
   is_offline: boolean;
   is_refundable: boolean;
   max_participants: number;

@@ -90,7 +90,7 @@ const { Text, Paragraph } = Typography;
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
-  timeCalculation: { dateIsBeforeDate, isBeforeDate },
+  timeCalculation: { dateIsBeforeDate, isPresentOrFuture },
 } = dateUtil;
 
 const CourseContentDetails = ({ productId, productType }) => {
@@ -146,7 +146,7 @@ const CourseContentDetails = ({ productId, productType }) => {
   }, [fetchInventoryDetails, fetchVideoDetails, productId, productType]);
 
   const renderSessionDetails = (session) =>
-    isBeforeDate(session.end_time) ? (
+    isPresentOrFuture(session.end_time) ? (
       <Space direction="horizontal" align="middle">
         <Text> {toLongDateWithDay(session.start_time)} </Text>
         <Text>

@@ -185,8 +185,10 @@ export default {
   courses: {
     deleteCourse: (courseId) => http.delete(`/secure/creator/courses/${courseId}`),
     getCoursesByUsername: () => http.get(`/courses`),
+    // TODO: This is currently unused since courses now contains inventories instead of sessions
     getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
-    getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
+    getCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}`),
+    getCoursesByInventoryId: (inventoryId) => http.get(`/courses?inventory_id=${inventoryId}`),
     getDetailsByInternalId: (courseInternalId) => http.get(`/courses/internal/${courseInternalId}`),
     getDetailsByExternalId: (courseExternalId) => http.get(`/courses/external/${courseExternalId}`),
     getCreatorCourses: () => http.get('/secure/creator/courses'),

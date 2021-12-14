@@ -42,7 +42,7 @@ const { Item } = Form;
 const {
   formatDate: { toShortDate, toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
-  timeCalculation: { isBeforeDate },
+  timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 
 const formInitialValues = {
@@ -215,7 +215,7 @@ const SessionRegistration = ({
         }
       } else {
         const latestInventories = classDetails.inventory
-          .filter((inventory) => isBeforeDate(inventory.end_time))
+          .filter((inventory) => isPresentOrFuture(inventory.end_time))
           .filter((inventory) => inventory.num_participants < classDetails.max_participants)
           .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
         setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
@@ -1208,7 +1208,7 @@ const SessionRegistration = ({
       return;
     }
 
-    if (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass) {
+    if (classDetails?.type === 'AVAILABILITY' && classDetails?.bundle_only && !selectedPass) {
       showErrorModal(
         'Please select a pass',
         <>
@@ -1354,7 +1354,7 @@ const SessionRegistration = ({
                         // Render help text that this session will be booked using user's subscription
                         <Row>
                           <Paragraph className={styles.bookingHelpText}>
-                            Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                            Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                             {classDetails.type === 'NORMAL' ? 'class' : 'time slot'} for{' '}
                             <Text delete>
                               {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
@@ -1386,7 +1386,7 @@ const SessionRegistration = ({
                           {selectedInventory && selectedPass && (
                             <Row>
                               <Paragraph className={styles.bookingHelpText}>
-                                Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                                Booki {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                                 {classDetails.type === 'NORMAL' ? 'class' : 'time slot'} for{' '}
                                 <Text delete>
                                   {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
@@ -1404,7 +1404,7 @@ const SessionRegistration = ({
                         <>
                           {availablePasses.length > 0 ? (
                             <>
-                              {classDetails?.type === 'AVAILABILITY' && classDetails?.is_course ? null : (
+                              {classDetails?.type === 'AVAILABILITY' && classDetails?.bundle_only ? null : (
                                 <div>
                                   <Title level={5}>
                                     Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
@@ -1443,7 +1443,7 @@ const SessionRegistration = ({
                                 )}
                               </div>
                             </>
-                          ) : classDetails?.type === 'AVAILABILITY' && classDetails?.is_course ? (
+                          ) : classDetails?.type === 'AVAILABILITY' && classDetails?.bundle_only ? (
                             <Item {...sessionRegistrationTailLayout}>
                               <Title level={5} className={styles.bookingHelpText}>
                                 You can only book this availability using a pass because it's a bundled availability.
@@ -1463,8 +1463,9 @@ const SessionRegistration = ({
                       )}
 
                       {classDetails?.type === 'AVAILABILITY' &&
-                      classDetails?.is_course &&
-                      ((user && userPasses.length <= 0) || (!user && availablePasses.length <= 0)) ? null : (
+                      classDetails?.bundle_only &&
+                      userPasses.length <= 0 &&
+                      availablePasses.length <= 0 ? null : (
                         <div className={styles.mt10}>
                           <Item {...sessionRegistrationTailLayout}>
                             <Row gutter={[8, 8]}>
@@ -1477,7 +1478,9 @@ const SessionRegistration = ({
                                   htmlType="submit"
                                   disabled={
                                     !selectedInventory ||
-                                    (classDetails?.type === 'AVAILABILITY' && classDetails?.is_course && !selectedPass)
+                                    (classDetails?.type === 'AVAILABILITY' &&
+                                      classDetails?.bundle_only &&
+                                      !selectedPass)
                                   }
                                 >
                                   {user &&
@@ -1500,7 +1503,7 @@ const SessionRegistration = ({
                                     disabled={
                                       !selectedInventory ||
                                       (classDetails?.type === 'AVAILABILITY' &&
-                                        classDetails?.is_course &&
+                                        classDetails?.bundle_only &&
                                         !selectedPass)
                                     }
                                   >
