@@ -29,7 +29,7 @@ import styles from './styles.module.scss';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLocaleDate, toLongDateWithLongDay },
-  timeCalculation: { isBeforeLimitHours, isBeforeDate },
+  timeCalculation: { isBeforeLimitHours, isPresentOrFuture },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { useBreakpoint } = Grid;
@@ -78,7 +78,7 @@ const SessionsInventories = ({ match }) => {
           refund_amount: i?.refund_amount || 0,
           is_refundable: i?.is_refundable || false,
           refund_before_hours: i?.refund_before_hours || 24,
-          is_course: i?.is_course,
+          bundle_only: i?.bundle_only,
           color_code: i?.color_code || whiteColor,
           is_offline: i?.is_offline,
           offline_event_address: i?.offline_event_address,
@@ -309,7 +309,7 @@ const SessionsInventories = ({ match }) => {
             children: (
               <>
                 <Text className={styles.sessionNameWrapper}>{record.name}</Text>{' '}
-                {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+                {record.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </>
             ),
           };
@@ -400,11 +400,13 @@ const SessionsInventories = ({ match }) => {
                       size="small"
                       block
                       className={
-                        !record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))
+                        !record.join_url || isPresentOrFuture(moment(record.start_time).subtract(15, 'minutes'))
                           ? styles.disabledSuccess
                           : styles.success
                       }
-                      disabled={!record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))}
+                      disabled={
+                        !record.join_url || isPresentOrFuture(moment(record.start_time).subtract(15, 'minutes'))
+                      }
                       onClick={() => trackAndJoinSession(record)}
                     >
                       Join
@@ -471,7 +473,7 @@ const SessionsInventories = ({ match }) => {
           <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
             {'  '}
-            {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
         actions={
@@ -500,11 +502,11 @@ const SessionsInventories = ({ match }) => {
                     size="small"
                     block
                     className={
-                      !item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))
+                      !item.join_url || isPresentOrFuture(moment(item.start_time).subtract(15, 'minutes'))
                         ? styles.disabledSuccess
                         : styles.success
                     }
-                    disabled={!item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))}
+                    disabled={!item.join_url || isPresentOrFuture(moment(item.start_time).subtract(15, 'minutes'))}
                     onClick={() => trackAndJoinSession(item)}
                   >
                     Join

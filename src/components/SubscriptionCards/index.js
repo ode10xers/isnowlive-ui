@@ -39,7 +39,7 @@ const SubscriptionCards = ({
           renderItem={(item) => (
             <List.Item>
               {' '}
-              {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {item[productNameKey]}{' '}
+              {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null} {item[productNameKey]}{' '}
             </List.Item>
           )}
         />

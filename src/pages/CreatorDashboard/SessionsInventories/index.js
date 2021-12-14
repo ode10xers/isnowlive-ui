@@ -117,7 +117,7 @@ const SessionsInventories = ({ match }) => {
             max_participants: i.max_participants,
             color_code: i.color_code,
             is_published: i.is_published,
-            is_course: i.is_course,
+            bundle_only: i.bundle_only,
             external_id: i.inventory_external_id,
             inventory_external_id: i.inventory_external_id,
             is_offline: i.is_offline,
@@ -287,7 +287,7 @@ const SessionsInventories = ({ match }) => {
               <>
                 <Text className={styles.sessionNameWrapper}>{record.name}</Text>{' '}
                 {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}{' '}
-                {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+                {record.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </>
             ),
           };
@@ -550,7 +550,7 @@ const SessionsInventories = ({ match }) => {
             onClick={() => openSessionInventoryDetails(item)}
           >
             {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>{' '}
-            {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
       >

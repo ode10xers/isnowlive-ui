@@ -37,7 +37,7 @@ const SessionInfo = ({ session }) => {
         </Text>
         <Text className={styles.subText}>{session?.group ? 'Group' : '1-on-1'}</Text>
       </Col>
-      {!session?.is_course && (
+      {!session?.bundle_only && (
         <Col xs={12} lg={8}>
           <Text className={styles.text} type="secondary">
             Price
@@ -46,7 +46,7 @@ const SessionInfo = ({ session }) => {
         </Col>
       )}
       {documentUrls.length > 0 && (
-        <Col xs={24} lg={session?.is_course ? 16 : 8}>
+        <Col xs={24} lg={session?.bundle_only ? 16 : 8}>
           <Text className={styles.text} type="secondary">
             {!!lg && 'Session '}Pre-read file(s)
           </Text>

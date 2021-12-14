@@ -15,6 +15,14 @@ export const couponTypes = {
   PERCENTAGE: 'PERCENTAGE',
 };
 
+export const couponProductTypes = {
+  SESSION: 'SESSION',
+  PASS: 'PASS',
+  VIDEO: 'VIDEO',
+  COURSE: 'COURSE',
+  AVAILABILITY: 'AVAILABILITY', // Only used locally
+};
+
 export const socialMediaIcons = {
   website: WebsiteLogo,
   facebook_link: FacebookLogo,
