@@ -1,7 +1,6 @@
-import React, { useEffect, lazy, Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
-import { setFreshChatWidgetVisibility } from 'services/integrations/fresh-chat';
 
 const MobileLayout = lazy(() => import('layouts/MobileLayout'));
 
@@ -35,14 +34,6 @@ const Affiliates = lazy(() => import('pages/CreatorDashboard/Affiliates'));
 const DynamicProfile = lazy(() => import('pages/DynamicProfile'));
 
 const CreatorDashboard = ({ match }) => {
-  useEffect(() => {
-    setFreshChatWidgetVisibility(true);
-
-    return () => {
-      setFreshChatWidgetVisibility(false);
-    };
-  }, []);
-
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Switch>
