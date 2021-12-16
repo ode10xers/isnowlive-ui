@@ -13,6 +13,7 @@ import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
+import { includedProductsList } from 'components/CreateSubscriptionCard';
 
 const { Text } = Typography;
 const defaultBorderColor = '#eeeeee';
@@ -38,8 +39,7 @@ const SubscriptionCards = ({
           dataSource={productList}
           renderItem={(item) => (
             <List.Item>
-              {' '}
-              {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null} {item[productNameKey]}{' '}
+              {item.bundle_only ? <BookTwoTone twoToneColor="#1890ff" /> : null} {item[productNameKey]}
             </List.Item>
           )}
         />
@@ -51,11 +51,6 @@ const SubscriptionCards = ({
     </Popover>
   );
 
-  const getBaseCreditsCount = () => {
-    // return (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
-    return subscription?.product_credits;
-  };
-
   const cardData = [
     {
       label: subscription.price > 0 ? `${subscription.currency?.toUpperCase()} ${subscription.price}` : 'Free',
@@ -66,21 +61,27 @@ const SubscriptionCards = ({
       className: undefined,
     },
     {
-      label: `${getBaseCreditsCount()} credits/period`,
-      className: undefined,
-    },
-    {
       label: generateSubscriptionDuration(subscription, true),
       className: undefined,
     },
     {
       label: (
-        <Row gutter={8}>
-          <Col xs={12}>{renderTickOrCross(subscription.products['SESSION'])} Session</Col>
-          <Col xs={12}>{renderTickOrCross(subscription.products['VIDEO'])} Videos</Col>
+        <Row gutter={6}>
+          {includedProductsList.map((prod) => (
+            <Col xs={8}>
+              {renderTickOrCross(subscription.products[prod.value])} {prod.label}
+            </Col>
+          ))}
         </Row>
       ),
       className: undefined,
+    },
+    {
+      label:
+        subscription.products['VIDEO'] || subscription.products['SESSION']
+          ? `${subscription.product_credits} credits/period`
+          : 'None',
+      className: subscription.products['VIDEO'] || subscription.products['SESSION'] ? undefined : styles.disabled,
     },
     {
       label: subscription.products['SESSION']
@@ -95,15 +96,7 @@ const SubscriptionCards = ({
       className: subscription.products['VIDEO'] ? styles.buttonContainer : styles.disabled,
     },
     {
-      label: (
-        <Row gutter={8} justify="center">
-          <Col xs={4}>{renderTickOrCross(subscription.products['COURSE'])}</Col>
-        </Row>
-      ),
-      className: subscription.products['COURSE'] ? undefined : styles.disabled,
-    },
-    {
-      label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/period` : 'None',
+      label: subscription.products['COURSE'] ? `${subscription.course_credits} credits/period` : 'None',
       className: subscription.products['COURSE'] ? undefined : styles.disabled,
     },
     {
