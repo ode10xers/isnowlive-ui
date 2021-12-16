@@ -4,7 +4,7 @@ export const generateBaseCreditsText = (subscription, isCourse = false) => {
 
   if (isCourse) {
     calculatedBaseCredits = subscription?.course_credits || 0;
-    productText = 'Course';
+    productText = 'Courses';
   } else {
     calculatedBaseCredits = subscription?.product_credits;
 

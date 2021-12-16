@@ -89,10 +89,8 @@ const SelectableSubscriptionItem = ({
         </Col>
         <Col xs={24} className={styles.subscriptionDetailsContainer}>
           <Paragraph className={styles.subscriptionDetails}>
-            {subscriptionContentText.join(' and ').replaceAll('/period', '')}
-          </Paragraph>
-          <Paragraph className={styles.subscriptionDetails}>
-            every {generateSubscriptionDuration(subscription, true)}
+            {subscriptionContentText.join(' and ').replaceAll('/period', '')} every{' '}
+            {generateSubscriptionDuration(subscription, true)}
           </Paragraph>
         </Col>
         {showExtra && (

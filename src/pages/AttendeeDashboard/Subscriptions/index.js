@@ -255,12 +255,11 @@ const Subscriptions = () => {
     let totalCredits = 0;
 
     if (isCourse) {
-      // TODO: Once we support course in subs, rework this based on new implementation
-      remainingCredits = subscription?.products['COURSE']?.credits - subscription?.products['COURSE']?.credits_used;
-      totalCredits = subscription?.products['COURSE']?.credits;
+      totalCredits = subscription?.course_credits ?? 0;
+      remainingCredits = totalCredits - (subscription?.course_credits_used ?? 0);
     } else {
-      totalCredits = subscription?.product_credits;
-      remainingCredits = totalCredits - subscription?.product_credits_used;
+      totalCredits = subscription?.product_credits ?? 0;
+      remainingCredits = totalCredits - (subscription?.product_credits_used ?? 0);
     }
 
     return (
@@ -284,7 +283,7 @@ const Subscriptions = () => {
   const renderRemainingCreditsForSubscription = (subscriptionOrder) => (
     <Space size="small" direction="vertical" align="left">
       {generateRemainingCreditsText(subscriptionOrder, false)}
-      {subscriptionOrder.products['COURSE'] && generateRemainingCreditsText(subscriptionOrder, true)}
+      {subscriptionOrder.product_details['COURSE'] && generateRemainingCreditsText(subscriptionOrder, true)}
     </Space>
   );
 
@@ -419,8 +418,6 @@ const Subscriptions = () => {
   };
 
   const renderSubscriptionDetails = (subscription, isActive) => {
-    const subscriptionDetails = subscription;
-
     return (
       <div>
         <Row gutter={[8, 24]}>
@@ -434,17 +431,21 @@ const Subscriptions = () => {
 
           <Col xs={24} className={!lg ? undefined : styles.subSection}>
             <Space align="left">
-              {(subscriptionDetails.products['SESSION'] || subscriptionDetails.products['VIDEO']) && (
+              {(subscription.product_details['SESSION'] || subscription.product_details['VIDEO']) && (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
-                    <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, false)}</div>
+                    <div className={styles.baseCreditsText}>
+                      {generateBaseCreditsText({ ...subscription, products: subscription.product_details }, false)}
+                    </div>
                   </Col>
                 </Row>
               )}
-              {subscriptionDetails.products['COURSE'] && (
+              {subscription.product_details['COURSE'] && (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
-                    <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, true)}</div>
+                    <div className={styles.baseCreditsText}>
+                      {generateBaseCreditsText({ ...subscription, products: subscription.product_details }, true)}
+                    </div>
                   </Col>
                 </Row>
               )}
@@ -458,13 +459,12 @@ const Subscriptions = () => {
               </Col>
               <Col xs={24} className={!lg ? undefined : styles.subSection}>
                 <Space direction="horizontal">
-                  {Object.entries(subscription?.products).map(([key, val]) => (
+                  {Object.entries(subscription?.product_details).map(([key, val]) => (
                     <Button
                       onClick={() => showProductsDetails(subscription, key)}
                       key={`${subscription?.external_id}_${key}`}
                     >
-                      {' '}
-                      {val.product_ids?.length ?? 0} {key.toLowerCase()}s{' '}
+                      {val.product_ids?.length ?? 0} {key.toLowerCase()}s
                     </Button>
                   ))}
                 </Space>
