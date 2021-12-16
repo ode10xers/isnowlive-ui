@@ -23,10 +23,15 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
 import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
-import { showErrorModal, showAlreadyBookedModal, showPurchaseSingleCourseSuccessModal } from 'components/Modals/modals';
+import {
+  showErrorModal,
+  showAlreadyBookedModal,
+  showPurchaseSingleCourseSuccessModal,
+  showGetCourseWithSubscriptionSuccessModal,
+} from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { saveGiftOrderData } from 'utils/storage';
+import { getLocalUserDetails, saveGiftOrderData } from 'utils/storage';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
 import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
 import { orderType, productType, videoSourceType, paymentSource } from 'utils/constants';
@@ -37,6 +42,7 @@ import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseV
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { fetchUsableSubscriptionForCourse } from 'utils/subscriptions';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
@@ -48,7 +54,12 @@ const {
 const CourseDetails = ({ match }) => {
   const courseId = match.params.course_id;
 
-  const { showPaymentPopup, showWaitlistPopup, showGiftMessageModal } = useGlobalContext();
+  const {
+    state: { userDetails },
+    showPaymentPopup,
+    showWaitlistPopup,
+    showGiftMessageModal,
+  } = useGlobalContext();
 
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +75,9 @@ const CourseDetails = ({ match }) => {
   const [purchaseAsGift, setPurchaseAsGift] = useState(false);
 
   const [isGiftEnabled, setIsGiftEnabled] = useState(true);
+
+  const [shouldFollowUpGetCourse, setShouldFollowUpGetCourse] = useState(false);
+  const [usableSubscription, setUsableSubscription] = useState(null);
 
   const getCreatorProfileDetails = useCallback(async (creatorUsername) => {
     try {
@@ -175,11 +189,38 @@ const CourseDetails = ({ match }) => {
     [fetchCourseContentDetails, getCreatorProfileDetails]
   );
 
+  const getUsableSubscriptionForUser = useCallback(async (courseId) => {
+    setIsLoading(true);
+    try {
+      const usableSubs = await fetchUsableSubscriptionForCourse({ id: courseId });
+      setUsableSubscription(usableSubs);
+    } catch (error) {
+      console.error(error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     if (courseId) {
       getCourseDetails(courseId);
     }
   }, [getCourseDetails, courseId]);
+
+  useEffect(() => {
+    if (course && userDetails) {
+      getUsableSubscriptionForUser(course.id);
+    } else {
+      setUsableSubscription(null);
+    }
+  }, [userDetails, course, getUsableSubscriptionForUser]);
+
+  useEffect(() => {
+    if (shouldFollowUpGetCourse) {
+      showConfirmPaymentPopup(purchaseAsGift);
+    }
+    // eslint-disable-next-line
+  }, [shouldFollowUpGetCourse, purchaseAsGift]);
 
   useEffect(() => {
     let profileColorObject = null;
@@ -226,6 +267,20 @@ const CourseDetails = ({ match }) => {
       return;
     }
 
+    let userPurchasedSubs = usableSubscription;
+
+    if (!shouldFollowUpGetCourse) {
+      if (getLocalUserDetails() && !usableSubscription) {
+        console.log(course);
+        await getUsableSubscriptionForUser(course.id);
+
+        setShouldFollowUpGetCourse(true);
+        return;
+      }
+    } else {
+      setShouldFollowUpGetCourse(false);
+    }
+
     let desc = [];
 
     // const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
@@ -244,22 +299,88 @@ const CourseDetails = ({ match }) => {
     //   desc.push(`${docContentCount} Files`);
     // }
 
-    let paymentPopupData = {
-      isGiftPurchase: purchaseAsGift,
-      productId: course.id,
-      productType: productType.COURSE,
-      itemList: [
-        {
-          name: course.name,
-          description: desc.join(', '),
-          currency: course.currency,
-          price: course.total_price,
+    if (userPurchasedSubs && !purchaseAsGift) {
+      const paymentPopupData = {
+        productId: course.id,
+        productType: productType.COURSE,
+        itemList: [
+          {
+            name: course.name,
+            description: desc.join(', '),
+            currency: course.currency,
+            price: course.total_price,
+          },
+        ],
+        paymentInstrumentDetails: {
+          type: paymentSource.SUBSCRIPTION,
+          ...userPurchasedSubs,
         },
-      ],
-    };
+      };
 
-    showPaymentPopup(paymentPopupData, (couponCode) => buySingleCourse(couponCode, purchaseAsGift));
+      showPaymentPopup(paymentPopupData, async () => await buyCourseUsingSubscription());
+    } else {
+      // Buy Course One-off
+
+      const paymentPopupData = {
+        isGiftPurchase: purchaseAsGift,
+        productId: course.id,
+        productType: productType.COURSE,
+        itemList: [
+          {
+            name: course.name,
+            description: desc.join(', '),
+            currency: course.currency,
+            price: course.total_price,
+          },
+        ],
+      };
+
+      showPaymentPopup(paymentPopupData, (couponCode) => buySingleCourse(couponCode, purchaseAsGift));
+    }
+
     setPurchaseAsGift(false);
+  };
+
+  const buyCourseUsingSubscription = async () => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        course_id: course.id,
+        price: course.total_price,
+        currency: course.currency,
+        timezone_location: getTimezoneLocation(),
+        payment_source: paymentSource.SUBSCRIPTION,
+        source_id: usableSubscription.subscription_order_id,
+      };
+
+      const { status, data } = await apis.courses.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        showGetCourseWithSubscriptionSuccessModal();
+        setIsLoading(false);
+
+        return {
+          ...data,
+          is_successful_order: false,
+        };
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error(error);
+      if (
+        error?.response?.status === 500 &&
+        error?.response?.data?.message === 'user already has a confirmed order for this course'
+      ) {
+        showAlreadyBookedModal(productType.COURSE);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      }
+    }
+
+    return {
+      is_successful_order: false,
+    };
   };
 
   const buySingleCourse = async (couponCode = '', isGift = false) => {
@@ -607,6 +728,8 @@ const CourseDetails = ({ match }) => {
             // NOTE : Empty here means that there is no modules at all
             // There can be a case where the modules are all outlines
             `Cannot purchase an empty course`
+          ) : usableSubscription ? (
+            `Get using purchased ${usableSubscription.subscription_name} membership`
           ) : (
             <>
               {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}

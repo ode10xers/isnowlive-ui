@@ -495,9 +495,12 @@ const PaymentPopup = () => {
     } else if (paymentInstrumentDetails.type === paymentSource.SUBSCRIPTION) {
       const subscriptionDetails = paymentInstrumentDetails;
 
-      textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${
-        subscriptionDetails.product_credits - subscriptionDetails.product_credits_used
-      } credits left`;
+      const remainingCredits =
+        productType === productTypeConstants.COURSE
+          ? subscriptionDetails.course_credits - subscriptionDetails.course_credits_used
+          : subscriptionDetails.product_credits - subscriptionDetails.product_credits_used;
+
+      textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${remainingCredits} credits left`;
     }
 
     return (

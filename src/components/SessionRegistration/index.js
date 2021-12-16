@@ -34,6 +34,7 @@ import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'la
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { fetchUsableSubscriptionForSession } from 'utils/subscriptions';
 
 const { Title, Text, Paragraph } = Typography;
 const { useBreakpoint } = Grid;
@@ -132,32 +133,8 @@ const SessionRegistration = ({
     setIsLoading(true);
 
     try {
-      const loggedInUserData = getLocalUserDetails();
-      if (loggedInUserData && classDetails) {
-        const { status, data } = await apis.subscriptions.getUserSubscriptionForSession(
-          classDetails.session_external_id
-        );
-
-        if (isAPISuccess(status) && data) {
-          if (data.active.length > 0) {
-            // Choose a purchased subscription based on these conditions
-            // 1. Should be usable for Session
-            // 2. Still have credits to purchase sessions
-            // 3. This session can be purchased by this subscription
-            const usableSubscription =
-              data.active.find(
-                (subscription) =>
-                  subscription.product_credits > subscription.product_credits_used &&
-                  subscription.products['SESSION'] &&
-                  subscription.products['SESSION']?.product_ids?.includes(classDetails.session_external_id)
-              ) || null;
-
-            setUsableUserSubscription(usableSubscription);
-          } else {
-            setUsableUserSubscription(null);
-          }
-        }
-      }
+      const usablePurchasedSubs = await fetchUsableSubscriptionForSession(classDetails);
+      setUsableUserSubscription(usablePurchasedSubs);
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed fetching usable subscription for user');
     }
