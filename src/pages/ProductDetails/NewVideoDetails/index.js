@@ -35,7 +35,7 @@ import dateUtil from 'utils/date';
 import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails, saveGiftOrderData } from 'utils/storage';
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
-import { generateBaseCreditsText, fetchUsableSubscriptionForVideo } from 'utils/subscriptions';
+import { generateBaseCreditsText, fetchUsableSubscriptionForVideo, isUnlimitedMembership } from 'utils/subscriptions';
 import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
 import { isAPISuccess, preventDefaults, isUnapprovedUserError } from 'utils/helper';
 import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
@@ -1023,8 +1023,14 @@ const NewVideoDetails = ({ match }) => {
                     {usableSubscription?.subscription_name ?? ''}
                   </Text>
                   <Text className={styles.usablePaymentInstrumentText}>
-                    {usableSubscription.product_credits - usableSubscription.product_credits_used}/
-                    {usableSubscription.product_credits} credits left.
+                    {isUnlimitedMembership(usableSubscription, false) ? (
+                      'Unlimited credits'
+                    ) : (
+                      <>
+                        {usableSubscription.product_credits - usableSubscription.product_credits_used}/
+                        {usableSubscription.product_credits} credits left.
+                      </>
+                    )}
                   </Text>
                 </Space>
               </Col>

@@ -33,9 +33,10 @@ import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 import { generateRandomColor } from 'utils/colors';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { defaultPlatformFeePercentage } from 'utils/constants';
+import { defaultPlatformFeePercentage, UNLIMITED_SUBSCRIPTION_CREDIT_COUNT } from 'utils/constants';
 
 import styles from './styles.module.scss';
+import { isUnlimitedMembership } from 'utils/subscriptions';
 
 const initialColor = generateRandomColor();
 
@@ -100,6 +101,8 @@ const CreateSubscriptionCard = ({
   const [colorCode, setColorCode] = useState(initialColor);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [selectedMemberTag, setSelectedMemberTag] = useState(null);
+
+  const [isUnlimited, setIsUnlimited] = useState(false);
 
   const getCreatorProducts = useCallback(async () => {
     try {
@@ -191,6 +194,13 @@ const CreateSubscriptionCard = ({
 
       form.setFieldsValue(formData);
 
+      setIsUnlimited(
+        isUnlimitedMembership(
+          editedSubscription,
+          !(editedSubscription?.products['VIDEO'] || editedSubscription?.products['SESSION'])
+        )
+      );
+
       setCurrency(editedSubscription?.currency || 'SGD');
       setSelectedTagType(formData.subscriptionTagType);
       setSelectedMemberTag(formData.selectedMemberTag);
@@ -203,6 +213,7 @@ const CreateSubscriptionCard = ({
       setSelectedCourses(formData.includedCourses);
     } else {
       form.resetFields();
+      setIsUnlimited(false);
       setIsSessionIncluded(false);
       setIsVideoIncluded(false);
       setIsCourseIncluded(false);
@@ -356,9 +367,15 @@ const CreateSubscriptionCard = ({
         color_code: values.colorCode || colorCode || defaultBorderColor,
         product_credits:
           values.includedProducts.includes('SESSION') || values.includedProducts.includes('VIDEO')
-            ? values.subscriptionCredits ?? 0
+            ? isUnlimited
+              ? UNLIMITED_SUBSCRIPTION_CREDIT_COUNT
+              : values.subscriptionCredits ?? 0
             : 0,
-        course_credits: values.includedProducts.includes('COURSE') ? values.courseCredits ?? 0 : 0,
+        course_credits: values.includedProducts.includes('COURSE')
+          ? isUnlimited
+            ? UNLIMITED_SUBSCRIPTION_CREDIT_COUNT
+            : values.courseCredits ?? 0
+          : 0,
         products: productsData,
       };
 
@@ -379,6 +396,16 @@ const CreateSubscriptionCard = ({
 
     setIsSubmitting(false);
   };
+
+  const unlimitedCheckbox = (
+    <Checkbox
+      className={styles.unlimitedCheckbox}
+      checked={isUnlimited}
+      onChange={(e) => setIsUnlimited(e.target.checked)}
+    >
+      Unlimited?
+    </Checkbox>
+  );
 
   return (
     <Form
@@ -530,8 +557,8 @@ const CreateSubscriptionCard = ({
                   styles.compactFormItem
                 )}
               >
-                <Row gutter={4}>
-                  <Col xs={10}>
+                <Row gutter={4} align="middle">
+                  <Col xs={6}>
                     <Form.Item
                       id="subscriptionCredits"
                       name="subscriptionCredits"
@@ -543,16 +570,17 @@ const CreateSubscriptionCard = ({
                       noStyle
                     >
                       <InputNumber
-                        disabled={!isVideoIncluded && !isSessionIncluded}
+                        disabled={(!isVideoIncluded && !isSessionIncluded) || isUnlimited}
                         min={!isVideoIncluded && !isSessionIncluded ? 0 : 1}
                         placeholder="Enter Session/Video credits"
                         className={styles.numericInput}
                       />
                     </Form.Item>
                   </Col>
-                  <Col xs={14} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
+                  <Col xs={9} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
                     <Text strong>credits/period</Text>
                   </Col>
+                  <Col xs={9}>{unlimitedCheckbox}</Col>
                 </Row>
               </Form.Item>
             </List.Item>
@@ -790,8 +818,8 @@ const CreateSubscriptionCard = ({
               </Form.Item>
             </List.Item>
             <List.Item>
-              <Row gutter={4}>
-                <Col xs={10}>
+              <Row gutter={4} align="middle">
+                <Col xs={6}>
                   <Form.Item
                     className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
                     id="courseCredits"
@@ -801,16 +829,17 @@ const CreateSubscriptionCard = ({
                     }
                   >
                     <InputNumber
-                      disabled={!isCourseIncluded}
+                      disabled={!isCourseIncluded || isUnlimited}
                       min={!isCourseIncluded ? 0 : 1}
                       placeholder="Course credits/period"
                       className={styles.numericInput}
                     />
                   </Form.Item>
                 </Col>
-                <Col xs={14} className={classNames(styles.helpTextWrapper, styles.textAlignCenter)}>
+                <Col xs={9} className={classNames(styles.helpTextWrapper, styles.textAlignCenter)}>
                   <Text strong>courses/period</Text>
                 </Col>
+                <Col xs={9}>{unlimitedCheckbox}</Col>
               </Row>
             </List.Item>
             <List.Item>

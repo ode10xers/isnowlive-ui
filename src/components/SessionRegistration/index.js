@@ -129,14 +129,14 @@ const SessionRegistration = ({
     setIsLoading(false);
   };
 
-  const getUsableSubscriptionForUser = async () => {
+  const getUsableSubscriptionForUser = async (sessionInventory) => {
     setIsLoading(true);
 
     try {
-      const usablePurchasedSubs = await fetchUsableSubscriptionForSession(classDetails);
+      const usablePurchasedSubs = await fetchUsableSubscriptionForSession(sessionInventory);
       setUsableUserSubscription(usablePurchasedSubs);
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching usable subscription for user');
+      console.error(error);
     }
     setIsLoading(false);
   };
@@ -235,8 +235,8 @@ const SessionRegistration = ({
         setShouldSetDefaultPass(true);
       }
 
-      if (!usableUserSubscription) {
-        getUsableSubscriptionForUser();
+      if (!usableUserSubscription && classDetails) {
+        getUsableSubscriptionForUser(classDetails);
       }
     } else {
       form.resetFields();

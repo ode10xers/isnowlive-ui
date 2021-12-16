@@ -12,7 +12,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { orderType } from 'utils/constants';
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, isUnlimitedMembership } from 'utils/subscriptions';
 import { isAPISuccess, isUnapprovedUserError, preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
@@ -253,18 +253,24 @@ const Subscriptions = () => {
   const generateRemainingCreditsText = (subscription, isCourse = false) => {
     let remainingCredits = 0;
     let totalCredits = 0;
+    let isUnlimited = isUnlimitedMembership(subscription, isCourse);
+    let productText = '';
 
     if (isCourse) {
       totalCredits = subscription?.course_credits ?? 0;
       remainingCredits = totalCredits - (subscription?.course_credits_used ?? 0);
+      productText = 'Course';
     } else {
       totalCredits = subscription?.product_credits ?? 0;
       remainingCredits = totalCredits - (subscription?.product_credits_used ?? 0);
+      productText = 'Session or Video';
     }
 
-    return (
+    return isUnlimited ? (
+      <Text>Unlimited {productText}</Text>
+    ) : (
       <Text>
-        {remainingCredits}/{totalCredits} {isCourse ? 'Course' : 'Session or Video'} credits left
+        {remainingCredits}/{totalCredits} {productText} credits left
       </Text>
     );
   };

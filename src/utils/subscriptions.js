@@ -1,11 +1,26 @@
 import { message } from 'antd';
 import apis from 'apis';
+import { UNLIMITED_SUBSCRIPTION_CREDIT_COUNT } from './constants';
 import { isAPISuccess } from './helper';
 import { getLocalUserDetails } from './storage';
+
+export const isUnlimitedMembership = (subscription, isCourse = false) => {
+  if (!subscription) {
+    return false;
+  }
+
+  if (isCourse) {
+    return subscription?.course_credits === UNLIMITED_SUBSCRIPTION_CREDIT_COUNT ?? false;
+  } else {
+    return subscription?.product_credits === UNLIMITED_SUBSCRIPTION_CREDIT_COUNT ?? false;
+  }
+};
 
 export const generateBaseCreditsText = (subscription, isCourse = false) => {
   let calculatedBaseCredits = 0;
   let productText = '';
+
+  const isUnlimited = isUnlimitedMembership(subscription, isCourse);
 
   if (isCourse) {
     calculatedBaseCredits = subscription?.course_credits || 0;
@@ -26,7 +41,7 @@ export const generateBaseCreditsText = (subscription, isCourse = false) => {
     productText = availableProducts.join(' or ');
   }
 
-  return `${calculatedBaseCredits} ${productText} credits/period`;
+  return isUnlimited ? `Unlimited ${productText}` : `${calculatedBaseCredits} ${productText} credits/period`;
 };
 
 export const generateSubscriptionDuration = (subscription, showNum = false) => {

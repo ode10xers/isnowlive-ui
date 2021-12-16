@@ -38,6 +38,7 @@ import { useGlobalContext } from 'services/globalContext';
 import http from 'services/http';
 
 import styles from './styles.module.scss';
+import { isUnlimitedMembership } from 'utils/subscriptions';
 
 const { Text, Title } = Typography;
 const {
@@ -500,7 +501,11 @@ const PaymentPopup = () => {
           ? subscriptionDetails.course_credits - subscriptionDetails.course_credits_used
           : subscriptionDetails.product_credits - subscriptionDetails.product_credits_used;
 
-      textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${remainingCredits} credits left`;
+      const isUnlimited = isUnlimitedMembership(subscriptionDetails, productType === productTypeConstants.COURSE);
+
+      textContent = `Will use ${subscriptionDetails.subscription_name} to book this. ${
+        isUnlimited ? '' : `You currently have ${remainingCredits} credits left`
+      }`;
     }
 
     return (

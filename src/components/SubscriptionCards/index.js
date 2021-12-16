@@ -6,14 +6,14 @@ import { Row, Col, Typography, Button, Card, List, Popover } from 'antd';
 import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone, EditOutlined } from '@ant-design/icons';
 
 import TagListPopup from 'components/TagListPopup';
+import { includedProductsList } from 'components/CreateSubscriptionCard';
 
-import { generateSubscriptionDuration } from 'utils/subscriptions';
+import { generateSubscriptionDuration, isUnlimitedMembership } from 'utils/subscriptions';
 import { copyToClipboard, preventDefaults } from 'utils/helper';
 import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
-import { includedProductsList } from 'components/CreateSubscriptionCard';
 
 const { Text } = Typography;
 const defaultBorderColor = '#eeeeee';
@@ -79,7 +79,9 @@ const SubscriptionCards = ({
     {
       label:
         subscription.products['VIDEO'] || subscription.products['SESSION']
-          ? `${subscription.product_credits} credits/period`
+          ? isUnlimitedMembership(subscription, false)
+            ? 'Unlimited'
+            : `${subscription.product_credits} credits/period`
           : 'None',
       className: subscription.products['VIDEO'] || subscription.products['SESSION'] ? undefined : styles.disabled,
     },
@@ -96,7 +98,11 @@ const SubscriptionCards = ({
       className: subscription.products['VIDEO'] ? styles.buttonContainer : styles.disabled,
     },
     {
-      label: subscription.products['COURSE'] ? `${subscription.course_credits} credits/period` : 'None',
+      label: subscription.products['COURSE']
+        ? isUnlimitedMembership(subscription, true)
+          ? 'Unlimited'
+          : `${subscription.course_credits} credits/period`
+        : 'None',
       className: subscription.products['COURSE'] ? undefined : styles.disabled,
     },
     {
