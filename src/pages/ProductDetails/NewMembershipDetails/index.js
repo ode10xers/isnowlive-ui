@@ -29,6 +29,7 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
+// TODO: Adjust this page to also show courses purchasable with membership
 const NewMembershipDetails = ({ match }) => {
   const subscriptionId = match.params.membership_id;
 
@@ -161,7 +162,9 @@ const NewMembershipDetails = ({ match }) => {
 
     let itemDescription = [];
 
-    itemDescription.push(generateBaseCreditsText(selectedSubsDetails, false));
+    if (selectedSubsDetails.products['VIDEO'] || selectedSubsDetails.products['SESSION']) {
+      itemDescription.push(generateBaseCreditsText(selectedSubsDetails, false));
+    }
 
     if (selectedSubsDetails.products['COURSE']) {
       itemDescription.push(generateBaseCreditsText(selectedSubsDetails, true));
@@ -283,33 +286,45 @@ const NewMembershipDetails = ({ match }) => {
   const renderSubsPrice = (subsData) =>
     subsData?.total_price > 0 ? `${subsData?.currency?.toUpperCase() ?? ''} ${subsData?.total_price ?? 0}` : 'Free';
 
-  const renderBuyableMembershipItem = (subs) => (
-    <Col xs={24} key={subs.external_id}>
-      <div
-        onClick={() => handleSelectSubsItem(subs)}
-        className={classNames(
-          styles.buyableSubsItem,
-          subs?.external_id === selectedSubsDetails?.external_id ? styles.selected : undefined
-        )}
-      >
-        <Row gutter={[8, 8]}>
-          <Col xs={12} className={styles.subsCheckContainer}>
-            <Space align="baseline">
-              <CheckCircleFilled className={styles.checkIcon} />
-              <Text className={classNames(styles.subsItemName, subs?.name.length > 20 ? styles.longText : undefined)}>
-                {subs?.name}
+  const renderBuyableMembershipItem = (subs) => {
+    let subscriptionContentText = [];
+
+    if (subs?.products['COURSE']) {
+      subscriptionContentText.push(generateBaseCreditsText(subs, true));
+    }
+
+    if (subs?.products['VIDEO'] || subs?.products['SESSION']) {
+      subscriptionContentText.push(generateBaseCreditsText(subs, false));
+    }
+
+    return (
+      <Col xs={24} key={subs.external_id}>
+        <div
+          onClick={() => handleSelectSubsItem(subs)}
+          className={classNames(
+            styles.buyableSubsItem,
+            subs?.external_id === selectedSubsDetails?.external_id ? styles.selected : undefined
+          )}
+        >
+          <Row gutter={[8, 8]}>
+            <Col xs={12} className={styles.subsCheckContainer}>
+              <Space align="baseline">
+                <CheckCircleFilled className={styles.checkIcon} />
+                <Text className={classNames(styles.subsItemName, subs?.name.length > 20 ? styles.longText : undefined)}>
+                  {subs?.name}
+                </Text>
+              </Space>
+            </Col>
+            <Col xs={12} className={styles.textAlignRight}>
+              <Text className={styles.subsItemDesc}>
+                {subscriptionContentText.join(', ').replaceAll(' credits/period', '')}
               </Text>
-            </Space>
-          </Col>
-          <Col xs={12} className={styles.textAlignRight}>
-            <Text className={styles.subsItemDesc}>
-              {generateBaseCreditsText(subs, false).replace(' credits/period', '')}
-            </Text>
-          </Col>
-        </Row>
-      </div>
-    </Col>
-  );
+            </Col>
+          </Row>
+        </div>
+      </Col>
+    );
+  };
 
   //#endregion End of UI Methods
 
@@ -326,9 +341,16 @@ const NewMembershipDetails = ({ match }) => {
         <Col xs={24}>
           <Space align="center" split={<Text className={styles.dotSeparator}>●</Text>}>
             <Text className={styles.subsDetailItem}>{renderSubsPrice(selectedSubsDetails)}</Text>
-            <Text className={styles.subsDetailItem}>
-              {generateBaseCreditsText(selectedSubsDetails, false).replace(' credits/period', '')}
-            </Text>
+            {selectedSubsDetails?.products['VIDEO'] || selectedSubsDetails?.products['SESSION'] ? (
+              <Text className={styles.subsDetailItem}>
+                {generateBaseCreditsText(selectedSubsDetails, false).replace(' credits/period', '')}
+              </Text>
+            ) : null}
+            {selectedSubsDetails?.products['COURSE'] ? (
+              <Text className={styles.subsDetailItem}>
+                {generateBaseCreditsText(selectedSubsDetails, true).replace(' credits/period', '')}
+              </Text>
+            ) : null}
             <Text className={styles.subsDetailItem}>
               Renewed every {generateSubscriptionDuration(selectedSubsDetails, true)}
             </Text>

@@ -300,18 +300,18 @@ const Subscriptions = ({ history }) => {
       label: 'Included Videos',
       className: undefined,
     },
-    // {
-    //   label: 'Course Included?',
-    //   className: undefined,
-    // },
-    // {
-    //   label: 'Course Credits/period',
-    //   className: undefined,
-    // },
-    // {
-    //   label: 'Included Courses',
-    //   className: undefined,
-    // },
+    {
+      label: 'Course Included?',
+      className: undefined,
+    },
+    {
+      label: 'Course Credits/period',
+      className: undefined,
+    },
+    {
+      label: 'Included Courses',
+      className: undefined,
+    },
   ];
 
   const renderSubscriptionFields = (item) => (

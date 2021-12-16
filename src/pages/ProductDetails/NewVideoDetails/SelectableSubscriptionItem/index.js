@@ -57,6 +57,16 @@ const SelectableSubscriptionItem = ({
     '--primary-dark-color': formatHSLStyleString(h, s, l - 20),
   };
 
+  let subscriptionContentText = [];
+
+  if (subscription?.products['COURSE']) {
+    subscriptionContentText.push(generateBaseCreditsText(subscription, true));
+  }
+
+  if (subscription?.products['VIDEO'] || subscription?.products['SESSION']) {
+    subscriptionContentText.push(generateBaseCreditsText(subscription, false));
+  }
+
   return (
     <div className={styles.selectableSubscriptionItem} style={colorObj}>
       <Row gutter={[8, 8]}>
@@ -79,7 +89,7 @@ const SelectableSubscriptionItem = ({
         </Col>
         <Col xs={24} className={styles.subscriptionDetailsContainer}>
           <Paragraph className={styles.subscriptionDetails}>
-            {generateBaseCreditsText(subscription, false).replace('/period', '')}
+            {subscriptionContentText.join(' and ').replaceAll('/period', '')}
           </Paragraph>
           <Paragraph className={styles.subscriptionDetails}>
             every {generateSubscriptionDuration(subscription, true)}

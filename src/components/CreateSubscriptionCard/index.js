@@ -20,7 +20,7 @@ import {
   Modal,
   message,
 } from 'antd';
-import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
+import { BookTwoTone, InfoCircleOutlined, TagOutlined, VideoCameraOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -90,9 +90,9 @@ const CreateSubscriptionCard = ({
   const [videos, setVideos] = useState([]);
   const [isVideoIncluded, setIsVideoIncluded] = useState(false);
   const [selectedVideos, setSelectedVideos] = useState([]);
-  // const [courses, setCourses] = useState([]);
-  // const [isCourseIncluded, setIsCourseIncluded] = useState(false);
-  // const [selectedCourses, setSelectedCourses] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [isCourseIncluded, setIsCourseIncluded] = useState(false);
+  const [selectedCourses, setSelectedCourses] = useState([]);
   const [currency, setCurrency] = useState('');
   const [colorCode, setColorCode] = useState(initialColor);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
@@ -119,15 +119,15 @@ const CreateSubscriptionCard = ({
       message.error(error?.response?.data?.message || 'Failed to load videos');
     }
 
-    // try {
-    //   const { status, data } = await apis.courses.getCreatorCourses();
+    try {
+      const { status, data } = await apis.courses.getCreatorCourses();
 
-    //   if (isAPISuccess(status) && data) {
-    //     setCourses(data);
-    //   }
-    // } catch (error) {
-    //   message.error(error?.response?.data?.message || 'Failed to load courses');
-    // }
+      if (isAPISuccess(status) && data) {
+        setCourses(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load courses');
+    }
   }, []);
 
   const getCreatorCurrencyDetails = useCallback(async () => {
@@ -162,6 +162,7 @@ const CreateSubscriptionCard = ({
     getCreatorProducts();
 
     if (editedSubscription) {
+      // TODO: Adjust the form data format here
       const formData = {
         subscriptionName: editedSubscription?.name,
         price: editedSubscription?.price,
@@ -178,11 +179,11 @@ const CreateSubscriptionCard = ({
         includedVideos: editedSubscription?.products['VIDEO']
           ? editedSubscription?.products['VIDEO'].product_ids || []
           : [],
-        // shouldIncludeCourse: editedSubscription?.products['COURSE'] ? true : false,
-        // courseCredits: editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].credits : 1,
-        // includedCourses: editedSubscription?.products['COURSE']
-        //   ? editedSubscription?.products['COURSE'].product_ids || []
-        //   : [],
+        shouldIncludeCourse: editedSubscription?.products['COURSE'] ? true : false,
+        courseCredits: editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].credits : 1,
+        includedCourses: editedSubscription?.products['COURSE']
+          ? editedSubscription?.products['COURSE'].product_ids || []
+          : [],
         colorCode: editedSubscription?.color_code || initialColor,
       };
 
@@ -200,18 +201,18 @@ const CreateSubscriptionCard = ({
       setSelectedVideos(
         editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].product_ids || [] : []
       );
-      // setIsCourseIncluded(editedSubscription?.products['COURSE'] ? true : false);
-      // setSelectedCourses(
-      //   editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].product_ids || [] : []
-      // );
+      setIsCourseIncluded(editedSubscription?.products['COURSE'] ? true : false);
+      setSelectedCourses(
+        editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].product_ids || [] : []
+      );
     } else {
       form.resetFields();
       setIsSessionIncluded(false);
       setIsVideoIncluded(false);
-      // setIsCourseIncluded(false);
+      setIsCourseIncluded(false);
       setSelectedSessions([]);
       setSelectedVideos([]);
-      // setSelectedCourses([]);
+      setSelectedCourses([]);
       setColorCode(initialColor);
       setSelectedTagType('anyone');
       setSelectedMemberTag(null);
@@ -302,20 +303,20 @@ const CreateSubscriptionCard = ({
     }
   };
 
-  // const onShouldIncludeCourseChange = (e) => {
-  //   const shouldIncludeCourse = e.target.checked;
+  const onShouldIncludeCourseChange = (e) => {
+    const shouldIncludeCourse = e.target.checked;
 
-  //   setIsCourseIncluded(shouldIncludeCourse);
+    setIsCourseIncluded(shouldIncludeCourse);
 
-  //   if (!shouldIncludeCourse) {
-  //     setSelectedCourses([]);
-  //     form.setFieldsValue({
-  //       ...form.getFieldValue(),
-  //       includedCourses: [],
-  //       courseCredits: 1,
-  //     });
-  //   }
-  // };
+    if (!shouldIncludeCourse) {
+      setSelectedCourses([]);
+      form.setFieldsValue({
+        ...form.getFieldValue(),
+        includedCourses: [],
+        courseCredits: 1,
+      });
+    }
+  };
 
   const handleCancelChange = () => {
     if (editedSubscription) {
@@ -345,12 +346,13 @@ const CreateSubscriptionCard = ({
       };
     });
 
-    // if (values.shouldIncludeCourse) {
-    //   productsData['COURSE'] = {
-    //     credits: values.courseCredits,
-    //     product_ids: selectedCourses,
-    //   };
-    // }
+    // TODO: Adjust the form data format here
+    if (values.shouldIncludeCourse) {
+      productsData['COURSE'] = {
+        credits: values.courseCredits,
+        product_ids: selectedCourses,
+      };
+    }
 
     try {
       let payload = {
@@ -777,7 +779,7 @@ const CreateSubscriptionCard = ({
                 </Select>
               </Form.Item>
             </List.Item>
-            {/* <List.Item>
+            <List.Item>
               <Row justify="center" align="center">
                 <Col>
                   <Form.Item
@@ -840,45 +842,103 @@ const CreateSubscriptionCard = ({
                     label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
                     key="Published Videos"
                   >
-                    {courses.filter((course) => course.is_published).filter((course) => !selectedMemberTag ? true : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)).map((course) => (
-                      <Select.Option value={course.id} key={course.id} label={<> {course.type === 'VIDEO' ? <VideoCameraOutlined style={{ color: '#1890ff' }} /> : null} {course.name} </>}>
-                        <Row gutter={[8, 8]}>
-                          <Col xs={17}> 
-                            {course.type === 'VIDEO' ? <VideoCameraOutlined style={{ color: '#1890ff' }} /> : null} {course.name}
-                          </Col>
-                          <Col xs={7}>
-                            {course.price > 0 ? `${course.currency.toUpperCase()} ${course.price}` : 'Free'}
-                          </Col>
-                        </Row>
+                    {courses
+                      .filter((course) => course.is_published)
+                      .filter((course) =>
+                        !selectedMemberTag
+                          ? true
+                          : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)
+                      )
+                      .map((course) => (
+                        <Select.Option
+                          value={course.id}
+                          key={course.id}
+                          label={
+                            <>
+                              {' '}
+                              {course.type === 'VIDEO' ? (
+                                <VideoCameraOutlined style={{ color: '#1890ff' }} />
+                              ) : null}{' '}
+                              {course.name}{' '}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17}>
+                              {course.type === 'VIDEO' ? <VideoCameraOutlined style={{ color: '#1890ff' }} /> : null}{' '}
+                              {course.name}
+                            </Col>
+                            <Col xs={7}>
+                              {course.price > 0 ? `${course.currency.toUpperCase()} ${course.price}` : 'Free'}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                    {courses
+                      .filter((course) => course.is_published)
+                      .filter((course) =>
+                        !selectedMemberTag
+                          ? true
+                          : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_published_course">
+                        {' '}
+                        <Text disabled> No published courses </Text>{' '}
                       </Select.Option>
-                    ))}
-                    {courses.filter((course) => course.is_published).filter((course) => !selectedMemberTag ? true : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)).length <= 0 && (
-                      <Select.Option disabled value="no_published_course"> <Text disabled> No published courses </Text> </Select.Option>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
                     label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
                     key="Unpublished Courses"
                   >
-                    {courses.filter((course) => !course.is_published).filter((course) => !selectedMemberTag ? true : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)).map((course) => (
-                      <Select.Option value={course.id} key={course.id} label={<> {course.type === 'VIDEO' ? <VideoCameraOutlined style={{ color: '#1890ff' }} /> : null} {course.name} </>}>
-                        <Row gutter={[8, 8]}>
-                          <Col xs={17}> 
-                            {course.type === 'VIDEO' ? <VideoCameraOutlined style={{ color: '#1890ff' }} /> : null} {course.name}
-                          </Col>
-                          <Col xs={7}>
-                            {course.price > 0 ? `${course.currency.toUpperCase()} ${course.price}` : 'Free'}
-                          </Col>
-                        </Row>
+                    {courses
+                      .filter((course) => !course.is_published)
+                      .filter((course) =>
+                        !selectedMemberTag
+                          ? true
+                          : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)
+                      )
+                      .map((course) => (
+                        <Select.Option
+                          value={course.id}
+                          key={course.id}
+                          label={
+                            <>
+                              {' '}
+                              {course.type === 'VIDEO' ? (
+                                <VideoCameraOutlined style={{ color: '#1890ff' }} />
+                              ) : null}{' '}
+                              {course.name}{' '}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17}>
+                              {course.type === 'VIDEO' ? <VideoCameraOutlined style={{ color: '#1890ff' }} /> : null}{' '}
+                              {course.name}
+                            </Col>
+                            <Col xs={7}>
+                              {course.price > 0 ? `${course.currency.toUpperCase()} ${course.price}` : 'Free'}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                    {courses
+                      .filter((course) => !course.is_published)
+                      .filter((course) =>
+                        !selectedMemberTag
+                          ? true
+                          : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_unpublished_course">
+                        {' '}
+                        <Text disabled> No unpublished courses </Text>{' '}
                       </Select.Option>
-                    ))}
-                    {courses.filter((course) => !course.is_published).filter((course) => !selectedMemberTag ? true : course.tag?.map((tag) => tag.external_id).includes(selectedMemberTag)).length <= 0 && (
-                      <Select.Option disabled value="no_unpublished_course"> <Text disabled> No unpublished courses </Text>  </Select.Option>
                     )}
                   </Select.OptGroup>
                 </Select>
               </Form.Item>
-            </List.Item> */}
+            </List.Item>
             <List.Item>
               <Form.Item className={styles.compactFormItem} id="colorCode" name="colorCode">
                 <TwitterPicker

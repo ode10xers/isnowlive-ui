@@ -434,18 +434,20 @@ const Subscriptions = () => {
 
           <Col xs={24} className={!lg ? undefined : styles.subSection}>
             <Space align="left">
-              <Row gutter={[8, 8]}>
-                <Col xs={24}>
-                  <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, false)}</div>
-                </Col>
-              </Row>
-              {/* {subscriptionDetails.products['COURSE'] && (
+              {(subscriptionDetails.products['SESSION'] || subscriptionDetails.products['VIDEO']) && (
+                <Row gutter={[8, 8]}>
+                  <Col xs={24}>
+                    <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, false)}</div>
+                  </Col>
+                </Row>
+              )}
+              {subscriptionDetails.products['COURSE'] && (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
                     <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, true)}</div>
                   </Col>
                 </Row>
-              )} */}
+              )}
             </Space>
           </Col>
 

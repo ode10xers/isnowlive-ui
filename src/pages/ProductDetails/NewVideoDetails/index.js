@@ -648,13 +648,23 @@ const NewVideoDetails = ({ match }) => {
         showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription());
       } else {
         // Buy Membership + Video flow
+        let itemDescription = [];
+
+        if (selectedSubscription.products['VIDEO'] || selectedSubscription.products['SESSION']) {
+          itemDescription.push(generateBaseCreditsText(selectedSubscription, false));
+        }
+
+        if (selectedSubscription.products['COURSE']) {
+          itemDescription.push(generateBaseCreditsText(selectedSubscription, true));
+        }
+
         const paymentPopupData = {
           productId: selectedSubscription.external_id,
           productType: productType.SUBSCRIPTION,
           itemList: [
             {
               name: selectedSubscription.name,
-              description: generateBaseCreditsText(selectedSubscription, false),
+              description: itemDescription.join(', '),
               currency: selectedSubscription.currency,
               price: selectedSubscription.total_price,
             },

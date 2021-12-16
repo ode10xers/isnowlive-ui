@@ -94,24 +94,24 @@ const SubscriptionCards = ({
         : 'None',
       className: subscription.products['VIDEO'] ? styles.buttonContainer : styles.disabled,
     },
-    // {
-    //   label: (
-    //     <Row gutter={8} justify="center">
-    //       <Col xs={4}>{renderTickOrCross(subscription.products['COURSE'])}</Col>
-    //     </Row>
-    //   ),
-    //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
-    // },
-    // {
-    //   label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/period` : 'None',
-    //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
-    // },
-    // {
-    //   label: subscription.products['COURSE']
-    //     ? renderProductListButton('Courses', subscription.product_details['COURSE'], 'name')
-    //     : 'None',
-    //   className: subscription.products['COURSE'] ? styles.buttonContainer : styles.disabled,
-    // },
+    {
+      label: (
+        <Row gutter={8} justify="center">
+          <Col xs={4}>{renderTickOrCross(subscription.products['COURSE'])}</Col>
+        </Row>
+      ),
+      className: subscription.products['COURSE'] ? undefined : styles.disabled,
+    },
+    {
+      label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/period` : 'None',
+      className: subscription.products['COURSE'] ? undefined : styles.disabled,
+    },
+    {
+      label: subscription.products['COURSE']
+        ? renderProductListButton('Courses', subscription.product_details['COURSE'], 'name')
+        : 'None',
+      className: subscription.products['COURSE'] ? styles.buttonContainer : styles.disabled,
+    },
   ];
 
   const renderCardData = (item) => (
@@ -155,8 +155,7 @@ const SubscriptionCards = ({
               type="primary"
               onClick={() => unpublishSubscription(subscription.external_id)}
             >
-              {' '}
-              Hide{' '}
+              Hide
             </Button>
           ) : (
             <Button
@@ -166,8 +165,7 @@ const SubscriptionCards = ({
               type="primary"
               onClick={() => publishSubscription(subscription.external_id)}
             >
-              {' '}
-              Show{' '}
+              Show
             </Button>
           )}
         </div>,
