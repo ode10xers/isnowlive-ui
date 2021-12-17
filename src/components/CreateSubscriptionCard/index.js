@@ -312,6 +312,7 @@ const CreateSubscriptionCard = ({
     }
 
     if (!values.includes('VIDEO') && !values.includes('SESSION')) {
+      setIsUnlimitedSessionVideoCredit(false);
       updatedFormValues = {
         ...updatedFormValues,
         subscriptionCredits: 0,
@@ -320,6 +321,7 @@ const CreateSubscriptionCard = ({
 
     if (!values.includes('COURSE')) {
       setSelectedCourses([]);
+      setIsUnlimitedCourseCredit(false);
       updatedFormValues = {
         ...updatedFormValues,
         includedCourses: [],
@@ -590,6 +592,7 @@ const CreateSubscriptionCard = ({
                   </Col>
                   <Col xs={9}>
                     <Checkbox
+                      disabled={!isVideoIncluded && !isSessionIncluded}
                       className={styles.unlimitedCheckbox}
                       checked={isUnlimitedSessionVideoCredit}
                       onChange={handleUnlimitedSessionVideoCreditChange}
@@ -859,6 +862,7 @@ const CreateSubscriptionCard = ({
                 </Col>
                 <Col xs={9}>
                   <Checkbox
+                    disabled={!isCourseIncluded}
                     className={styles.unlimitedCheckbox}
                     checked={isUnlimitedCourseCredit}
                     onChange={handleUnlimitedCourseCreditChange}
