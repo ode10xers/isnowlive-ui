@@ -31,8 +31,9 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { getLocalUserDetails, saveGiftOrderData } from 'utils/storage';
 import { getYoutubeVideoIDFromURL } from 'utils/video';
+import { getLocalUserDetails, saveGiftOrderData } from 'utils/storage';
+import { fetchUsableSubscriptionForCourse } from 'utils/subscriptions';
 import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
 import { orderType, productType, videoSourceType, paymentSource } from 'utils/constants';
 import { generateColorPalletteForProfile, isBrightColorShade, convertHexToRGB } from 'utils/colors';
@@ -42,7 +43,6 @@ import { getCourseDocumentContentCount, getCourseSessionContentCount, getCourseV
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { fetchUsableSubscriptionForCourse } from 'utils/subscriptions';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
@@ -729,7 +729,7 @@ const CourseDetails = ({ match }) => {
             // There can be a case where the modules are all outlines
             `Cannot purchase an empty course`
           ) : usableSubscription ? (
-            `Get using purchased ${usableSubscription.subscription_name} membership`
+            `Get using your existing membership`
           ) : (
             <>
               {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}

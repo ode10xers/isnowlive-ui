@@ -102,7 +102,8 @@ const CreateSubscriptionCard = ({
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [selectedMemberTag, setSelectedMemberTag] = useState(null);
 
-  const [isUnlimited, setIsUnlimited] = useState(false);
+  const [isUnlimitedSessionVideoCredit, setIsUnlimitedSessionVideoCredit] = useState(false);
+  const [isUnlimitedCourseCredit, setIsUnlimitedCourseCredit] = useState(false);
 
   const getCreatorProducts = useCallback(async () => {
     try {
@@ -194,12 +195,8 @@ const CreateSubscriptionCard = ({
 
       form.setFieldsValue(formData);
 
-      setIsUnlimited(
-        isUnlimitedMembership(
-          editedSubscription,
-          !(editedSubscription?.products['VIDEO'] || editedSubscription?.products['SESSION'])
-        )
-      );
+      setIsUnlimitedCourseCredit(isUnlimitedMembership(editedSubscription, true));
+      setIsUnlimitedSessionVideoCredit(isUnlimitedMembership(editedSubscription, false));
 
       setCurrency(editedSubscription?.currency || 'SGD');
       setSelectedTagType(formData.subscriptionTagType);
@@ -213,7 +210,8 @@ const CreateSubscriptionCard = ({
       setSelectedCourses(formData.includedCourses);
     } else {
       form.resetFields();
-      setIsUnlimited(false);
+      setIsUnlimitedCourseCredit(false);
+      setIsUnlimitedSessionVideoCredit(false);
       setIsSessionIncluded(false);
       setIsVideoIncluded(false);
       setIsCourseIncluded(false);
@@ -347,6 +345,26 @@ const CreateSubscriptionCard = ({
     form.setFieldsValue({ ...form.getFieldsValue(), colorCode: color.hex || defaultBorderColor });
   };
 
+  const handleUnlimitedSessionVideoCreditChange = (e) => {
+    const isChecked = e.target.checked;
+
+    setIsUnlimitedSessionVideoCredit(isChecked);
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      subscriptionCredits: isChecked ? UNLIMITED_SUBSCRIPTION_CREDIT_COUNT : 5,
+    });
+  };
+
+  const handleUnlimitedCourseCreditChange = (e) => {
+    const isChecked = e.target.checked;
+
+    setIsUnlimitedCourseCredit(isChecked);
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      courseCredits: isChecked ? UNLIMITED_SUBSCRIPTION_CREDIT_COUNT : 5,
+    });
+  };
+
   const handleFinish = async (values) => {
     setIsSubmitting(true);
 
@@ -367,12 +385,12 @@ const CreateSubscriptionCard = ({
         color_code: values.colorCode || colorCode || defaultBorderColor,
         product_credits:
           values.includedProducts.includes('SESSION') || values.includedProducts.includes('VIDEO')
-            ? isUnlimited
+            ? isUnlimitedSessionVideoCredit
               ? UNLIMITED_SUBSCRIPTION_CREDIT_COUNT
               : values.subscriptionCredits ?? 0
             : 0,
         course_credits: values.includedProducts.includes('COURSE')
-          ? isUnlimited
+          ? isUnlimitedCourseCredit
             ? UNLIMITED_SUBSCRIPTION_CREDIT_COUNT
             : values.courseCredits ?? 0
           : 0,
@@ -396,16 +414,6 @@ const CreateSubscriptionCard = ({
 
     setIsSubmitting(false);
   };
-
-  const unlimitedCheckbox = (
-    <Checkbox
-      className={styles.unlimitedCheckbox}
-      checked={isUnlimited}
-      onChange={(e) => setIsUnlimited(e.target.checked)}
-    >
-      Unlimited?
-    </Checkbox>
-  );
 
   return (
     <Form
@@ -563,15 +571,15 @@ const CreateSubscriptionCard = ({
                       id="subscriptionCredits"
                       name="subscriptionCredits"
                       rules={
-                        isSessionIncluded || isVideoIncluded
+                        (isSessionIncluded || isVideoIncluded) && !isUnlimitedSessionVideoCredit
                           ? validationRules.numberValidation('Please input Session/Video credits/period', 1, false)
                           : []
                       }
                       noStyle
                     >
                       <InputNumber
-                        disabled={(!isVideoIncluded && !isSessionIncluded) || isUnlimited}
-                        min={(!isVideoIncluded && !isSessionIncluded) || isUnlimited ? 0 : 1}
+                        disabled={(!isVideoIncluded && !isSessionIncluded) || isUnlimitedSessionVideoCredit}
+                        min={(!isVideoIncluded && !isSessionIncluded) || isUnlimitedSessionVideoCredit ? 0 : 1}
                         placeholder="Enter Session/Video credits"
                         className={styles.numericInput}
                       />
@@ -580,7 +588,15 @@ const CreateSubscriptionCard = ({
                   <Col xs={9} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
                     <Text strong>credits/period</Text>
                   </Col>
-                  <Col xs={9}>{unlimitedCheckbox}</Col>
+                  <Col xs={9}>
+                    <Checkbox
+                      className={styles.unlimitedCheckbox}
+                      checked={isUnlimitedSessionVideoCredit}
+                      onChange={handleUnlimitedSessionVideoCreditChange}
+                    >
+                      Unlimited?
+                    </Checkbox>
+                  </Col>
                 </Row>
               </Form.Item>
             </List.Item>
@@ -825,12 +841,14 @@ const CreateSubscriptionCard = ({
                     id="courseCredits"
                     name="courseCredits"
                     rules={
-                      isCourseIncluded ? validationRules.numberValidation('Please input course credits', 1, false) : []
+                      isCourseIncluded && !isUnlimitedCourseCredit
+                        ? validationRules.numberValidation('Please input course credits', 1, false)
+                        : []
                     }
                   >
                     <InputNumber
-                      disabled={!isCourseIncluded || isUnlimited}
-                      min={!isCourseIncluded || isUnlimited ? 0 : 1}
+                      disabled={!isCourseIncluded || isUnlimitedCourseCredit}
+                      min={!isCourseIncluded || isUnlimitedCourseCredit ? 0 : 1}
                       placeholder="Course credits/period"
                       className={styles.numericInput}
                     />
@@ -839,7 +857,15 @@ const CreateSubscriptionCard = ({
                 <Col xs={9} className={classNames(styles.helpTextWrapper, styles.textAlignCenter)}>
                   <Text strong>courses/period</Text>
                 </Col>
-                <Col xs={9}>{unlimitedCheckbox}</Col>
+                <Col xs={9}>
+                  <Checkbox
+                    className={styles.unlimitedCheckbox}
+                    checked={isUnlimitedCourseCredit}
+                    onChange={handleUnlimitedCourseCreditChange}
+                  >
+                    Unlimited?
+                  </Checkbox>
+                </Col>
               </Row>
             </List.Item>
             <List.Item>

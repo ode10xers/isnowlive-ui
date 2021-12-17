@@ -1119,7 +1119,9 @@ const UploadVideoModal = ({
               </Col>
               <Col xs={24} className={styles.mb20}>
                 <Collapse>
-                  <Panel header={<Text strong>Advanced Options</Text>}>
+                  <Panel
+                    header={<Text strong>Advance Options (click to add it to memberships, passes or add a file)</Text>}
+                  >
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
                         <Form.Item id="document_id" name="document_id" label="Attached File">
