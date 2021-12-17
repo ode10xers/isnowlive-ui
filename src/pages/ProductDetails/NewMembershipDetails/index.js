@@ -9,6 +9,7 @@ import apis from 'apis';
 import AuthModal from 'components/AuthModal';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
+import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -161,7 +162,9 @@ const NewMembershipDetails = ({ match }) => {
 
     let itemDescription = [];
 
-    itemDescription.push(generateBaseCreditsText(selectedSubsDetails, false));
+    if (selectedSubsDetails.products['VIDEO'] || selectedSubsDetails.products['SESSION']) {
+      itemDescription.push(generateBaseCreditsText(selectedSubsDetails, false));
+    }
 
     if (selectedSubsDetails.products['COURSE']) {
       itemDescription.push(generateBaseCreditsText(selectedSubsDetails, true));
@@ -262,13 +265,16 @@ const NewMembershipDetails = ({ match }) => {
     }
   };
 
-  // TODO: Clarify the approach here
   const handleSeeMoreSessions = () => {
     setMoreView('sessions');
     setBottomSheetsVisible(true);
   };
   const handleSeeMoreVideos = () => {
     setMoreView('videos');
+    setBottomSheetsVisible(true);
+  };
+  const handleSeeMoreCourses = () => {
+    setMoreView('courses');
     setBottomSheetsVisible(true);
   };
 
@@ -283,33 +289,45 @@ const NewMembershipDetails = ({ match }) => {
   const renderSubsPrice = (subsData) =>
     subsData?.total_price > 0 ? `${subsData?.currency?.toUpperCase() ?? ''} ${subsData?.total_price ?? 0}` : 'Free';
 
-  const renderBuyableMembershipItem = (subs) => (
-    <Col xs={24} key={subs.external_id}>
-      <div
-        onClick={() => handleSelectSubsItem(subs)}
-        className={classNames(
-          styles.buyableSubsItem,
-          subs?.external_id === selectedSubsDetails?.external_id ? styles.selected : undefined
-        )}
-      >
-        <Row gutter={[8, 8]}>
-          <Col xs={12} className={styles.subsCheckContainer}>
-            <Space align="baseline">
-              <CheckCircleFilled className={styles.checkIcon} />
-              <Text className={classNames(styles.subsItemName, subs?.name.length > 20 ? styles.longText : undefined)}>
-                {subs?.name}
+  const renderBuyableMembershipItem = (subs) => {
+    let subscriptionContentText = [];
+
+    if (subs?.products['COURSE']) {
+      subscriptionContentText.push(generateBaseCreditsText(subs, true));
+    }
+
+    if (subs?.products['VIDEO'] || subs?.products['SESSION']) {
+      subscriptionContentText.push(generateBaseCreditsText(subs, false));
+    }
+
+    return (
+      <Col xs={24} key={subs.external_id}>
+        <div
+          onClick={() => handleSelectSubsItem(subs)}
+          className={classNames(
+            styles.buyableSubsItem,
+            subs?.external_id === selectedSubsDetails?.external_id ? styles.selected : undefined
+          )}
+        >
+          <Row gutter={[8, 8]}>
+            <Col xs={12} className={styles.subsCheckContainer}>
+              <Space align="baseline">
+                <CheckCircleFilled className={styles.checkIcon} />
+                <Text className={classNames(styles.subsItemName, subs?.name.length > 20 ? styles.longText : undefined)}>
+                  {subs?.name}
+                </Text>
+              </Space>
+            </Col>
+            <Col xs={12} className={styles.textAlignRight}>
+              <Text className={styles.subsItemDesc}>
+                {subscriptionContentText.join(', ').replaceAll(' credits/period', '')}
               </Text>
-            </Space>
-          </Col>
-          <Col xs={12} className={styles.textAlignRight}>
-            <Text className={styles.subsItemDesc}>
-              {generateBaseCreditsText(subs, false).replace(' credits/period', '')}
-            </Text>
-          </Col>
-        </Row>
-      </div>
-    </Col>
-  );
+            </Col>
+          </Row>
+        </div>
+      </Col>
+    );
+  };
 
   //#endregion End of UI Methods
 
@@ -323,16 +341,49 @@ const NewMembershipDetails = ({ match }) => {
             {selectedSubsDetails?.name}
           </Title>
         </Col>
-        <Col xs={24}>
+        <Col xs={0} sm={24}>
           <Space align="center" split={<Text className={styles.dotSeparator}>●</Text>}>
             <Text className={styles.subsDetailItem}>{renderSubsPrice(selectedSubsDetails)}</Text>
-            <Text className={styles.subsDetailItem}>
-              {generateBaseCreditsText(selectedSubsDetails, false).replace(' credits/period', '')}
-            </Text>
+            {selectedSubsDetails?.products['VIDEO'] || selectedSubsDetails?.products['SESSION'] ? (
+              <Text className={styles.subsDetailItem}>
+                {generateBaseCreditsText(selectedSubsDetails, false).replace(' credits/period', '')}
+              </Text>
+            ) : null}
+            {selectedSubsDetails?.products['COURSE'] ? (
+              <Text className={styles.subsDetailItem}>
+                {generateBaseCreditsText(selectedSubsDetails, true).replace(' credits/period', '')}
+              </Text>
+            ) : null}
             <Text className={styles.subsDetailItem}>
               Renewed every {generateSubscriptionDuration(selectedSubsDetails, true)}
             </Text>
           </Space>
+        </Col>
+        <Col xs={24} sm={0}>
+          <Row gutter={[0, 4]}>
+            <Col xs={24}>
+              <Space align="center" split={<Text className={styles.dotSeparator}>●</Text>}>
+                <Text className={styles.subsDetailItem}>{renderSubsPrice(selectedSubsDetails)}</Text>
+                <Text className={styles.subsDetailItem}>
+                  Renewed every {generateSubscriptionDuration(selectedSubsDetails, true)}
+                </Text>
+              </Space>
+            </Col>
+            <Col xs={24}>
+              <Space align="center" split={<Text className={styles.dotSeparator}>●</Text>}>
+                {selectedSubsDetails?.products['COURSE'] ? (
+                  <Text className={styles.subsDetailItem}>
+                    {generateBaseCreditsText(selectedSubsDetails, true).replace(' credits/period', '')}
+                  </Text>
+                ) : null}
+                {selectedSubsDetails?.products['VIDEO'] || selectedSubsDetails?.products['SESSION'] ? (
+                  <Text className={styles.subsDetailItem}>
+                    {generateBaseCreditsText(selectedSubsDetails, false).replace(' credits/period', '')}
+                  </Text>
+                ) : null}
+              </Space>
+            </Col>
+          </Row>
         </Col>
       </Row>
     </div>
@@ -425,6 +476,48 @@ const NewMembershipDetails = ({ match }) => {
       </Row>
     ) : (
       <Empty description="No videos to show" />
+    );
+
+  const courseItemLimit = 3;
+  const subsCourseList = (
+    <>
+      <Title level={4} className={styles.sectionHeading}>
+        Courses purchasable with this membership
+      </Title>
+      <Row gutter={[8, 8]} className={styles.subsContentContainer}>
+        {selectedSubsDetails?.product_details['COURSE']?.slice(0, courseItemLimit).map((course) => (
+          <Col xs={16} sm={14} md={10} lg={12} key={course.id}>
+            <CourseListItem course={course} />
+          </Col>
+        ))}
+        {selectedSubsDetails?.product_details['COURSE']?.length > courseItemLimit ? (
+          <Col xs={16} sm={14} md={10} lg={12} className={styles.fadedItemContainer}>
+            <div className={styles.fadedOverlay}>
+              <div className={styles.seeMoreButton} onClick={handleSeeMoreCourses}>
+                <BarsOutlined className={styles.seeMoreIcon} />
+                SEE MORE
+              </div>
+            </div>
+            <div className={styles.fadedItem}>
+              <CourseListItem course={selectedSubsDetails?.product_details['COURSE'][courseItemLimit]} />
+            </div>
+          </Col>
+        ) : null}
+      </Row>
+    </>
+  );
+
+  const moreCoursesListView =
+    selectedSubsDetails?.product_details['COURSE']?.length > 0 ? (
+      <Row gutter={[16, 16]}>
+        {selectedSubsDetails?.product_details['COURSE']?.map((course) => (
+          <Col xs={24} md={12} lg={8} xl={6} key={`more_${course.id}`}>
+            <CourseListItem course={course} />
+          </Col>
+        ))}
+      </Row>
+    ) : (
+      <Empty description="No courses to show" />
     );
 
   const moreMembershipHeader = (
@@ -520,13 +613,23 @@ const NewMembershipDetails = ({ match }) => {
                 </>
               )}
 
-              {/* Video Lists Lists */}
+              {/* Video Lists */}
               {selectedSubsDetails?.product_details['VIDEO']?.length > 0 && (
                 <>
                   <Col xs={24}>
                     <Divider />
                   </Col>
                   <Col xs={24}>{subsVideoList}</Col>
+                </>
+              )}
+
+              {/* Course List */}
+              {selectedSubsDetails?.product_details['COURSE']?.length > 0 && (
+                <>
+                  <Col xs={24}>
+                    <Divider />
+                  </Col>
+                  <Col xs={24}>{subsCourseList}</Col>
                 </>
               )}
             </Row>
@@ -556,7 +659,11 @@ const NewMembershipDetails = ({ match }) => {
         onClose={handleCloseBottomSheets}
         className={styles.moreContentDrawer}
       >
-        {moreView === 'sessions' ? moreSessionsListView : moreVideosListView}
+        {moreView === 'sessions'
+          ? moreSessionsListView
+          : moreView === 'videos'
+          ? moreVideosListView
+          : moreCoursesListView}
       </Drawer>
     </div>
   );

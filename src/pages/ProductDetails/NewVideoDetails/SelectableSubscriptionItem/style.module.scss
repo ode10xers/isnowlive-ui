@@ -6,6 +6,7 @@
   background-color: var(--primary-lightest-color);
   box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
   padding: 0 3px;
+  min-height: 150px;
 
   .subscriptionItemHeadingContainer {
     background-color: var(--primary-light-color);
@@ -32,6 +33,7 @@
 
   .subscriptionDetailsContainer {
     padding: 4px 12px !important;
+    height: 54px;
 
     .subscriptionDetails {
       font-size: 14px;

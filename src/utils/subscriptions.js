@@ -1,21 +1,30 @@
-const productTextMapping = {
-  SESSION: 'Sessions',
-  VIDEO: 'Videos',
-  COURSE: 'Courses',
-};
+import { message } from 'antd';
+import apis from 'apis';
+import { UNLIMITED_SUBSCRIPTION_CREDIT_COUNT } from './constants';
+import { isAPISuccess } from './helper';
+import { getLocalUserDetails } from './storage';
 
-const accessTypeTextMapping = {
-  PUBLIC: 'Public',
-  MEMBERSHIP: 'Membership',
+export const isUnlimitedMembership = (subscription, isCourse = false) => {
+  if (!subscription) {
+    return false;
+  }
+
+  if (isCourse) {
+    return subscription?.course_credits === UNLIMITED_SUBSCRIPTION_CREDIT_COUNT ?? false;
+  } else {
+    return subscription?.product_credits === UNLIMITED_SUBSCRIPTION_CREDIT_COUNT ?? false;
+  }
 };
 
 export const generateBaseCreditsText = (subscription, isCourse = false) => {
   let calculatedBaseCredits = 0;
   let productText = '';
 
+  const isUnlimited = isUnlimitedMembership(subscription, isCourse);
+
   if (isCourse) {
-    calculatedBaseCredits = subscription?.products['COURSE']?.credits || 0;
-    productText = 'Course';
+    calculatedBaseCredits = subscription?.course_credits || 0;
+    productText = 'Courses';
   } else {
     calculatedBaseCredits = subscription?.product_credits;
 
@@ -32,30 +41,7 @@ export const generateBaseCreditsText = (subscription, isCourse = false) => {
     productText = availableProducts.join(' or ');
   }
 
-  return `${calculatedBaseCredits} ${productText} credits/period`;
-};
-
-export const generateIncludedProducts = (subscription, isCourse = false) => {
-  let productTexts = [];
-
-  if (isCourse) {
-    productTexts =
-      subscription?.products['COURSE']?.access_types?.map(
-        (accessType) => `${accessTypeTextMapping[accessType]} ${productTextMapping['COURSE']}`
-      ) || [];
-  } else {
-    const excludedProductKeys = ['COURSE'];
-    Object.entries(subscription?.products).forEach(([key, val]) => {
-      if (!excludedProductKeys.includes(key)) {
-        productTexts = [
-          ...productTexts,
-          ...val.access_types.map((accessType) => `${accessTypeTextMapping[accessType]} ${productTextMapping[key]}`),
-        ];
-      }
-    });
-  }
-
-  return productTexts;
+  return isUnlimited ? `Unlimited ${productText}` : `${calculatedBaseCredits} ${productText} credits/period`;
 };
 
 export const generateSubscriptionDuration = (subscription, showNum = false) => {
@@ -82,4 +68,107 @@ export const generateSubscriptionDuration = (subscription, showNum = false) => {
   }
 
   return subscriptionPeriodInDays > 1 ? `${subscriptionPeriodInDays} days` : showNum ? '1 day' : 'day';
+};
+
+export const fetchUsableSubscriptionForSession = async (sessionInventory) => {
+  try {
+    const loggedInUserData = getLocalUserDetails();
+
+    if (!loggedInUserData) {
+      return null;
+    }
+
+    const { status, data } = await apis.subscriptions.getUserSubscriptionForSession(
+      sessionInventory.session_external_id
+    );
+
+    if (isAPISuccess(status) && data) {
+      if (data.active.length <= 0) {
+        return null;
+      }
+
+      const usableSubscription =
+        data.active.find(
+          (subs) =>
+            subs.product_credits > subs.product_credits_used &&
+            subs.product_details['SESSION'] &&
+            subs.product_details['SESSION'].find(
+              (includedSession) => includedSession.session_external_id === sessionInventory.session_external_id
+            )
+        ) ?? null;
+
+      return usableSubscription;
+    }
+  } catch (error) {
+    console.error(error);
+    message.error(error.response?.data?.message || 'Failed fetching usable membership for session');
+  }
+
+  return null;
+};
+
+export const fetchUsableSubscriptionForVideo = async (video) => {
+  try {
+    const loggedInUserData = getLocalUserDetails();
+
+    if (!loggedInUserData) {
+      return null;
+    }
+
+    const { status, data } = await apis.subscriptions.getUserSubscriptionForVideo(video.external_id);
+
+    if (isAPISuccess(status) && data) {
+      if (data.active.length <= 0) {
+        return null;
+      }
+
+      const usableSubscription =
+        data.active.find(
+          (subs) =>
+            subs.product_credits > subs.product_credits_used &&
+            subs.product_details['VIDEO'] &&
+            subs.product_details['VIDEO'].find((includedVideo) => includedVideo.external_id === video.external_id)
+        ) ?? null;
+
+      return usableSubscription;
+    }
+  } catch (error) {
+    console.error(error);
+    message.error(error.response?.data?.message || 'Failed fetching usable membership for video');
+  }
+
+  return null;
+};
+
+export const fetchUsableSubscriptionForCourse = async (course) => {
+  try {
+    const loggedInUserData = getLocalUserDetails();
+
+    if (!loggedInUserData) {
+      return null;
+    }
+
+    const { status, data } = await apis.subscriptions.getUserSubscriptionForCourse(course.id);
+
+    if (isAPISuccess(status) && data) {
+      if (data.active.length <= 0) {
+        return null;
+      }
+
+      const usableSubscription =
+        data.active.find(
+          (subs) =>
+            subs.course_credits > subs.course_credits_used &&
+            subs.product_details['COURSE'] &&
+            subs.product_details['COURSE'].find((includedCourse) => includedCourse.id === course.id)
+        ) ?? null;
+
+      return usableSubscription;
+    }
+  } catch (error) {
+    console.error(error);
+    message.error(error.response?.data?.message || 'Failed fetching usable membership for course');
+  }
+
+  return null;
 };

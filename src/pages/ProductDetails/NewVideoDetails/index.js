@@ -35,7 +35,7 @@ import dateUtil from 'utils/date';
 import { getUsernameFromUrl } from 'utils/url';
 import { getLocalUserDetails, saveGiftOrderData } from 'utils/storage';
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, fetchUsableSubscriptionForVideo, isUnlimitedMembership } from 'utils/subscriptions';
 import { redirectToPluginVideoDetailsPage, redirectToVideosPage } from 'utils/redirect';
 import { isAPISuccess, preventDefaults, isUnapprovedUserError } from 'utils/helper';
 import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } from 'utils/colors';
@@ -119,26 +119,8 @@ const NewVideoDetails = ({ match }) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.subscriptions.getUserSubscriptionForVideo(videoExternalId);
-
-      if (isAPISuccess(status) && data) {
-        if (data.active.length > 0) {
-          // Choose a purchased subscription based on these conditions
-          // 1. Should be usable for Videos
-          // 2. Still have credits to purchase videos
-          // 3. This video can be purchased by this subscription
-          const usableSubscription =
-            data.active.find(
-              (subscription) =>
-                subscription.product_credits > subscription.product_credits_used &&
-                subscription.products['VIDEO'] &&
-                subscription.products['VIDEO']?.product_ids?.includes(videoExternalId)
-            ) || null;
-
-          setIsLoading(false);
-          return usableSubscription;
-        }
-      }
+      const usablePurchasedSubs = await fetchUsableSubscriptionForVideo({ external_id: videoExternalId });
+      return usablePurchasedSubs;
     } catch (error) {
       console.error(error);
       message.error(error?.response?.data?.message || 'Failed to fetch user memberships for video');
@@ -306,13 +288,13 @@ const NewVideoDetails = ({ match }) => {
 
   // Use Effect logic to handle when user lands in the page already logged in
   useEffect(() => {
-    if (userDetails) {
-      fetchUserPaymentInstruments(videoId);
+    if (userDetails && videoData) {
+      fetchUserPaymentInstruments(videoData.external_id);
     } else {
       setUsablePass(null);
       setUsableSubscription(null);
     }
-  }, [videoId, userDetails, fetchUserPaymentInstruments]);
+  }, [videoData, userDetails, fetchUserPaymentInstruments]);
 
   useEffect(() => {
     if (shouldFollowUpGetVideo) {
@@ -544,6 +526,8 @@ const NewVideoDetails = ({ match }) => {
   };
 
   const buyVideoUsingSubscription = async () => {
+    setIsLoading(true);
+
     try {
       const payload = {
         video_id: videoData.external_id,
@@ -648,13 +632,23 @@ const NewVideoDetails = ({ match }) => {
         showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription());
       } else {
         // Buy Membership + Video flow
+        let itemDescription = [];
+
+        if (selectedSubscription.products['VIDEO'] || selectedSubscription.products['SESSION']) {
+          itemDescription.push(generateBaseCreditsText(selectedSubscription, false));
+        }
+
+        if (selectedSubscription.products['COURSE']) {
+          itemDescription.push(generateBaseCreditsText(selectedSubscription, true));
+        }
+
         const paymentPopupData = {
           productId: selectedSubscription.external_id,
           productType: productType.SUBSCRIPTION,
           itemList: [
             {
               name: selectedSubscription.name,
-              description: generateBaseCreditsText(selectedSubscription, false),
+              description: itemDescription.join(', '),
               currency: selectedSubscription.currency,
               price: selectedSubscription.total_price,
             },
@@ -1029,8 +1023,14 @@ const NewVideoDetails = ({ match }) => {
                     {usableSubscription?.subscription_name ?? ''}
                   </Text>
                   <Text className={styles.usablePaymentInstrumentText}>
-                    {usableSubscription.product_credits - usableSubscription.product_credits_used}/
-                    {usableSubscription.product_credits} credits left.
+                    {isUnlimitedMembership(usableSubscription, false) ? (
+                      'Unlimited credits'
+                    ) : (
+                      <>
+                        {usableSubscription.product_credits - usableSubscription.product_credits_used}/
+                        {usableSubscription.product_credits} credits left.
+                      </>
+                    )}
                   </Text>
                 </Space>
               </Col>
