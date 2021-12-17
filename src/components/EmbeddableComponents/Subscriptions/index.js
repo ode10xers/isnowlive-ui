@@ -56,13 +56,18 @@ const NewSubscriptionItem = ({ subscription = null, onBuy, onDetails }) => {
         </Col>
         <Col xs={24}>
           <Row gutter={[4, 4]} justify="center" className={styles.subscriptionDetailsContainer}>
-            <Col xs={24}>
-              <CheckCircleFilled className={styles.subscriptionIcon} /> {subscription?.product_credits ?? 0} Credits
-            </Col>
-            {/* <Col xs={24}>
-              <CheckCircleFilled className={styles.subscriptionIcon} /> Usable on{' '}
-              {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}
-            </Col> */}
+            {subscription?.products['VIDEO'] || subscription?.products['SESSION'] ? (
+              <Col xs={24}>
+                <CheckCircleFilled className={styles.subscriptionIcon} />{' '}
+                {generateBaseCreditsText(subscription, false).replace('/period', '')}
+              </Col>
+            ) : null}
+            {subscription?.products['COURSE'] ? (
+              <Col xs={24}>
+                <CheckCircleFilled className={styles.subscriptionIcon} />{' '}
+                {generateBaseCreditsText(subscription, true).replace('/period', '')}
+              </Col>
+            ) : null}
             <Col xs={24}>
               <CheckCircleFilled className={styles.subscriptionIcon} /> Renewed every{' '}
               {generateSubscriptionDuration(subscription, true)}
@@ -205,7 +210,9 @@ const Subscriptions = () => {
 
     let itemDescription = [];
 
-    itemDescription.push(generateBaseCreditsText(selectedSubscription, false));
+    if (selectedSubscription.products['VIDEO'] || selectedSubscription.products['SESSION']) {
+      itemDescription.push(generateBaseCreditsText(selectedSubscription, false));
+    }
 
     if (selectedSubscription.products['COURSE']) {
       itemDescription.push(generateBaseCreditsText(selectedSubscription, true));

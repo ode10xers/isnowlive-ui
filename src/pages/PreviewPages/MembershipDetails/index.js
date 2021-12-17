@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Button, Spin, Typography, message, Affix, Drawer } from 'antd';
+import { Row, Col, Button, Spin, Typography, message, Affix, Drawer, Space } from 'antd';
 import {
   ArrowLeftOutlined,
   BarsOutlined,
@@ -305,7 +305,14 @@ const MembershipDetailPreview = ({ match, history }) => {
                   <Col xs={24}>
                     <Row gutter={8} align="bottom">
                       <Col xs={14} className={styles.highlightedMembershipDetails}>
-                        {generateBaseCreditsText(selectedSubscription, false)}
+                        <Space direction="vertical">
+                          {selectedSubscription?.products['COURSE'] ? (
+                            <Text>{generateBaseCreditsText(selectedSubscription, true)}</Text>
+                          ) : null}
+                          {selectedSubscription?.products['VIDEO'] || selectedSubscription?.products['SESSION'] ? (
+                            <Text>{generateBaseCreditsText(selectedSubscription, false)}</Text>
+                          ) : null}
+                        </Space>
                       </Col>
                       <Col xs={10} className={styles.highlightedMembershipPrice}>
                         {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} /{' '}

@@ -23,8 +23,9 @@ import {
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { getUsernameFromUrl } from 'utils/url';
-import { getGiftReceiverData, getLocalUserDetails, saveGiftReceiverData, saveGiftOrderData } from 'utils/storage';
+import { isUnlimitedMembership } from 'utils/subscriptions';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
+import { getGiftReceiverData, getLocalUserDetails, saveGiftReceiverData, saveGiftOrderData } from 'utils/storage';
 import { isAPISuccess, isInCreatorDashboard, isUnapprovedUserError } from 'utils/helper';
 import {
   orderType,
@@ -495,9 +496,16 @@ const PaymentPopup = () => {
     } else if (paymentInstrumentDetails.type === paymentSource.SUBSCRIPTION) {
       const subscriptionDetails = paymentInstrumentDetails;
 
-      textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${
-        subscriptionDetails.product_credits - subscriptionDetails.product_credits_used
-      } credits left`;
+      const remainingCredits =
+        productType === productTypeConstants.COURSE
+          ? subscriptionDetails.course_credits - subscriptionDetails.course_credits_used
+          : subscriptionDetails.product_credits - subscriptionDetails.product_credits_used;
+
+      const isUnlimited = isUnlimitedMembership(subscriptionDetails, productType === productTypeConstants.COURSE);
+
+      textContent = `Will use ${subscriptionDetails.subscription_name} to book this. ${
+        isUnlimited ? '' : `You currently have ${remainingCredits} credits left`
+      }`;
     }
 
     return (

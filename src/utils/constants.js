@@ -4,7 +4,8 @@ import TwitterLogo from 'assets/icons/twitter/TwitterLogo';
 import InstagramLogo from 'assets/icons/instagram/InstagramLogo';
 import LinkedInLogo from 'assets/icons/linkedin/LinkedInLogo';
 
-// TODO: Move constants in helper.js and other utils file here
+export const UNLIMITED_SUBSCRIPTION_CREDIT_COUNT = 100000;
+
 export const paymentProvider = {
   STRIPE: 'STRIPE',
   PAYPAL: 'PAYPAL',

@@ -19,6 +19,16 @@ const SubscriptionListItem = ({ subscription }) => {
     redirectToMembershipPage(subscription);
   };
 
+  let subscriptionContentText = [];
+
+  if (subscription?.products['COURSE']) {
+    subscriptionContentText.push(generateBaseCreditsText(subscription, true));
+  }
+
+  if (subscription?.products['VIDEO'] || subscription?.products['SESSION']) {
+    subscriptionContentText.push(generateBaseCreditsText(subscription, false));
+  }
+
   return (
     <div
       className={styles.subscriptionItem}
@@ -40,7 +50,7 @@ const SubscriptionListItem = ({ subscription }) => {
                 {generateSubscriptionDuration(subscription, true)} access for up to
               </Text>
               <Text className={styles.contentText}>
-                {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}
+                {subscriptionContentText.join(' and ').replaceAll(' credits/period', '')}
               </Text>
             </Col>
             <Col xs={6} className={styles.textAlignRight}>
@@ -54,53 +64,6 @@ const SubscriptionListItem = ({ subscription }) => {
         </Col>
       </Row>
     </div>
-    // <div
-    //   className={styles.membershipItem}
-    //   style={{
-    //     '--primary-color': `${getSubscriptionColorCode()}80`,
-    //     '--secondary-color': getShadeForHexColor(getSubscriptionColorCode(), 1),
-    //     '--ternary-color': getShadeForHexColor(getSubscriptionColorCode(), 2),
-    //   }}
-    //   onClick={handleMembershipItemClicked}
-    // >
-    //   <Row gutter={[8, 12]}>
-    //     <Col xs={24}>
-    //       <Row gutter={8}>
-    //         <Col xs={22}>
-    //           <div
-    //             className={classNames(
-    //               styles.membershipName,
-    //               subscription?.name?.length > 25 ? styles.textLength50 : styles.textLength25
-    //             )}
-    //           >
-    //             {subscription?.name}
-    //           </div>
-    //         </Col>
-    //         <Col xs={2}>
-    //           <div className={styles.arrowSignContainer}>
-    //             <ArrowRightOutlined className={styles.arrowSign} />
-    //           </div>
-    //         </Col>
-    //       </Row>
-    //     </Col>
-    //     <Col xs={24}>
-    //       <Row gutter={8}>
-    //         <Col xs={14}>
-    //           <div className={styles.membershipDetails}>
-    //             {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}
-    //             <br />/ {generateSubscriptionDuration(subscription)}
-    //           </div>
-    //         </Col>
-    //         <Col xs={10}>
-    //           <div className={styles.membershipPrice}>
-    //             {subscription?.currency?.toUpperCase()} {subscription?.total_price} /
-    //             {generateSubscriptionDuration(subscription)}
-    //           </div>
-    //         </Col>
-    //       </Row>
-    //     </Col>
-    //   </Row>
-    // </div>
   );
 };
 

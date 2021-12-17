@@ -270,7 +270,7 @@ const Subscriptions = ({ history }) => {
   const subscriptionFields = [
     {
       label: 'Membership Tier Name',
-      className: styles.subscriptionNameField,
+      className: undefined,
     },
     {
       label: 'Membership Price',
@@ -278,10 +278,6 @@ const Subscriptions = ({ history }) => {
     },
     {
       label: 'Purchasable by',
-      className: undefined,
-    },
-    {
-      label: 'Session/Video Credit',
       className: undefined,
     },
     {
@@ -293,6 +289,10 @@ const Subscriptions = ({ history }) => {
       className: undefined,
     },
     {
+      label: 'Session/Video Credit',
+      className: undefined,
+    },
+    {
       label: 'Included Sessions',
       className: undefined,
     },
@@ -300,18 +300,14 @@ const Subscriptions = ({ history }) => {
       label: 'Included Videos',
       className: undefined,
     },
-    // {
-    //   label: 'Course Included?',
-    //   className: undefined,
-    // },
-    // {
-    //   label: 'Course Credits/period',
-    //   className: undefined,
-    // },
-    // {
-    //   label: 'Included Courses',
-    //   className: undefined,
-    // },
+    {
+      label: 'Course Credits/period',
+      className: undefined,
+    },
+    {
+      label: 'Included Courses',
+      className: undefined,
+    },
   ];
 
   const renderSubscriptionFields = (item) => (

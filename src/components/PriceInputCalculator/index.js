@@ -30,8 +30,6 @@ const PriceInputCalculator = ({
       fieldValue = form.getFieldValue(name);
     }
 
-    console.log(fieldValue);
-
     if (fieldValue && !isNaN(fieldValue)) {
       setCreatorPrice(fieldValue);
 

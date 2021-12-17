@@ -12,10 +12,11 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { orderType } from 'utils/constants';
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, isUnlimitedMembership } from 'utils/subscriptions';
 import { isAPISuccess, isUnapprovedUserError, preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 
 const { Title, Text, Paragraph } = Typography;
 const { useBreakpoint } = Grid;
@@ -64,12 +65,24 @@ const Subscriptions = () => {
     </Row>
   );
 
+  const renderCourseList = (courses = []) => (
+    <Row gutter={[8, 10]}>
+      {courses.map((course) => (
+        <Col xs={24} key={course.id}>
+          <CourseListItem course={course} />
+        </Col>
+      ))}
+    </Row>
+  );
+
   const renderProductDetails = () => {
     if (selectedSubscription) {
       return selectedProductDetailsKey === 'SESSION' ? (
         renderSessionList(selectedSubscription?.product_details['SESSION'])
       ) : selectedProductDetailsKey === 'VIDEO' ? (
         renderVideoList(selectedSubscription?.product_details['VIDEO'])
+      ) : selectedProductDetailsKey === 'COURSE' ? (
+        renderCourseList(selectedSubscription?.product_details['COURSE'])
       ) : (
         <Text disabled> No product details to show </Text>
       );
@@ -92,7 +105,7 @@ const Subscriptions = () => {
     await Promise.all([
       ...data.active.map(async (activeSubscriptionOrder, idx) => {
         try {
-          const [sessionUsageResponse, videoUsageResponse] = await Promise.all([
+          const [sessionUsageResponse, videoUsageResponse, courseUsageResponse] = await Promise.all([
             apis.subscriptions.getSubscriptionOrderUsageDetails(
               orderType.CLASS,
               activeSubscriptionOrder.subscription_order_id
@@ -101,12 +114,21 @@ const Subscriptions = () => {
               orderType.VIDEO,
               activeSubscriptionOrder.subscription_order_id
             ),
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.COURSE,
+              activeSubscriptionOrder.subscription_order_id
+            ),
           ]);
 
-          if (isAPISuccess(sessionUsageResponse.status) && isAPISuccess(videoUsageResponse.status)) {
+          if (
+            isAPISuccess(sessionUsageResponse.status) &&
+            isAPISuccess(videoUsageResponse.status) &&
+            isAPISuccess(courseUsageResponse.status)
+          ) {
             subscriptionOrdersArr.active[idx]['usage_details'] = [
               ...(sessionUsageResponse.data || []),
               ...(videoUsageResponse.data || []),
+              ...(courseUsageResponse.data || []),
             ];
           }
         } catch (error) {
@@ -118,7 +140,7 @@ const Subscriptions = () => {
       }),
       ...data.expired.map(async (expiredSubscriptionOrder, idx) => {
         try {
-          const [sessionUsageResponse, videoUsageResponse] = await Promise.all([
+          const [sessionUsageResponse, videoUsageResponse, courseUsageResponse] = await Promise.all([
             apis.subscriptions.getSubscriptionOrderUsageDetails(
               orderType.CLASS,
               expiredSubscriptionOrder.subscription_order_id
@@ -127,12 +149,21 @@ const Subscriptions = () => {
               orderType.VIDEO,
               expiredSubscriptionOrder.subscription_order_id
             ),
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.COURSE,
+              expiredSubscriptionOrder.subscription_order_id
+            ),
           ]);
 
-          if (isAPISuccess(sessionUsageResponse.status) && isAPISuccess(videoUsageResponse.status)) {
+          if (
+            isAPISuccess(sessionUsageResponse.status) &&
+            isAPISuccess(videoUsageResponse.status) &&
+            isAPISuccess(courseUsageResponse.status)
+          ) {
             subscriptionOrdersArr.expired[idx]['usage_details'] = [
               ...(sessionUsageResponse.data || []),
               ...(videoUsageResponse.data || []),
+              ...(courseUsageResponse.data || []),
             ];
           }
         } catch (error) {
@@ -253,19 +284,24 @@ const Subscriptions = () => {
   const generateRemainingCreditsText = (subscription, isCourse = false) => {
     let remainingCredits = 0;
     let totalCredits = 0;
+    let isUnlimited = isUnlimitedMembership(subscription, isCourse);
+    let productText = '';
 
     if (isCourse) {
-      // TODO: Once we support course in subs, rework this based on new implementation
-      remainingCredits = subscription?.products['COURSE']?.credits - subscription?.products['COURSE']?.credits_used;
-      totalCredits = subscription?.products['COURSE']?.credits;
+      totalCredits = subscription?.course_credits ?? 0;
+      remainingCredits = totalCredits - (subscription?.course_credits_used ?? 0);
+      productText = 'Course';
     } else {
-      totalCredits = subscription?.product_credits;
-      remainingCredits = totalCredits - subscription?.product_credits_used;
+      totalCredits = subscription?.product_credits ?? 0;
+      remainingCredits = totalCredits - (subscription?.product_credits_used ?? 0);
+      productText = 'Session or Video';
     }
 
-    return (
+    return isUnlimited ? (
+      <Text>Unlimited {productText}</Text>
+    ) : (
       <Text>
-        {remainingCredits}/{totalCredits} {isCourse ? 'Course' : 'Session or Video'} credits left
+        {remainingCredits}/{totalCredits} {productText} credits left
       </Text>
     );
   };
@@ -276,6 +312,8 @@ const Subscriptions = () => {
         return 'Session';
       case orderType.VIDEO:
         return 'Video';
+      case orderType.COURSE:
+        return 'Course';
       default:
         return '';
     }
@@ -283,8 +321,9 @@ const Subscriptions = () => {
 
   const renderRemainingCreditsForSubscription = (subscriptionOrder) => (
     <Space size="small" direction="vertical" align="left">
-      {generateRemainingCreditsText(subscriptionOrder, false)}
-      {subscriptionOrder.products['COURSE'] && generateRemainingCreditsText(subscriptionOrder, true)}
+      {(subscriptionOrder.product_details['SESSION'] || subscriptionOrder.product_details['VIDEO']) &&
+        generateRemainingCreditsText(subscriptionOrder, false)}
+      {subscriptionOrder.product_details['COURSE'] && generateRemainingCreditsText(subscriptionOrder, true)}
     </Space>
   );
 
@@ -419,8 +458,6 @@ const Subscriptions = () => {
   };
 
   const renderSubscriptionDetails = (subscription, isActive) => {
-    const subscriptionDetails = subscription;
-
     return (
       <div>
         <Row gutter={[8, 24]}>
@@ -434,18 +471,24 @@ const Subscriptions = () => {
 
           <Col xs={24} className={!lg ? undefined : styles.subSection}>
             <Space align="left">
-              <Row gutter={[8, 8]}>
-                <Col xs={24}>
-                  <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, false)}</div>
-                </Col>
-              </Row>
-              {/* {subscriptionDetails.products['COURSE'] && (
+              {(subscription.product_details['SESSION'] || subscription.product_details['VIDEO']) && (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
-                    <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, true)}</div>
+                    <div className={styles.baseCreditsText}>
+                      {generateBaseCreditsText({ ...subscription, products: subscription.product_details }, false)}
+                    </div>
                   </Col>
                 </Row>
-              )} */}
+              )}
+              {subscription.product_details['COURSE'] && (
+                <Row gutter={[8, 8]}>
+                  <Col xs={24}>
+                    <div className={styles.baseCreditsText}>
+                      {generateBaseCreditsText({ ...subscription, products: subscription.product_details }, true)}
+                    </div>
+                  </Col>
+                </Row>
+              )}
             </Space>
           </Col>
 
@@ -456,13 +499,12 @@ const Subscriptions = () => {
               </Col>
               <Col xs={24} className={!lg ? undefined : styles.subSection}>
                 <Space direction="horizontal">
-                  {Object.entries(subscription?.products).map(([key, val]) => (
+                  {Object.entries(subscription?.product_details).map(([key, val]) => (
                     <Button
                       onClick={() => showProductsDetails(subscription, key)}
                       key={`${subscription?.external_id}_${key}`}
                     >
-                      {' '}
-                      {val.product_ids?.length ?? 0} {key.toLowerCase()}s{' '}
+                      {val.length ?? 0} {key.toLowerCase()}s
                     </Button>
                   ))}
                 </Space>
