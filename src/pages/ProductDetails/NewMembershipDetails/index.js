@@ -9,6 +9,7 @@ import apis from 'apis';
 import AuthModal from 'components/AuthModal';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
+import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -23,14 +24,12 @@ import { generateColorPalletteForProfile, convertHexToRGB, isBrightColorShade } 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 
 const { Title, Text } = Typography;
 const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-// TODO: Adjust this page to also show courses purchasable with membership
 const NewMembershipDetails = ({ match }) => {
   const subscriptionId = match.params.membership_id;
 

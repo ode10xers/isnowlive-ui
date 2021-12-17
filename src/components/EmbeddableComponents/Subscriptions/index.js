@@ -43,7 +43,6 @@ const NewSubscriptionItem = ({ subscription = null, onBuy, onDetails }) => {
     '--primary-color-darkest': formatHSLStyleString(h, s, l - 35),
   };
 
-  // TODO: Adjust the copy here for more clarity
   return (
     <div className={styles.subscriptionItem} style={colorObj}>
       <Row gutter={[8, 16]} align="middle" justify="center">

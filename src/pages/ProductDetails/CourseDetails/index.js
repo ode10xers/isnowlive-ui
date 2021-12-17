@@ -271,7 +271,6 @@ const CourseDetails = ({ match }) => {
 
     if (!shouldFollowUpGetCourse) {
       if (getLocalUserDetails() && !usableSubscription) {
-        console.log(course);
         await getUsableSubscriptionForUser(course.id);
 
         setShouldFollowUpGetCourse(true);

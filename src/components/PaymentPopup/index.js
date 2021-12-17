@@ -23,8 +23,9 @@ import {
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { getUsernameFromUrl } from 'utils/url';
-import { getGiftReceiverData, getLocalUserDetails, saveGiftReceiverData, saveGiftOrderData } from 'utils/storage';
+import { isUnlimitedMembership } from 'utils/subscriptions';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
+import { getGiftReceiverData, getLocalUserDetails, saveGiftReceiverData, saveGiftOrderData } from 'utils/storage';
 import { isAPISuccess, isInCreatorDashboard, isUnapprovedUserError } from 'utils/helper';
 import {
   orderType,
@@ -38,7 +39,6 @@ import { useGlobalContext } from 'services/globalContext';
 import http from 'services/http';
 
 import styles from './styles.module.scss';
-import { isUnlimitedMembership } from 'utils/subscriptions';
 
 const { Text, Title } = Typography;
 const {
