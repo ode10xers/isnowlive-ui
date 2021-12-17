@@ -16,6 +16,7 @@ import { generateBaseCreditsText, isUnlimitedMembership } from 'utils/subscripti
 import { isAPISuccess, isUnapprovedUserError, preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 
 const { Title, Text, Paragraph } = Typography;
 const { useBreakpoint } = Grid;
@@ -64,12 +65,24 @@ const Subscriptions = () => {
     </Row>
   );
 
+  const renderCourseList = (courses = []) => (
+    <Row gutter={[8, 10]}>
+      {courses.map((course) => (
+        <Col xs={24} key={course.id}>
+          <CourseListItem course={course} />
+        </Col>
+      ))}
+    </Row>
+  );
+
   const renderProductDetails = () => {
     if (selectedSubscription) {
       return selectedProductDetailsKey === 'SESSION' ? (
         renderSessionList(selectedSubscription?.product_details['SESSION'])
       ) : selectedProductDetailsKey === 'VIDEO' ? (
         renderVideoList(selectedSubscription?.product_details['VIDEO'])
+      ) : selectedProductDetailsKey === 'COURSE' ? (
+        renderCourseList(selectedSubscription?.product_details['COURSE'])
       ) : (
         <Text disabled> No product details to show </Text>
       );
@@ -92,7 +105,7 @@ const Subscriptions = () => {
     await Promise.all([
       ...data.active.map(async (activeSubscriptionOrder, idx) => {
         try {
-          const [sessionUsageResponse, videoUsageResponse] = await Promise.all([
+          const [sessionUsageResponse, videoUsageResponse, courseUsageResponse] = await Promise.all([
             apis.subscriptions.getSubscriptionOrderUsageDetails(
               orderType.CLASS,
               activeSubscriptionOrder.subscription_order_id
@@ -101,12 +114,21 @@ const Subscriptions = () => {
               orderType.VIDEO,
               activeSubscriptionOrder.subscription_order_id
             ),
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.COURSE,
+              activeSubscriptionOrder.subscription_order_id
+            ),
           ]);
 
-          if (isAPISuccess(sessionUsageResponse.status) && isAPISuccess(videoUsageResponse.status)) {
+          if (
+            isAPISuccess(sessionUsageResponse.status) &&
+            isAPISuccess(videoUsageResponse.status) &&
+            isAPISuccess(courseUsageResponse.status)
+          ) {
             subscriptionOrdersArr.active[idx]['usage_details'] = [
               ...(sessionUsageResponse.data || []),
               ...(videoUsageResponse.data || []),
+              ...(courseUsageResponse.data || []),
             ];
           }
         } catch (error) {
@@ -118,7 +140,7 @@ const Subscriptions = () => {
       }),
       ...data.expired.map(async (expiredSubscriptionOrder, idx) => {
         try {
-          const [sessionUsageResponse, videoUsageResponse] = await Promise.all([
+          const [sessionUsageResponse, videoUsageResponse, courseUsageResponse] = await Promise.all([
             apis.subscriptions.getSubscriptionOrderUsageDetails(
               orderType.CLASS,
               expiredSubscriptionOrder.subscription_order_id
@@ -127,12 +149,21 @@ const Subscriptions = () => {
               orderType.VIDEO,
               expiredSubscriptionOrder.subscription_order_id
             ),
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.COURSE,
+              expiredSubscriptionOrder.subscription_order_id
+            ),
           ]);
 
-          if (isAPISuccess(sessionUsageResponse.status) && isAPISuccess(videoUsageResponse.status)) {
+          if (
+            isAPISuccess(sessionUsageResponse.status) &&
+            isAPISuccess(videoUsageResponse.status) &&
+            isAPISuccess(courseUsageResponse.status)
+          ) {
             subscriptionOrdersArr.expired[idx]['usage_details'] = [
               ...(sessionUsageResponse.data || []),
               ...(videoUsageResponse.data || []),
+              ...(courseUsageResponse.data || []),
             ];
           }
         } catch (error) {
@@ -281,6 +312,8 @@ const Subscriptions = () => {
         return 'Session';
       case orderType.VIDEO:
         return 'Video';
+      case orderType.COURSE:
+        return 'Course';
       default:
         return '';
     }
