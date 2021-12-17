@@ -571,7 +571,7 @@ const CreateSubscriptionCard = ({
                     >
                       <InputNumber
                         disabled={(!isVideoIncluded && !isSessionIncluded) || isUnlimited}
-                        min={!isVideoIncluded && !isSessionIncluded ? 0 : 1}
+                        min={(!isVideoIncluded && !isSessionIncluded) || isUnlimited ? 0 : 1}
                         placeholder="Enter Session/Video credits"
                         className={styles.numericInput}
                       />
@@ -830,7 +830,7 @@ const CreateSubscriptionCard = ({
                   >
                     <InputNumber
                       disabled={!isCourseIncluded || isUnlimited}
-                      min={!isCourseIncluded ? 0 : 1}
+                      min={!isCourseIncluded || isUnlimited ? 0 : 1}
                       placeholder="Course credits/period"
                       className={styles.numericInput}
                     />
