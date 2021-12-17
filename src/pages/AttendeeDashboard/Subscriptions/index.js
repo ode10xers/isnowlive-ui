@@ -288,7 +288,8 @@ const Subscriptions = () => {
 
   const renderRemainingCreditsForSubscription = (subscriptionOrder) => (
     <Space size="small" direction="vertical" align="left">
-      {generateRemainingCreditsText(subscriptionOrder, false)}
+      {(subscriptionOrder.product_details['SESSION'] || subscriptionOrder.product_details['VIDEO']) &&
+        generateRemainingCreditsText(subscriptionOrder, false)}
       {subscriptionOrder.product_details['COURSE'] && generateRemainingCreditsText(subscriptionOrder, true)}
     </Space>
   );
