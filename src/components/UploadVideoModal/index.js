@@ -51,7 +51,7 @@ import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 import { fetchCreatorCurrency } from 'utils/payment';
 import { generateYoutubeThumbnailURL } from 'utils/video';
-import { defaultPlatformFeePercentage } from 'utils/constants';
+import { courseType, defaultPlatformFeePercentage } from 'utils/constants';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
@@ -147,6 +147,8 @@ const UploadVideoModal = ({
   const [selectedPassIds, setSelectedPassIds] = useState([]);
   const [creatorMemberships, setCreatorMemberships] = useState([]);
   const [selectedMembershipIds, setSelectedMembershipIds] = useState([]);
+  const [creatorCourses, setCreatorCourses] = useState([]);
+  const [selectedCourseIds, setSelectedCourseIds] = useState([]);
 
   const [creatorDocuments, setCreatorDocuments] = useState([]);
   const [accessibleBeforePurchase, setAccessibleBeforePurchase] = useState(false);
@@ -294,6 +296,25 @@ const UploadVideoModal = ({
     setIsLoading(false);
   }, []);
 
+  const fetchCoursesForCreator = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.courses.getCreatorCourses();
+
+      if (isAPISuccess(status) && data) {
+        const filteredCourses =
+          data.filter((course) => course.type === courseType.VIDEO || course.type === courseType.MIXED) ?? [];
+        setCreatorCourses(filteredCourses);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch courses');
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  }, []);
+
   const fetchCreatorDocuments = useCallback(async () => {
     try {
       const { status, data } = await apis.documents.getCreatorDocuments();
@@ -338,7 +359,14 @@ const UploadVideoModal = ({
     fetchAllClassesForCreator();
     fetchPassesForCreator();
     fetchSubscriptionsForCreator();
-  }, [fetchAllClassesForCreator, fetchPassesForCreator, fetchSubscriptionsForCreator, fetchCreatorDocuments]);
+    fetchCoursesForCreator();
+  }, [
+    fetchAllClassesForCreator,
+    fetchPassesForCreator,
+    fetchSubscriptionsForCreator,
+    fetchCreatorDocuments,
+    fetchCoursesForCreator,
+  ]);
 
   useEffect(() => {
     if (visible) {
@@ -498,9 +526,59 @@ const UploadVideoModal = ({
     setIsCourseVideo(e.target.value === 'course');
   };
 
+  // NOTE: In addition to custom "add to course logic"
+  // We'll need to show confirmation modal to "Propagate Orders"
+  const handleFirstFormSubmitClicked = (values) => {
+    const shouldAddToCourse = (selectedCourseIds || values.course_ids || []).length > 0;
+
+    if (shouldAddToCourse) {
+      const modalRef = Modal.confirm({
+        centered: true,
+        closable: true,
+        maskClosable: false,
+        title: 'Some items in this course have changed',
+        width: 640,
+        content: (
+          <Row gutter={[8, 4]}>
+            <Col xs={24}>
+              <Paragraph>It seems you have added or removed some items in this course.</Paragraph>
+            </Col>
+            <Col xs={24}>
+              <Paragraph>
+                Would you like these changes to also reflect in the course orders already purchased by some attendees?
+              </Paragraph>
+            </Col>
+            <Col xs={24}>
+              <Row gutter={8} justify="end">
+                <Col>
+                  <Button block type="default" onClick={() => handleFinish(values, false, modalRef)}>
+                    Don't change existing orders
+                  </Button>
+                </Col>
+                <Col>
+                  <Button block type="primary" onClick={() => handleFinish(values, true, modalRef)}>
+                    Change existing orders
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        ),
+        okButtonProps: { style: { display: 'none' } },
+        cancelButtonProps: { style: { display: 'none' } },
+      });
+    } else {
+      handleFinish(values, false);
+    }
+  };
+
   // NOTE : This handles the form submit logic on the first part of the modal
-  const handleFinish = async (values) => {
+  const handleFinish = async (values, shouldPropagateCourses = false, modalRef = null) => {
     setIsSubmitting(true);
+
+    if (modalRef) {
+      modalRef.destroy();
+    }
 
     try {
       const videoSourceData =
@@ -549,11 +627,15 @@ const UploadVideoModal = ({
             video_currency: data.currency || customNullValue,
           });
 
+          // NOTE: Custom Logic to Automagically add this new video
+          // to selected passes
+
           const targetPassIds = selectedPassIds || values.pass_ids || [];
           const targetPasses = creatorPasses.filter((cPass) => targetPassIds.includes(cPass.external_id));
           try {
             await Promise.all(
               targetPasses.map(async (pass) => {
+                // NOTE: This needs to be similar to the one in CreatePassModal
                 const passPayload = {
                   currency: pass.currency,
                   price: pass.price,
@@ -578,6 +660,86 @@ const UploadVideoModal = ({
             console.error(error);
           }
 
+          // NOTE: Custom Logic to Automagically add this new video
+          // to selected courses
+
+          const targetCourseIds = selectedCourseIds || values.course_ids || [];
+          const targetCourses = creatorCourses?.filter((cCourse) => targetCourseIds.includes(cCourse.id));
+          try {
+            await Promise.all(
+              targetCourses.map(async (course) => {
+                const modifiedModules = course.modules?.map((mod) => mod) ?? []; // Deep clone
+
+                // 2 Possible cases
+                if (modifiedModules.length === 0) {
+                  // 1) Outline courses (there's no modules at all)
+                  // Use video title as both module name and content name
+
+                  modifiedModules.push({
+                    name: data.title,
+                    module_content: [
+                      {
+                        name: data.title,
+                        product_id: data.external_id,
+                        product_type: 'VIDEO',
+                      },
+                    ],
+                  });
+                } else {
+                  // 2) In this case there's already a module
+                  // We choose the module with the highest video count
+                  // If none, we push to the first module
+                  const moduleContentLengths = modifiedModules.map(
+                    (mod) => mod.module_content?.filter((content) => content.product_type === 'VIDEO').length
+                  );
+                  console.log(moduleContentLengths);
+                  const foundMostVideoIndex = moduleContentLengths.reduce(
+                    (iMax, x, i, arr) => (x > arr[iMax] ? i : iMax),
+                    0
+                  );
+                  console.log('Index with most videos: ', foundMostVideoIndex);
+
+                  modifiedModules[foundMostVideoIndex].module_content.push({
+                    name: data.title,
+                    product_id: data.external_id,
+                    product_type: 'VIDEO',
+                  });
+                }
+
+                // NOTE: This needs to be similar to the one in ManageCourses/CourseForm
+                const coursePayload = {
+                  course_image_url: course.course_image_url,
+                  currency: course.currency,
+                  description: course.description,
+                  end_date: course.end_date ?? 'Invalid Date', //will be invalid for VIDEO courses
+                  faqs: course.faqs,
+                  max_participants: course.max_participants ?? 1,
+                  modules: modifiedModules,
+                  name: course.name,
+                  preview_image_url: course.preview_image_url,
+                  price: course.price,
+                  propagate_to_orders: shouldPropagateCourses ?? false,
+                  summary: course.summary,
+                  tag_ids: course.tag?.map((tagData) => tagData.external_id),
+                  topic: course.topic,
+                  type: course.type,
+                  validity: course.validity ?? 1,
+                };
+
+                const updateCourseResponse = await apis.courses.updateCourse(course.id, coursePayload);
+                console.log(updateCourseResponse.status);
+              })
+            );
+
+            await fetchCoursesForCreator();
+          } catch (error) {
+            message.error('Failed to attach video to pass');
+            console.error(error);
+          }
+
+          // NOTE: Custom Logic to Automagically add this new video
+          // to selected memberships
+
           const targetMembershipIds = selectedMembershipIds || values.membership_ids || [];
           const targetMemberships = creatorMemberships?.filter((cSubs) =>
             targetMembershipIds.includes(cSubs.external_id)
@@ -585,6 +747,7 @@ const UploadVideoModal = ({
 
           try {
             await Promise.all(
+              // NOTE: This needs to be similar to the one in CreateSubscriptionCard
               targetMemberships.map(async (subs) => {
                 let videosProductInfo = subs.products['VIDEO'] ?? null;
 
@@ -885,7 +1048,7 @@ const UploadVideoModal = ({
 
   const modalTitle = () => {
     if (formPart === 1) {
-      return 'Create Video Product';
+      return editedVideo ? 'Edit Video Product' : 'Create Video Product';
     } else if (formPart === 2) {
       return 'Upload Video';
     } else if (formPart === 3) {
@@ -937,7 +1100,7 @@ const UploadVideoModal = ({
             {...formLayout}
             name="classVideoForm"
             form={form}
-            onFinish={handleFinish}
+            onFinish={handleFirstFormSubmitClicked}
             scrollToFirstError={true}
             initialValues={formInitialValues}
           >
@@ -1120,7 +1283,12 @@ const UploadVideoModal = ({
               <Col xs={24} className={styles.mb20}>
                 <Collapse>
                   <Panel
-                    header={<Text strong>Advance Options (click to add it to memberships, passes or add a file)</Text>}
+                    header={
+                      <Text strong>
+                        Advance Options (click to {editedVideo ? '' : 'add it to memberships, passes, courses, or'} add
+                        a file)
+                      </Text>
+                    }
                   >
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
@@ -1264,7 +1432,7 @@ const UploadVideoModal = ({
                             mode="multiple"
                             value={selectedPassIds}
                             onChange={setSelectedPassIds}
-                            placeholder="Select the passes usable for this video"
+                            placeholder="Select the passes to add this video into"
                             maxTagCount={2}
                             optionLabelProp="label"
                           >
@@ -1368,6 +1536,65 @@ const UploadVideoModal = ({
                               {creatorMemberships?.filter((subs) => !subs.is_published).length <= 0 && (
                                 <Select.Option disabled value="no_unpublished_subs">
                                   <Text disabled> No unpublished memberships </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={editedVideo ? 0 : 24}>
+                        <Form.Item id="course_ids" name="course_ids" label="Related Course(s)">
+                          <Select
+                            showArrow
+                            showSearch={false}
+                            mode="multiple"
+                            value={selectedCourseIds}
+                            onChange={setSelectedCourseIds}
+                            placeholder="Select the courses to add this video into"
+                            maxTagCount={2}
+                            optionLabelProp="label"
+                          >
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                              key="Published Courses"
+                            >
+                              {creatorCourses
+                                ?.filter((course) => course.is_published)
+                                .map((course) => (
+                                  <Select.Option key={course.id} value={course.id} label={course.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{course.name}</Col>
+                                      <Col xs={7}>
+                                        {course.price > 0 ? `${course.currency.toUpperCase()} ${course.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorCourses?.filter((course) => course.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_published_course">
+                                  <Text disabled> No published courses </Text>
+                                </Select.Option>
+                              )}
+                            </Select.OptGroup>
+                            <Select.OptGroup
+                              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                              key="Unpublished Courses"
+                            >
+                              {creatorCourses
+                                ?.filter((course) => !course.is_published)
+                                .map((course) => (
+                                  <Select.Option key={course.id} value={course.id} label={course.name}>
+                                    <Row gutter={[8, 8]}>
+                                      <Col xs={17}>{course.name}</Col>
+                                      <Col xs={7}>
+                                        {course.price > 0 ? `${course.currency.toUpperCase()} ${course.price}` : 'Free'}
+                                      </Col>
+                                    </Row>
+                                  </Select.Option>
+                                ))}
+                              {creatorCourses?.filter((course) => !course.is_published).length <= 0 && (
+                                <Select.Option disabled value="no_unpublished_course">
+                                  <Text disabled> No unpublished courses </Text>
                                 </Select.Option>
                               )}
                             </Select.OptGroup>
