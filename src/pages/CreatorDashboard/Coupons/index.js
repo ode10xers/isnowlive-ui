@@ -409,11 +409,6 @@ const Coupons = () => {
       key: 'amount',
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.amount}`,
     },
-    // {
-    //   title: '',
-    //   dataIndex: '',
-    //   key: '',
-    // },
   ];
 
   return (
