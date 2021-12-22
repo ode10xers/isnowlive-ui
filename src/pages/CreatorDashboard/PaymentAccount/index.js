@@ -153,7 +153,7 @@ const PaymentAccount = () => {
       validateStripeAccount();
     }
     //eslint-disable-next-line
-  }, [validateAccount, openStripeDashboard, setUserDetails]);
+  }, []);
 
   const onboardUserToStripe = async () => {
     setIsLoading(true);
