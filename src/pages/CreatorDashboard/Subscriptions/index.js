@@ -54,8 +54,7 @@ const Subscriptions = ({ history }) => {
   const getCreatorSubscriptions = useCallback(async () => {
     setIsLoading(true);
     try {
-      //TODO: Since the API is paginated right now the temporary solution is to set per_page as 25
-      const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 25);
+      const { status, data } = await apis.subscriptions.getCreatorSubscriptions();
 
       let mappedSubscriptionData = [];
       if (isAPISuccess(status) && data.Data) {

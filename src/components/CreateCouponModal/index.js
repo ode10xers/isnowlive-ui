@@ -23,12 +23,12 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { isAvailabilityCoupon } from 'utils/coupon';
 import { couponProductTypes, couponTypes } from 'utils/constants';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { isAvailabilityCoupon } from 'utils/coupon';
 
 const { Text } = Typography;
 
@@ -58,6 +58,11 @@ const creatorProductInfo = [
     key: couponProductTypes.VIDEO,
     name: 'Videos',
     apiMethod: apis.videos.getCreatorVideos,
+  },
+  {
+    key: couponProductTypes.SUBSCRIPTION,
+    name: 'Memberships',
+    apiMethod: apis.subscriptions.getCreatorSubscriptions,
   },
 ];
 
@@ -105,6 +110,8 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         return productData['external_id'];
       case couponProductTypes.VIDEO.toLowerCase():
         return productData['external_id'];
+      case couponProductTypes.SUBSCRIPTION.toLowerCase():
+        return productData['external_id'];
       default:
         break;
     }
@@ -124,6 +131,8 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         return productData['name'];
       case couponProductTypes.VIDEO.toLowerCase():
         return productData['title'];
+      case couponProductTypes.SUBSCRIPTION.toLowerCase():
+        return productData['name'];
       default:
         break;
     }
@@ -141,7 +150,12 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         const { status, data } = await product.apiMethod();
 
         if (isAPISuccess(status) && data) {
-          productInfo[product.key.toLowerCase()] = data;
+          if (product.key === couponProductTypes.SUBSCRIPTION) {
+            // NOTE: The response structure of Subscription is a bit different
+            productInfo[product.key.toLowerCase()] = data.Data;
+          } else {
+            productInfo[product.key.toLowerCase()] = data;
+          }
         }
       } catch (error) {
         message.error(error?.response?.data?.message || `Failed to fetch ${product.name}`);

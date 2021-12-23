@@ -33,6 +33,7 @@ import {
   paymentSource,
   paymentProvider,
   reservedDomainName,
+  couponProductTypes,
 } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -223,51 +224,38 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(true);
 
     try {
-      let couponStatus = null;
-      let couponData = null;
+      let couponProductType = '';
+
       switch (productType) {
         case productTypeConstants.COURSE:
-          const coursePayload = {
-            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
-            course_id: productId,
-          };
-          const { status: statusCourse, data: dataCourse } = await apis.coupons.validateCourseCoupon(coursePayload);
-          couponStatus = statusCourse;
-          couponData = dataCourse;
+          couponProductType = couponProductTypes.COURSE;
           break;
         case productTypeConstants.CLASS:
-          const sessionPayload = {
-            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
-            session_id: productId,
-          };
-          const { status: statusSession, data: dataSession } = await apis.coupons.validateSessionCoupon(sessionPayload);
-          couponStatus = statusSession;
-          couponData = dataSession;
+          couponProductType = couponProductTypes.SESSION;
           break;
         case productTypeConstants.PASS:
-          const passPayload = {
-            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
-            pass_id: productId,
-          };
-          const { status: statusPass, data: dataPass } = await apis.coupons.validatePassCoupon(passPayload);
-          couponStatus = statusPass;
-          couponData = dataPass;
+          couponProductType = couponProductTypes.PASS;
           break;
         case productTypeConstants.VIDEO:
-          const videoPayload = {
-            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
-            video_id: productId,
-          };
-          const { status: statusVideo, data: dataVideo } = await apis.coupons.validateVideoCoupon(videoPayload);
-          couponStatus = statusVideo;
-          couponData = dataVideo;
+          couponProductType = couponProductTypes.VIDEO;
+          break;
+        case productTypeConstants.SUBSCRIPTION:
+          couponProductType = couponProductTypes.SUBSCRIPTION;
           break;
         default:
           break;
       }
 
-      if (isAPISuccess(couponStatus) && couponData) {
-        setDiscountedPrice(couponData.discounted_amount);
+      const payload = {
+        product_id: productId,
+        product_type: couponProductType,
+        coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+      };
+
+      const { status, data } = await apis.coupons.validateCoupon(payload);
+
+      if (isAPISuccess(status) && data) {
+        setDiscountedPrice(data.discounted_amount);
         setCouponErrorText(<Text type="success"> Coupon Applied! </Text>);
         setCouponApplied(true);
       }

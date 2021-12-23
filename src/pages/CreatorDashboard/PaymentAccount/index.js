@@ -118,7 +118,7 @@ const PaymentAccount = () => {
   }, [fetchSupportedCountriesForPayment]);
 
   useEffect(() => {
-    if (validateAccount && paymentConnected === StripeAccountStatus.VERIFICATION_PENDING) {
+    if (validateAccount || paymentConnected === StripeAccountStatus.VERIFICATION_PENDING) {
       const validateStripeAccount = async () => {
         try {
           const { status, data } = await apis.payment.stripe.validate();
@@ -128,20 +128,29 @@ const PaymentAccount = () => {
             const localUserDetails = getLocalUserDetails();
             localUserDetails.profile.payment_account_status = paymentStatus;
             setUserDetails(localUserDetails);
-
-            Modal.confirm({
-              centered: true,
-              title: 'Stripe account successfully connected',
-              content: `Now you can start making paid products and earn money by selling them. You can now check your earnings in the "Get Paid" section of your dashboard.`,
-              onOk: () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions),
-              okText: 'Create Session',
-              onCancel: () => history.push(Routes.creatorDashboard.rootPath),
-              cancelText: 'Go to Dashboard',
-              closable: true,
-              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-            });
-
             setPaymentConnected(paymentStatus);
+
+            if (paymentStatus === StripeAccountStatus.CONNECTED) {
+              Modal.confirm({
+                centered: true,
+                title: 'Stripe account successfully connected',
+                content: `Now you can start making paid products and earn money by selling them. You can now check your earnings in the "Get Paid" section of your dashboard.`,
+                onOk: () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions),
+                okText: 'Create Session',
+                onCancel: () => history.push(Routes.creatorDashboard.rootPath),
+                cancelText: 'Go to Dashboard',
+                closable: true,
+                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+              });
+            } else {
+              Modal.info({
+                centered: true,
+                title: 'Stripe account verification in progress',
+                content: `It will take some time for Stripe to verify your details. You might need to submit valid identity documents to proceed further. Please come back after some time to validate your account`,
+                okText: 'Understood',
+                closable: true,
+              });
+            }
           }
         } catch (error) {
           if (error.response?.data?.message && error.response?.data?.message !== 'unable to find payment credentials') {
@@ -153,7 +162,7 @@ const PaymentAccount = () => {
       validateStripeAccount();
     }
     //eslint-disable-next-line
-  }, [validateAccount, openStripeDashboard, setUserDetails]);
+  }, []);
 
   const onboardUserToStripe = async () => {
     setIsLoading(true);

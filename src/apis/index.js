@@ -1,4 +1,5 @@
 import http from 'services/http';
+import { CREATOR_SUBSCRIPTION_API_PER_PAGE_COUNT } from 'utils/constants';
 import { generateQueryString } from 'utils/url';
 
 export default {
@@ -190,10 +191,11 @@ export default {
     updateCoupon: (couponId, payload) => http.put(`/secure/creator/coupons/${couponId}`, payload),
     publishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/publish`),
     unpublishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/unpublish`),
-    validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
-    validateSessionCoupon: (payload) => http.post('/secure/customer/promotions/validate/session', payload),
-    validateVideoCoupon: (payload) => http.post('/secure/customer/promotions/validate/video', payload),
-    validatePassCoupon: (payload) => http.post('/secure/customer/promotions/validate/pass', payload),
+    validateCoupon: (payload) => http.post(`/secure/customer/promotions/validate`, payload),
+    // validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
+    // validateSessionCoupon: (payload) => http.post('/secure/customer/promotions/validate/session', payload),
+    // validateVideoCoupon: (payload) => http.post('/secure/customer/promotions/validate/video', payload),
+    // validatePassCoupon: (payload) => http.post('/secure/customer/promotions/validate/pass', payload),
   },
   subscriptions: {
     createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
@@ -201,7 +203,8 @@ export default {
     unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),
     updateSubscription: (subscriptionId, payload) =>
       http.patch(`/secure/creator/subscription/${subscriptionId}`, payload),
-    getCreatorSubscriptions: (pageNo, perPage = 3) =>
+    //TODO: The API is paginated, but in order to provide a normal experience we're hardcoding the per_page to 25
+    getCreatorSubscriptions: (pageNo = 1, perPage = CREATOR_SUBSCRIPTION_API_PER_PAGE_COUNT) =>
       http.get(`/secure/creator/subscription?page=${pageNo}&per_page=${perPage}`),
     getSubscriptionDetails: (subscriptionId) => http.get(`/secure/creator/subscription/${subscriptionId}`),
     deleteSubscription: (subscriptionId) => http.delete(`/secure/creator/subscription/${subscriptionId}`),

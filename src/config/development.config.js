@@ -15,7 +15,10 @@ export default {
   },
   stripe: {
     secretKey:
-      'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
+      // Old
+      // 'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
+      // New
+      'pk_test_51K8lTKLEVlohEuny0r0Ryl9qYigA0ji9jN7kN4TvOZ5ZGQVIGTvCSKAl0XxXwKkiAjl3fJwU7Qi3IBMVbMYXX2ij00224N2O0H',
     indianSecretKey:
       'pk_test_51JAUu3SAipO1KYDwrdTNBNT3unsc2CJYbVd6RhW5ksXRrHM4s5V2ztVFUZ746GSjUqEv5rMuUO7Nt2GhbJTc2Tyj00XPYyClay',
   },
