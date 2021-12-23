@@ -1,6 +1,7 @@
-import React, { lazy, Suspense } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
+import { setFreshChatWidgetVisibility } from '../../services/integrations/fresh-chat';
 
 const SessionsInventories = lazy(() => import('pages/AttendeeDashboard/SessionsInventories'));
 const ClassPassList = lazy(() => import('pages/AttendeeDashboard/ClassPassList'));
@@ -14,6 +15,14 @@ const DashboardPage = lazy(() => import('pages/AttendeeDashboard/DashboardPage')
 const DocumentDetails = lazy(() => import('pages/AttendeeDashboard/DocumentDetails'));
 
 const AttendeeDashboard = ({ match }) => {
+  useEffect(() => {
+    setFreshChatWidgetVisibility(true);
+
+    return () => {
+      setFreshChatWidgetVisibility(false);
+    };
+  }, []);
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Switch>
