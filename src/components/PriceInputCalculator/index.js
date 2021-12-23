@@ -49,7 +49,9 @@ const PriceInputCalculator = ({
   const onCreatorPriceChange = (numValue) => {
     if (typeof numValue === 'number' && !isNaN(numValue) && numValue > 0) {
       setCreatorPrice(numValue);
-      setCalculatedPrice(numValue * (1 + feePercentage));
+      const calcPrice = Number(Number(numValue * (1 + feePercentage)).toFixed(2));
+      console.log(calcPrice);
+      setCalculatedPrice(calcPrice);
 
       form.setFields([
         {
@@ -63,7 +65,8 @@ const PriceInputCalculator = ({
   const onCalculatedPriceChange = (numValue) => {
     if (typeof numValue === 'number' && !isNaN(numValue) && numValue > 0) {
       setCalculatedPrice(numValue);
-      const creatorPrice = numValue / (1 + feePercentage);
+      const creatorPrice = Number(Number(numValue / (1 + feePercentage)).toFixed(2));
+      console.log(creatorPrice);
       setCreatorPrice(creatorPrice);
 
       form.setFields([

@@ -281,7 +281,7 @@ const UploadVideoModal = ({
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 25);
+      const { status, data } = await apis.subscriptions.getCreatorSubscriptions();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberships(data.Data ?? []);

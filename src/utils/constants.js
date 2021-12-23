@@ -6,6 +6,8 @@ import LinkedInLogo from 'assets/icons/linkedin/LinkedInLogo';
 
 export const UNLIMITED_SUBSCRIPTION_CREDIT_COUNT = 100000;
 
+export const CREATOR_SUBSCRIPTION_API_PER_PAGE_COUNT = 25;
+
 export const paymentProvider = {
   STRIPE: 'STRIPE',
   PAYPAL: 'PAYPAL',
@@ -22,6 +24,7 @@ export const couponProductTypes = {
   VIDEO: 'VIDEO',
   COURSE: 'COURSE',
   AVAILABILITY: 'AVAILABILITY', // Only used locally
+  SUBSCRIPTION: 'SUBSCRIPTION',
 };
 
 export const socialMediaIcons = {
