@@ -224,41 +224,98 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(true);
 
     try {
-      let couponProductType = '';
-
+      // Old implementation (doesn't support Subscription)
+      // Using this for now to solve PROD issue temporarily
+      let couponStatus = null;
+      let couponData = null;
       switch (productType) {
         case productTypeConstants.COURSE:
-          couponProductType = couponProductTypes.COURSE;
+          const coursePayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            course_id: productId,
+          };
+          const { status: statusCourse, data: dataCourse } = await apis.coupons.validateCourseCoupon(coursePayload);
+          couponStatus = statusCourse;
+          couponData = dataCourse;
           break;
         case productTypeConstants.CLASS:
-          couponProductType = couponProductTypes.SESSION;
+          const sessionPayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            session_id: productId,
+          };
+          const { status: statusSession, data: dataSession } = await apis.coupons.validateSessionCoupon(sessionPayload);
+          couponStatus = statusSession;
+          couponData = dataSession;
           break;
         case productTypeConstants.PASS:
-          couponProductType = couponProductTypes.PASS;
+          const passPayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            pass_id: productId,
+          };
+          const { status: statusPass, data: dataPass } = await apis.coupons.validatePassCoupon(passPayload);
+          couponStatus = statusPass;
+          couponData = dataPass;
           break;
         case productTypeConstants.VIDEO:
-          couponProductType = couponProductTypes.VIDEO;
-          break;
-        case productTypeConstants.SUBSCRIPTION:
-          couponProductType = couponProductTypes.SUBSCRIPTION;
+          const videoPayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            video_id: productId,
+          };
+          const { status: statusVideo, data: dataVideo } = await apis.coupons.validateVideoCoupon(videoPayload);
+          couponStatus = statusVideo;
+          couponData = dataVideo;
           break;
         default:
           break;
       }
 
-      const payload = {
-        product_id: productId,
-        product_type: couponProductType,
-        coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
-      };
+      console.log(couponProductTypes);
 
-      const { status, data } = await apis.coupons.validateCoupon(payload);
-
-      if (isAPISuccess(status) && data) {
-        setDiscountedPrice(data.discounted_amount);
+      if (isAPISuccess(couponStatus) && couponData) {
+        setDiscountedPrice(couponData.discounted_amount);
         setCouponErrorText(<Text type="success"> Coupon Applied! </Text>);
         setCouponApplied(true);
       }
+
+      // New Implementation which is more dynamic and supports Subscription
+      // However there might be some BE deployment/discrepancy issue so for now
+      // we're reverting to the old flow as above
+
+      // let couponProductType = '';
+
+      // switch (productType) {
+      //   case productTypeConstants.COURSE:
+      //     couponProductType = couponProductTypes.COURSE;
+      //     break;
+      //   case productTypeConstants.CLASS:
+      //     couponProductType = couponProductTypes.SESSION;
+      //     break;
+      //   case productTypeConstants.PASS:
+      //     couponProductType = couponProductTypes.PASS;
+      //     break;
+      //   case productTypeConstants.VIDEO:
+      //     couponProductType = couponProductTypes.VIDEO;
+      //     break;
+      //   case productTypeConstants.SUBSCRIPTION:
+      //     couponProductType = couponProductTypes.SUBSCRIPTION;
+      //     break;
+      //   default:
+      //     break;
+      // }
+
+      // const payload = {
+      //   product_id: productId,
+      //   product_type: couponProductType,
+      //   coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+      // };
+
+      // const { status, data } = await apis.coupons.validateCoupon(payload);
+
+      // if (isAPISuccess(status) && data) {
+      //   setDiscountedPrice(data.discounted_amount);
+      //   setCouponErrorText(<Text type="success"> Coupon Applied! </Text>);
+      //   setCouponApplied(true);
+      // }
     } catch (error) {
       if (!isUnapprovedUserError(error.response)) {
         setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
