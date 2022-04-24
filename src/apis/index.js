@@ -192,11 +192,10 @@ export default {
     publishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/publish`),
     unpublishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/unpublish`),
     validateCoupon: (payload) => http.post(`/secure/customer/promotions/validate`, payload),
-    // TODO: This is the old version, currently re-enabling to solve PROD issue
-    validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
-    validateSessionCoupon: (payload) => http.post('/secure/customer/promotions/validate/session', payload),
-    validateVideoCoupon: (payload) => http.post('/secure/customer/promotions/validate/video', payload),
-    validatePassCoupon: (payload) => http.post('/secure/customer/promotions/validate/pass', payload),
+    // validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
+    // validateSessionCoupon: (payload) => http.post('/secure/customer/promotions/validate/session', payload),
+    // validateVideoCoupon: (payload) => http.post('/secure/customer/promotions/validate/video', payload),
+    // validatePassCoupon: (payload) => http.post('/secure/customer/promotions/validate/pass', payload),
   },
   subscriptions: {
     createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
