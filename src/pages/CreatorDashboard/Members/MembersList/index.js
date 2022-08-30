@@ -362,9 +362,20 @@ const MembersList = () => {
       return noActivityTag;
     }
 
-    const isInactive = !interactionDetails['session'].external_id && !interactionDetails['video'].external_id;
+    // const isInactive = !interactionDetails['session'].external_id && !interactionDetails['video'].external_id;
 
-    if (isInactive) {
+    // if (isInactive) {
+    //   return noActivityTag;
+    // }
+
+    // Previously we're using the above check, but for some reason the external_id can still come
+    // empty even though the person has bought something so we switched to check their last_interaction
+    // date instead
+    const isNotActiveRecently =
+      moment(interactionDetails['session'].last_interaction).isBefore(moment(0)) &&
+      moment(interactionDetails['video'].last_interaction).isBefore(moment(0));
+
+    if (isNotActiveRecently) {
       return noActivityTag;
     }
 
