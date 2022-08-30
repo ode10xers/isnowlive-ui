@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import classNames from 'classnames';
+import { generatePath, useHistory } from 'react-router-dom';
 
 import { Row, Col, Typography, Button, Card, List, Popover } from 'antd';
 
@@ -14,6 +15,7 @@ import { generateUrlFromUsername } from 'utils/url';
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
+import Routes from 'routes';
 
 const { Text } = Typography;
 const defaultBorderColor = '#eeeeee';
@@ -26,6 +28,7 @@ const SubscriptionCards = ({
   publishSubscription,
   unpublishSubscription,
 }) => {
+  const history = useHistory();
   const renderTickOrCross = (isTrue) =>
     isTrue ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#bb2124" />;
 
@@ -74,7 +77,7 @@ const SubscriptionCards = ({
           ))}
         </Row>
       ),
-      className: undefined,
+      className: styles.itemsContainer,
     },
     {
       label:
@@ -125,6 +128,14 @@ const SubscriptionCards = ({
     copyToClipboard(pageLink);
   };
 
+  const handleShowSubscriptionMembers = useCallback(() => {
+    history.push(
+      generatePath(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptionMembers, {
+        subscription_id: subscription.external_id,
+      })
+    );
+  }, [history, subscription]);
+
   return (
     <Card
       hoverable={true}
@@ -144,38 +155,51 @@ const SubscriptionCards = ({
         />
       }
       bodyStyle={{ padding: '0px 10px' }}
-      actions={[
-        <div className={styles.p10}>
-          {subscription.is_published ? (
-            <Button
-              block
-              danger
-              disabled={editing}
-              type="primary"
-              onClick={() => unpublishSubscription(subscription.external_id)}
-            >
-              Hide
-            </Button>
-          ) : (
-            <Button
-              block
-              className={editing ? undefined : styles.greenBtn}
-              disabled={editing}
-              type="primary"
-              onClick={() => publishSubscription(subscription.external_id)}
-            >
-              Show
-            </Button>
-          )}
-        </div>,
-        <div className={styles.p10}>
-          <Button block ghost type="primary" onClick={copySubscriptionLink}>
-            Copy Link
-          </Button>
-        </div>,
-      ]}
     >
-      <List size="large" itemLayout="vertical" dataSource={cardData} renderItem={renderCardData} rowKey="label" />
+      <List
+        size="large"
+        itemLayout="vertical"
+        dataSource={cardData}
+        renderItem={renderCardData}
+        rowKey="label"
+        footer={
+          <Row gutter={[8, 8]}>
+            <Col xs={24}>
+              {subscription.is_published ? (
+                <Button
+                  block
+                  danger
+                  disabled={editing}
+                  type="primary"
+                  onClick={() => unpublishSubscription(subscription.external_id)}
+                >
+                  Hide
+                </Button>
+              ) : (
+                <Button
+                  block
+                  className={editing ? undefined : styles.greenBtn}
+                  disabled={editing}
+                  type="primary"
+                  onClick={() => publishSubscription(subscription.external_id)}
+                >
+                  Show
+                </Button>
+              )}
+            </Col>
+            <Col xs={24}>
+              <Button block ghost type="primary" onClick={copySubscriptionLink}>
+                Copy Link
+              </Button>
+            </Col>
+            <Col xs={24}>
+              <Button block type="primary" onClick={handleShowSubscriptionMembers}>
+                See Members
+              </Button>
+            </Col>
+          </Row>
+        }
+      />
     </Card>
   );
 };
