@@ -198,6 +198,7 @@ export default {
     // validatePassCoupon: (payload) => http.post('/secure/customer/promotions/validate/pass', payload),
   },
   subscriptions: {
+    getSubscriptionMembers: (subscriptionId) => http.get(`/secure/creator/subscription/${subscriptionId}/members`),
     createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
     publishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/publish`),
     unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),

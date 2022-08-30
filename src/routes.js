@@ -63,6 +63,7 @@ const Routes = {
     passes: '/passes',
     courses: '/courses',
     subscriptions: '/subscriptions',
+    subscriptionMembers: '/subscriptions/:subscription_id/members',
     membersList: '/members/list',
     profile: '/profile',
     profileComponents: {

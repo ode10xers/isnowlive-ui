@@ -22,3 +22,7 @@
 .greenText {
   color: map-get($map: $colors, $key: 'KellyGreen') !important;
 }
+
+.itemsContainer {
+  font-size: 13px;
+}
