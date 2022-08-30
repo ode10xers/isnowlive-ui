@@ -58,26 +58,30 @@ const SubscriptionCards = ({
     {
       label: subscription.price > 0 ? `${subscription.currency?.toUpperCase()} ${subscription.price}` : 'Free',
       className: undefined,
+      id: 'Price',
     },
     {
       label: <TagListPopup tags={[subscription.tag].filter((tag) => tag.external_id)} />,
       className: undefined,
+      id: 'Tags',
     },
     {
       label: generateSubscriptionDuration(subscription, true),
       className: undefined,
+      id: 'Duration',
     },
     {
       label: (
         <Row gutter={6}>
           {includedProductsList.map((prod) => (
-            <Col xs={8}>
+            <Col xs={8} key={prod.value}>
               {renderTickOrCross(subscription.products[prod.value])} {prod.label}
             </Col>
           ))}
         </Row>
       ),
       className: styles.itemsContainer,
+      id: 'Products',
     },
     {
       label:
@@ -87,18 +91,21 @@ const SubscriptionCards = ({
             : `${subscription.product_credits} credits/period`
           : 'None',
       className: subscription.products['VIDEO'] || subscription.products['SESSION'] ? undefined : styles.disabled,
+      id: 'ProductCredits',
     },
     {
       label: subscription.products['SESSION']
         ? renderProductListButton('Sessions', subscription.product_details['SESSION'], 'name')
         : 'None',
       className: subscription.products['SESSION'] ? styles.buttonContainer : styles.disabled,
+      id: 'IncludedSessions',
     },
     {
       label: subscription.products['VIDEO']
         ? renderProductListButton('Videos', subscription.product_details['VIDEO'], 'title')
         : 'None',
       className: subscription.products['VIDEO'] ? styles.buttonContainer : styles.disabled,
+      id: 'IncludedVideos',
     },
     {
       label: subscription.products['COURSE']
@@ -107,12 +114,14 @@ const SubscriptionCards = ({
           : `${subscription.course_credits} credits/period`
         : 'None',
       className: subscription.products['COURSE'] ? undefined : styles.disabled,
+      id: 'CourseCredits',
     },
     {
       label: subscription.products['COURSE']
         ? renderProductListButton('Courses', subscription.product_details['COURSE'], 'name')
         : 'None',
       className: subscription.products['COURSE'] ? styles.buttonContainer : styles.disabled,
+      id: 'IncludedCredits',
     },
   ];
 
@@ -161,7 +170,7 @@ const SubscriptionCards = ({
         itemLayout="vertical"
         dataSource={cardData}
         renderItem={renderCardData}
-        rowKey="label"
+        rowKey="id"
         footer={
           <Row gutter={[8, 8]}>
             <Col xs={24}>
