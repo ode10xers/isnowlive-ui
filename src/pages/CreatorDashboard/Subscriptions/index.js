@@ -360,6 +360,7 @@ const Subscriptions = ({ history }) => {
       <Row gutter={10} justify="start" key={segmentedSubs[0].external_id || 'button'}>
         <Col xs={5}>
           <List
+            rowKey="external_id"
             itemLayout="vertical"
             size="large"
             dataSource={subscriptionFields}

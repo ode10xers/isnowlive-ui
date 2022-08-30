@@ -8,9 +8,6 @@ const MobileLayout = lazy(() => import('layouts/MobileLayout'));
 const SessionsInventories = lazy(() => import('pages/CreatorDashboard/SessionsInventories'));
 const SessionsDetails = lazy(() => import('pages/CreatorDashboard/SessionsDetails'));
 const ManageSessions = lazy(() => import('pages/CreatorDashboard/ManageSessions'));
-const Session = lazy(() => import('pages/Session'));
-const Profile = lazy(() => import('pages/Profile'));
-const LiveStream = lazy(() => import('pages/LiveStream'));
 const ClassPassList = lazy(() => import('pages/CreatorDashboard/ClassPassList'));
 const PaymentAccount = lazy(() => import('pages/CreatorDashboard/PaymentAccount'));
 const EarningDetails = lazy(() => import('pages/CreatorDashboard/EarningDetails'));
@@ -32,7 +29,12 @@ const MembersTags = lazy(() => import('pages/CreatorDashboard/AdvancedFeatures/M
 const MemberSettings = lazy(() => import('pages/CreatorDashboard/AdvancedFeatures/MembersSettings'));
 const Referral = lazy(() => import('pages/CreatorDashboard/Referral'));
 const Affiliates = lazy(() => import('pages/CreatorDashboard/Affiliates'));
+const SubscriptionMembersList = lazy(() => import('pages/CreatorDashboard/SubscriptionMembersList'));
+
 const DynamicProfile = lazy(() => import('pages/DynamicProfile'));
+const Session = lazy(() => import('pages/Session'));
+const Profile = lazy(() => import('pages/Profile'));
+const LiveStream = lazy(() => import('pages/LiveStream'));
 
 const CreatorDashboard = ({ match }) => {
   useEffect(() => {
@@ -79,6 +81,11 @@ const CreatorDashboard = ({ match }) => {
         <Route exact path={match.url + Routes.creatorDashboard.createCourse} component={CourseForm} />
         <Route exact path={match.url + Routes.creatorDashboard.createCourseModule} component={CourseModulesForm} />
         <Route exact path={match.url + Routes.creatorDashboard.subscriptions} component={Subscriptions} />
+        <Route
+          exact
+          path={match.url + Routes.creatorDashboard.subscriptionMembers}
+          component={SubscriptionMembersList}
+        />
         <Route exact path={match.url + Routes.creatorDashboard.coupons} component={Coupons} />
         <Route exact path={match.url + Routes.creatorDashboard.accountSettings} component={AccountSettings} />
         <Route exact path={match.url + Routes.creatorDashboard.audiences} component={Audiences} />
