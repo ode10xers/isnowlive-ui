@@ -18,6 +18,7 @@ import {
   Space,
   Card,
   Tag,
+  Tooltip,
 } from 'antd';
 import {
   DownOutlined,
@@ -25,6 +26,7 @@ import {
   ArrowLeftOutlined,
   PlayCircleOutlined,
   VideoCameraOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 
 import Routes from 'routes';
@@ -53,7 +55,7 @@ const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 
 const {
-  formatDate: { toLocaleTime, toLongDateWithDay },
+  formatDate: { toLocaleTime, toLongDateWithDay, toDateAndTime },
   timeCalculation: { isPresentOrFuture },
 } = dateUtil;
 
@@ -121,6 +123,23 @@ const CourseOrderDetails = ({ match, history }) => {
         tempCourseData.course.modules = tempCourseData.course.modules.filter(
           (module) => module.module_content.length > 0
         );
+
+        // Here we go through the whole loop again IF the course needs drip
+        if (courseData.course.video_drip_delay > 0) {
+          let vidIdx = 0;
+          tempCourseData.course.modules = tempCourseData.course.modules.map((moduleData) => ({
+            ...moduleData,
+            module_content: moduleData.module_content.map((modContent) => {
+              const updatedContent = {
+                ...modContent,
+                video_idx: vidIdx,
+              };
+
+              vidIdx += 1;
+              return updatedContent;
+            }),
+          }));
+        }
       } catch (error) {
         console.error('Failed fetching course module details');
         console.error(error);
@@ -140,6 +159,8 @@ const CourseOrderDetails = ({ match, history }) => {
         if (isAPISuccess(status) && data) {
           const activeData = data.active;
           const targetCourse = activeData.find((course) => course.course_order_id === courseOrderID);
+
+          console.log(targetCourse);
 
           // NOTE : If the target course size is too big, might be an issue. Few ways to mitigate this is
           // By removing unused keys
@@ -235,6 +256,38 @@ const CourseOrderDetails = ({ match, history }) => {
       <FilePdfOutlined className={styles.blueText} />
     ) : null;
 
+  const renderWatchVideoButton = (moduleIdx, content) => {
+    if (!courseOrderDetails) return null;
+
+    if (content.video_idx === undefined) {
+      return (
+        <Button type="primary" onClick={() => redirectToVideoOrderDetails(moduleIdx, content)}>
+          Watch Now
+        </Button>
+      );
+    }
+
+    const watchStartMoment = moment(courseOrderDetails.start_date).add(
+      (courseOrderDetails.course.video_drip_delay ?? 0) * content.video_idx,
+      'days'
+    );
+    const isDisabled = isPresentOrFuture(watchStartMoment);
+
+    return (
+      <>
+        <Button type="primary" disabled={isDisabled} onClick={() => redirectToVideoOrderDetails(moduleIdx, content)}>
+          Watch Now
+        </Button>
+
+        {isDisabled ? (
+          <Tooltip placement="topRight" title={`Watchable at ${toDateAndTime(watchStartMoment)}`}>
+            <InfoCircleOutlined />
+          </Tooltip>
+        ) : null}
+      </>
+    );
+  };
+
   const renderExtraContent = (moduleIdx, content, contentType) =>
     contentType === 'SESSION' ? (
       <Space align="center" size="large">
@@ -292,9 +345,7 @@ const CourseOrderDetails = ({ match, history }) => {
         ) : (
           <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
         )}
-        <Button type="primary" onClick={() => redirectToVideoOrderDetails(moduleIdx, content)}>
-          Watch Now
-        </Button>
+        {renderWatchVideoButton(moduleIdx, content)}
       </Space>
     ) : contentType === 'DOCUMENT' ? (
       <Button type="primary" onClick={() => redirectToDocumentDetails(moduleIdx, content)}>
