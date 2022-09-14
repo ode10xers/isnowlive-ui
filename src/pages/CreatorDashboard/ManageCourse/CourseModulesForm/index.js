@@ -29,6 +29,7 @@ import {
   MinusCircleTwoTone,
   DeleteOutlined,
   FilePdfOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -852,6 +853,27 @@ const CourseModulesForm = ({ match, history }) => {
     );
   };
 
+  const handleDripInfoPressed = () => {
+    Modal.info({
+      centered: true,
+      mask: true,
+      maskClosable: true,
+      title: 'Drip Content Pre-cautions',
+      content: (
+        <>
+          <Paragraph>
+            Please make sure that the drip duration and amount of videos doesn't exceed the video course validity, or
+            some videos might be inaccessible by the attendee.
+          </Paragraph>
+          <Paragraph>
+            For example, if the Validity is 14 days, and there are 6 videos with 3 days drip duration, the last video
+            might not be accessible before the course expires.
+          </Paragraph>
+        </>
+      ),
+    });
+  };
+
   return (
     <>
       <SessionContentPopup
@@ -1018,7 +1040,13 @@ const CourseModulesForm = ({ match, history }) => {
                       }
                     >
                       <InputNumber
-                        addonAfter={<Text> Days after releasing previous video </Text>}
+                        addonAfter={
+                          <Text>
+                            {' '}
+                            Days after releasing previous video{' '}
+                            <Button type="link" icon={<InfoCircleOutlined />} onClick={handleDripInfoPressed} />{' '}
+                          </Text>
+                        }
                         placeholder="No. of days"
                         min={0}
                         className={styles.numericInput}

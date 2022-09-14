@@ -160,8 +160,6 @@ const CourseOrderDetails = ({ match, history }) => {
           const activeData = data.active;
           const targetCourse = activeData.find((course) => course.course_order_id === courseOrderID);
 
-          console.log(targetCourse);
-
           // NOTE : If the target course size is too big, might be an issue. Few ways to mitigate this is
           // By removing unused keys
           localStorage.setItem(localStorageAttendeeCourseDataKey, JSON.stringify(targetCourse));
