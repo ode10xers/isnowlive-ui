@@ -81,6 +81,8 @@ const formInitialValues = {
   curriculumType: courseCurriculumTypes.VIDEO.name,
   maxParticipants: 1,
   validity: 1,
+  dripDelayed: 'false',
+  videoDripDelay: 0,
   courseStartDate: null,
   courseEndDate: null,
 };
@@ -206,6 +208,8 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
 
+  const [isDripDelayed, setIsDripDelayed] = useState(false);
+
   // const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
   // const [excludedFilesInModal, setExcludedFilesInModal] = useState([]);
 
@@ -269,7 +273,10 @@ const CourseModulesForm = ({ match, history }) => {
             courseEndDate: data?.end_date ? moment(data?.end_date) : null,
             maxParticipants: data?.max_participants || 1,
             validity: data?.validity ?? 1,
+            dripDelayed: `${data?.video_drip_delay > 0}` ?? 'false',
+            videoDripDelay: data?.video_drip_delay ?? 0,
           });
+          setIsDripDelayed(data?.video_drip_delay > 0 ?? false);
           setCourseCurriculumType(data?.type || courseCurriculumTypes.MIXED.name);
           setCourseStartDate(data?.start_date ? moment(data?.start_date) : null);
           setCourseEndDate(data?.end_date ? moment(data?.end_date) : null);
@@ -538,6 +545,17 @@ const CourseModulesForm = ({ match, history }) => {
     const curriculumType = e.target.value;
     showCourseDetailsChangedModal();
     setCourseCurriculumType(curriculumType);
+    setIsDripDelayed(false);
+    form.setFieldsValue({
+      dripDelayed: 'false',
+    });
+  };
+
+  const handleDripTypeChanged = (e) => {
+    form.setFieldsValue({
+      dripDelayed: e.target.value,
+    });
+    setIsDripDelayed(e.target.value === 'true');
   };
 
   const saveCourseCurriculum = async (payload, modalRef = null) => {
@@ -585,6 +603,7 @@ const CourseModulesForm = ({ match, history }) => {
       start_date: moment(courseStartDate).startOf('day').utc().format(),
       end_date: moment(courseEndDate).endOf('day').utc().format(),
       validity: values.validity ?? 1,
+      video_drip_delay: (isDripDelayed ? values.videoDripDelay : 0) || 0,
     };
 
     // NOTE : We'll only modify the related fields and keep everything else the same
@@ -885,8 +904,7 @@ const CourseModulesForm = ({ match, history }) => {
                       <Radio.Group>
                         {Object.entries(courseCurriculumTypes).map(([key, val]) => (
                           <Radio key={key} value={val.name}>
-                            {' '}
-                            {val.label}{' '}
+                            {val.label}
                           </Radio>
                         ))}
                       </Radio.Group>
@@ -968,6 +986,43 @@ const CourseModulesForm = ({ match, history }) => {
                       }
                     >
                       <InputNumber placeholder="Course Videos Validity" min={1} className={styles.numericInput} />
+                    </Form.Item>
+                  </Col>
+                  {/* Drip Video Delay (ONLY FOR VIDEO ONLY COURSES) */}
+                  <Col xs={isVideosOnlyCourse() ? 24 : 0}>
+                    <Form.Item
+                      {...courseCreatePageLayout}
+                      id="dripDelayed"
+                      name="dripDelayed"
+                      label="You want videos to be visible"
+                      rules={validationRules.requiredValidation}
+                      onChange={handleDripTypeChanged}
+                    >
+                      <Radio.Group>
+                        <Radio value="false">All at once</Radio>
+                        <Radio value="true">One after the other</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={isVideosOnlyCourse() && isDripDelayed ? 24 : 0}>
+                    <Form.Item
+                      {...courseCreatePageLayout}
+                      hidden={!(isVideosOnlyCourse() && isDripDelayed)}
+                      id="videoDripDelay"
+                      name="videoDripDelay"
+                      label="Release next video after"
+                      rules={
+                        isVideosOnlyCourse() && isDripDelayed
+                          ? validationRules.numberValidation('Please input number of days', 1)
+                          : []
+                      }
+                    >
+                      <InputNumber
+                        addonAfter={<Text> Days after releasing previous video </Text>}
+                        placeholder="No. of days"
+                        min={0}
+                        className={styles.numericInput}
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
