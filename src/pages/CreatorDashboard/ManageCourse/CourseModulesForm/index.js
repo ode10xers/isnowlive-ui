@@ -29,7 +29,6 @@ import {
   MinusCircleTwoTone,
   DeleteOutlined,
   FilePdfOutlined,
-  InfoCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -853,27 +852,6 @@ const CourseModulesForm = ({ match, history }) => {
     );
   };
 
-  const handleDripInfoPressed = () => {
-    Modal.info({
-      centered: true,
-      mask: true,
-      maskClosable: true,
-      title: 'Drip Content Pre-cautions',
-      content: (
-        <>
-          <Paragraph>
-            Please make sure that the drip duration and amount of videos doesn't exceed the video course validity, or
-            some videos might be inaccessible by the attendee.
-          </Paragraph>
-          <Paragraph>
-            For example, if the Validity is 14 days, and there are 6 videos with 3 days drip duration, the last video
-            might not be accessible before the course expires.
-          </Paragraph>
-        </>
-      ),
-    });
-  };
-
   return (
     <>
       <SessionContentPopup
@@ -1027,6 +1005,22 @@ const CourseModulesForm = ({ match, history }) => {
                     </Form.Item>
                   </Col>
                   <Col xs={isVideosOnlyCourse() && isDripDelayed ? 24 : 0}>
+                    <Row justify="end">
+                      <Col xs={16}>
+                        <Paragraph className={styles.blueText}>
+                          If you are setting a time delay to for your videos to be released and watchable by the course
+                          buyers then please ensure the validity period you set above of the course is longer than the
+                          time it will take for all the content to become available.
+                        </Paragraph>
+                        <Paragraph className={styles.blueText}>
+                          For example if you have 5 videos and next video is released 3 days after the one earlier then
+                          it will take around 15 days for all videos to be available so the validity of the course you
+                          have set above needs to be at least 15 days or more
+                        </Paragraph>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col xs={isVideosOnlyCourse() && isDripDelayed ? 24 : 0}>
                     <Form.Item
                       {...courseCreatePageLayout}
                       hidden={!(isVideosOnlyCourse() && isDripDelayed)}
@@ -1040,13 +1034,7 @@ const CourseModulesForm = ({ match, history }) => {
                       }
                     >
                       <InputNumber
-                        addonAfter={
-                          <Text>
-                            {' '}
-                            Days after releasing previous video{' '}
-                            <Button type="link" icon={<InfoCircleOutlined />} onClick={handleDripInfoPressed} />{' '}
-                          </Text>
-                        }
+                        addonAfter={<Text> Days after releasing previous video</Text>}
                         placeholder="No. of days"
                         min={0}
                         className={styles.numericInput}

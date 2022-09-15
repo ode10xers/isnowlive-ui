@@ -18,7 +18,6 @@ import {
   Space,
   Card,
   Tag,
-  Tooltip,
 } from 'antd';
 import {
   DownOutlined,
@@ -26,7 +25,6 @@ import {
   ArrowLeftOutlined,
   PlayCircleOutlined,
   VideoCameraOutlined,
-  InfoCircleOutlined,
 } from '@ant-design/icons';
 
 import Routes from 'routes';
@@ -272,17 +270,9 @@ const CourseOrderDetails = ({ match, history }) => {
     const isDisabled = isPresentOrFuture(watchStartMoment);
 
     return (
-      <>
-        <Button type="primary" disabled={isDisabled} onClick={() => redirectToVideoOrderDetails(moduleIdx, content)}>
-          Watch Now
-        </Button>
-
-        {isDisabled ? (
-          <Tooltip placement="topRight" title={`Watchable at ${toDateAndTime(watchStartMoment)}`}>
-            <InfoCircleOutlined />
-          </Tooltip>
-        ) : null}
-      </>
+      <Button type="primary" disabled={isDisabled} onClick={() => redirectToVideoOrderDetails(moduleIdx, content)}>
+        {isDisabled ? `Available On ${toDateAndTime(watchStartMoment)}` : 'Watch Now'}
+      </Button>
     );
   };
 
