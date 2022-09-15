@@ -77,3 +77,7 @@
   width: 100%;
   max-width: 300px;
 }
+
+.blueText {
+  color: map-get($map: $colors, $key: 'DodgerBlue')
+}
