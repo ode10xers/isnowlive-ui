@@ -28,6 +28,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import { tagColors } from 'utils/colors';
+import dateUtil from 'utils/date';
 
 import styles from './styles.module.scss';
 
@@ -35,6 +36,10 @@ const { Text, Title, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
 const { useBreakpoint } = Grid;
 const { Search } = Input;
+
+const {
+  formatDate: { toShortDateWithYear },
+} = dateUtil;
 
 const memberViews = {
   ACTIVE: {
@@ -356,6 +361,7 @@ const MembersList = () => {
       </Text>
     );
 
+    const { last_membership_name = '', last_membership_expiry = '' } = memberDetails;
     const interactionDetails = memberDetails?.interaction_details ?? null;
 
     if (!interactionDetails) {
@@ -373,7 +379,8 @@ const MembersList = () => {
     // date instead
     const isNotActiveRecently =
       moment(interactionDetails['session'].last_interaction).isBefore(moment(0)) &&
-      moment(interactionDetails['video'].last_interaction).isBefore(moment(0));
+      moment(interactionDetails['video'].last_interaction).isBefore(moment(0)) &&
+      memberDetails.last_membership_name === '';
 
     if (isNotActiveRecently) {
       return noActivityTag;
@@ -395,6 +402,37 @@ const MembersList = () => {
         );
       })
       .filter((tag) => tag);
+
+    if (last_membership_name === '') {
+      activityTags.push(
+        <Text key="subscription" className={styles.activityText}>
+          Never got a membership
+        </Text>
+      );
+    } else {
+      const activityMoment = moment(last_membership_expiry);
+      let activityText = '';
+
+      // Check if it's before 1970-01-01, if it is we consider it invalid
+      if (activityMoment.isBefore(moment(0))) {
+        activityText = 'Never bought a membership';
+      }
+
+      // Check if the subscription is still valid
+      const membershipExpired = activityMoment.isBefore(moment());
+      const expiryDate = toShortDateWithYear(activityMoment);
+      if (membershipExpired) {
+        activityText = `Previously got "${last_membership_name}” membership, which expired at ${expiryDate}`;
+      } else {
+        activityText = `Currently have "${last_membership_name}” membership, which will expire at ${expiryDate}`;
+      }
+
+      activityTags.push(
+        <Text key="subscription" className={styles.activityText}>
+          {activityText}
+        </Text>
+      );
+    }
 
     return activityTags.length > 0 ? (
       <Space direction="vertical">{activityTags.map((tag) => tag)}</Space>
@@ -420,13 +458,13 @@ const MembersList = () => {
           title: 'Full Name',
           dataIndex: 'first_name',
           key: 'first_name',
+          width: '220px',
           render: (text, record) => `${record.first_name ?? ''} ${record.last_name ?? '-'}`,
         },
         {
           title: 'Activity',
           dataIndex: 'interaction_details',
           key: 'interaction_details',
-          width: '220px',
           render: (text, record) => renderMemberInteractionDetails(record),
         },
       ];
