@@ -14,7 +14,6 @@ import Table from 'components/Table';
 import TagListPopup from 'components/TagListPopup';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { copyToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { generateUrlFromUsername } from 'utils/url';
