@@ -941,7 +941,39 @@ const SessionRegistration = ({
   const showConfirmPaymentPopup = () => {
     setCreateFollowUpOrder(false);
 
-    if (usableUserSubscription) {
+    if (classDetails?.total_price === 0) {
+      // If it's free, don't think, just simply book without
+      // using any Pass/Subscription
+      const paymentPopupData = {
+        productId: classDetails.session_external_id,
+        productType: productType.CLASS,
+        itemList: [
+          {
+            name: classDetails.name,
+            description: toLongDateWithTime(selectedInventory.start_time),
+            currency: classDetails.currency,
+            price: classDetails.total_price,
+            pay_what_you_want: classDetails.pay_what_you_want,
+          },
+        ],
+        flexiblePaymentDetails: null,
+      };
+
+      // Default case, book single class;
+      const payload = {
+        inventory_id: parseInt(selectedInventory.inventory_id),
+        user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone_location: getTimezoneLocation(),
+        user_timezone: getCurrentLongTimezone(),
+        payment_source: paymentSource.GATEWAY,
+      };
+
+      showPaymentPopup(
+        paymentPopupData,
+        async (couponCode = '', priceAmount = undefined) =>
+          await buySingleClass(payload, couponCode, priceAmount ?? inputPrice ?? classDetails.price)
+      );
+    } else if (usableUserSubscription) {
       const payload = {
         inventory_id: parseInt(selectedInventory.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
@@ -1327,7 +1359,15 @@ const SessionRegistration = ({
                         </Button>
                       </Item>
 
-                      {user && usableUserSubscription ? (
+                      {classDetails?.total_price === 0 ? (
+                        // If it's free, we just render the usual thing. This is to prevent any pass/subs being used to book it
+                        <Item {...sessionRegistrationTailLayout}>
+                          <Title level={5} className={styles.bookingHelpText}>
+                            Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
+                            {classDetails?.type === 'NORMAL' ? 'class' : 'time slot'}
+                          </Title>
+                        </Item>
+                      ) : user && usableUserSubscription ? (
                         // Render help text that this session will be booked using user's subscription
                         <Row>
                           <Paragraph className={styles.bookingHelpText}>
