@@ -298,7 +298,7 @@ const CourseDetails = ({ match }) => {
     //   desc.push(`${docContentCount} Files`);
     // }
 
-    if (userPurchasedSubs && !purchaseAsGift) {
+    if (userPurchasedSubs && !purchaseAsGift && course.total_price > 0) {
       const paymentPopupData = {
         productId: course.id,
         productType: productType.COURSE,
@@ -727,7 +727,7 @@ const CourseDetails = ({ match }) => {
             // NOTE : Empty here means that there is no modules at all
             // There can be a case where the modules are all outlines
             `Cannot purchase an empty course`
-          ) : usableSubscription ? (
+          ) : usableSubscription && course?.total_price > 0 ? (
             `Get using your existing membership`
           ) : (
             <>
