@@ -38,11 +38,12 @@ const CalendarView = ({
     }
   }, [updateCalendarDate]);
 
-  const views = ['month', isMobileDevice ? 'day' : 'week', 'agenda'];
+  // const views = ['month', isMobileDevice ? 'day' : 'week', 'agenda'];
+
   return (
     <div className={classNames(styles.calendarWrapper, styles.mt20, ...classes)}>
       <Calendar
-        views={views}
+        // views={views}
         className={styles.calendar}
         localizer={localizer}
         events={inventories}
