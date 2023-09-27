@@ -302,7 +302,7 @@ const SessionContentPopup = ({
               <Collapse
                 activeKey={expandedAccordionKeys}
                 onChange={setExpandedAccordionKeys}
-                expandIconPosition="right"
+                expandIconPosition="end"
                 expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
               >
                 {groupInventoryBySession(inventories).map((session) => (

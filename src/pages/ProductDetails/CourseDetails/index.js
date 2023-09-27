@@ -913,7 +913,7 @@ const CourseDetails = ({ match }) => {
                 <Col xs={24}>
                   <Collapse
                     ghost
-                    expandIconPosition="right"
+                    expandIconPosition="end"
                     className={styles.courseModules}
                     activeKey={expandedCourseModules}
                     onChange={setExpandedCourseModules}
@@ -968,7 +968,7 @@ const CourseDetails = ({ match }) => {
                 <Col xs={24}>
                   <Collapse
                     ghost
-                    expandIconPosition="right"
+                    expandIconPosition="end"
                     className={styles.courseFAQs}
                     defaultActiveKey={course?.faqs.map((faq) => faq.faq_question)}
                     expandIcon={({ isActive }) =>

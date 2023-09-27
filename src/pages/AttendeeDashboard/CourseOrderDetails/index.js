@@ -504,7 +504,7 @@ const CourseOrderDetails = ({ match, history }) => {
                 <Col xs={24}>
                   <Collapse
                     ghost
-                    expandIconPosition="right"
+                    expandIconPosition="end"
                     className={styles.courseModules}
                     activeKey={expandedCourseModules}
                     onChange={setExpandedCourseModules}
