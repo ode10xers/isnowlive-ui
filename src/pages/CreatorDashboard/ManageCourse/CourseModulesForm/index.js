@@ -675,14 +675,15 @@ const CourseModulesForm = ({ match, history }) => {
     // This function will accept the content data that will be added
     return (contentData) => {
       const previousFormValues = deepCloneObject(form.getFieldsValue());
-      console.log(previousFormValues);
       const targetModuleContents = previousFormValues.modules[moduleIndex].module_content;
+      console.log(previousFormValues);
 
       // Check if the same product is already there, if so then skip
       // currently the duplicate check is only in the content scope
       const duplicateContentInstance = targetModuleContents.find(
         (moduleContent) =>
-          moduleContent.product_type === contentData.product_type && moduleContent.product_id === contentData.product_id
+          moduleContent?.product_type === contentData.product_type &&
+          moduleContent?.product_id === contentData.product_id
       );
 
       if (duplicateContentInstance) {
@@ -696,9 +697,9 @@ const CourseModulesForm = ({ match, history }) => {
       // Check if there's an empty content to replace with
       const targetContentIndex = targetModuleContents.findIndex(
         (moduleContent) =>
-          moduleContent.product_type !== 'SESSION' &&
-          moduleContent.product_type !== 'VIDEO' &&
-          moduleContent.product_type !== 'DOCUMENT'
+          moduleContent?.product_type !== 'SESSION' &&
+          moduleContent?.product_type !== 'VIDEO' &&
+          moduleContent?.product_type !== 'DOCUMENT'
       );
 
       if (targetContentIndex >= 0) {
