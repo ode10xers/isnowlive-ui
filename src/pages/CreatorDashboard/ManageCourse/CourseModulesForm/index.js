@@ -675,6 +675,7 @@ const CourseModulesForm = ({ match, history }) => {
     // This function will accept the content data that will be added
     return (contentData) => {
       const previousFormValues = deepCloneObject(form.getFieldsValue());
+      console.log(previousFormValues);
       const targetModuleContents = previousFormValues.modules[moduleIndex].module_content;
 
       // Check if the same product is already there, if so then skip

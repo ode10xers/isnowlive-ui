@@ -911,7 +911,7 @@ const EditProfile = ({ match, history }) => {
                         <Col xs={24}>
                           <Collapse
                             ghost
-                            expandIconPosition="right"
+                            expandIconPosition="end"
                             className={styles.componentsSectionContainer}
                             defaultActiveKey={['profile']}
                             expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
