@@ -104,8 +104,10 @@ export default {
     getInventoryDetailsByExternalId: (inventoryExternalId) => http.get(`/inventories/external/${inventoryExternalId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
-    getCreatorInventoryEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings/inventories?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorInventoryEarnings: (pageNo, perPage, startTime = '', endTime = '', isAnalytics = false) =>
+      http.get(
+        `/secure/creator/payments/earnings/inventories?page_no=${pageNo}&per_page=${perPage}&start_time=${startTime}&end_time=${endTime}&analytics=${isAnalytics}`
+      ),
     getEarningsByInventoryId: (inventoryId) =>
       http.get(`/secure/creator/payments/earnings/inventories/id/${inventoryId}`),
     getEarningsByPassId: (passId) => http.get(`/secure/creator/payments/earnings/passes/id/${passId}`),
@@ -140,14 +142,18 @@ export default {
     getAttendeePassesForVideo: (videoId) => http.get(`/secure/customer/passes/orders?video_id=${videoId}`),
     publishPass: (passId) => http.post(`/secure/creator/passes/${passId}/publish`),
     unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
-    getCreatorPassEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorPassEarnings: (pageNo, perPage, startTime = '', endTime = '', isAnalytics = false) =>
+      http.get(
+        `/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}&start_time=${startTime}&end_time=${endTime}&analytics=${isAnalytics}`
+      ),
   },
   videos: {
     getVideoById: (videoId) => http.get(`/videos/${videoId}`),
     getVideosByUsername: () => http.get(`/videos`),
-    getCreatorVideosEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings/videos?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorVideosEarnings: (pageNo, perPage, startTime = '', endTime = '', isAnalytics = false) =>
+      http.get(
+        `/secure/creator/payments/earnings/videos?page_no=${pageNo}&per_page=${perPage}&start_time=${startTime}&end_time=${endTime}&analytics=${isAnalytics}`
+      ),
     getEarningsByVideoId: (videoId) => http.get(`/secure/creator/payments/earnings/videos/id/${videoId}`),
     getCreatorVideos: () => http.get(`/secure/creator/videos`),
     createVideo: (payload) => http.post(`/secure/creator/videos`, payload),
@@ -182,8 +188,10 @@ export default {
     unpublishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/unpublish`),
     getAttendeeCourses: () => http.get('/secure/customer/courses/orders'),
     getEarningsByCourseId: (courseId) => http.get(`/secure/creator/payments/earnings/courses/id/${courseId}`),
-    getCreatorCourseEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings/courses?page_no=${pageNo}&per_page${perPage}`),
+    getCreatorCourseEarnings: (pageNo, perPage, startTime = '', endTime = '', isAnalytics = false) =>
+      http.get(
+        `/secure/creator/payments/earnings/courses?page_no=${pageNo}&per_page${perPage}&start_time=${startTime}&end_time=${endTime}&analytics=${isAnalytics}`
+      ),
   },
   coupons: {
     getCreatorCoupons: () => http.get('/secure/creator/coupons'),
@@ -209,8 +217,10 @@ export default {
       http.get(`/secure/creator/subscription?page=${pageNo}&per_page=${perPage}`),
     getSubscriptionDetails: (subscriptionId) => http.get(`/secure/creator/subscription/${subscriptionId}`),
     deleteSubscription: (subscriptionId) => http.delete(`/secure/creator/subscription/${subscriptionId}`),
-    getSubscriptionEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings/subscriptions?page_no=${pageNo}&per_page${perPage}`),
+    getSubscriptionEarnings: (pageNo, perPage, startTime = '', endTime = '', isAnalytics = false) =>
+      http.get(
+        `/secure/creator/payments/earnings/subscriptions?page_no=${pageNo}&per_page${perPage}&start_time=${startTime}&end_time=${endTime}&analytics=${isAnalytics}`
+      ),
     getEarningsBySubscriptionId: (subscriptionId) =>
       http.get(`/secure/creator/payments/earnings/subscriptions/id/${subscriptionId}`),
     getSubscriptionById: (subscriptionId) => http.get(`/subscriptions/${subscriptionId}`),

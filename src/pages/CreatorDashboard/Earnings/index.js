@@ -2,7 +2,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 
-import { Row, Col, Typography, Button, Card, Empty, Popconfirm, Grid, Collapse, Modal, Input, message } from 'antd';
+import {
+  Row,
+  Col,
+  Typography,
+  Button,
+  Card,
+  Empty,
+  Popconfirm,
+  Grid,
+  Collapse,
+  Modal,
+  Input,
+  message,
+  DatePicker,
+} from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -26,6 +40,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
+import moment from 'moment';
 
 const cashIcon = require('assets/images/cash.png');
 const checkIcon = require('assets/images/check.png');
@@ -36,7 +51,7 @@ const { Title, Text, Paragraph } = Typography;
 const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 const {
-  formatDate: { toLongDateWithDayTime },
+  formatDate: { toLongDateWithDayTime, toDateTime },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
 
@@ -59,11 +74,14 @@ const Earnings = () => {
   } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isTotalEarningLoading, setIsTotalEarningLoading] = useState(false);
   const [balance, setBalance] = useState(null);
   const [isLoadingPayout, setIsLoadingPayout] = useState(false);
   const [paypalAccountModalVisible, setPaypalAccountModalVisible] = useState(false);
   const [creatorPaypalAccountDetails, setCreatorPaypalAccountDetails] = useState(null);
   const [creatorPaypalEmail, setCreatorPaypalEmail] = useState(null);
+  const [selectedDate, setSelectedDate] = useState();
+  const [totalEarning, setTotalEarning] = useState(null);
 
   const [earnings, setEarnings] = useState({
     sessions: [],
@@ -104,6 +122,28 @@ const Earnings = () => {
     }
 
     setIsLoading(false);
+  }, []);
+
+  const getCreatorTotalEarnings = useCallback(async (startTime, endTime) => {
+    setIsTotalEarningLoading(true);
+    let result = 0;
+    try {
+      const isAnalytics = true;
+      for (const key in getEarningsAPIs) {
+        const getEarningAPI = getEarningsAPIs[key];
+        const { status, data } = await getEarningAPI(0, 0, startTime, endTime, isAnalytics);
+
+        if (isAPISuccess(status) && data) {
+          const total = data.earnings.reduce((acc, curr) => acc + curr.total_earned, 0);
+          result += total;
+        }
+      }
+      setTotalEarning(result);
+    } catch (error) {
+      message.error(error.response?.data?.message || `Something went wrong when fetching total earning`);
+    } finally {
+      setIsTotalEarningLoading(false);
+    }
   }, []);
 
   const getCreatorEarnings = useCallback(() => {
@@ -252,6 +292,7 @@ const Earnings = () => {
   useEffect(() => {
     getCreatorBalance();
     getCreatorEarnings();
+    getCreatorTotalEarnings(toDateTime(moment().startOf('month')), toDateTime(moment()));
 
     if (userDetails.profile?.payment_account_status === StripeAccountStatus.CONNECTED) {
       checkAndSendCreatorConversionEvent();
@@ -260,7 +301,7 @@ const Earnings = () => {
         creator_payment_account_status: userDetails.profile?.payment_account_status || customNullValue,
       });
     }
-  }, [getCreatorBalance, getCreatorEarnings, checkAndSendCreatorConversionEvent, userDetails]);
+  }, [getCreatorBalance, getCreatorEarnings, getCreatorTotalEarnings, checkAndSendCreatorConversionEvent, userDetails]);
 
   useEffect(() => {
     if (userDetails.profile?.payment_provider === paymentProvider.PAYPAL) {
@@ -321,21 +362,30 @@ const Earnings = () => {
     </div>
   );
 
-  const paymentBoxLayout = (title, titleClassName = null, titleType = 'default', amount, image) => (
+  const paymentBoxLayout = (
+    title,
+    titleClassName = null,
+    titleType = 'default',
+    amount,
+    image,
+    isDataLoading = false
+  ) => (
     <div className={styles.box2}>
-      <Row>
-        <Col xs={24}>
-          <Text className={titleClassName} type={titleType}>
-            {title}
-          </Text>
-        </Col>
-        <Col xs={18}>
-          <ShowAmount amount={amount} currency={balance?.currency.toUpperCase()} />
-        </Col>
-        <Col xs={6}>
-          <img loading="lazy" src={image} height={40} alt="" />
-        </Col>
-      </Row>
+      <Loader loading={isDataLoading} size="small">
+        <Row>
+          <Col xs={24}>
+            <Text className={titleClassName} type={titleType}>
+              {title}
+            </Text>
+          </Col>
+          <Col xs={18}>
+            <ShowAmount amount={amount} currency={balance?.currency.toUpperCase()} />
+          </Col>
+          <Col xs={6}>
+            <img loading="lazy" src={image} height={40} alt="" />
+          </Col>
+        </Row>
+      </Loader>
     </div>
   );
 
@@ -343,8 +393,10 @@ const Earnings = () => {
     'Total Amount Earned ',
     styles.box2Text,
     'default',
-    balance?.total_earned,
-    cashIcon
+    totalEarning,
+    // balance?.total_earned,
+    cashIcon,
+    isTotalEarningLoading
   );
 
   const paidOut = paymentBoxLayout('Paid Out', null, 'success', balance?.paid_out, checkIcon);
@@ -437,6 +489,10 @@ const Earnings = () => {
       okText: 'Confirm',
       onOk: updatePaypalAccount,
     });
+  };
+
+  const handleOnFilterClick = () => {
+    getCreatorTotalEarnings(toDateTime(selectedDate[0]), toDateTime(selectedDate[1]));
   };
 
   const paypalEditEmail = (
@@ -698,6 +754,20 @@ const Earnings = () => {
         <Row>
           <Col xs={24} lg={8}>
             <Title level={2}>Your Earnings</Title>
+            <Row>
+              <Col md={16}>
+                <DatePicker.RangePicker
+                  defaultValue={[moment().startOf('month'), moment()]}
+                  onChange={setSelectedDate}
+                  allowClear={false}
+                />
+              </Col>
+              <Col md={4}>
+                <Button className={styles.box1Button} onClick={handleOnFilterClick}>
+                  filter
+                </Button>
+              </Col>
+            </Row>
           </Col>
           <Col xs={24} lg={8}>
             {userDetails?.profile?.payment_provider === paymentProvider.PAYPAL

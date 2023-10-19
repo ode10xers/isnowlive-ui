@@ -25,6 +25,7 @@ const formatDate = {
   toShortDateMonth: (date) => moment(date).format(`DD MMM`),
   toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
+  toDateTime: (date) => moment(date).format('YYYY-MM-DDTHH:mm:ss[Z]'),
   getTimeDiff: (startTime = moment(), endTime = moment(), unit = 'minutes') => moment(startTime).diff(endTime, unit),
   getISODayOfWeek: (date) => moment(date).isoWeekday(),
   getVideoMinutesDuration: (durationSeconds) =>

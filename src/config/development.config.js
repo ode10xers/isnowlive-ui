@@ -1,7 +1,8 @@
 /* eslint-disable */
 export default {
   server: {
-    baseURL: 'https://stage.api.app.passion.do',
+    baseURL: 'http://localhost:8080',
+    // baseURL: 'https://stage.api.app.passion.do',
   },
   client: {
     platformBaseURL: 'http://localhost:3000',
