@@ -1,7 +1,7 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
-// import { setFreshChatWidgetVisibility } from '../../services/integrations/fresh-chat';
+import { useGlobalContext } from 'services/globalContext';
 
 const MobileLayout = lazy(() => import('layouts/MobileLayout'));
 
@@ -37,13 +37,15 @@ const Profile = lazy(() => import('pages/Profile'));
 const LiveStream = lazy(() => import('pages/LiveStream'));
 
 const CreatorDashboard = ({ match }) => {
-  // useEffect(() => {
-  //   setFreshChatWidgetVisibility(true);
+  const { toggleTawkToWidgetVisibility } = useGlobalContext();
 
-  //   return () => {
-  //     setFreshChatWidgetVisibility(false);
-  //   };
-  // }, []);
+  useEffect(() => {
+    toggleTawkToWidgetVisibility(true);
+
+    return () => {
+      toggleTawkToWidgetVisibility(false);
+    };
+  }, [toggleTawkToWidgetVisibility]);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

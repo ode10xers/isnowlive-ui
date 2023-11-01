@@ -16,7 +16,6 @@ import {
   getCreatorProfileByUsername,
 } from 'utils/orderHelper';
 
-// import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import { getAuthTokenFromLS } from 'services/localAuthToken';
 import { getAuthCookie } from 'services/authCookie';
 
@@ -111,7 +110,6 @@ export const showSetNewPasswordModal = (email, openTawkChatWidget) => {
     okText: 'Okay',
     cancelText: 'Talk to us',
     onCancel: () => openTawkChatWidget(),
-    // onCancel: () => openFreshChatWidget(),
     afterClose: resetBodyStyle,
   });
 };
@@ -751,7 +749,6 @@ export const showMemberUnapprovedJoinModal = async (openTawkChatWidget) => {
           cancelText: 'Chat with us',
           onOk: () => window.open(generateMailToLink(creatorProfileData), '_blank'),
           onCancel: () => openTawkChatWidget(),
-          // onCancel: () => openFreshChatWidget(),
           afterClose: () => {
             resetBodyStyle();
             window.privateSitePopupShown = false;

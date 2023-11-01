@@ -6,10 +6,10 @@ export default {
   client: {
     platformBaseURL: 'http://localhost:3000',
   },
-  freshChat: {
-    appToken: 'a30f40c7-e40a-4a1f-ade9-c66ee65c372d',
-    hostUrl: 'https://wchat.in.freshchat.com',
-  },
+  // freshChat: {
+  //   appToken: 'a30f40c7-e40a-4a1f-ade9-c66ee65c372d',
+  //   hostUrl: 'https://wchat.in.freshchat.com',
+  // },
   tawkChat: {
     propertyId: '6540a63fa84dd54dc4870283',
     widgetId: '1he28iqlv',

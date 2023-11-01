@@ -12,8 +12,6 @@ import { getLocalUserDetails } from 'utils/storage';
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 import { useGlobalContext } from 'services/globalContext';
 
-// import { openFreshChatWidget } from 'services/integrations/fresh-chat';
-
 import styles from './style.module.scss';
 
 const { user, attendee } = mixPanelEventTags;
@@ -84,7 +82,6 @@ const DashboardToggle = () => {
           setTimeout(() => trackAndNavigate(Routes.onboardingName, attendee.click.dashboard.becomeHost), 100);
         },
         onCancel: () => openTawkMessengerWidget(),
-        // onCancel: () => openFreshChatWidget(),
       });
     }
   };

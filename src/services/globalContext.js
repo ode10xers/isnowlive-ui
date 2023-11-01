@@ -222,6 +222,16 @@ const GlobalDataProvider = ({ children }) => {
     }
   }
 
+  function toggleTawkToWidgetVisibility(visible = true) {
+    if (tawkMessengerRef.current) {
+      if (visible && window?.Tawk_API?.showWidget) {
+        tawkMessengerRef.current.showWidget();
+      } else if (!visible && window?.Tawk_API?.hideWidget) {
+        tawkMessengerRef.current.hideWidget();
+      }
+    }
+  }
+
   function initTawkChatUserInfo(userInfo) {
     const { username, email, external_id } = userInfo ?? {};
     if (tawkMessengerRef?.current) {
@@ -255,6 +265,7 @@ const GlobalDataProvider = ({ children }) => {
     showGiftMessageModal,
     hideGiftMessageModal,
     openTawkMessengerWidget,
+    toggleTawkToWidgetVisibility,
   };
 
   return (

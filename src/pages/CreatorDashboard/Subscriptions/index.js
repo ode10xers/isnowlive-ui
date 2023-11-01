@@ -16,7 +16,6 @@ import { isAPISuccess } from 'utils/helper';
 import { StripeAccountStatus, defaultPlatformFeePercentage, paymentProvider } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
-// import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './styles.module.scss';
 
@@ -157,10 +156,9 @@ const Subscriptions = ({ history }) => {
         ),
         okText: 'I want to sell memberships',
         onOk: openTawkMessengerWidget,
-        // onOk: openFreshChatWidget,
       });
     }
-  }, [subscriptions, userDetails, history, hideAllSubscriptions]);
+  }, [subscriptions, userDetails, history, hideAllSubscriptions, openTawkMessengerWidget]);
 
   const publishSubscription = async (subscriptionId) => {
     setIsLoading(true);

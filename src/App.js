@@ -16,7 +16,6 @@ import { mapUserToPendo } from 'services/integrations/pendo';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie, setAuthCookie } from 'services/authCookie';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
-import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 
 import './styles/globals.scss';
@@ -153,10 +152,7 @@ function App() {
 
   useEffect(() => {
     if (!isWidget && !signupAuthToken) {
-      // initializeFreshChat(userDetails, cookieConsent);
-
       if (cookieConsent) {
-        // initFreshChatWidget(userDetails);
         initMixPanel();
         if (userDetails && userDetails.is_creator) {
           setGTMUserAttributes(userDetails);
