@@ -29,7 +29,7 @@ const { user } = mixPanelEventTags;
 const Login = ({ history }) => {
   const [loginForm] = Form.useForm();
   const [emailPasswordForm] = Form.useForm();
-  const { state, logIn } = useGlobalContext();
+  const { state, logIn, openTawkMessengerWidget } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginView, setIsLoginView] = useState(true);
 
@@ -83,7 +83,7 @@ const Login = ({ history }) => {
         trackSuccessEvent(eventTag, { email: values.email });
 
         setIsLoading(false);
-        showSetNewPasswordModal(values.email);
+        showSetNewPasswordModal(values.email, openTawkMessengerWidget);
       }
     } catch (error) {
       setIsLoading(false);

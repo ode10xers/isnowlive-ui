@@ -16,7 +16,7 @@ import {
   getCreatorProfileByUsername,
 } from 'utils/orderHelper';
 
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+// import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import { getAuthTokenFromLS } from 'services/localAuthToken';
 import { getAuthCookie } from 'services/authCookie';
 
@@ -81,7 +81,7 @@ export const showWarningModal = (title, message = '') => {
 
 export const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
 
-export const showSetNewPasswordModal = (email) => {
+export const showSetNewPasswordModal = (email, openTawkChatWidget) => {
   Modal.confirm({
     mask: true,
     center: true,
@@ -110,7 +110,8 @@ export const showSetNewPasswordModal = (email) => {
     ),
     okText: 'Okay',
     cancelText: 'Talk to us',
-    onCancel: () => openFreshChatWidget(),
+    onCancel: () => openTawkChatWidget(),
+    // onCancel: () => openFreshChatWidget(),
     afterClose: resetBodyStyle,
   });
 };
@@ -715,7 +716,7 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
   });
 };
 
-export const showMemberUnapprovedJoinModal = async () => {
+export const showMemberUnapprovedJoinModal = async (openTawkChatWidget) => {
   if (!window.privateSitePopupShown) {
     window.privateSitePopupShown = true;
     const creatorUsername = getUsernameFromUrl();
@@ -749,7 +750,8 @@ export const showMemberUnapprovedJoinModal = async () => {
           okText: `Email ${creatorProfileData.first_name}`,
           cancelText: 'Chat with us',
           onOk: () => window.open(generateMailToLink(creatorProfileData), '_blank'),
-          onCancel: () => openFreshChatWidget(),
+          onCancel: () => openTawkChatWidget(),
+          // onCancel: () => openFreshChatWidget(),
           afterClose: () => {
             resetBodyStyle();
             window.privateSitePopupShown = false;

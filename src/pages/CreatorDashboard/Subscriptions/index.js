@@ -16,7 +16,7 @@ import { isAPISuccess } from 'utils/helper';
 import { StripeAccountStatus, defaultPlatformFeePercentage, paymentProvider } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+// import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './styles.module.scss';
 
@@ -25,6 +25,7 @@ const { Title, Text, Paragraph } = Typography;
 const Subscriptions = ({ history }) => {
   const {
     state: { userDetails },
+    openTawkMessengerWidget,
   } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -155,7 +156,8 @@ const Subscriptions = ({ history }) => {
           </>
         ),
         okText: 'I want to sell memberships',
-        onOk: openFreshChatWidget,
+        onOk: openTawkMessengerWidget,
+        // onOk: openFreshChatWidget,
       });
     }
   }, [subscriptions, userDetails, history, hideAllSubscriptions]);

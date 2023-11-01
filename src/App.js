@@ -153,10 +153,10 @@ function App() {
 
   useEffect(() => {
     if (!isWidget && !signupAuthToken) {
-      initializeFreshChat(userDetails, cookieConsent);
+      // initializeFreshChat(userDetails, cookieConsent);
 
       if (cookieConsent) {
-        initFreshChatWidget(userDetails);
+        // initFreshChatWidget(userDetails);
         initMixPanel();
         if (userDetails && userDetails.is_creator) {
           setGTMUserAttributes(userDetails);

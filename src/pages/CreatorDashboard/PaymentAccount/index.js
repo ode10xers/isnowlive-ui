@@ -18,7 +18,7 @@ import { paymentProvider, StripeAccountStatus } from 'utils/constants';
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+// import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import StripeLogo from 'assets/icons/stripe/StripeLogo';
 import PaypalLogo from 'assets/icons/paypal/PaypalLogo';
@@ -35,6 +35,7 @@ const PaymentAccount = () => {
   const {
     state: { userDetails },
     setUserDetails,
+    openTawkMessengerWidget,
   } = useGlobalContext();
 
   const payment_account_status = userDetails?.profile?.payment_account_status ?? StripeAccountStatus.NOT_CONNECTED;
@@ -367,7 +368,12 @@ const PaymentAccount = () => {
           paypalInfo: (
             <Text>
               Not right now,{' '}
-              <Button style={{ padding: 0 }} type="link" onClick={openFreshChatWidget}>
+              <Button
+                style={{ padding: 0 }}
+                type="link"
+                onClick={openTawkMessengerWidget}
+                // onClick={openFreshChatWidget}
+              >
                 Express your interest
               </Button>
             </Text>

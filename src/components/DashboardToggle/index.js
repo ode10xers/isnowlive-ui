@@ -10,7 +10,9 @@ import Routes from 'routes';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+import { useGlobalContext } from 'services/globalContext';
+
+// import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
 
@@ -48,6 +50,7 @@ const switchSelectorOptions = [
 
 const DashboardToggle = () => {
   const history = useHistory();
+  const { openTawkMessengerWidget } = useGlobalContext;
 
   const isInCreatorDashboard = () => window.location.pathname.includes('/creator');
 
@@ -80,7 +83,8 @@ const DashboardToggle = () => {
         onOk: () => {
           setTimeout(() => trackAndNavigate(Routes.onboardingName, attendee.click.dashboard.becomeHost), 100);
         },
-        onCancel: () => openFreshChatWidget(),
+        onCancel: () => openTawkMessengerWidget(),
+        // onCancel: () => openFreshChatWidget(),
       });
     }
   };

@@ -38,7 +38,7 @@ const {
 
 //TODO: Might want to refactor this to be generic modal (like PaymentPopup)
 const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallback }) => {
-  const { logIn } = useGlobalContext();
+  const { logIn, openTawkMessengerWidget } = useGlobalContext();
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
 
@@ -196,7 +196,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
       const { status } = await sendNewPasswordEmail(email);
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        showSetNewPasswordModal(email);
+        showSetNewPasswordModal(email, openTawkMessengerWidget);
       }
     } catch (error) {
       setIsLoading(false);

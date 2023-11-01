@@ -1,8 +1,10 @@
-import React, { useReducer, useContext, createContext } from 'react';
+import React, { useReducer, useContext, createContext, useRef, useEffect, useState } from 'react';
 import Routes from 'routes';
 // import { getCookieConsentValue } from 'react-cookie-consent';
+import TawkMessengerReact from '@tawk.to/tawk-messenger-react';
 
 import { getLocalUserDetails } from 'utils/storage';
+import config from 'config';
 
 import http from 'services/http';
 import { mapUserToPendo } from 'services/integrations/pendo';
@@ -127,7 +129,10 @@ const GlobalDataProvider = ({ children }) => {
     giftModalVisible: false,
   };
 
+  const tawkMessengerRef = useRef();
+
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [tawkIsLoaded, setTawkIsLoaded] = useState(false);
 
   function logIn(userDetails, rememberUser, isIframeMode = false) {
     setUserDetails(userDetails);
@@ -211,6 +216,29 @@ const GlobalDataProvider = ({ children }) => {
     clearGTMUserAttributes();
   }
 
+  function openTawkMessengerWidget() {
+    if (tawkMessengerRef.current) {
+      tawkMessengerRef.current.maximize();
+    }
+  }
+
+  function initTawkChatUserInfo(userInfo) {
+    const { username, email, external_id } = userInfo ?? {};
+    if (tawkMessengerRef?.current) {
+      tawkMessengerRef.current.setAttributes({
+        name: username ?? '',
+        email: email ?? '',
+        externalId: external_id ?? '',
+      });
+    }
+  }
+
+  useEffect(() => {
+    if (tawkIsLoaded && initialState.userDetails && initialState.cookieConsent) {
+      initTawkChatUserInfo(initialState.userDetails);
+    }
+  }, [initialState.userDetails, tawkIsLoaded, initialState.cookieConsent]);
+
   const value = {
     state,
     logOut,
@@ -226,9 +254,20 @@ const GlobalDataProvider = ({ children }) => {
     hideWaitlistPopup,
     showGiftMessageModal,
     hideGiftMessageModal,
+    openTawkMessengerWidget,
   };
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return (
+    <Context.Provider value={value}>
+      {children}
+      <TawkMessengerReact
+        onLoad={() => setTawkIsLoaded(true)}
+        propertyId={config.tawkChat.propertyId}
+        widgetId={config.tawkChat.widgetId}
+        ref={tawkMessengerRef}
+      />
+    </Context.Provider>
+  );
 };
 
 function useGlobalContext() {

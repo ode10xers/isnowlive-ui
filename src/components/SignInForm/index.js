@@ -20,7 +20,7 @@ const { Title, Text } = Typography;
 
 const SignInForm = ({ user, hideSignInForm }) => {
   const [form] = Form.useForm();
-  const { logIn } = useGlobalContext();
+  const { logIn, openTawkMessengerWidget } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
@@ -36,7 +36,7 @@ const SignInForm = ({ user, hideSignInForm }) => {
         const { status } = await sendNewPasswordEmail(email);
         if (isAPISuccess(status)) {
           setIsLoading(false);
-          showSetNewPasswordModal(email);
+          showSetNewPasswordModal(email, openTawkMessengerWidget);
         }
       } catch (error) {
         setIsLoading(false);
